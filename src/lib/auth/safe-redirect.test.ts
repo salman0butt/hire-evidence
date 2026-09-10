@@ -13,6 +13,10 @@ describe("safeInternalPath", () => {
     expect(safeInternalPath("https://evil.example", "/fallback")).toBe("/fallback");
   });
 
+  it("rejects backslash network-path variants", () => {
+    expect(safeInternalPath("/\\evil.example", "/fallback")).toBe("/fallback");
+  });
+
   it("rejects empty and non-slash paths", () => {
     expect(safeInternalPath("", "/fallback")).toBe("/fallback");
     expect(safeInternalPath("app/profile", "/fallback")).toBe("/fallback");
