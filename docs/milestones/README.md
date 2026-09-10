@@ -67,8 +67,10 @@ Enterprise Compliance
 
 ## Current evidence
 
-M00 integrated through PR #2; exact post-merge `main` SHA `64ebeb4f7b2a39fc0557685ef34035650211aad9` passed CI run `34486610200` / #57. M01 is active in draft PR #3 on `feat/saas-shell-auth`; M01.1 reviewed code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4` passed CI run `34492022676` / #64.
+M00 integrated through PR #2; exact post-merge `main` SHA `64ebeb4f7b2a39fc0557685ef34035650211aad9` passed CI `34486610200` / #57.
+
+M01 is active in draft PR #3 on `feat/saas-shell-auth`. M01.1 passed CI #64 on `6107253fdde1639097a6e6a6d8fd3777f242e5a4`. M01.2 Supabase SSR/session infrastructure passed the full quality suite in CI `34499829397` / #83 on reviewed code head `c1a11206916684546c8b8dcdd89f4a3908fe359e`. M01.3 core email authentication is the next capability after durable reconciliation.
 
 ## Recovery
 
-Start from actual Git/GitHub + exact-head CI, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md`, known issues, `CURRENT.md`, active milestone ledger, relevant PRD/traceability, active Superpowers spec/plan, PR/reviews, source/tests.
+Start from actual Git/GitHub + exact-head CI, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md`, known issues, `CURRENT.md`, active milestone ledger, relevant PRD/traceability, active Superpowers spec/plan/evidence, PR/reviews, source/tests.
