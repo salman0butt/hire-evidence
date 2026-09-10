@@ -65,7 +65,7 @@ The PRD ordering remains authoritative. A future worker may refine technical dep
 
 | Milestone | Capability | Status | Primary dependencies |
 | --- | --- | --- | --- |
-| [M00 — Product Foundation](./M00-product-foundation.md) | Product Foundation | **IMPLEMENTING** | None |
+| [M00 — Product Foundation](./M00-product-foundation.md) | Product Foundation | **VERIFYING** | None |
 | [M01 — SaaS Shell + Auth](./M01-saas-shell-auth.md) | SaaS Shell + Auth | **NOT STARTED** | M00 |
 | [M02 — Organizations + RBAC](./M02-organizations-rbac.md) | Organizations + RBAC | **NOT STARTED** | M01 |
 | [M03 — Jobs + Interviewer Builder](./M03-jobs-interviewer-builder.md) | Jobs + Interviewer Builder | **NOT STARTED** | M02 |

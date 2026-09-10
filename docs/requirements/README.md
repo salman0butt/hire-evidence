@@ -2,31 +2,35 @@
 
 ## Authority
 
-The original owner-supplied AI Interviewer requirements pack is the product source of truth. Its verified source archive is:
+The original owner-supplied AI Interviewer requirements pack is the product source of truth. The verified source archive metadata persisted in `SOURCE-MANIFEST.json` is:
 
-- filename: `AI-Interviewer-Codex-Pack(1).zip`;
+- filename: `AI-Interviewer-Codex-Pack(3).zip`;
 - size: `121574` bytes;
 - SHA-256: `900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba`.
 
-The complete pack is not yet durably persisted in GitHub. Previous connector-created ZIP copies were invalid transport artifacts and have been removed; they must never be recreated or treated as source material.
+The complete verified source pack is now durably persisted under:
 
-When the verified source pack is imported, preserve its original files as faithfully as practical. The pack's `docs/product/PRD.md` should become the canonical normalized product PRD at that repository path after import.
+`docs/requirements/source/AI-Interviewer-Codex-Pack/`
 
-## Fresh-session source recovery while ingestion is blocked
+The repository also exposes the operational product corpus under `docs/product/` and `docs/iterations/`. The source archive copy is retained for faithful recovery; the living milestone/recovery ledgers in the repository remain authoritative for execution state and must not be overwritten by older source-pack progress snapshots.
 
-Until the complete source pack is committed, GitHub alone cannot reconstruct requirements that have never been persisted. A fresh worker must therefore:
+Previous connector-created/truncated ZIP transport artifacts are not source material and must not be recreated or trusted.
 
-1. first verify that the pack has not already been imported by checking Git and the PRD coverage gate;
-2. if still absent, obtain the original owner-supplied archive through an available conversation/file/runtime source rather than inventing or reconstructing requirements from memory;
-3. verify the archive size and SHA-256 above before extraction;
-4. if the original archive is unavailable, mark requirements ingestion `BLOCKED` and record the exact human action needed: provide/mount the original archive or otherwise make the verified source bytes available;
-5. continue any other safe higher-priority work that does not require guessing missing requirements.
+## Fresh-session source recovery
 
-Never silently synthesize missing PRD text from summaries.
+A fresh worker must:
+
+1. recover actual GitHub state before assuming any requirement-ingestion status;
+2. verify `docs/requirements/SOURCE-MANIFEST.json` and the durable source tree exist;
+3. use `docs/product/PRD.md` as the canonical normalized product PRD;
+4. use `scripts/verify_prd_coverage.py` to prove expected numbered-section coverage before claiming requirements integrity;
+5. preserve the source corpus and living execution ledgers without silently reconstructing or deleting difficult/future requirements.
+
+Never synthesize missing PRD text from memory if repository evidence is incomplete.
 
 ## Stable identifiers
 
-The supplied PRD has numbered sections 1–242. Preserve those section numbers as durable source anchors after import. Traceability may refer to a section as `PRD-001` through `PRD-242`.
+The supplied PRD has numbered sections 1–242. Preserve those section numbers as durable source anchors. Traceability may refer to a section as `PRD-001` through `PRD-242`.
 
 When a section contains multiple independently testable requirements, introduce capability-specific atomic IDs only as needed, for example `AUTH-001`, `SESSION-001`, `EVAL-001`, `SEC-001`, `PERF-001`, or `A11Y-001`. Every atomic ID must point back to its source PRD section(s); do not invent requirements unsupported by the PRD.
 
@@ -44,7 +48,7 @@ A normalized requirement should record:
 - acceptance criteria;
 - status.
 
-Allowed implementation-state terms should remain explicit: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEFERRED`, or `REJECTED WITH DOCUMENTED REASON`.
+Allowed implementation-state terms: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEFERRED`, or `REJECTED WITH DOCUMENTED REASON`.
 
 ## Traceability
 
@@ -64,4 +68,6 @@ Do not mark a requirement VERIFIED simply because code exists. Verification requ
 
 ## Ingestion completion gate
 
-Requirements ingestion is complete only when the full verified source pack is durably available in Git, the repository PRD coverage verifier passes all expected sections, traceability can account for required future features, and no truncated/reconstructed transport artifact is being mistaken for the source archive.
+Requirements ingestion is complete when the full verified source pack is durably available in Git, the repository PRD coverage verifier passes all expected sections, traceability can account for required future features, and no truncated/reconstructed transport artifact is being mistaken for source material.
+
+That ingestion gate passed on PR head `dcf54ace909345194b873b51a44e94dce825d9db` in GitHub Actions CI run `34473131246`; future changes to requirements/verifier inputs require fresh verification.

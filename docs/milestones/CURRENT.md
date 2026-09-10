@@ -7,10 +7,10 @@ Legacy roadmap identifier:
 M00
 
 Current capability:
-Durable autonomous-development framework + requirements persistence + verification closeout
+Foundation verification and durable closeout
 
 Status:
-BLOCKED_ON_REQUIREMENTS_IMPORT
+VERIFYING
 
 Branch:
 `feat/product-foundation-requirements`
@@ -31,41 +31,43 @@ Detailed known issues:
 
 - Repository/application foundation implemented with TDD and merged through PR #1.
 - Next.js/TypeScript app shell, environment validation, `/api/health`, unit/component harness, Playwright smoke harness, and CI are present on `main`.
-- Previous application CI passed dependency install, lint, typecheck, unit/component tests, production build, Chromium install, and smoke E2E before failing the missing-PRD coverage gate.
-- Original requirements source archive independently verified locally at 121574 bytes with SHA-256 `900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba`.
-- Draft PR #2 exists for requirements/governance persistence.
-- Autonomous long-project framework design and executable implementation plan are persisted under `docs/superpowers/`.
-- Canonical autonomy, product, architecture, decisions, feature matrix, requirements, traceability, project status, and known-issues documents are on PR #2.
-- Machine-checkable autonomous-framework verifier and focused unit tests are on PR #2 with genuine local RED→GREEN evidence.
-- Root `AGENTS.md` and `CODEX-START-HERE.md` now enforce fresh-session recovery, work-selection priority, exact-SHA verification, concurrency safety, durable handoff, and manual merge policy.
-- Known-invalid 20,000-byte requirements transport ZIPs, marker files, and obsolete one-time importer workflow were removed from the active branch.
+- Complete owner-supplied requirements source is durably persisted under `docs/requirements/source/AI-Interviewer-Codex-Pack/` with `docs/requirements/SOURCE-MANIFEST.json` recording the verified source ZIP metadata.
+- Canonical operational product requirements are present under `docs/product/` and iteration roadmap under `docs/iterations/`.
+- `scripts/verify_prd_coverage.py` is present and verifies PRD sections 1–242 and milestone definitions M00–M15.
+- `pnpm-lock.yaml` is committed and CI uses `pnpm install --frozen-lockfile`.
+- Autonomous long-project framework, living milestone ledgers, feature matrix, traceability, architecture/decisions, progress state, and Superpowers design/plan artifacts are present.
+- Exact head `dcf54ace909345194b873b51a44e94dce825d9db` passed GitHub Actions CI run `34473131246`, including frozen install, lint, typecheck, tests, framework verification, build, smoke E2E, and PRD coverage.
+- PR #2 has no submitted reviews and no unresolved review threads at the latest recovery check.
 
 ## In progress
 
-- Review the framework-upgrade diff and inspect exact-head CI evidence.
-- Persist the complete verified requirements source corpus through a transport path that does not truncate the original data.
+- Reconcile stale durable recovery documents with the already-completed requirements/lockfile/CI state.
+- Perform final skeptical review and verify CI on the resulting exact reconciliation head.
 
 ## Remaining
 
-- Import every missing source-of-truth requirement file from the verified original archive using direct filesystem/Git access.
-- Run `python3 scripts/verify_prd_coverage.py` successfully across the complete corpus.
-- Run full exact-head CI and inspect the exact final SHA.
-- Perform independent review; fix all Critical/Important findings.
-- Update status/traceability/feature matrix with proven final state.
-- Keep PR #2 open unless explicit merge authorization is given.
+- Inspect the complete final PR diff from PRD compliance, correctness, architecture/YAGNI, testing, security, and hiring-AI safety perspectives.
+- Fix any Critical/Important findings if discovered.
+- Verify GitHub Actions on the exact final reconciliation SHA.
+- If all gates remain green, record M00 closeout state without merging PR #2.
 
 ## Blocker
 
-The connected GitHub transport used for the ZIP truncated/altered large binary payloads. The source archive itself is valid; the complete corpus is not yet present in GitHub. Direct filesystem/Git import of the verified original archive is required.
+None currently known.
 
 ## Verification state
 
-- application install/lint/typecheck/tests/build/smoke E2E: passed on an older application head;
-- autonomous framework verifier: local RED→GREEN evidence exists; exact-head CI inspection pending;
-- invalid temporary transport artifacts: removed and confirmed absent from the branch tree;
-- PRD coverage: BLOCKED/FAIL until full requirements corpus exists;
-- final exact-head milestone verification: PENDING.
+- dependency install: PASS using frozen lockfile on CI run `34473131246`;
+- lint: PASS on CI run `34473131246`;
+- typecheck: PASS on CI run `34473131246`;
+- unit/component tests: PASS on CI run `34473131246`;
+- autonomous framework verifier tests: PASS on CI run `34473131246`;
+- autonomous framework verification: PASS on CI run `34473131246`;
+- production build: PASS on CI run `34473131246`;
+- smoke E2E: PASS on CI run `34473131246`;
+- PRD coverage: PASS on CI run `34473131246`;
+- final reconciliation head verification: PENDING because durable-state edits create a newer SHA.
 
 ## Next Action
 
-Follow `docs/progress/STATUS.md` `Exact next work:`. Import the original verified requirements pack through direct filesystem/Git access, then run PRD coverage, review, and full exact-head verification before starting the next product milestone.
+Follow `docs/progress/STATUS.md` `Exact next work:`. Review and verify the exact final PR #2 head, fix any blocking findings, then record foundation closeout while leaving PR #2 open unless the owner explicitly authorizes merge.

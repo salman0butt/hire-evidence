@@ -2,14 +2,15 @@
 
 Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEFERRED`.
 
-`IMPLEMENTED` means code/artifacts exist. `VERIFIED` additionally requires the applicable acceptance criteria, review, and exact-head verification gates.
+`IMPLEMENTED` means code/artifacts exist. `VERIFIED` additionally requires applicable acceptance criteria, review, and exact-head verification gates.
 
 | Capability | PRD ownership | Milestone | Status | Evidence / note |
 |---|---|---|---|---|
-| Repository/application foundation | Foundation sections / milestone ledger | Product Foundation | IMPLEMENTED | Merged through PR #1; milestone verification still blocked by incomplete PRD corpus persistence. |
-| Durable autonomous-development control plane | Owner framework upgrade + PRD autonomous-development sections | Product Foundation | ACTIVE | Implemented on draft PR #2; final exact-head CI/review pending. |
-| Complete PRD/requirements corpus in Git | PRD coverage and autonomous-development requirements | Product Foundation | BLOCKED | Source ZIP verified locally; GitHub binary transport attempts were truncated. |
-| SaaS shell and authentication | PRD milestone roadmap | SaaS Shell + Auth | PLANNED | Do not start until foundation completion is proven. |
+| Repository/application foundation | Foundation sections / milestone ledger | Product Foundation | IMPLEMENTED | Merged through PR #1; final M00 closeout is verifying the reconciled PR #2 head. |
+| Durable autonomous-development control plane | Owner framework upgrade + PRD autonomous-development sections | Product Foundation | IMPLEMENTED | Framework and verifier are present; all framework CI checks passed on `dcf54ace…`; final reconciliation-head review/CI pending. |
+| Complete PRD/requirements corpus in Git | PRD coverage and autonomous-development requirements | Product Foundation | VERIFIED | Verified source persisted with manifest; PRD sections 1–242 coverage passed in CI run `34473131246`. |
+| Reproducible dependency graph | Product Foundation build/CI requirements | Product Foundation | VERIFIED | `pnpm-lock.yaml` committed; frozen install passed in CI run `34473131246`. |
+| SaaS shell and authentication | PRD milestone roadmap | SaaS Shell + Auth | PLANNED | Do not start until Product Foundation closeout is objectively complete. |
 | Organizations and RBAC | PRD milestone roadmap | Organizations + RBAC | PLANNED | Requires auth/persistence foundations. |
 | Jobs and interviewer builder | PRD milestone roadmap | Jobs + Interviewer Builder | PLANNED | Includes immutable published configuration/versioning requirements. |
 | Candidates and invitations | PRD milestone roadmap | Candidates + Invitations | PLANNED | Candidate authorization must be narrow and invitation-scoped. |
