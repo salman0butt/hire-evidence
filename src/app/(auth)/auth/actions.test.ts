@@ -168,4 +168,22 @@ describe("authentication server actions", () => {
         "Your password reset link is invalid or expired. Request a new reset link.",
     });
   });
+
+  it("maps reset provider exceptions to a bounded retry-safe error", async () => {
+    mockedCreateClient.mockResolvedValue({
+      auth: {
+        updateUser: vi.fn().mockRejectedValue(new Error("network details")),
+      },
+    } as never);
+
+    const result = await resetPasswordAction(
+      idleAuthActionState,
+      passwordOnly(),
+    );
+
+    expect(result).toEqual({
+      status: "error",
+      message: "We could not update your password. Request a new reset link and try again.",
+    });
+  });
 });
