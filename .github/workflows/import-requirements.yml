@@ -21,12 +21,32 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Decode and verify archive
+      - name: Diagnose archive encoding
         shell: bash
         run: |
           set -euo pipefail
-          base64 --decode .tmp/requirements-pack.zip > /tmp/requirements-pack.zip
-          echo "900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba  /tmp/requirements-pack.zip" | sha256sum -c -
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          import hashlib
+
+          expected = "900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba"
+          data = Path(".tmp/requirements-pack.zip").read_bytes()
+
+          for depth in range(4):
+              digest = hashlib.sha256(data).hexdigest()
+              print(f"depth={depth} bytes={len(data)} sha256={digest} prefix={data[:16]!r}")
+              if digest == expected:
+                  Path("/tmp/requirements-pack.zip").write_bytes(data)
+                  print(f"matched expected archive at depth={depth}")
+                  break
+              try:
+                  data = base64.b64decode(data, validate=True)
+              except Exception as exc:
+                  raise SystemExit(f"no valid archive found before base64 decoding stopped: {exc}")
+          else:
+              raise SystemExit("no valid archive found within three base64 decode layers")
+          PY
       - name: Extract missing requirements
         shell: bash
         run: |
