@@ -8,7 +8,11 @@ export function safeInternalPath(
 
   const candidate = value.trim();
 
-  if (!candidate.startsWith("/") || candidate.startsWith("//")) {
+  if (
+    !candidate.startsWith("/") ||
+    candidate.startsWith("//") ||
+    candidate.includes("\\")
+  ) {
     return fallback;
   }
 
