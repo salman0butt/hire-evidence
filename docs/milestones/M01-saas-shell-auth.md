@@ -50,7 +50,7 @@ Product Foundation — COMPLETE and integrated on `main` at `64ebeb4f7b2a39fc055
 
 1. **VERIFIED** — M01.1 — Marketing shell: premium homepage, typed pricing placeholder, responsive layout, SEO/accessibility baseline.
 2. **VERIFIED** — M01.2 — Supabase auth infrastructure: clients, cookies/session boundaries, env/config, safe internal redirects. Reviewed code head `c1a11206916684546c8b8dcdd89f4a3908fe359e`; CI `34499829397` / #83 PASS.
-3. **NOT STARTED** — M01.3 — Core auth flows: signup, login, logout, verification.
+3. **VERIFIED (provider-independent)** — M01.3 — Core auth flows: signup, login, logout, verification. Reviewed code/setup head `32326d4715b1c60c485b40308df0c5f022c01bbb`; CI `34502240299` / #103 PASS. Provider-backed verification remains an M01.7 gate.
 4. **NOT STARTED** — M01.4 — Recovery flows: forgot/reset password and error states.
 5. **NOT STARTED** — M01.5 — Authenticated app shell: protected routing/navigation.
 6. **NOT STARTED** — M01.6 — Basic profile: minimum profile persistence/settings with RLS.
@@ -64,60 +64,73 @@ M01.1:
 
 M01.2:
 
-- Environment RED `883853a231650487d9c5fda8bf8029550194ed36`; CI `34498258324` / #67 failed because Supabase environment fields did not exist in production code.
+- Environment RED `883853a231650487d9c5fda8bf8029550194ed36`; CI #67 failed because production Supabase environment fields did not yet exist.
 - Redirect test-first commit `e334ce34ebca2851cf239daa6364164300be30e4` preceded helper implementation.
-- CI `34498441763` / #70 later exposed a test-construction misuse of `exactOptionalPropertyTypes`; corrected in `c7d5d2160cd3c3d1ea8d956bc574fbfcb1d0ccda` without weakening runtime validation.
-- Security regression RED `ea8f6d628935bb942f0fd26b824c603bd1380e4f`; CI `34499549698` / #82 failed exactly on `/\\evil.example` while 15 tests passed.
-- Security/full GREEN `c1a11206916684546c8b8dcdd89f4a3908fe359e`; CI `34499829397` / #83 passed all gates.
+- Security regression RED `ea8f6d628935bb942f0fd26b824c603bd1380e4f`; CI #82 failed exactly on the backslash redirect case.
+- GREEN `c1a11206916684546c8b8dcdd89f4a3908fe359e`; CI #83 passed all gates.
 
-M01.3–M01.7 TDD evidence: PENDING; never fabricate evidence before execution.
+M01.3:
+
+- Validation RED `e434a8f7387e09aba56ccc374f1bb32ea8e47941`.
+- Form RED `041f2cdd0daa3330e9899750fd0e8b80d14006af`; CI `34501339680` / #92 failed because production validation/form modules did not yet exist.
+- Minimum implementation followed in commits `5a7eda4…` through `9959e52…`.
+- Implementation CI #99 exposed an `exactOptionalPropertyTypes` call-site defect; `edf7e93f95b0646587041306670cb1c198540e13` fixed it by omitting the absent optional prop; CI #100 passed.
+- Review verification added focused provider-error tests in `f43b089d6167feae1fa260b77cef29181f3d2f27`.
+- CI #102 exposed a missing required environment fixture in that new signup-action test; `32326d4715b1c60c485b40308df0c5f022c01bbb` fixed only the fixture with explicit non-secret values.
+- Full GREEN `32326d4715b1c60c485b40308df0c5f022c01bbb`; CI `34502240299` / #103 passed all repository gates with 25 tests.
+
+M01.4–M01.7 TDD evidence: PENDING; never fabricate evidence before execution.
 
 ## Integration Test Evidence
 
 - M01.1 provider-independent smoke E2E remains green.
 - M01.2 build/smoke CI exercises the active request proxy using explicit non-secret public placeholder Supabase config.
+- M01.3 focused server-action tests verify invalid input stops before provider access and login/signup provider failures map to stable user-safe messages.
 - Provider-backed signup/login/verification/recovery/logout/profile integration remains PENDING and is required before M01 completion.
 
 ## E2E / Visual Verification
 
 - M01.1 semantic/responsive public shell smoke coverage passed on CI #64.
-- M01.2 provider-independent smoke E2E passed on code head `c1a1120…` in CI #83 with request proxy active.
+- M01.2/M01.3 provider-independent smoke E2E remains green through CI #103.
 - Provider-backed desktop/mobile auth/profile scenarios remain PENDING for M01.7.
 
 ## Security Review
 
-M01.2 uses browser-safe publishable credentials only, request-scoped cookie-backed SSR clients, `auth.getClaims()` in the request proxy, and safe internal redirect validation. A skeptical review identified `/\\evil.example` as an Important network-path redirect escape; a failing regression test proved the defect and the helper now rejects backslashes. CI #83 verified the fix.
+M01.2 established browser-safe publishable credentials, request-scoped cookie-backed SSR clients, claim verification, and internal redirect validation.
 
-Provider-backed account-enumeration, verification/recovery token, authenticated route, and RLS reviews remain later M01 gates. Human hiring authority and prohibited-scoring boundaries remain unchanged.
+M01.3 validates credentials before provider calls, maps provider failures to bounded messages, revalidates login destinations server-side, never logs confirmation tokens, and restricts the confirmation route to expected email/signup token types. Supabase's SSR token-hash email-template requirement is now durable in `docs/SUPABASE-AUTH-SETUP.md`.
+
+Provider-backed account-enumeration, verification/recovery token, authenticated-route, and RLS reviews remain later M01 gates. Human hiring authority and prohibited-scoring boundaries remain unchanged.
 
 ## Accessibility Review
 
-No new user-facing M01.2 form UI was added. M01.1 accessibility baseline remains in place. Labeled form/error/status and provider-backed keyboard/mobile checks are required in later slices.
+M01.3 forms use associated labels, email/password autocomplete semantics, help text, pending disabled state, and alert/status roles. Provider-backed keyboard/mobile/visual checks remain M01.7.
 
 ## Performance Review
 
-The request proxy introduces auth claim verification on matched dynamic requests, following the selected SSR architecture. No queues/services or speculative infrastructure were added. Reassess provider latency/failure behavior as auth flows are introduced.
+M01.3 adds bounded form validation and one provider call per auth mutation. No unbounded work, queue, polling loop, or speculative service was added. Provider latency/failure behavior will be exercised in provider-backed M01 verification.
 
 ## AI / Eval Review
 
-No assessment AI is introduced in M01. M01.2 contains authentication/session infrastructure only. Humans remain hiring decision makers.
+No assessment AI is introduced in M01. AI does not make hiring decisions, infer protected traits, or score appearance/emotion/accent/personality/deception.
 
 ## Code Review Findings
 
-Skeptical M01.2 perspectives: PRD compliance, correctness, architecture/YAGNI, test quality, dependency reproducibility, security/redirect injection, and hiring-AI safety.
+Skeptical M01.3 perspectives: PRD compliance, correctness, architecture/YAGNI, testing quality, auth security, token/redirect handling, accessibility, and hiring-AI safety.
 
 - Critical: 0 unresolved.
 - Important: 0 unresolved.
-- Resolved Important: backslash network-path redirect escape.
-- Resolved Important: build/smoke CI lacked explicit public Supabase config after the broad request proxy became active.
+- Resolved Important: server-action provider-error translation lacked focused verification.
+- Resolved Important/documentation gap: provider-backed SSR email verification depends on Supabase token-hash email-template configuration that was not durably recorded.
+- Minor: Supabase logout currently uses SDK default scope; leave unchanged absent an explicit session-scope product requirement.
 - Minor: existing Vitest/Vite ESM-in-CommonJS config-loader warning remains deferred maintenance.
 
 ## Fixes / Re-review
 
-- Added a genuine failing redirect regression before hardening `safeInternalPath`.
-- Added only non-secret CI placeholders for provider-independent build/smoke; did not misclassify them as provider-backed auth evidence.
-- Generated Supabase lockfile changes through `pnpm add` in a one-shot runner workflow; the temporary write-enabled workflow was removed immediately afterward.
-- Re-review of reviewed code head `c1a11206916684546c8b8dcdd89f4a3908fe359e` found 0 unresolved Critical/Important findings.
+- Added focused action tests without pretending they were part of the original RED phase.
+- Fixed only the missing test environment fixture exposed by CI #102; production validation was not weakened.
+- Added `docs/SUPABASE-AUTH-SETUP.md` for required provider configuration.
+- Re-review of `32326d4715b1c60c485b40308df0c5f022c01bbb` found 0 unresolved Critical/Important findings.
 
 ## Fresh Verification Commands
 
@@ -137,17 +150,17 @@ python3 scripts/verify_prd_coverage.py
 
 ## Fresh Verification Results
 
-Reviewed M01.2 code head `c1a11206916684546c8b8dcdd89f4a3908fe359e` passed GitHub Actions CI `34499829397` / #83 across frozen install, lint, typecheck, 16 tests, both verifier test suites, both repository verifiers, production build, Chromium installation, smoke E2E, and PRD coverage.
+Reviewed M01.3 code/setup head `32326d4715b1c60c485b40308df0c5f022c01bbb` passed GitHub Actions CI `34502240299` / #103 across frozen install, lint, typecheck, 25 tests, both verifier test suites, both repository verifiers, production build, Chromium installation, smoke E2E, and PRD coverage.
 
-Documentation reconciliation after this reviewed code head requires fresh exact-head CI before the latest branch head is considered green.
+Durable reconciliation after this reviewed head requires fresh exact-head CI before the latest branch head is considered green.
 
 ## Known Limitations
 
-M01 is not complete. Signup/login/logout/verification, password recovery, protected app shell, profile/RLS, provider-backed E2E, and milestone-wide security/accessibility closeout remain unfinished.
+M01 is not complete. Password recovery, protected app shell, profile/RLS, provider-backed signup/login/verification/logout E2E, and milestone-wide security/accessibility closeout remain unfinished. Provider-backed email confirmation also requires the Supabase project configuration in `docs/SUPABASE-AUTH-SETUP.md`.
 
 ## Documentation Updated
 
-Progress/status, known issues, current milestone, feature matrix, requirements traceability, and dedicated M01.2 engineering evidence are reconciled for the verified M01.2 code state.
+Progress/status, current milestone, feature matrix, requirements traceability, Supabase auth setup, and dedicated M01.3 engineering evidence are reconciled for the verified code/setup state.
 
 ## Durable Recovery Sources
 
@@ -167,7 +180,7 @@ Progress/status, known issues, current milestone, feature matrix, requirements t
 
 ## Exact Next Capability
 
-M01.3 — core email authentication. Start with failing auth validation and accessible signup/login form tests from the active plan.
+M01.4 — password recovery. Begin with failing recovery-form/action tests from the active implementation plan after fresh exact-head CI validates this reconciliation.
 
 ## Next Milestone
 M02 — Organizations + RBAC. Do not start until M01 is objectively complete and integrated/authorized according to repository policy.
