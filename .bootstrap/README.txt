@@ -1,1 +1,0 @@
-Temporary transport directory for importing the verified requirements archive. Removed after import.
