@@ -1,0 +1,57 @@
+name: Import requirements pack
+
+on:
+  push:
+    branches:
+      - feat/product-foundation-requirements
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-requirements-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Verify archive
+        run: echo "900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba  .tmp/requirements-pack.zip" | sha256sum -c -
+      - name: Extract missing requirements
+        shell: bash
+        run: |
+          set -euo pipefail
+          workdir="$(mktemp -d)"
+          unzip -q .tmp/requirements-pack.zip -d "$workdir"
+          src="$workdir/AI-Interviewer-Codex-Pack"
+          test -d "$src"
+
+          # Preserve the repository's existing product README and execution-state files.
+          # Import every source-of-truth file that is still missing from the repository.
+          rsync -a --ignore-existing --exclude 'README.md' "$src/" ./
+
+          # Keep the original packaging README available without replacing the product README.
+          mkdir -p docs/requirements-pack
+          cp "$src/README.md" docs/requirements-pack/README.md
+
+          python3 scripts/verify_prd_coverage.py
+
+          rm -f .tmp/requirements-pack.zip
+          rmdir .tmp 2>/dev/null || true
+          rm -f .github/workflows/import-requirements.yml
+      - name: Commit imported requirements
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "docs: import complete requirements pack"
+          git push origin HEAD:feat/product-foundation-requirements
