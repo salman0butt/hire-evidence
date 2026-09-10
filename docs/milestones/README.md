@@ -31,7 +31,7 @@ No milestone is COMPLETE without requirements/iterations accounted for, acceptan
 | [M15](./M15-enterprise-compliance.md) | Enterprise Compliance | **NOT STARTED** |
 
 ## Current evidence
-M00 is integrated on `main` at `64ebeb4…`, CI #57. M01 draft PR #3 remains open/unmerged. M01.1–M01.5 are provider-independently verified. M01.6 profile/RLS is implemented and reviewed at `e9c2ad64…`, CI #130, but remains short of VERIFIED until real Supabase cross-user isolation is executed. M01.7 provider-independent browser coverage is verified at `061762ec…`, CI #134; recovered durable head `b072290b…` passed CI #139. Connected-account discovery on 2026-09-11 found no clearly identifiable dedicated Hire Evidence Supabase test project, so provider-backed auth/profile E2E and RLS isolation remain evidence blockers and M01 remains IMPLEMENTING.
+M00 is integrated on `main` at `64ebeb4…`, CI #57. M01 draft PR #3 remains open/unmerged. M01.1–M01.5 are provider-independently verified. M01.6 profile/RLS is implemented and reviewed at `e9c2ad64…`, CI #130, but remains short of VERIFIED until real Supabase cross-user isolation is executed. M01.7 provider-independent browser coverage is verified at `061762ec…`, CI #134. Focused Vitest configuration maintenance is verified at `85ff107…`, CI #141, with the prior ESM-in-CommonJS loader warning removed. Connected-account discovery on 2026-09-11 found only unrelated existing Supabase projects, so provider-backed auth/profile E2E and RLS isolation remain evidence blockers and M01 remains IMPLEMENTING.
 
 ## Recovery
 Start from actual Git/GitHub + exact-head CI, then autonomy docs, compact status, known issues, current/active milestone ledgers, PRD/traceability, Superpowers artifacts, PR/reviews, source/tests.
