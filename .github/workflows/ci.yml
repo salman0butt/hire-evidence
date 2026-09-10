@@ -46,6 +46,9 @@ jobs:
       - name: Verify requirements source integrity
         run: python3 scripts/verify_requirements_source.py
       - name: Build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
         run: pnpm build
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
@@ -53,6 +56,8 @@ jobs:
         env:
           CI: "true"
           NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+          NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
         run: pnpm e2e
       - name: Verify PRD coverage
         run: python3 scripts/verify_prd_coverage.py
