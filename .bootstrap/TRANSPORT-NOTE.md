@@ -1,0 +1,1 @@
+Temporary import transport files are removed after the requirements pack is materialized.
