@@ -13,8 +13,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
+    "verify:framework": "python3 -m unittest tests/python/test_verify_autonomous_framework.py && python3 scripts/verify_autonomous_framework.py",
+    "verify:requirements": "python3 -m unittest tests/python/test_verify_requirements_source.py && python3 scripts/verify_requirements_source.py && python3 scripts/verify_prd_coverage.py",
     "verify:docs": "python3 scripts/verify_prd_coverage.py",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e && pnpm verify:docs"
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e && pnpm verify:framework && pnpm verify:requirements"
   },
   "dependencies": {
     "next": "16.3.4",

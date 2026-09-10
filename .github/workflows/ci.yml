@@ -30,13 +30,21 @@ jobs:
         with:
           node-version: 24
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm lint
       - name: Typecheck
         run: pnpm typecheck
       - name: Unit and component tests
         run: pnpm test
+      - name: Framework verifier tests
+        run: python3 -m unittest tests/python/test_verify_autonomous_framework.py
+      - name: Requirements source verifier tests
+        run: python3 -m unittest tests/python/test_verify_requirements_source.py
+      - name: Verify autonomous framework
+        run: python3 scripts/verify_autonomous_framework.py
+      - name: Verify requirements source integrity
+        run: python3 scripts/verify_requirements_source.py
       - name: Build
         run: pnpm build
       - name: Install Chromium

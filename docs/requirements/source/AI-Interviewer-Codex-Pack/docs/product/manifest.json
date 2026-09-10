@@ -1,0 +1,123 @@
+{
+  "source_file": "Pasted markdown(20260909-141010).md",
+  "source_sha256": "3403577a47a6f9baa7a6af70df887f520768fa8e053ecfb12cfdd4e489c7ff4f",
+  "numbered_sections": 242,
+  "missing_sections": [],
+  "duplicate_sections": [],
+  "milestones": [
+    "M00",
+    "M01",
+    "M02",
+    "M03",
+    "M04",
+    "M05",
+    "M06",
+    "M07",
+    "M08",
+    "M09",
+    "M10",
+    "M11",
+    "M12",
+    "M13",
+    "M14",
+    "M15"
+  ],
+  "categories": [
+    {
+      "file": "00-product-foundations-safety-personas-tenancy.md",
+      "start": 1,
+      "end": 14,
+      "title": "Product Foundations, Safety, Personas & Tenancy"
+    },
+    {
+      "file": "01-saas-auth-organizations-jobs.md",
+      "start": 15,
+      "end": 22,
+      "title": "SaaS Experience, Authentication, Organizations & Jobs"
+    },
+    {
+      "file": "02-interviewer-builder-rubrics-plan.md",
+      "start": 23,
+      "end": 41,
+      "title": "Interviewer Builder, Rubrics, Questions & Interview Plan"
+    },
+    {
+      "file": "03-candidates-invitations-preinterview.md",
+      "start": 42,
+      "end": 53,
+      "title": "Candidates, Invitations & Pre-Interview Flow"
+    },
+    {
+      "file": "04-realtime-voice-transcript-session.md",
+      "start": 54,
+      "end": 68,
+      "title": "Realtime Voice, Transcript & Session Lifecycle"
+    },
+    {
+      "file": "05-assessment-evidence-analysis.md",
+      "start": 69,
+      "end": 83,
+      "title": "Evidence-Based Assessment & Analysis"
+    },
+    {
+      "file": "06-human-review-audit-versioning.md",
+      "start": 84,
+      "end": 100,
+      "title": "Human Review, Auditability & Versioning"
+    },
+    {
+      "file": "07-ai-evals-quality-fairness.md",
+      "start": 101,
+      "end": 113,
+      "title": "AI Evals, Quality & Fairness"
+    },
+    {
+      "file": "08-billing-subscriptions-usage.md",
+      "start": 114,
+      "end": 123,
+      "title": "Billing, Subscriptions & Usage"
+    },
+    {
+      "file": "09-data-security-privacy-ops-experience.md",
+      "start": 124,
+      "end": 153,
+      "title": "Data Model, Security, Privacy, Operations & Candidate Experience"
+    },
+    {
+      "file": "10-ai-platform-models-prompts-observability.md",
+      "start": 154,
+      "end": 170,
+      "title": "AI Platform, Models, Prompts & Observability"
+    },
+    {
+      "file": "11-engineering-testing-architecture.md",
+      "start": 171,
+      "end": 182,
+      "title": "Engineering, Testing & Architecture"
+    },
+    {
+      "file": "12-autonomous-development-system.md",
+      "start": 183,
+      "end": 194,
+      "title": "Autonomous Development & Milestone System"
+    },
+    {
+      "file": "13-milestone-definitions-m00-m15.md",
+      "start": 195,
+      "end": 210,
+      "title": "Milestone Definitions M00\u2013M15"
+    },
+    {
+      "file": "14-review-verification-priorities.md",
+      "start": 211,
+      "end": 220,
+      "title": "Branches, PRs, Review, Verification & Priorities"
+    },
+    {
+      "file": "15-future-mvp-governance-north-star.md",
+      "start": 221,
+      "end": 242,
+      "title": "Future Opportunities, Metrics, MVP, Governance & North Star"
+    }
+  ]
+}

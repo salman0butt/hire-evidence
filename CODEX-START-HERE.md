@@ -1,34 +1,44 @@
 # CODEX — START HERE
 
-You are working on a new product named **AI Interviewer**.
+This repository is designed for long-running autonomous development across completely fresh sessions.
 
-Do not implement the complete product in one run.
+## Mandatory startup
 
-## Authoritative sources
+1. Invoke/read installed Superpowers `using-superpowers` **before engineering actions**.
+2. Read root `AGENTS.md`.
+3. Read `docs/AUTONOMOUS-DEVELOPMENT.md`.
+4. Recover actual GitHub state: default branch, latest SHAs, recent commits, active branches, open/draft PRs, reviews/threads, and CI for the exact active head.
+5. Read `docs/progress/STATUS.md` and `docs/progress/KNOWN-ISSUES.md`.
+6. Read `docs/milestones/CURRENT.md` and the active milestone ledger.
+7. Read relevant PRD/requirements/traceability entries.
+8. Read the active Superpowers spec and implementation plan.
+9. Compare docs with actual Git/code/tests/PR/CI; repair stale docs when evidence proves them stale.
+10. Continue the highest-priority unfinished active work before starting new work.
 
-Read in this order:
+## Source precedence
 
-1. Actual Git/repository state
-2. `AGENTS.md`
-3. `docs/product/PRD.md`
-4. `docs/milestones/CURRENT.md`
-5. Active milestone file
-6. Active design spec
-7. Active implementation plan
-8. Conversation context
+```text
+Git graph / actual repository state
+> source + tests at relevant SHA
+> fresh exact-SHA CI/artifacts
+> current PR/review state
+> progress/milestone docs
+> older handoffs
+> chat memory
+```
 
-## First run
+## Current recovery index
 
-Use:
+Canonical compact state: `docs/progress/STATUS.md`.
 
-`prompts/01-bootstrap-m00.md`
+Detailed unresolved issues: `docs/progress/KNOWN-ISSUES.md`.
 
-## Later runs
+Legacy/detailed session history may exist in `docs/SESSION-HANDOFF.md`, but it never outranks current Git/code/CI or `STATUS.md` reconciled against them.
 
-Use:
+## Working rules
 
-`prompts/02-continue-current-iteration.md`
+Use repository-defined pre-approval for routine design/spec/plan gates while preserving Superpowers rigor. Use strict TDD for meaningful behavior, independent review, verification-before-completion, exact-SHA CI, durable traceability, and concurrency safety.
 
-## Key rule
+Do not use milestone codes as meaningless commit/PR titles.
 
-Only one milestone should normally be active. Inside that milestone, implement one small dependency-ordered iteration at a time. Do not start the next milestone until the current milestone passes its exit criteria, review, CI, documentation, and fresh verification.
+Do not merge unless explicitly authorized.
