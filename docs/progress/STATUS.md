@@ -25,7 +25,7 @@ Active branch: `feat/saas-shell-auth`
 
 Active PR: #3 DRAFT — `Build SaaS shell and authentication`; open and unmerged.
 
-Latest verified implementation/configuration head: `85ff10741875892e2787631b106cfc48bfad0d5c` — GitHub Actions `34528888577` / #141 SUCCESS. This documentation reconciliation commit is newer and therefore requires its own exact-head CI before it can be called green.
+CI status: documentation reconciliation `79821d5ce1ab8da66b7a34e4c7e58f01f0cd716f` failed CI `34529334351` / #142 only at `verify_autonomous_framework` because this file omitted the required literal `CI status:` recovery field; lint, typecheck, and 54 tests had already passed. The implementation/configuration head `85ff10741875892e2787631b106cfc48bfad0d5c` remains fully verified by CI #141. This repair commit requires fresh exact-head CI.
 
 ## M01.7 Recovery / Verification Evidence
 
