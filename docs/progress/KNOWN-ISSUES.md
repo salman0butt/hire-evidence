@@ -10,17 +10,19 @@ M01 resolved issues include Testing Library DOM leakage, overly broad human-deci
 
 ### KI-021 — Accessibility browser test used an ambiguous login locator
 
-Status: RESOLVED. Initial M01.7 browser verification `caa82b59ebd85e20b4c02702c85587b6ce7b68cd` failed CI #133 because `getByRole("link", { name: /log in/i })` matched both the header and footer login links under Playwright strict mode. This was a test-scoping defect, not a product failure. `061762ec28a9f95ed97c433f35df8eee060389fe` scoped the intended link through the `banner` landmark; CI #134 passed all gates including all seven browser tests.
+Status: RESOLVED. Initial M01.7 browser verification `caa82b59ebd85e20b4c02702c85587b6ce7b68cd` failed CI #133 because `getByRole("link", { name: /log in/i })` matched both the header and footer login links under Playwright strict mode. This was a test-scoping defect, not a product failure. `061762ec28a9f95ed97c433f35df8eee060389fe` scoped the intended link through the `banner` landmark; CI #134 passed all gates including all seven browser tests. Durable reconciliation `787039c65db6f1e11c96d5298f004f5a4862f8f2` passed exact-head CI #135.
 
 ## Current unresolved issues
 
 ### KI-020 — Provider-backed profile RLS isolation evidence unavailable
 
-Status: BLOCKED ON EXTERNAL TEST CONFIGURATION. The profile schema, own-user repository/action, and RLS policies are implemented, but M01.6 may not be called VERIFIED until the migration runs against a configured Supabase test project and two real authenticated users prove User A cannot select/update User B and vice versa. Required environment action: configure a safe Supabase test environment with the documented public application variables and test identities; never commit service-role secrets.
+Status: BLOCKED ON EXTERNAL TEST CONFIGURATION. The profile schema, own-user repository/action, and RLS policies are implemented, but M01.6 may not be called VERIFIED until the migration runs against a configured Supabase test project and two real authenticated users prove User A cannot select/update User B and vice versa.
+
+2026-09-11 recovery evidence: safe discovery through the connected Supabase account found no clearly identifiable Hire Evidence test project. Existing unrelated projects were left untouched. Creating a new project/development branch is cost-bearing and requires explicit organization/cost confirmation, so autonomous execution did not create one. Required unblock action: identify or configure a dedicated safe Hire Evidence Supabase test environment and test identities; never commit service-role secrets.
 
 ### KI-022 — Provider-backed M01 auth E2E evidence unavailable
 
-Status: BLOCKED ON EXTERNAL TEST CONFIGURATION. Provider-independent browser coverage now proves mobile layout/no horizontal overflow, keyboard focus navigation to authentication, labeled login/signup controls, and unauthenticated protected-route behavior. Full signup/email verification/login/logout/recovery/authenticated app/profile E2E still requires a configured Supabase test project and real test identities. Placeholder CI credentials are not valid provider evidence.
+Status: BLOCKED ON EXTERNAL TEST CONFIGURATION. Provider-independent browser coverage proves mobile layout/no horizontal overflow, keyboard focus navigation to authentication, labeled login/signup controls, and unauthenticated protected-route behavior. Full signup/email verification/login/logout/recovery/authenticated app/profile E2E still requires the dedicated configured Supabase test environment and real test identities. Placeholder CI credentials, unrelated projects, and mocks are not valid provider evidence.
 
 A non-blocking Vitest/Vite warning remains: `vitest.config.ts` is loaded as CommonJS while using ESM syntax. Classification: **Minor**; defer to focused configuration maintenance.
 
