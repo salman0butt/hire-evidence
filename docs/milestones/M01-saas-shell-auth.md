@@ -14,11 +14,37 @@ Relevant positioning/auth requirements trace to PRD sections 15–17 and 196.
 ## Dependencies
 Product Foundation — COMPLETE and integrated on `main` at `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI #57 passed.
 
+## In Scope
+
+- premium public homepage, pricing placeholder/config, SEO, responsive design and accessibility;
+- Supabase email/password signup, login, verification, logout and password recovery;
+- cookie-backed secure sessions with server-authoritative protected routing;
+- authenticated application shell;
+- minimal own-user profile persistence protected by RLS;
+- provider-backed auth E2E and cross-user profile-isolation evidence before milestone completion.
+
+## Out of Scope
+
+- organizations/memberships/RBAC and later product milestones;
+- AI assessment or autonomous hiring decisions;
+- billing enforcement and enterprise SSO;
+- speculative service decomposition.
+
 ## Selected Design / Implementation Plan
 
 - Design: `docs/superpowers/specs/2026-09-10-saas-shell-auth-design.md`
 - Plan: `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`
 - Architecture: existing Next.js App Router + Supabase SSR cookie-backed auth, server-authoritative protected rendering, server actions, and RLS-protected own-profile persistence.
+
+## Acceptance Criteria
+
+- PRD deliverables and exit criteria pass.
+- All M01 iterations complete or explicitly resolved.
+- Relevant security/privacy/accessibility/performance gates pass.
+- Provider-backed auth and RLS isolation evidence exists before completion.
+- 0 unresolved Critical or Important review findings.
+- Traceability/feature state reconciled.
+- Exact-final-head CI green.
 
 ## Tasks / Iterations
 
@@ -30,20 +56,31 @@ Product Foundation — COMPLETE and integrated on `main` at `64ebeb4f7b2a39fc055
 6. **NOT STARTED** — M01.6 — basic profile: minimum profile persistence/settings with RLS.
 7. **NOT STARTED** — M01.7 — accessibility + provider-backed E2E/security/review closeout.
 
-## M01.4 TDD / Debugging Evidence
+## TDD Evidence
 
-Recovered implementation history includes test-first recovery work rather than reconstructed evidence. During skeptical review, an Important redirect security defect was found: the confirmation route used the incoming request origin instead of the configured app origin.
+M01.1–M01.3 retain their durable evidence in prior milestone history and dedicated evidence files.
 
-- Security regression RED: `ee8fd9b4706c47530d3268542ee5495d8ea3796c`.
-- RED CI: `34507199272` / #120 — lint/typecheck passed; unit/component tests failed on the configured-origin assertions.
+M01.4 recovered actual test-first recovery commits from Git rather than reconstructing evidence. During skeptical review, an Important redirect security defect was found: the confirmation route used the incoming request origin instead of the configured app origin.
+
+- Existing recovery confirmation RED: `44d91c291eb58ee35b7e34bcfe615d969660a97b`.
+- Existing minimum recovery-session implementation: `472b06a0176db5cba50edad9ccfcae9209443eed`.
+- Existing expired-link regression: `bb83e7eb213cd0e8a349c2be3b8fb9cacb9d16d9` → `8bb51c4cf84ff62e3e64e49e4f17c4058a60fcfa`.
+- Security review regression RED: `ee8fd9b4706c47530d3268542ee5495d8ea3796c`.
+- RED CI: `34507199272` / #120 — frozen install, lint and typecheck passed; unit/component tests failed on configured-origin assertions.
 - Minimum fix: `b048782e0644213727f16fdf376d87f6bebb1d1e`.
 - Full GREEN: `34507320033` / #121 — all repository gates passed.
 
 Detailed evidence: `docs/superpowers/evidence/2026-09-10-m01-password-recovery.md`.
 
-## Integration / E2E Evidence
+## Integration Test Evidence
 
-Provider-independent unit/component/integration and smoke E2E remain green through CI #121. Provider-backed signup/login/verification/recovery/logout/profile integration is still PENDING and required before M01 completion.
+Provider-independent unit/component/integration and smoke E2E remain green through CI #121. Recovery action tests cover invalid email/password input, generic account-enumeration-safe reset-request state, invalid recovery sessions, and bounded provider exceptions. Confirmation-route tests cover server-side recovery token verification, expired-token routing, and configured-origin redirect safety.
+
+Provider-backed signup/login/verification/recovery/logout/profile integration is still PENDING and required before M01 completion.
+
+## E2E / Visual Verification
+
+Provider-independent smoke E2E remains green through CI #121. Provider-backed desktop/mobile auth/profile scenarios and milestone-wide visual/accessibility verification remain PENDING for M01.7.
 
 ## Security Review
 
@@ -51,24 +88,63 @@ M01.4 keeps forgot-password responses generic, validates reset inputs before pro
 
 Hiring-AI safety boundaries remain unchanged: no autonomous hire/reject behavior, protected-trait inference, appearance/emotion/accent/personality/deception scoring, fabricated evidence, or tenant bypass was introduced.
 
-## Accessibility / Performance Review
+## Accessibility Review
 
-Recovery forms use associated labels, autocomplete semantics, password help text, pending disabled state, and alert/status roles. M01.4 adds bounded validation and one provider call per mutation; no unbounded work or polling was introduced. Provider-backed keyboard/mobile/visual verification remains M01.7.
+Recovery forms use associated labels, autocomplete semantics, password help text, pending disabled state, and alert/status roles. Provider-backed keyboard/mobile/visual verification remains M01.7.
+
+## Performance Review
+
+M01.4 adds bounded validation and one provider call per mutation; no unbounded work, queue, polling loop, or speculative service was introduced.
+
+## AI / Eval Review
+
+No assessment AI is introduced in M01. AI does not make hiring decisions, infer protected traits, or score appearance/emotion/accent/personality/deception.
 
 ## Code Review Findings
 
 - Critical: 0 unresolved.
 - Important: 0 unresolved after fixing request-origin trust in the confirmation route.
+- Resolved Important: `/auth/confirm` used the incoming request origin for post-verification redirects; regression RED `ee8fd9b…` and GREEN `b048782…` prove the fix.
 - Minor: Supabase logout default scope remains a product-semantics follow-up only.
 - Minor: existing Vitest/Vite ESM-in-CommonJS warning remains deferred maintenance.
 
+## Fixes / Re-review
+
+The configured-origin security regression was written before the fix and failed in CI #120 for the intended reason. The minimum production fix then passed the complete repository suite in CI #121. Re-review found 0 unresolved Critical/Important findings for M01.4.
+
+## Fresh Verification Commands
+
+```bash
+pnpm install --frozen-lockfile
+pnpm lint
+pnpm typecheck
+pnpm test
+python3 -m unittest tests/python/test_verify_autonomous_framework.py
+python3 -m unittest tests/python/test_verify_requirements_source.py
+python3 scripts/verify_autonomous_framework.py
+python3 scripts/verify_requirements_source.py
+pnpm build
+pnpm e2e
+python3 scripts/verify_prd_coverage.py
+```
+
 ## Fresh Verification Results
 
-Reviewed M01.4 head `b048782e0644213727f16fdf376d87f6bebb1d1e` passed GitHub Actions CI `34507320033` / #121 across frozen install, lint, typecheck, unit/component/integration tests, both verifier test suites, both repository verifiers, production build, Chromium smoke E2E, and PRD coverage.
+Reviewed M01.4 code head `b048782e0644213727f16fdf376d87f6bebb1d1e` passed GitHub Actions CI `34507320033` / #121 across frozen install, lint, typecheck, unit/component/integration tests, both verifier test suites, both repository verifiers, production build, Chromium smoke E2E, and PRD coverage.
+
+A subsequent documentation reconciliation commit `6c001265bd71076bd67eaca34a9a23f208d46a6a` correctly failed the autonomous-framework verifier because this ledger accidentally omitted required durable section headings. That documentation-contract regression is being repaired without changing or weakening the verifier; the repaired head requires fresh exact-SHA CI before being called green.
 
 ## Known Limitations
 
 M01 is not complete. Protected app shell, profile/RLS, provider-backed auth/recovery E2E, cross-user isolation, and milestone-wide security/accessibility closeout remain unfinished.
+
+## Documentation Updated
+
+Progress/status, known issues, current milestone, feature matrix, requirements traceability, milestone program, and dedicated M01.4 engineering evidence are reconciled for the verified password-recovery capability.
+
+## Durable Recovery Sources
+
+`AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → actual Git/PR/CI → `docs/progress/STATUS.md` → `docs/progress/KNOWN-ISSUES.md` → `docs/milestones/CURRENT.md` → this ledger → relevant PRD/traceability → M01 Superpowers spec/plan/evidence → source/tests.
 
 ## Completion Checklist
 
@@ -84,7 +160,7 @@ M01 is not complete. Protected app shell, profile/RLS, provider-backed auth/reco
 
 ## Exact Next Capability
 
-M01.5 — protected application shell. Begin with failing navigation/protection tests from the active implementation plan.
+M01.5 — protected application shell. Begin with failing navigation/protection tests from the active implementation plan after the repaired durable reconciliation head passes exact-SHA CI.
 
 ## Next Milestone
 M02 — Organizations + RBAC. Do not start until M01 is objectively complete and integrated/authorized according to repository policy.
