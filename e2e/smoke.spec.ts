@@ -15,6 +15,13 @@ test("marketing page exposes the product position, human boundary, and signup pa
   );
 });
 
+test("unauthenticated application entry redirects to login with the internal return path", async ({ page }) => {
+  await page.goto("/app");
+
+  await expect(page).toHaveURL(/\/auth\/login\?next=\/app$/);
+  await expect(page.getByRole("heading", { name: /log in to hire evidence/i })).toBeVisible();
+});
+
 test("health endpoint reports only M00 service status", async ({ request }) => {
   const response = await request.get("/api/health");
   expect(response.status()).toBe(200);
