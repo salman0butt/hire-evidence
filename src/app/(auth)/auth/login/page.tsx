@@ -19,12 +19,15 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       ? "We could not verify that email link. Request a new link or try logging in."
       : null;
 
-  return (
-    <AuthForm
-      mode="login"
-      action={loginAction}
-      errorMessage={errorMessage}
-      nextPath={nextPath}
-    />
+  const sharedProps = {
+    mode: "login" as const,
+    action: loginAction,
+    errorMessage,
+  };
+
+  return nextPath ? (
+    <AuthForm {...sharedProps} nextPath={nextPath} />
+  ) : (
+    <AuthForm {...sharedProps} />
   );
 }
