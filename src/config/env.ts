@@ -5,6 +5,11 @@ export type AppEnvironment = Readonly<{
   appUrl: URL;
 }>;
 
+export type EnvironmentInput = Readonly<{
+  NODE_ENV?: string;
+  NEXT_PUBLIC_APP_URL?: string;
+}>;
+
 const DEFAULT_APP_URL = "http://localhost:3000";
 const VALID_NODE_ENVIRONMENTS = new Set<NodeEnvironment>([
   "development",
@@ -38,7 +43,7 @@ function parseAppUrl(value: string | undefined): URL {
   return appUrl;
 }
 
-export function parseEnvironment(input: NodeJS.ProcessEnv): AppEnvironment {
+export function parseEnvironment(input: EnvironmentInput): AppEnvironment {
   return {
     nodeEnv: parseNodeEnvironment(input.NODE_ENV),
     appUrl: parseAppUrl(input.NEXT_PUBLIC_APP_URL),
