@@ -106,23 +106,20 @@ jobs:
         with:
           node-version: 24
 
-      - name: Lock dependency graph and enforce frozen CI installs
+      - name: Lock and verify dependency graph
         shell: bash
         run: |
           set -euo pipefail
           pnpm install --lockfile-only
           pnpm install --frozen-lockfile
-          sed -i 's/pnpm install --no-frozen-lockfile/pnpm install --frozen-lockfile/' .github/workflows/ci.yml
-          grep -F 'pnpm install --frozen-lockfile' .github/workflows/ci.yml
           python3 scripts/verify_prd_coverage.py
           python3 scripts/verify_autonomous_framework.py
 
-      - name: Remove one-time transport and commit verified state
+      - name: Commit verified requirements and lockfile
         shell: bash
         run: |
           set -euo pipefail
           rm -rf .requirements-staging
-          rm -f .github/workflows/finalize-requirements.yml
           git diff --check
           git add -A
           git config user.name 'github-actions[bot]'
