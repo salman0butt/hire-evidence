@@ -8,10 +8,10 @@ export type AppEnvironment = Readonly<{
 }>;
 
 export type EnvironmentInput = Readonly<{
-  NODE_ENV?: string;
-  NEXT_PUBLIC_APP_URL?: string;
-  NEXT_PUBLIC_SUPABASE_URL?: string;
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?: string;
+  NODE_ENV?: string | undefined;
+  NEXT_PUBLIC_APP_URL?: string | undefined;
+  NEXT_PUBLIC_SUPABASE_URL?: string | undefined;
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?: string | undefined;
 }>;
 
 const DEFAULT_APP_URL = "http://localhost:3000";
