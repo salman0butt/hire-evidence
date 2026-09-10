@@ -1,0 +1,347 @@
+{
+  "source_zip": {
+    "filename": "AI-Interviewer-Codex-Pack(3).zip",
+    "size": 121574,
+    "sha256": "900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba"
+  },
+  "files": [
+    {
+      "path": ".github/PULL_REQUEST_TEMPLATE.md",
+      "size": 267,
+      "sha256": "bfbf60e158179542632bcf638122aa295e514c7ce5417f7d26d376f8e2ed508c"
+    },
+    {
+      "path": "AGENTS.md",
+      "size": 6602,
+      "sha256": "3b1f6be34a0de7fd30279bfb73f888573ef2bac9e32e8db98e6a7ea4a5a55536"
+    },
+    {
+      "path": "CODEX-START-HERE.md",
+      "size": 782,
+      "sha256": "07c76a881c4ef01384abb92b1a214024c3c15b1af21fa94455e6c385f9aeca30"
+    },
+    {
+      "path": "FILE-INVENTORY.md",
+      "size": 2944,
+      "sha256": "bb61012b87ba57eac9de195e04a7ded278f1c5b0fedc1848e635df45d0b7b57d"
+    },
+    {
+      "path": "README.md",
+      "size": 2189,
+      "sha256": "03092d7370d76a5df6c27845d1524641b8ce06c00849ade47159ed73a6cda16a"
+    },
+    {
+      "path": "docs/ai/ai-safety.md",
+      "size": 1681,
+      "sha256": "d4fae4760fc611dceba79d70351779f664ed52c58ee10cc191f3a9cc8d21bf4b"
+    },
+    {
+      "path": "docs/ai/evaluation-strategy.md",
+      "size": 1626,
+      "sha256": "787776defd73368c4f30236ef91e910baa1165e8caf9ae3465d103b506c61bf5"
+    },
+    {
+      "path": "docs/architecture/overview.md",
+      "size": 2388,
+      "sha256": "b9d995ffe6daf826e70ca6e35ada667a5dd491dd8bd4182f2f3c9d8e1e6f94ff"
+    },
+    {
+      "path": "docs/iterations/ITERATION-ROADMAP.md",
+      "size": 11512,
+      "sha256": "50e358d7fedaca3362ddf8999367e2b3e5910c64e79d177533385562580932e8"
+    },
+    {
+      "path": "docs/iterations/README.md",
+      "size": 382,
+      "sha256": "13a1613a312a6e7518ff16c38f15928c124238ac3053a76fb774749d03926e8d"
+    },
+    {
+      "path": "docs/milestones/CURRENT.md",
+      "size": 755,
+      "sha256": "e4808331770d769f8cbc602def25fbabbb504a4eab3979944959a2ced72ded16"
+    },
+    {
+      "path": "docs/milestones/M00-product-foundation.md",
+      "size": 1569,
+      "sha256": "10a851792859ff2aaba3899a3fd06f71725406fc19db4a405ecc7be303ba74d3"
+    },
+    {
+      "path": "docs/milestones/M01-saas-shell-auth.md",
+      "size": 1610,
+      "sha256": "d8e34ff40192aba3ab5568d1948b1c06f21c6e673c8f4dfed300c2b692c9a8e2"
+    },
+    {
+      "path": "docs/milestones/M02-organizations-rbac.md",
+      "size": 1585,
+      "sha256": "54d9b91b4f6ffd4896a7aefba0213be861d115a80699c223c99bf8b292ebecfe"
+    },
+    {
+      "path": "docs/milestones/M03-jobs-interviewer-builder.md",
+      "size": 2022,
+      "sha256": "0a21a6dd434f60db150fbc33f72b765c6728002954d48d26366c9e8172f41ba8"
+    },
+    {
+      "path": "docs/milestones/M04-candidates-invitations.md",
+      "size": 1740,
+      "sha256": "256b8a77db6333ac1c4e40dc014bd02336141a4685f2c8a4c365c279dbfcb63a"
+    },
+    {
+      "path": "docs/milestones/M05-realtime-ai-interview.md",
+      "size": 2446,
+      "sha256": "e3fa4bbcaf5ae613396f44b88fdf30419fcc249fe50d4d31beafeaedb660a4e3"
+    },
+    {
+      "path": "docs/milestones/M06-transcript-durable-session.md",
+      "size": 1860,
+      "sha256": "cff850bb07686559762655e9f9eddf6963be5c1f56a408789ec150d8abff48a6"
+    },
+    {
+      "path": "docs/milestones/M07-evidence-assessment-engine.md",
+      "size": 2149,
+      "sha256": "b142f1d761c35d497a67d275a29d1c8f1b311c501f929ea69edf3dcd0f475915"
+    },
+    {
+      "path": "docs/milestones/M08-hiring-team-review.md",
+      "size": 1789,
+      "sha256": "230686fe6af4cd97421920769392bf961d4003c84a23b6a1a5f0ecd51ce767dc"
+    },
+    {
+      "path": "docs/milestones/M09-billing-usage.md",
+      "size": 1744,
+      "sha256": "93d7b7000671a5acd39c2ae4b1bd871287cc8767a68447850028c7fad14564dd"
+    },
+    {
+      "path": "docs/milestones/M10-ai-quality-guardrails-evals.md",
+      "size": 1824,
+      "sha256": "b1fc501b34342fc6aac72d8ff6abd1454158431a7b9a0aebc933d7cffbda7a3b"
+    },
+    {
+      "path": "docs/milestones/M11-enterprise-readiness.md",
+      "size": 1612,
+      "sha256": "18d6956b633d0c291c881a0823195d2ea5a08c279fd20bad8614c374ff405492"
+    },
+    {
+      "path": "docs/milestones/M12-integrations.md",
+      "size": 1385,
+      "sha256": "3d4511d1110baf257843b5f9663c7e60de09ee37dfccf710eebfb132b3438600"
+    },
+    {
+      "path": "docs/milestones/M13-coding-interview.md",
+      "size": 1543,
+      "sha256": "e1bdd468e00c38a01632b78c6f92031e1e20800ac53699d32f581c32d774bf4b"
+    },
+    {
+      "path": "docs/milestones/M14-advanced-interview-formats.md",
+      "size": 1258,
+      "sha256": "fa5f6532b6db8aed2d6fca3df8984696609f662ed23025409454e482fa1b7101"
+    },
+    {
+      "path": "docs/milestones/M15-enterprise-compliance.md",
+      "size": 1766,
+      "sha256": "a55dcd0819d763e5bf35a59eac75419f9313f646b19dc2b0340a8db7a3e4c7f9"
+    },
+    {
+      "path": "docs/milestones/README.md",
+      "size": 1077,
+      "sha256": "807c9b0d7e6c8d6c606218fd82574b65a77caf770c7ec456ad3c44cf667e9771"
+    },
+    {
+      "path": "docs/product/00-preamble.md",
+      "size": 843,
+      "sha256": "12144724fae66932a8c629cf3204d069262779680ab4d2db504d64c5fbdf08d9"
+    },
+    {
+      "path": "docs/product/COVERAGE-AUDIT.md",
+      "size": 654,
+      "sha256": "447cf287834878f4ca0724a2bfbbfc1c133f7329e6c47f726e483def205bded1"
+    },
+    {
+      "path": "docs/product/COVERAGE-VERIFICATION-OUTPUT.txt",
+      "size": 182,
+      "sha256": "1fbb65415a215b63bbbd7f75f5bdcbcf8c2ae442a611fc1c452f8b64cec86d65"
+    },
+    {
+      "path": "docs/product/PRD.md",
+      "size": 70808,
+      "sha256": "8089817d879d9eb46df96b2590d69b6f40a2512911f882006ff6c2d09a83d7de"
+    },
+    {
+      "path": "docs/product/SECTION-INDEX.md",
+      "size": 24496,
+      "sha256": "2b96a7c85d8ddba657878b7b7d11db4ae62159844c9e07cf77174717ea2f8568"
+    },
+    {
+      "path": "docs/product/SECTION-MAP.csv",
+      "size": 24390,
+      "sha256": "1d2979cd3aa0dd462ecd0e967498b4960b9c6fc1ce423f9d26193cdf875cd13c"
+    },
+    {
+      "path": "docs/product/categories/00-product-foundations-safety-personas-tenancy.md",
+      "size": 6823,
+      "sha256": "9620c08cdc7c814710ac7883b0107608e1f7f35b5f00594c8cc416dc3c43a962"
+    },
+    {
+      "path": "docs/product/categories/01-saas-auth-organizations-jobs.md",
+      "size": 2758,
+      "sha256": "93bde6cee712473fde8183a32c9059da51d4094057e2c63b82812aebc68bd44d"
+    },
+    {
+      "path": "docs/product/categories/02-interviewer-builder-rubrics-plan.md",
+      "size": 6706,
+      "sha256": "cdab1c2e4cbfba3c8bba75b81245d0b4b91cf93047c9d979e9baed8153417fbb"
+    },
+    {
+      "path": "docs/product/categories/03-candidates-invitations-preinterview.md",
+      "size": 2909,
+      "sha256": "c01cf0041115813eda57fbb7b9fb43a5ccb3a3e8431f18ed83bcab10a527e4d7"
+    },
+    {
+      "path": "docs/product/categories/04-realtime-voice-transcript-session.md",
+      "size": 4742,
+      "sha256": "7a26622ad614c1cd42446cfa804eda8c139295bfacc2d9cd47965202c7d3b770"
+    },
+    {
+      "path": "docs/product/categories/05-assessment-evidence-analysis.md",
+      "size": 4291,
+      "sha256": "5865343aa260fbf2e8246269eabef6417b83b1cdef0af02bac7f05868af3ef0c"
+    },
+    {
+      "path": "docs/product/categories/06-human-review-audit-versioning.md",
+      "size": 4422,
+      "sha256": "46b29565de3d07248ec45e7384d465d11800489b7dc576d437d78b64e2887043"
+    },
+    {
+      "path": "docs/product/categories/07-ai-evals-quality-fairness.md",
+      "size": 3388,
+      "sha256": "5eaa32644ba17c04e316aef63eeb7a84393b0a0026430eeb2cb18995f436fcc7"
+    },
+    {
+      "path": "docs/product/categories/08-billing-subscriptions-usage.md",
+      "size": 2169,
+      "sha256": "f68dbc41f96ac7c62bc6cf55861bd0db6ce200954e2711fad314d8b687c934f1"
+    },
+    {
+      "path": "docs/product/categories/09-data-security-privacy-ops-experience.md",
+      "size": 6526,
+      "sha256": "852f9587be5ec1081c8b9c142884a04b8f560a122ac57bcab7a70747cfb6d4c4"
+    },
+    {
+      "path": "docs/product/categories/10-ai-platform-models-prompts-observability.md",
+      "size": 4241,
+      "sha256": "9fa9254fb1631de39a2183035931f3eb8ba04e6ee3436a40c21840716b187072"
+    },
+    {
+      "path": "docs/product/categories/11-engineering-testing-architecture.md",
+      "size": 3365,
+      "sha256": "77f2a17a839daf878eed4e61cd5f864f12a55567382764ddbbe4cfac4fbd4e6a"
+    },
+    {
+      "path": "docs/product/categories/12-autonomous-development-system.md",
+      "size": 4167,
+      "sha256": "8d4f41a071c2208a76581b69e3a65608f6937945211207613c1a1b234b600e07"
+    },
+    {
+      "path": "docs/product/categories/13-milestone-definitions-m00-m15.md",
+      "size": 5179,
+      "sha256": "42088266595ef9f4186cc78e97eb245925d32b0c91960bc7cba2d0b1070f3ff4"
+    },
+    {
+      "path": "docs/product/categories/14-review-verification-priorities.md",
+      "size": 2387,
+      "sha256": "a66e40510ecc7e77b0929cf4e80fb9be670ff141cdc457fff55315b018163922"
+    },
+    {
+      "path": "docs/product/categories/15-future-mvp-governance-north-star.md",
+      "size": 8756,
+      "sha256": "21293fc8bf31c0f1c98891f2723ee73ff0916688f40bfa7ba0ee8f9a7f76388c"
+    },
+    {
+      "path": "docs/product/manifest.json",
+      "size": 3134,
+      "sha256": "86682b8b3cfe1583cf291c8d768473008b8c1628b77dac105f30977fe0485d7e"
+    },
+    {
+      "path": "docs/security/security-model.md",
+      "size": 1912,
+      "sha256": "ac22f1ba17ce59fa9c7e9b183a08ea6cc1a6ba07e951d1a6ea0cd8e21418b004"
+    },
+    {
+      "path": "docs/superpowers/plans/.gitkeep",
+      "size": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "docs/superpowers/specs/.gitkeep",
+      "size": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "prompts/01-bootstrap-m00.md",
+      "size": 1780,
+      "sha256": "3c42c0cb86c003e2ebeb8041f967ca94e1b578f361013703e54aadc781b90a52"
+    },
+    {
+      "path": "prompts/02-continue-current-iteration.md",
+      "size": 1625,
+      "sha256": "d5f1f8015ae852baae22f6378ef75abf825a509a10b82dcce0ec3c9434a4cad5"
+    },
+    {
+      "path": "prompts/03-review-current-pr.md",
+      "size": 1126,
+      "sha256": "9c783d1c356f839c7ad8d8f684145d1ac2027f09f524ea2c58ab5ad333edcf42"
+    },
+    {
+      "path": "prompts/04-fix-review-findings.md",
+      "size": 716,
+      "sha256": "676e99703440a37d3996fc4401e5ce5f2b93464b376c4a356971700dac8eadc7"
+    },
+    {
+      "path": "prompts/05-complete-current-milestone.md",
+      "size": 900,
+      "sha256": "a15655122137c04e2330e12099a3b5025fb41cf31d013478fc233c253e0d7d31"
+    },
+    {
+      "path": "scripts/verify_prd_coverage.py",
+      "size": 1579,
+      "sha256": "3c3af683fffe3df25803097e089d6e50683efd4ca93c3b986564b6444cbd66d0"
+    },
+    {
+      "path": "templates/DESIGN-SPEC.md",
+      "size": 340,
+      "sha256": "8c986792d254aaf19b3d1cfb745a70852ca744d91fca0b972d2c1fb7618b8c4f"
+    },
+    {
+      "path": "templates/IMPLEMENTATION-PLAN.md",
+      "size": 291,
+      "sha256": "c648bc23c6cd3caf2bb520b3aff8aa85bd7d7170da5883061c287adc0632ca08"
+    },
+    {
+      "path": "templates/ITERATION.md",
+      "size": 519,
+      "sha256": "6bc3f19e45e4ebd0afc60a7161e3a0315cdc58a6858431fb4d383356bb503899"
+    },
+    {
+      "path": "templates/MILESTONE-PR.md",
+      "size": 267,
+      "sha256": "bfbf60e158179542632bcf638122aa295e514c7ce5417f7d26d376f8e2ed508c"
+    },
+    {
+      "path": "templates/REVIEW-CHECKLIST.md",
+      "size": 735,
+      "sha256": "1f0537492b6b16358c23185acff83183fd93d85adb5725618148c0aec5714162"
+    },
+    {
+      "path": "templates/VERIFICATION-REPORT.md",
+      "size": 463,
+      "sha256": "84460e258be2d5fd443e46e98aa86409622455d833794b5883f10b9dfcc890de"
+    }
+  ],
+  "transport": {
+    "format": "deterministic-tar.xz-base64",
+    "tar_size": 327680,
+    "xz_size": 43668,
+    "xz_sha256": "1d4f498e5a662b670752bf7e72816b87e128cf1171b72dc23940705d5cd8da7e",
+    "base64_size": 58224,
+    "chunk_chars": 15000
+  }
+}
