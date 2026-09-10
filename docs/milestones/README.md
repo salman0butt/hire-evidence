@@ -14,36 +14,6 @@ No milestone is COMPLETE without requirements/iterations accounted for, acceptan
 
 Only one milestone should normally be active.
 
-## Dependency-Aware Roadmap
-
-```text
-Product Foundation
-    |
-SaaS Shell + Auth
-    |
-Organizations + RBAC
-    |
-Jobs + Interviewer Builder
-    |
-Candidates + Invitations
-    |
-Realtime AI Interview
-    |
-Transcript + Durable Session
-    |
-Evidence Assessment
-    |
-Hiring Team Review
-   / \
-Billing  AI Quality/Evals
-   \ /
-Enterprise Readiness
-    |
-Integrations / Coding Interview / Advanced Formats
-    |
-Enterprise Compliance
-```
-
 ## Program Status
 
 | Milestone | Capability | Status | Primary dependencies |
@@ -58,7 +28,7 @@ Enterprise Compliance
 | [M07 — Evidence-Based Assessment Engine](./M07-evidence-assessment-engine.md) | Evidence-Based Assessment Engine | **NOT STARTED** | M06, M03 |
 | [M08 — Hiring Team Review Experience](./M08-hiring-team-review.md) | Hiring Team Review Experience | **NOT STARTED** | M07 |
 | [M09 — Billing + Usage](./M09-billing-usage.md) | Billing + Usage | **NOT STARTED** | M02, M05 |
-| [M10 — AI Quality, Guardrails & Evals](./M10-ai-quality-guardrails-evals.md) | AI Quality, Guardrails & Evals | **NOT STARTED** | M05–M08 |
+| [M10 — AI Quality, Guardrails & Evals](./M10-ai-quality-guardrails-evals.md) | AI Quality / Guardrails / Evals | **NOT STARTED** | M05–M08 |
 | [M11 — Enterprise Readiness](./M11-enterprise-readiness.md) | Enterprise Readiness | **NOT STARTED** | M02–M10 as relevant |
 | [M12 — Integrations](./M12-integrations.md) | Integrations | **NOT STARTED** | Stable core + M11 security boundaries |
 | [M13 — Coding Interview](./M13-coding-interview.md) | Coding Interview | **NOT STARTED** | M04, M07, M08, M11 |
@@ -67,9 +37,9 @@ Enterprise Compliance
 
 ## Current evidence
 
-M00 integrated through PR #2; exact post-merge `main` SHA `64ebeb4f7b2a39fc0557685ef34035650211aad9` passed CI `34486610200` / #57.
+M00 integrated through PR #2; exact post-merge `main` SHA `64ebeb4f7b2a39fc0557685ef34035650211aad9` passed CI #57.
 
-M01 is active in draft PR #3 on `feat/saas-shell-auth`. M01.1 passed CI #64 on `6107253fdde1639097a6e6a6d8fd3777f242e5a4`. M01.2 Supabase SSR/session infrastructure passed the full quality suite in CI `34499829397` / #83 on reviewed code head `c1a11206916684546c8b8dcdd89f4a3908fe359e`. M01.3 core email authentication is the next capability after durable reconciliation.
+M01 is active in draft PR #3 on `feat/saas-shell-auth`. M01.1 passed CI #64, M01.2 passed CI #83, M01.3 core email authentication passed CI #103, and M01.4 password recovery plus configured-origin security review passed exact-head CI #121 on `b048782e0644213727f16fdf376d87f6bebb1d1e`. M01.5 protected application shell is next.
 
 ## Recovery
 

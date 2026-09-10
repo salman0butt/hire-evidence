@@ -12,15 +12,15 @@ PR #2 was merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`. Post-m
 
 SaaS Shell + Auth — **IMPLEMENTING**.
 
-Current capability slice: M01.3 core email authentication — implementation, skeptical review, provider-independent verification, and durable evidence complete; final durable reconciliation head requires fresh exact-head CI before the next slice begins.
+Current capability slice: M01.4 password recovery — provider-independent implementation, skeptical security review, redirect-boundary regression fix, and exact-head verification complete.
 
 ## Current Task State
 
 - M00 Product Foundation: COMPLETE on `main` at `64ebeb4f7b2a39fc0557685ef34035650211aad9`; CI #57 PASS.
 - M01.1 marketing shell: VERIFIED on `6107253fdde1639097a6e6a6d8fd3777f242e5a4`; CI #64 PASS.
-- M01.2 Supabase SSR/session infrastructure: VERIFIED on `c1a11206916684546c8b8dcdd89f4a3908fe359e`; CI `34499829397` / #83 PASS.
-- M01.3 signup/login/logout/email verification: VERIFIED provider-independently on reviewed code/setup head `32326d4715b1c60c485b40308df0c5f022c01bbb`; CI `34502240299` / #103 PASS with 25 tests and the full repository suite.
-- M01.4 password recovery: NOT STARTED.
+- M01.2 Supabase SSR/session infrastructure: VERIFIED on `c1a11206916684546c8b8dcdd89f4a3908fe359e`; CI #83 PASS.
+- M01.3 signup/login/logout/email verification: VERIFIED provider-independently on `32326d4715b1c60c485b40308df0c5f022c01bbb`; CI #103 PASS.
+- M01.4 password recovery: VERIFIED provider-independently on `b048782e0644213727f16fdf376d87f6bebb1d1e`; CI `34507320033` / #121 PASS.
 - M01.5 protected application shell: NOT STARTED.
 - M01.6 profile + RLS: NOT STARTED.
 - M01.7 provider-backed E2E/accessibility/security closeout: NOT STARTED.
@@ -37,29 +37,28 @@ Do not merge without explicit owner authorization.
 
 ## CI Status
 
-CI status: PASS on reviewed M01.3 code/setup head `32326d4715b1c60c485b40308df0c5f022c01bbb` in GitHub Actions `34502240299` / #103. Durable reconciliation commits after that code/setup head require fresh exact-head CI before the latest branch head may be treated as green.
+CI status: PASS on reviewed M01.4 head `b048782e0644213727f16fdf376d87f6bebb1d1e` in GitHub Actions `34507320033` / #121.
 
-Run #103 passed frozen install, lint, typecheck, 25 unit/component/integration tests, autonomous-framework verifier tests, requirements-source verifier tests, both repository verifiers, production build, Chromium installation, smoke E2E, and PRD coverage.
+Run #121 passed frozen install, lint, typecheck, unit/component/integration tests, autonomous-framework verifier tests, requirements-source verifier tests, both repository verifiers, production build, Chromium smoke E2E, and PRD coverage.
 
-## M01.3 TDD / Debugging Evidence
+## M01.4 TDD / Debugging Evidence
 
-- RED validation test commit: `e434a8f7387e09aba56ccc374f1bb32ea8e47941`.
-- RED form test commit: `041f2cdd0daa3330e9899750fd0e8b80d14006af`; CI `34501339680` / #92 failed because the production validation/form modules did not yet exist.
-- Implementation CI `34501650238` / #99 exposed explicit `nextPath={undefined}` under `exactOptionalPropertyTypes`; fixed at the source in `edf7e93f95b0646587041306670cb1c198540e13` by omitting the absent optional prop. CI #100 passed.
-- Skeptical review found an Important provider-error test gap; review tests were added in `f43b089d6167feae1fa260b77cef29181f3d2f27`.
-- CI `34502118781` / #102 exposed a missing required environment fixture in the signup-action test; `32326d4715b1c60c485b40308df0c5f022c01bbb` supplied explicit non-secret test values without weakening production validation.
-- Full GREEN: `32326d4715b1c60c485b40308df0c5f022c01bbb`, CI `34502240299` / #103.
-- Detailed evidence: `docs/superpowers/evidence/2026-09-10-m01-core-auth.md`.
+- Existing recovery work was recovered from Git rather than reconstructed from chat. The branch contained genuine test-first recovery commits and exact-head CI #119 PASS before review.
+- Skeptical review found an Important redirect-boundary issue: `/auth/confirm` constructed success/error redirects from the incoming request origin instead of the configured application origin.
+- Regression RED: `ee8fd9b4706c47530d3268542ee5495d8ea3796c`; CI `34507199272` / #120 failed at unit/component tests after lint and typecheck passed.
+- Minimum GREEN fix: `b048782e0644213727f16fdf376d87f6bebb1d1e`; confirmation redirects now use validated `NEXT_PUBLIC_APP_URL` origin.
+- Full GREEN: CI `34507320033` / #121 passed every repository gate.
+- Detailed evidence: `docs/superpowers/evidence/2026-09-10-m01-password-recovery.md`.
 
 ## Blockers
 
-No blocker prevents beginning M01.4 after the latest durable reconciliation head is green. Provider-backed Supabase email verification requires the project settings documented in `docs/SUPABASE-AUTH-SETUP.md`; provider-backed auth E2E and profile RLS/cross-user isolation remain mandatory before M01 completion.
+No blocker prevents beginning M01.5. Provider-backed Supabase signup/verification/recovery/logout and profile RLS/cross-user isolation remain mandatory before final M01 completion.
 
 ## Critical / Important Findings
 
 - Critical: 0 unresolved.
-- Important: 0 unresolved after adding focused provider-error translation verification and durably documenting the Supabase token-hash email-template requirement.
-- Minor: Supabase logout currently uses the SDK default scope; do not change session-scope semantics without an explicit product requirement.
+- Important: 0 unresolved after fixing the confirmation-route origin trust issue.
+- Minor: Supabase logout uses SDK default session scope; do not change without an explicit product-semantics requirement.
 - Minor: existing Vitest/Vite ESM-in-CommonJS config-loader warning remains deferred maintenance.
 
 ## Milestone Program
@@ -74,4 +73,4 @@ Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`,
 
 ## Exact next work
 
-Exact next work: after confirming fresh exact-head CI on the final durable M01.3 reconciliation head, begin M01.4 password recovery with genuine RED recovery-form/action tests from `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`; keep PR #3 draft/open and unmerged.
+Exact next work: begin M01.5 protected application shell with genuine RED navigation/protection tests from `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`; keep PR #3 draft/open and unmerged.
