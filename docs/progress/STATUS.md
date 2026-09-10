@@ -6,22 +6,22 @@ Last reconciled: 2026-09-10
 
 Product Foundation — **COMPLETE**.
 
-PR #2 was merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`. Post-merge GitHub Actions CI run `34486610200` / run #57 passed on that exact `main` SHA. The durable requirements corpus, PRD sections 1–242 verifier, requirements-source integrity verifier, reproducible `pnpm-lock.yaml`, frozen CI installation, autonomous-development framework, milestone ledgers, feature matrix, and traceability are integrated.
+PR #2 was merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`. Post-merge GitHub Actions CI run `34486610200` / run #57 passed on that exact `main` SHA. The durable requirements corpus, PRD sections 1–242 verifier, requirements-source integrity verifier, reproducible dependency lockfile, frozen CI installation, autonomous-development framework, milestone ledgers, feature matrix, and traceability are integrated.
 
 ## Current Milestone
 
 SaaS Shell + Auth — **IMPLEMENTING**.
 
-Current capability slice: M01.1 premium marketing shell, pricing placeholder, SEO, responsive/accessibility baseline — implementation verified; durable reconciliation in progress.
+Current capability slice: M01.2 Supabase SSR/session infrastructure and environment boundary — implementation/review complete on code head `c1a11206916684546c8b8dcdd89f4a3908fe359e`; durable reconciliation is in progress before M01.3.
 
 ## Current Task State
 
-- M00 Product Foundation: COMPLETE on `main` with post-merge CI green at `64ebeb4f7b2a39fc0557685ef34035650211aad9` / run `34486610200`.
-- M01 design: COMPLETE in `docs/superpowers/specs/2026-09-10-saas-shell-auth-design.md`.
-- M01 implementation plan: ACTIVE in `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`.
-- M01.1 marketing shell: IMPLEMENTED and VERIFIED on reviewed code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4` / CI run `34492022676` / run #64.
-- M01.2 Supabase SSR infrastructure: NOT STARTED.
-- M01.3–M01.7: NOT STARTED.
+- M00 Product Foundation: COMPLETE on `main` at `64ebeb4f7b2a39fc0557685ef34035650211aad9`; CI `34486610200` / #57 PASS.
+- M01 design/plan: ACTIVE and durable under `docs/superpowers/`.
+- M01.1 marketing shell: VERIFIED on `6107253fdde1639097a6e6a6d8fd3777f242e5a4`; CI `34492022676` / #64 PASS.
+- M01.2 Supabase SSR/session infrastructure: IMPLEMENTED and VERIFIED on code head `c1a11206916684546c8b8dcdd89f4a3908fe359e`; CI `34499829397` / #83 PASS across the complete repository quality job.
+- M01.3 signup/login/logout/email verification: NOT STARTED.
+- M01.4–M01.7: NOT STARTED.
 
 ## Active Branch
 
@@ -35,25 +35,28 @@ Do not merge without explicit owner authorization.
 
 ## CI Status
 
-CI status: PASS on reviewed M01.1 code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4`; this durable-state reconciliation commit creates a newer documentation head that requires fresh exact-head CI.
+CI status: PASS on reviewed M01.2 code head `c1a11206916684546c8b8dcdd89f4a3908fe359e`; this durable-state reconciliation creates a newer documentation head that requires fresh exact-head CI before a future worker treats the latest branch head as green.
 
-CI run `34492022676` / run #64 passed frozen install, lint, typecheck, unit/component tests, autonomous-framework verifier tests, requirements-source verifier tests, autonomous-framework verification, requirements-source integrity verification, production build, Chromium installation, smoke E2E, and PRD coverage.
+CI run `34499829397` / run #83 passed frozen install, lint, typecheck, 16 unit/component tests, autonomous-framework verifier tests, requirements-source verifier tests, autonomous-framework verification, requirements-source integrity verification, production build, Chromium installation, smoke E2E, and PRD coverage.
 
-Debugging evidence from the active slice:
+## M01.2 TDD / Debugging Evidence
 
-- RED: CI run `34488549294` / run #62 on `f8bf5c915acc7ba2dc7630adef516b4e43182cee` failed because Testing Library DOM cleanup was not registered with Vitest globals disabled.
-- Partial GREEN / second defect exposed: `97513c5357aa82b1bbf8c6ea093c61962e9407ab` registered explicit `afterEach(cleanup)`; CI run `34491773023` / run #63 then reached a separate ambiguous text selector.
-- GREEN: `6107253fdde1639097a6e6a6d8fd3777f242e5a4` scoped the human-decision assertion to the named safety region; CI run `34492022676` / run #64 passed all gates.
+- Environment RED: `883853a231650487d9c5fda8bf8029550194ed36`; CI `34498258324` / #67 failed because production environment types/fields did not yet include Supabase configuration.
+- Initial environment/redirect implementation followed the failure rather than preceding it.
+- Test-construction defect: CI `34498441763` / #70 exposed an `exactOptionalPropertyTypes` misuse where a test explicitly assigned `undefined` instead of omitting an optional property; fixed in `c7d5d2160cd3c3d1ea8d956bc574fbfcb1d0ccda` without weakening production behavior.
+- Security RED: `ea8f6d628935bb942f0fd26b824c603bd1380e4f`; CI `34499549698` / #82 failed exactly because `/\\evil.example` escaped the original redirect guard.
+- Security GREEN: `c1a11206916684546c8b8dcdd89f4a3908fe359e` rejects backslashes in redirect targets; CI `34499829397` / #83 passed every gate.
+- Supabase dependencies were generated by `pnpm add` on GitHub Actions rather than by hand-editing the lockfile. Generated dependency commit: `4c81f50f8025ac4bfd800e4ae50b929f1123b0d3`. The one-shot generator workflow was removed immediately afterward.
 
 ## Blockers
 
-No external blocker is known for M01.2 planning/implementation. Provider-backed Supabase E2E and RLS evidence remain required before M01 can be completed, but they do not block beginning M01.2.
+No blocker prevents M01.3. Provider-backed Supabase auth E2E and profile RLS/cross-user isolation evidence remain mandatory before M01 completion; they are planned later milestone gates, not evidence claimed by M01.2.
 
 ## Critical / Important Findings
 
 - Critical: 0 unresolved.
-- Important: 0 unresolved.
-- Minor: Vitest/Vite emits the existing ESM-in-CommonJS config-loader warning; tests pass and this remains deferred maintenance.
+- Important: 0 unresolved after fixing the backslash network-path redirect escape and provider-independent CI environment integration.
+- Minor: Vitest/Vite still reports the existing ESM-in-CommonJS config-loader warning; defer to focused module/config maintenance.
 
 ## Milestone Program
 
@@ -63,8 +66,8 @@ No external blocker is known for M01.2 planning/implementation. Provider-backed 
 
 ## Durable Recovery
 
-Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, `docs/milestones/CURRENT.md`, `docs/milestones/M01-saas-shell-auth.md`, relevant PRD/traceability, the M01 Superpowers spec/plan, and source/tests.
+Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, `docs/milestones/CURRENT.md`, `docs/milestones/M01-saas-shell-auth.md`, relevant PRD/traceability, the M01 Superpowers spec/plan/evidence, and source/tests.
 
 ## Exact next work
 
-Exact next work: after fresh CI verifies the durable reconciliation head, continue M01.2 by writing the failing Supabase environment and safe-internal-redirect tests from `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`; do not start M02 and do not merge PR #3 without explicit owner authorization.
+Exact next work: begin M01.3 with genuine RED tests for auth input validation and accessible signup/login form behavior from `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`, then implement the minimum core email authentication flows; keep PR #3 draft/open and unmerged.
