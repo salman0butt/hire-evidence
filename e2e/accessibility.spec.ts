@@ -12,7 +12,8 @@ test("marketing page remains usable without horizontal overflow on a mobile view
       name: /create structured ai interviews once\. interview candidates anytime\./i,
     }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /log in/i })).toBeVisible();
+  const headerLogin = page.getByRole("banner").getByRole("link", { name: /^log in$/i });
+  await expect(headerLogin).toBeVisible();
 
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
@@ -27,17 +28,16 @@ test("marketing page exposes a visible keyboard focus path to authentication", a
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: /hire evidence home/i })).toBeFocused();
 
+  const headerLogin = page.getByRole("banner").getByRole("link", { name: /^log in$/i });
   let reachedLogin = false;
   for (let index = 0; index < 8; index += 1) {
     await page.keyboard.press("Tab");
-    reachedLogin = await page.getByRole("link", { name: /^log in$/i }).evaluate(
-      (element) => element === document.activeElement,
-    );
+    reachedLogin = await headerLogin.evaluate((element) => element === document.activeElement);
     if (reachedLogin) break;
   }
 
   expect(reachedLogin).toBe(true);
-  await expect(page.getByRole("link", { name: /^log in$/i })).toBeFocused();
+  await expect(headerLogin).toBeFocused();
 });
 
 test("login and signup pages expose labeled credential controls", async ({ page }) => {
