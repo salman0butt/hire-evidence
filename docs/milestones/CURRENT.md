@@ -1,67 +1,68 @@
 # Current Milestone
 
 Milestone:
-M00 — Product Foundation
+Product Foundation
 
-Iteration:
-Foundation governance persistence and final verification
+Legacy roadmap identifier:
+M00
+
+Current capability:
+Durable autonomous-development framework + requirements persistence + verification closeout
 
 Status:
 BLOCKED_ON_REQUIREMENTS_IMPORT
 
 Branch:
-feat/product-foundation-requirements
+`feat/product-foundation-requirements`
 
 Base:
-main
+`main`
 
 PR:
-#2 — open draft (`Persist product requirements and recovery state`)
+#2 — open draft, `Persist product requirements and recovery state`
 
-Main commit:
-`2f64d4aa10aef2b328f2a6fa64d5008dc82253c6`
+Canonical compact recovery state:
+`docs/progress/STATUS.md`
 
-Current continuation head before status updates:
-`34e435403555778f2451589a71b9b192f0ce893f`
+Detailed known issues:
+`docs/progress/KNOWN-ISSUES.md`
 
-Detailed recovery handoff:
-`docs/SESSION-HANDOFF.md`
+## Completed
 
-Completed:
-- Repository initialized.
-- Product foundation implemented with TDD and merged via PR #1.
-- Next.js/TypeScript application shell, environment validation, `/api/health`, test harnesses, and CI are present on `main`.
-- Application CI evidence on commit `a5c211ddab4a92aaab5dc1e29ef1daf93faa232b`: install, lint, typecheck, unit/component tests, build, Chromium install, and smoke E2E all PASS.
-- Original uploaded requirements archive independently verified locally: 121574 bytes, SHA-256 `900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba`.
-- Draft PR #2 opened to persist the complete requirements/governance pack and final recovery state.
-- Session recovery handoff committed for cross-session continuation.
+- Repository/application foundation implemented with TDD and merged through PR #1.
+- Next.js/TypeScript app shell, environment validation, `/api/health`, unit/component harness, Playwright smoke harness, and CI are present on `main`.
+- Previous application CI passed dependency install, lint, typecheck, unit/component tests, production build, Chromium install, and smoke E2E before failing the missing-PRD coverage gate.
+- Original requirements source archive independently verified locally at 121574 bytes with SHA-256 `900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba`.
+- Draft PR #2 exists for requirements/governance persistence.
+- Autonomous long-project framework design and implementation plan have been added to `docs/superpowers/`.
+- Canonical autonomy/product/architecture/decisions/feature/requirements/progress documents are being established on PR #2.
+- Machine-checkable framework verifier and focused unit tests were added with local RED→GREEN evidence.
 
-In Progress:
-- Persist the complete requirements pack in GitHub without corrupting/truncating the uploaded archive.
+## In progress
 
-Remaining:
-- Recover the original uploaded ZIP through direct filesystem/file runtime access.
-- Import all missing source-of-truth requirement files.
-- Remove temporary `.bootstrap`, `.tmp`, marker files, and one-time import workflow.
-- Run `python3 scripts/verify_prd_coverage.py` successfully for all expected PRD sections.
-- Run full exact-head CI: lint, typecheck, tests, build, E2E, coverage.
-- Review the final PR diff and fix findings.
-- Write/update final verification report and recovery state.
+- Remove known-invalid temporary requirements transport/import artifacts.
+- Verify the upgraded autonomy framework on the active PR head.
+
+## Remaining
+
+- Persist the complete verified original requirements pack in GitHub using direct filesystem/Git access rather than the truncating connector transport path.
+- Run `python3 scripts/verify_prd_coverage.py` successfully across the complete corpus.
+- Run full exact-head CI and inspect the exact final SHA.
+- Perform independent review; fix all Critical/Important findings.
+- Update status/traceability/feature matrix with proven final state.
 - Keep PR #2 open unless explicit merge authorization is given.
 
-Blocking Issues:
-- GitHub connector transport truncated/altered large binary payloads used to transfer the requirements ZIP.
-- Current branch copies of the ZIP are invalid 20,000-byte transport artifacts and MUST NOT be trusted or merged.
+## Blocker
 
-Verification:
-- application dependency install: PASS on last tested application head
-- application lint: PASS on last tested application head
-- application typecheck: PASS on last tested application head
-- application unit/component tests: PASS on last tested application head
-- application build: PASS on last tested application head
-- application smoke E2E: PASS on last tested application head
-- PRD coverage: FAIL/BLOCKED because the full requirements corpus is not yet persisted
-- final exact-head verification: PENDING
+The connected GitHub transport used for the ZIP truncated/altered large binary payloads. The source archive itself is valid; the complete corpus is not yet present in GitHub.
 
-Next Action:
-Read `docs/SESSION-HANDOFF.md`, recover the original verified requirements ZIP directly from the conversation/file runtime, import its missing files using local filesystem/Git access, remove all temporary transport artifacts, then run PRD coverage and the full CI suite.
+## Verification state
+
+- application install/lint/typecheck/tests/build/smoke E2E: passed on an older application head;
+- autonomous framework verifier: local RED→GREEN evidence exists; exact-head CI pending;
+- PRD coverage: BLOCKED/FAIL until full requirements corpus exists;
+- final exact-head verification: PENDING.
+
+## Next Action
+
+Follow `docs/progress/STATUS.md` `Exact next work:`. Remove all known-invalid temporary transport/import artifacts, then import the original verified requirements pack through direct filesystem/Git access and run PRD coverage plus full exact-head verification before starting the next product milestone.
