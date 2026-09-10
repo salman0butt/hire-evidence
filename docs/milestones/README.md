@@ -3,44 +3,35 @@
 This repository uses **M00–M15** as durable PRD milestone identifiers. Codes belong in documentation/traceability, not as meaningless commit or PR prefixes.
 
 ## Lifecycle
-
 `NOT STARTED -> DESIGN -> PLANNED -> IMPLEMENTING -> VERIFYING -> REVIEW -> COMPLETE`
 
 `BLOCKED` is allowed only with evidence and an exact unblock action. Git/code/tests/current CI outrank stale status text.
 
 ## Completion Rule
-
 No milestone is COMPLETE without requirements/iterations accounted for, acceptance criteria verified, genuine TDD evidence where practical, applicable E2E/security/accessibility/performance/AI-eval evidence, skeptical review with 0 unresolved Critical/Important findings, reconciled traceability/feature state, exact-final-head CI, and durable closeout evidence.
 
-Only one milestone should normally be active.
-
 ## Program Status
-
-| Milestone | Capability | Status | Primary dependencies |
-| --- | --- | --- | --- |
-| [M00 — Product Foundation](./M00-product-foundation.md) | Product Foundation | **COMPLETE** | None |
-| [M01 — SaaS Shell + Auth](./M01-saas-shell-auth.md) | SaaS Shell + Auth | **IMPLEMENTING** | M00 |
-| [M02 — Organizations + RBAC](./M02-organizations-rbac.md) | Organizations + RBAC | **NOT STARTED** | M01 |
-| [M03 — Jobs + Interviewer Builder](./M03-jobs-interviewer-builder.md) | Jobs + Interviewer Builder | **NOT STARTED** | M02 |
-| [M04 — Candidates + Invitations](./M04-candidates-invitations.md) | Candidates + Invitations | **NOT STARTED** | M02, M03 |
-| [M05 — Realtime AI Interview](./M05-realtime-ai-interview.md) | Realtime AI Interview | **NOT STARTED** | M04, M03 |
-| [M06 — Transcript + Durable Session](./M06-transcript-durable-session.md) | Transcript + Durable Session | **NOT STARTED** | M05 |
-| [M07 — Evidence-Based Assessment Engine](./M07-evidence-assessment-engine.md) | Evidence-Based Assessment Engine | **NOT STARTED** | M06, M03 |
-| [M08 — Hiring Team Review Experience](./M08-hiring-team-review.md) | Hiring Team Review Experience | **NOT STARTED** | M07 |
-| [M09 — Billing + Usage](./M09-billing-usage.md) | Billing + Usage | **NOT STARTED** | M02, M05 |
-| [M10 — AI Quality, Guardrails & Evals](./M10-ai-quality-guardrails-evals.md) | AI Quality / Guardrails / Evals | **NOT STARTED** | M05–M08 |
-| [M11 — Enterprise Readiness](./M11-enterprise-readiness.md) | Enterprise Readiness | **NOT STARTED** | M02–M10 as relevant |
-| [M12 — Integrations](./M12-integrations.md) | Integrations | **NOT STARTED** | Stable core + M11 security boundaries |
-| [M13 — Coding Interview](./M13-coding-interview.md) | Coding Interview | **NOT STARTED** | M04, M07, M08, M11 |
-| [M14 — Advanced Interview Formats](./M14-advanced-interview-formats.md) | Advanced Interview Formats | **NOT STARTED** | Core adoption + M05–M08 |
-| [M15 — Enterprise Compliance Program](./M15-enterprise-compliance.md) | Enterprise Compliance Program | **NOT STARTED** | Current product + current legal research |
+| Milestone | Capability | Status |
+|---|---|---|
+| [M00](./M00-product-foundation.md) | Product Foundation | **COMPLETE** |
+| [M01](./M01-saas-shell-auth.md) | SaaS Shell + Auth | **IMPLEMENTING** |
+| [M02](./M02-organizations-rbac.md) | Organizations + RBAC | **NOT STARTED** |
+| [M03](./M03-jobs-interviewer-builder.md) | Jobs + Interviewer Builder | **NOT STARTED** |
+| [M04](./M04-candidates-invitations.md) | Candidates + Invitations | **NOT STARTED** |
+| [M05](./M05-realtime-ai-interview.md) | Realtime AI Interview | **NOT STARTED** |
+| [M06](./M06-transcript-durable-session.md) | Transcript + Durable Session | **NOT STARTED** |
+| [M07](./M07-evidence-assessment-engine.md) | Evidence Assessment | **NOT STARTED** |
+| [M08](./M08-hiring-team-review.md) | Hiring Team Review | **NOT STARTED** |
+| [M09](./M09-billing-usage.md) | Billing + Usage | **NOT STARTED** |
+| [M10](./M10-ai-quality-guardrails-evals.md) | AI Quality / Guardrails / Evals | **NOT STARTED** |
+| [M11](./M11-enterprise-readiness.md) | Enterprise Readiness | **NOT STARTED** |
+| [M12](./M12-integrations.md) | Integrations | **NOT STARTED** |
+| [M13](./M13-coding-interview.md) | Coding Interview | **NOT STARTED** |
+| [M14](./M14-advanced-interview-formats.md) | Advanced Interview Formats | **NOT STARTED** |
+| [M15](./M15-enterprise-compliance.md) | Enterprise Compliance | **NOT STARTED** |
 
 ## Current evidence
-
-M00 integrated through PR #2; exact post-merge `main` SHA `64ebeb4f7b2a39fc0557685ef34035650211aad9` passed CI #57.
-
-M01 is active in draft PR #3 on `feat/saas-shell-auth`. M01.1 passed CI #64, M01.2 passed CI #83, M01.3 core email authentication passed CI #103, and M01.4 password recovery plus configured-origin security review passed exact-head CI #121 on `b048782e0644213727f16fdf376d87f6bebb1d1e`. M01.5 protected application shell is next.
+M00 is integrated on `main` at `64ebeb4…`, CI #57. M01 draft PR #3 remains open/unmerged. M01.1–M01.5 are provider-independently verified; latest M01.5 code/E2E head `d5ee32a4ceab57df9ea8108a0e7600a1244c070c` passed CI #126. M01.6 profile/RLS is next.
 
 ## Recovery
-
-Start from actual Git/GitHub + exact-head CI, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md`, known issues, `CURRENT.md`, active milestone ledger, relevant PRD/traceability, active Superpowers spec/plan/evidence, PR/reviews, source/tests.
+Start from actual Git/GitHub + exact-head CI, then autonomy docs, compact status, known issues, current/active milestone ledgers, PRD/traceability, Superpowers artifacts, PR/reviews, source/tests.
