@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import Home from "./page";
@@ -31,9 +31,12 @@ describe("Home", () => {
     expect(
       screen.getByRole("region", { name: /structure first\. evidence throughout\./i }),
     ).toBeVisible();
-    expect(
-      screen.getByRole("region", { name: /security & fairness are constraints/i }),
-    ).toBeVisible();
+
+    const safetyRegion = screen.getByRole("region", {
+      name: /security & fairness are constraints/i,
+    });
+    expect(safetyRegion).toBeVisible();
+
     expect(
       screen.getByRole("region", {
         name: /start with the workflow\. add billing when it is ready/i,
@@ -42,6 +45,6 @@ describe("Home", () => {
     expect(
       screen.getByRole("region", { name: /frequently asked questions/i }),
     ).toBeVisible();
-    expect(screen.getByText(/humans make hiring decisions/i)).toBeVisible();
+    expect(within(safetyRegion).getByText(/humans make hiring decisions/i)).toBeVisible();
   });
 });
