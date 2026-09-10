@@ -20,8 +20,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
+          ref: feat/product-foundation-requirements
           fetch-depth: 0
-      - name: Diagnose archive encoding
+
+      - name: Decode and verify requirements archive
         shell: bash
         run: |
           set -euo pipefail
@@ -31,44 +33,68 @@ jobs:
           import hashlib
 
           expected = "900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba"
-          data = Path(".tmp/requirements-pack.zip").read_bytes()
+          data = Path(".bootstrap/AI-Interviewer-Codex-Pack.zip").read_bytes()
 
           for depth in range(4):
               digest = hashlib.sha256(data).hexdigest()
-              print(f"depth={depth} bytes={len(data)} sha256={digest} prefix={data[:16]!r}")
+              print(f"decode_depth={depth} bytes={len(data)} sha256={digest}")
               if digest == expected:
                   Path("/tmp/requirements-pack.zip").write_bytes(data)
-                  print(f"matched expected archive at depth={depth}")
+                  print(f"verified archive at decode depth {depth}")
                   break
               try:
                   data = base64.b64decode(data, validate=True)
               except Exception as exc:
-                  raise SystemExit(f"no valid archive found before base64 decoding stopped: {exc}")
+                  raise SystemExit(f"verified archive not found before base64 decoding stopped: {exc}")
           else:
-              raise SystemExit("no valid archive found within three base64 decode layers")
+              raise SystemExit("verified archive not found within three base64 decode layers")
           PY
-      - name: Extract missing requirements
+
+      - name: Import missing source-of-truth files
         shell: bash
         run: |
           set -euo pipefail
           workdir="$(mktemp -d)"
           unzip -q /tmp/requirements-pack.zip -d "$workdir"
-          src="$workdir/AI-Interviewer-Codex-Pack"
-          test -d "$src"
 
-          # Preserve the repository's existing product README and execution-state files.
-          # Import every source-of-truth file that is still missing from the repository.
-          rsync -a --ignore-existing --exclude 'README.md' "$src/" ./
+          python3 - "$workdir/AI-Interviewer-Codex-Pack" <<'PY'
+          from pathlib import Path
+          import shutil
+          import sys
 
-          # Keep the original packaging README available without replacing the product README.
-          mkdir -p docs/requirements-pack
-          cp "$src/README.md" docs/requirements-pack/README.md
+          source = Path(sys.argv[1])
+          destination = Path('.')
+          live_overrides = {
+              Path('README.md'),
+              Path('docs/milestones/CURRENT.md'),
+          }
+
+          copied = []
+          for src in sorted(p for p in source.rglob('*') if p.is_file()):
+              rel = src.relative_to(source)
+              dst = destination / rel
+
+              if dst.exists():
+                  if rel not in live_overrides and dst.read_bytes() != src.read_bytes():
+                      raise SystemExit(f"Existing file diverges from requirements pack: {rel}")
+                  continue
+
+              dst.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(src, dst)
+              copied.append(str(rel))
+
+          packaging_readme = destination / 'docs/requirements-pack/README.md'
+          packaging_readme.parent.mkdir(parents=True, exist_ok=True)
+          shutil.copy2(source / 'README.md', packaging_readme)
+
+          print(f"Imported {len(copied)} missing files")
+          for path in copied:
+              print(path)
+          PY
 
           python3 scripts/verify_prd_coverage.py
+          rm -rf .bootstrap .tmp
 
-          rm -f .tmp/requirements-pack.zip
-          rmdir .tmp 2>/dev/null || true
-          rm -f .github/workflows/import-requirements.yml
       - name: Commit imported requirements
         shell: bash
         run: |
@@ -76,6 +102,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git diff --cached --quiet && exit 0
+          if git diff --cached --quiet; then
+            echo "No requirements files needed importing"
+            exit 0
+          fi
           git commit -m "docs: import complete requirements pack"
           git push origin HEAD:feat/product-foundation-requirements
