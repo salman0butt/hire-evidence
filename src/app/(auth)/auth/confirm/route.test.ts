@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -13,6 +13,13 @@ const mockedCreateClient = vi.mocked(createClient);
 describe("GET /auth/confirm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://hire-evidence.example");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "sb_publishable_test");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("verifies a recovery token server-side and redirects to the reset form", async () => {
@@ -34,7 +41,22 @@ describe("GET /auth/confirm", () => {
     );
   });
 
-  it("sends invalid or expired recovery tokens back to the recovery entry point", async () => {
+  it("keeps successful confirmation redirects on the configured application origin", async () => {
+    const verifyOtp = vi.fn().mockResolvedValue({ error: null });
+    mockedCreateClient.mockResolvedValue({ auth: { verifyOtp } } as never);
+
+    const response = await GET(
+      new Request(
+        "https://attacker.example/auth/confirm?token_hash=recovery-secret&type=recovery",
+      ),
+    );
+
+    expect(response.headers.get("location")).toBe(
+      "https://hire-evidence.example/auth/reset-password",
+    );
+  });
+
+  it("keeps failed confirmation redirects on the configured application origin", async () => {
     mockedCreateClient.mockResolvedValue({
       auth: {
         verifyOtp: vi.fn().mockResolvedValue({ error: new Error("expired") }),
@@ -43,7 +65,7 @@ describe("GET /auth/confirm", () => {
 
     const response = await GET(
       new Request(
-        "https://hire-evidence.example/auth/confirm?token_hash=expired&type=recovery",
+        "https://attacker.example/auth/confirm?token_hash=expired&type=recovery",
       ),
     );
 
