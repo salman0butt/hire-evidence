@@ -1,5 +1,10 @@
 export type AuthActionState = Readonly<{
-  status: "idle" | "error" | "verification-required";
+  status:
+    | "idle"
+    | "error"
+    | "verification-required"
+    | "recovery-requested"
+    | "password-updated";
   message?: string;
 }>;
 
