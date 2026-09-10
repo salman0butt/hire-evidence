@@ -21,14 +21,18 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Verify archive
-        run: echo "900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba  .tmp/requirements-pack.zip" | sha256sum -c -
+      - name: Decode and verify archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode .tmp/requirements-pack.zip > /tmp/requirements-pack.zip
+          echo "900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba  /tmp/requirements-pack.zip" | sha256sum -c -
       - name: Extract missing requirements
         shell: bash
         run: |
           set -euo pipefail
           workdir="$(mktemp -d)"
-          unzip -q .tmp/requirements-pack.zip -d "$workdir"
+          unzip -q /tmp/requirements-pack.zip -d "$workdir"
           src="$workdir/AI-Interviewer-Codex-Pack"
           test -d "$src"
 
