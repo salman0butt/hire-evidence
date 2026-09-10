@@ -1,136 +1,93 @@
 # M01 — SaaS Shell + Auth
 
-Status: **NOT STARTED**
+Status: **IMPLEMENTING**
 
 ## Goal
-Deliver the authoritative PRD milestone below as a reviewable, evidence-backed capability.
+Deliver a premium public SaaS experience plus secure Supabase email/password authentication, protected application entry, and a minimal user profile while preserving human hiring authority and deferring organization/RBAC scope to M02.
 
 ## Authoritative PRD Milestone Definition
 
-# 196. MILESTONE 01 — SAAS SHELL + AUTH
+PRD section 196 requires: premium homepage, pricing placeholder/config, signup, login, verification, forgot/reset password, authenticated shell, secure sessions, basic profile, SEO, responsive design, accessibility; exit when an authenticated user can enter the SaaS app.
 
-Deliver:
-
-```text
-premium homepage
-pricing placeholder/config
-signup
-login
-verification
-forgot/reset password
-authenticated shell
-secure sessions
-basic profile
-```
-
-Also:
-
-```text
-SEO
-responsive design
-accessibility
-```
-
-Exit:
-
-authenticated user can enter SaaS app.
+Relevant positioning/auth requirements are traced from PRD sections 15–17 and 196 through the active design and plan.
 
 ## Dependencies
-Product Foundation.
-
-## In Scope
-The authoritative definition plus every default iteration listed below.
-
-## Out of Scope
-Later milestones, speculative abstractions, and behavior not justified by the PRD.
-
-## Architecture Notes
-Next.js App Router UI with Supabase auth/session boundaries. Server-side session authority, secure cookie handling, and protected routing precede authenticated product features.
+Product Foundation — COMPLETE and integrated on `main` at `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI run `34486610200` / run #57 passed.
 
 ## Selected Design / Implementation Plan
-- Not created yet. On activation, recover requirements, use Superpowers brainstorming/design, write an executable plan, and record the selected paths here.
+
+- Design: `docs/superpowers/specs/2026-09-10-saas-shell-auth-design.md`
+- Plan: `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`
+- Selected architecture: existing Next.js App Router application + Supabase SSR cookie-backed auth, server-authoritative protected rendering, server actions, RLS-protected own-profile persistence.
 
 ## Acceptance Criteria
+
 - PRD deliverables and exit criteria pass.
-- All required iterations are complete or explicitly resolved.
-- Relevant security/privacy/tenancy/accessibility/performance/AI-safety gates pass.
+- All M01 iterations complete or explicitly resolved.
+- Relevant security/privacy/accessibility/performance gates pass.
+- Provider-backed auth and RLS isolation evidence exists before completion.
 - 0 unresolved Critical or Important review findings.
-- Traceability and feature state are reconciled.
-- Exact-final-head CI is green.
+- Traceability/feature state reconciled.
+- Exact-final-head CI green.
 
 ## Tasks / Iterations
-1. **NOT STARTED** — M01.1 — Marketing shell: premium homepage, responsive layout, SEO baseline.
-2. **NOT STARTED** — M01.2 — Supabase auth infrastructure: clients, cookies/session boundaries, env/config.
+
+1. **VERIFIED** — M01.1 — Marketing shell: premium homepage, typed pricing placeholder, responsive layout, SEO baseline, accessibility baseline.
+2. **NOT STARTED** — M01.2 — Supabase auth infrastructure: clients, cookies/session boundaries, env/config, safe internal redirects.
 3. **NOT STARTED** — M01.3 — Core auth flows: signup, login, logout, verification.
 4. **NOT STARTED** — M01.4 — Recovery flows: forgot/reset password and error states.
 5. **NOT STARTED** — M01.5 — Authenticated app shell: protected routing/navigation.
-6. **NOT STARTED** — M01.6 — Basic profile: minimum profile persistence/settings.
-7. **NOT STARTED** — M01.7 — Accessibility + E2E: keyboard, mobile, visual/auth scenarios.
+6. **NOT STARTED** — M01.6 — Basic profile: minimum profile persistence/settings with RLS.
+7. **NOT STARTED** — M01.7 — Accessibility + provider-backed E2E/security/review closeout.
 
-## TDD Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+## M01.1 TDD / Debug Evidence
 
-## Integration Test Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+- RED behavior definition: `32571d4b9ced71dfb50f7fc53204901b33f3e92c` — `test: define premium marketing shell behavior` preceded the implementation commit.
+- GREEN implementation: `1279843b285178a3024c37a3cc3cafcee728587c` — `feat: add premium marketing shell`.
+- CI regression RED: `f8bf5c915acc7ba2dc7630adef516b4e43182cee`, run `34488549294` / #62, exposed missing DOM cleanup.
+- Root-cause fix: `97513c5357aa82b1bbf8c6ea093c61962e9407ab` registered explicit Testing Library cleanup; run `34491773023` / #63 exposed a separate ambiguous safety-copy selector.
+- Final GREEN: `6107253fdde1639097a6e6a6d8fd3777f242e5a4`; run `34492022676` / #64 passed all repository gates.
 
-## E2E / Visual Verification
-PENDING — define milestone-specific browser/realtime/visual scenarios before closeout where applicable.
+## M01.1 E2E / Accessibility / Safety Evidence
 
-## Security Review
-PENDING — cover auth/authz, tenant isolation, untrusted input, secrets, data exposure, injection and milestone-specific threats.
-
-## Accessibility Review
-PENDING where UI exists — keyboard, focus, semantics, labels, status/error states, responsive and assistive-technology paths.
-
-## Performance Review
-PENDING where relevant — bounded work, pagination, resource limits, retries and hot-path cost.
-
-## AI / Eval Review
-No assessment AI is required. Any marketing copy or helper AI must not become an authorization source.
+- Smoke E2E validates public homepage positioning and signup path provider-independently.
+- Semantic headings/regions, visible focus treatment, and reduced-motion handling are implemented.
+- Marketing copy explicitly preserves human decision authority and rejects autonomous hire/reject and prohibited appearance/emotion/accent/personality/deception scoring.
+- Provider-backed auth E2E is intentionally pending later M01 slices and is required before milestone completion.
 
 ## Code Review Findings
-None yet; milestone has not started.
 
-## Fixes / Re-review
-PENDING when evidence-backed findings exist.
+Skeptical M01.1 review perspectives: PRD compliance, correctness, architecture/YAGNI, testing, security, accessibility/responsiveness, and hiring-AI safety.
 
-## Fresh Verification Commands
-Run repository-wide verification plus milestone-specific tests. Baseline:
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm e2e
-python3 scripts/verify_autonomous_framework.py
-python3 scripts/verify_prd_coverage.py
-```
+- Critical: 0 unresolved.
+- Important: 0 unresolved after the two active-CI test-infrastructure/selector defects were root-caused and fixed.
+- Minor: existing Vitest/Vite ESM-in-CommonJS config-loader warning remains deferred maintenance.
 
 ## Fresh Verification Results
-PENDING — milestone has not started.
 
-## Commits / Files Changed
-None yet.
+Reviewed code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4` passed GitHub Actions CI run `34492022676` / run #64: frozen install, lint, typecheck, unit/component tests, framework tests/verifiers, requirements-source tests/verifier, build, Chromium install, smoke E2E, and PRD coverage.
+
+A subsequent durable-state reconciliation documentation commit requires fresh exact-head CI under repository policy.
 
 ## Known Limitations
-Milestone is NOT STARTED; implementation-specific limitations are not yet known.
 
-## Documentation Updated
-This living ledger must be reconciled whenever milestone state/evidence changes.
-
-## Durable Recovery Sources
-`AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → relevant PRD → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
+Only M01.1 is complete. Supabase infrastructure, auth flows, protected app shell, profile/RLS, provider-backed E2E, and milestone-wide security/accessibility closeout remain unfinished.
 
 ## Completion Checklist
-- [ ] Requirements and iterations accounted for.
-- [ ] Acceptance criteria verified.
-- [ ] Required TDD/integration/E2E evidence recorded.
-- [ ] Security/accessibility/performance/AI-eval reviews complete where relevant.
-- [ ] 0 Critical / 0 Important findings.
-- [ ] Traceability/feature matrix reconciled.
+
+- [ ] All M01 requirements and iterations accounted for.
+- [ ] Authenticated user can enter `/app`.
+- [ ] Provider-backed signup/login/verification/recovery/logout E2E passes.
+- [ ] Profile own-user RLS and cross-user denial are verified.
+- [ ] Milestone-wide security/accessibility/performance review complete.
+- [ ] 0 Critical / 0 Important findings at final review.
+- [ ] Traceability/feature matrix reconciled for final M01 state.
 - [ ] Exact-final-head CI green.
-- [ ] Durable status/closeout state current.
+- [ ] Durable closeout state current.
+
+## Exact Next Capability
+
+M01.2 — Supabase SSR infrastructure and environment boundary. Start with the plan's failing environment and safe-internal-redirect tests before production implementation.
 
 ## Next Milestone
-M02 — Organizations + RBAC.
+M02 — Organizations + RBAC. Do not start until M01 is objectively complete and integrated/authorized according to repository policy.

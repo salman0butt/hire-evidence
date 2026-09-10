@@ -4,77 +4,67 @@ Last reconciled: 2026-09-10
 
 ## Completed Milestones
 
-None formally COMPLETE yet.
+Product Foundation — **COMPLETE**.
 
-The application foundation from PR #1 is on `main`. PR #2 contains the durable requirements corpus, reproducible dependency lockfile, upgraded autonomous-development framework, living milestone ledgers, PRD verification, and requirements-source integrity verification. The reviewed implementation/config head `a83750b3da902bffe0944dedda13a6c4c21aa0f8` passed every required GitHub Actions gate in CI run `34474864214` / run #55. PR #2 remains draft/open and must not be merged without explicit owner authorization.
+PR #2 was merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`. Post-merge GitHub Actions CI run `34486610200` / run #57 passed on that exact `main` SHA. The durable requirements corpus, PRD sections 1–242 verifier, requirements-source integrity verifier, reproducible `pnpm-lock.yaml`, frozen CI installation, autonomous-development framework, milestone ledgers, feature matrix, and traceability are integrated.
 
 ## Current Milestone
 
-Product Foundation — **VERIFYING**.
+SaaS Shell + Auth — **IMPLEMENTING**.
 
-Current capability slice: durable closeout reconciliation after exact-head verification.
+Current capability slice: M01.1 premium marketing shell, pricing placeholder, SEO, responsive/accessibility baseline — implementation verified; durable reconciliation in progress.
 
 ## Current Task State
 
-- repository bootstrap: COMPLETE;
-- testing foundation: COMPLETE;
-- CI foundation: COMPLETE;
-- autonomous long-project control plane: IMPLEMENTED;
-- durable milestone-ledger migration: IMPLEMENTED;
-- complete requirements corpus persistence: IMPLEMENTED;
-- PRD sections 1–242 coverage: VERIFIED on CI run `34474864214`;
-- reproducible `pnpm-lock.yaml` + frozen CI install: VERIFIED on CI run `34474864214`;
-- requirements-source exact file/size/SHA-256 integrity gate: VERIFIED on CI run `34474864214`;
-- skeptical review: COMPLETE with 0 Critical and 3 Important findings found/fixed; 1 Minor warning deferred;
-- reviewed implementation/config head `a83750b3da902bffe0944dedda13a6c4c21aa0f8`: EXACT-HEAD CI GREEN;
-- durable closeout reconciliation: IN PROGRESS; this documentation commit creates a newer head that requires fresh exact-head CI under repository policy.
+- M00 Product Foundation: COMPLETE on `main` with post-merge CI green at `64ebeb4f7b2a39fc0557685ef34035650211aad9` / run `34486610200`.
+- M01 design: COMPLETE in `docs/superpowers/specs/2026-09-10-saas-shell-auth-design.md`.
+- M01 implementation plan: ACTIVE in `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`.
+- M01.1 marketing shell: IMPLEMENTED and VERIFIED on reviewed code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4` / CI run `34492022676` / run #64.
+- M01.2 Supabase SSR infrastructure: NOT STARTED.
+- M01.3–M01.7: NOT STARTED.
 
 ## Active Branch
 
-Active branch: `feat/product-foundation-requirements`
+Active branch: `feat/saas-shell-auth`
 
 ## Active PR
 
-Active PR: #2 DRAFT — `Persist product requirements and recovery state`
+Active PR: #3 DRAFT — `Build SaaS shell and authentication`
 
 Do not merge without explicit owner authorization.
 
 ## CI Status
 
-CI status: PASS on reviewed implementation/config head `a83750b3da902bffe0944dedda13a6c4c21aa0f8`; fresh CI required for the newer durable-state reconciliation head.
+CI status: PASS on reviewed M01.1 code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4`; this durable-state reconciliation commit creates a newer documentation head that requires fresh exact-head CI.
 
-GitHub Actions CI run `34474864214` / run #55 passed frozen install, lint, typecheck, application tests, framework verifier tests, requirements-source verifier tests, autonomous-framework verification, requirements-source integrity verification, production build, Chromium installation, smoke E2E, and PRD coverage.
+CI run `34492022676` / run #64 passed frozen install, lint, typecheck, unit/component tests, autonomous-framework verifier tests, requirements-source verifier tests, autonomous-framework verification, requirements-source integrity verification, production build, Chromium installation, smoke E2E, and PRD coverage.
 
-Requirements-source TDD evidence:
+Debugging evidence from the active slice:
 
-- RED: `e2cf842f2d6db16e6b5c41d15cac584fca8a3ab3`, CI `34474152336`, expected failure because `scripts/verify_requirements_source.py` did not exist;
-- GREEN tests: `051a400bc2571b94f4c8e61ef63a4b08e401c386`, CI `34474310301`, all 5 focused source-integrity tests passed;
-- full GREEN: `4ea1eed4c822c3667d575a13c6b735e5148c69df`, CI `34474528983`;
-- final reviewed implementation/config GREEN: `a83750b3da902bffe0944dedda13a6c4c21aa0f8`, CI `34474864214` / run #55.
+- RED: CI run `34488549294` / run #62 on `f8bf5c915acc7ba2dc7630adef516b4e43182cee` failed because Testing Library DOM cleanup was not registered with Vitest globals disabled.
+- Partial GREEN / second defect exposed: `97513c5357aa82b1bbf8c6ea093c61962e9407ab` registered explicit `afterEach(cleanup)`; CI run `34491773023` / run #63 then reached a separate ambiguous text selector.
+- GREEN: `6107253fdde1639097a6e6a6d8fd3777f242e5a4` scoped the human-decision assertion to the named safety region; CI run `34492022676` / run #64 passed all gates.
 
 ## Blockers
 
-No external blocker is known. Product/config verification is green. The only remaining evidence gate is exact-head CI for the durable closeout reconciliation commit(s).
+No external blocker is known for M01.2 planning/implementation. Provider-backed Supabase E2E and RLS evidence remain required before M01 can be completed, but they do not block beginning M01.2.
 
 ## Critical / Important Findings
 
-- Critical: 0.
-- Important 1: archived requirements source lacked continuous manifest integrity verification — FIXED and VERIFIED.
-- Important 2: status reconciliation dropped mandatory `CI status:` marker — FIXED and VERIFIED.
-- Important 3: unified local `pnpm verify` omitted requirements-source verification while CI enforced it — FIXED and VERIFIED on `a83750b3da902bffe0944dedda13a6c4c21aa0f8` / CI `34474864214`.
-- Minor: Vitest/Vite warns about ESM syntax in `vitest.config.ts` loaded as CommonJS; tests pass and this is deferred to focused module/config maintenance.
+- Critical: 0 unresolved.
+- Important: 0 unresolved.
+- Minor: Vitest/Vite emits the existing ESM-in-CommonJS config-loader warning; tests pass and this remains deferred maintenance.
 
 ## Milestone Program
 
-- M00 Product Foundation — VERIFYING durable closeout head
-- M01–M15 — NOT STARTED
-
-Do not start M01 from this unmerged branch. PR #2 is the owner-controlled integration boundary.
+- M00 Product Foundation — COMPLETE
+- M01 SaaS Shell + Auth — IMPLEMENTING
+- M02–M15 — NOT STARTED
 
 ## Durable Recovery
 
-Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, current/active milestone ledger, relevant PRD/traceability, Superpowers spec/plan, and source/tests.
+Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, `docs/milestones/CURRENT.md`, `docs/milestones/M01-saas-shell-auth.md`, relevant PRD/traceability, the M01 Superpowers spec/plan, and source/tests.
 
 ## Exact next work
 
-Exact next work: inspect GitHub Actions for the exact latest PR #2 head created by durable closeout reconciliation. If every required gate is green and no new Critical/Important finding appears, leave PR #2 draft/open and unmerged for explicit owner-controlled integration; do not start M01 from PR #2.
+Exact next work: after fresh CI verifies the durable reconciliation head, continue M01.2 by writing the failing Supabase environment and safe-internal-redirect tests from `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`; do not start M02 and do not merge PR #3 without explicit owner authorization.

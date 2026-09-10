@@ -1,23 +1,28 @@
 # Requirements Traceability
 
-This matrix tracks the autonomous-development framework requirements and the current product-foundation state. Product requirement mappings expand incrementally as each capability becomes active. The complete source corpus is durably persisted; future milestones must refine traceability from the canonical PRD rather than reconstructing scope from chat memory.
+This matrix tracks durable framework requirements plus the currently active product capability. Expand product mappings incrementally from the canonical PRD; never reconstruct missing scope from chat memory.
 
-| Requirement | Milestone | Spec | Implementation | Tests | Verification | Status |
+| Requirement | Milestone | Spec / Plan | Implementation | Tests | Verification | Status |
 |---|---|---|---|---|---|---|
-| AUTO-001 — Git/GitHub is durable execution memory; do not rely on chat | Product Foundation | `docs/superpowers/specs/2026-09-10-autonomous-long-project-framework-design.md` | `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md` | framework verifier tests | CI run `34473131246` on `dcf54ace…` | VERIFIED |
-| AUTO-002 — Every fresh run performs mandatory recovery before writes | Product Foundation | same framework spec | `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `CODEX-START-HERE.md` | framework verifier tests | CI run `34473131246` on `dcf54ace…` | VERIFIED |
-| AUTO-003 — Use evidence-based recovery precedence | Product Foundation | same framework spec | `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md` | framework verifier tests | CI run `34473131246` on `dcf54ace…` | VERIFIED |
-| AUTO-004 — Continue highest-priority unfinished active work before new work | Product Foundation | same framework spec | `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md` | framework verifier tests | CI run `34473131246` on `dcf54ace…` | VERIFIED |
-| AUTO-005 — Meaningful behavior changes use genuine RED → GREEN → refactor | Product Foundation | same framework spec | `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md` | framework verifier tests + capability tests | framework verifier history + CI run `34473131246` | VERIFIED |
-| AUTO-006 — Critical/Important review findings block completion | Product Foundation | same framework spec | `docs/AUTONOMOUS-DEVELOPMENT.md` | framework verifier tests | policy machine-checks passed; final PR closeout review pending | IMPLEMENTED |
-| AUTO-007 — Completion requires fresh exact-SHA CI | Product Foundation | same framework spec | `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, CI | framework verifier tests | exact pre-reconciliation SHA `dcf54ace…` green; final reconciliation SHA pending | IMPLEMENTED |
-| AUTO-008 — Default PR policy creates/updates PRs but does not auto-merge | Product Foundation | same framework spec | `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md` | framework verifier tests | PR #2 remains draft/open and unmerged | VERIFIED |
-| AUTO-009 — End every meaningful run with durable status and exact next work | Product Foundation | same framework spec | `docs/progress/STATUS.md`, milestone ledger | framework verifier tests | CI run `34473131246`; current reconciliation updates durable state | IMPLEMENTED |
-| AUTO-010 — Detect/avoid duplicate concurrent work | Product Foundation | same framework spec | `docs/AUTONOMOUS-DEVELOPMENT.md`, status/PR recovery | review/manual recovery evidence | recovery performed against active PR #2 without duplicate PR | VERIFIED |
-| PRD-195 — Product foundation milestone | Product Foundation | foundation + autonomy/milestone designs | application shell/config/CI/docs, durable PRD, lockfile, milestone system | Vitest, Testing Library, Playwright smoke, framework verifier, PRD coverage verifier | all required CI steps passed on `dcf54ace…`; final reconciled-head review/CI pending | IMPLEMENTED |
-| REQ-DURABILITY — Preserve complete owner requirements source in Git | Product Foundation | milestone-ledger/autonomy designs | `docs/requirements/source/AI-Interviewer-Codex-Pack/`, `SOURCE-MANIFEST.json`, `docs/product/`, `docs/iterations/` | `scripts/verify_prd_coverage.py` | PRD coverage PASS in CI run `34473131246` | VERIFIED |
-| DEP-REPRO — Dependency graph is reproducible | Product Foundation | foundation closeout | `pnpm-lock.yaml`, frozen CI install | CI install + full quality job | frozen install PASS in CI run `34473131246` | VERIFIED |
+| AUTO-001 — Git/GitHub is durable execution memory | Product Foundation | autonomy framework spec | `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md` | framework verifier tests | integrated `main` SHA `64ebeb4…`, CI `34486610200` | VERIFIED |
+| AUTO-002 — Mandatory fresh recovery before writes | Product Foundation | autonomy framework spec | recovery/control-plane docs | framework verifier tests | post-merge `main` CI green | VERIFIED |
+| AUTO-003 — Evidence-based recovery precedence | Product Foundation | autonomy framework spec | autonomy/status docs | framework verifier tests | post-merge `main` CI green | VERIFIED |
+| AUTO-004 — Highest-priority unfinished work first | Product Foundation | autonomy framework spec | `AGENTS.md`, autonomy docs | framework verifier tests | applied to failed PR #3 CI in this run | VERIFIED |
+| AUTO-005 — Genuine RED → GREEN for meaningful behavior | Product Foundation / active capabilities | autonomy framework + capability plan | test-first commits + implementation | capability tests | M01.1 RED `32571d4…`, GREEN `1279843…`, final CI `34492022676` | VERIFIED |
+| AUTO-006 — Critical/Important review findings block completion | Product Foundation | autonomy framework | policy + review workflow | framework tests + skeptical review | M01.1 review has 0 unresolved Critical/Important | VERIFIED |
+| AUTO-007 — Completion requires fresh exact-SHA CI | Product Foundation | autonomy framework | CI + recovery docs | framework tests | `main` `64ebeb4…` CI #57; M01.1 code `6107253…` CI #64 | VERIFIED |
+| AUTO-008 — PRs default open/unmerged | Product Foundation | autonomy framework | GitHub workflow policy | framework tests | draft PR #3 remains open/unmerged | VERIFIED |
+| AUTO-009 — Durable end-of-run recovery state | Product Foundation | autonomy framework | status/milestone/traceability docs | framework tests | reconciled for active PR #3; reconciliation-head CI pending | IMPLEMENTED |
+| AUTO-010 — Avoid duplicate concurrent work | Product Foundation | autonomy framework | recovery + active PR reuse | review/manual recovery | existing PR #3 continued; no duplicate PR | VERIFIED |
+| PRD-195 — Product Foundation | Product Foundation | foundation/autonomy designs | application foundation + requirements/control plane | repository full suite | merged `main` SHA `64ebeb4…`, CI `34486610200` | VERIFIED |
+| REQ-DURABILITY — Preserve owner requirements source | Product Foundation | foundation closeout | durable source tree + manifest | PRD/source verifiers | post-merge CI #57 | VERIFIED |
+| DEP-REPRO — Reproducible dependency graph | Product Foundation | foundation closeout | `pnpm-lock.yaml`, frozen CI | install/full quality job | post-merge CI #57 | VERIFIED |
+| PRD-015/016/017/196 — Public SaaS positioning, auth/profile foundations, M01 deliverables | SaaS Shell + Auth | `docs/superpowers/specs/2026-09-10-saas-shell-auth-design.md`; `docs/superpowers/plans/2026-09-10-saas-shell-auth.md` | M01.1: `src/app/page.tsx`, `src/app/layout.tsx`, `src/app/globals.css`, `src/config/pricing.ts`; later auth/profile slices pending | `src/app/page.test.tsx`, `src/config/pricing.test.ts`, `e2e/smoke.spec.ts` | M01.1 reviewed code head `6107253…`, CI `34492022676` | ACTIVE |
+
+## Active requirement interpretation
+
+M01.1 verifies only the public marketing/pricing/SEO/accessibility baseline. The broader PRD-015/016/017/196 group remains ACTIVE because signup/login/verification/recovery, secure sessions, authenticated shell, profile/RLS, provider-backed E2E, and final accessibility/security closeout are not yet implemented. Do not mark the grouped requirement VERIFIED until those remaining acceptance criteria pass.
 
 ## Expansion rule
 
-When a product capability becomes active, add or refine traceability entries before declaring its milestone complete. A fresh worker should be able to navigate from every active/verified requirement to its owning spec/plan, code, tests, and verification evidence.
+When the next M01 slice becomes active, refine this row into atomic auth/session/profile requirements as needed, each pointing back to the source PRD sections. A fresh worker must be able to navigate from every active/verified requirement to design/plan, code, tests, and verification evidence.

@@ -1,31 +1,16 @@
 # Milestone Program
 
-This repository uses **M00–M15** as durable PRD milestone identifiers. They are useful in documentation, filenames, traceability, and requirement references. Do **not** use milestone codes as meaningless commit or PR title prefixes; Git history should describe the behavior or evidence being changed.
+This repository uses **M00–M15** as durable PRD milestone identifiers. Codes belong in documentation/traceability, not as meaningless commit or PR prefixes.
 
 ## Lifecycle
 
-Every milestone is a living execution ledger and uses:
-
 `NOT STARTED -> DESIGN -> PLANNED -> IMPLEMENTING -> VERIFYING -> REVIEW -> COMPLETE`
 
-`BLOCKED` is allowed when an evidence-backed blocker prevents legitimate progress. A blocked ledger must record the blocker, its impact, and the exact unblock action.
-
-A milestone may move backward when fresh evidence invalidates an earlier state. Git/code/tests/current CI outrank stale status text.
+`BLOCKED` is allowed only with evidence and an exact unblock action. Git/code/tests/current CI outrank stale status text.
 
 ## Completion Rule
 
-No milestone may be marked COMPLETE without:
-
-- all authoritative PRD requirements and iterations accounted for;
-- acceptance criteria verified;
-- genuine TDD evidence where practical;
-- required integration/E2E/security/accessibility/performance/AI-eval evidence;
-- independent review and fixes/re-review;
-- 0 unresolved Critical findings;
-- 0 unresolved Important findings;
-- traceability/feature state reconciled;
-- exact-final-head CI green;
-- durable closeout/recovery evidence.
+No milestone is COMPLETE without requirements/iterations accounted for, acceptance criteria verified, genuine TDD evidence where practical, applicable E2E/security/accessibility/performance/AI-eval evidence, skeptical review with 0 unresolved Critical/Important findings, reconciled traceability/feature state, exact-final-head CI, and durable closeout evidence.
 
 Only one milestone should normally be active.
 
@@ -59,14 +44,12 @@ Integrations / Coding Interview / Advanced Formats
 Enterprise Compliance
 ```
 
-The PRD ordering remains authoritative. A future worker may refine technical dependency edges when repository evidence requires it, but must document material deviations rather than silently reordering scope.
-
 ## Program Status
 
 | Milestone | Capability | Status | Primary dependencies |
 | --- | --- | --- | --- |
-| [M00 — Product Foundation](./M00-product-foundation.md) | Product Foundation | **VERIFYING** | None |
-| [M01 — SaaS Shell + Auth](./M01-saas-shell-auth.md) | SaaS Shell + Auth | **NOT STARTED** | M00 |
+| [M00 — Product Foundation](./M00-product-foundation.md) | Product Foundation | **COMPLETE** | None |
+| [M01 — SaaS Shell + Auth](./M01-saas-shell-auth.md) | SaaS Shell + Auth | **IMPLEMENTING** | M00 |
 | [M02 — Organizations + RBAC](./M02-organizations-rbac.md) | Organizations + RBAC | **NOT STARTED** | M01 |
 | [M03 — Jobs + Interviewer Builder](./M03-jobs-interviewer-builder.md) | Jobs + Interviewer Builder | **NOT STARTED** | M02 |
 | [M04 — Candidates + Invitations](./M04-candidates-invitations.md) | Candidates + Invitations | **NOT STARTED** | M02, M03 |
@@ -82,18 +65,10 @@ The PRD ordering remains authoritative. A future worker may refine technical dep
 | [M14 — Advanced Interview Formats](./M14-advanced-interview-formats.md) | Advanced Interview Formats | **NOT STARTED** | Core adoption + M05–M08 |
 | [M15 — Enterprise Compliance Program](./M15-enterprise-compliance.md) | Enterprise Compliance Program | **NOT STARTED** | Current product + current legal research |
 
+## Current evidence
+
+M00 integrated through PR #2; exact post-merge `main` SHA `64ebeb4f7b2a39fc0557685ef34035650211aad9` passed CI run `34486610200` / #57. M01 is active in draft PR #3 on `feat/saas-shell-auth`; M01.1 reviewed code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4` passed CI run `34492022676` / #64.
+
 ## Recovery
 
-Start from:
-
-1. actual Git/GitHub graph and exact-head CI;
-2. `AGENTS.md`;
-3. `docs/AUTONOMOUS-DEVELOPMENT.md`;
-4. `docs/progress/STATUS.md`;
-5. `docs/progress/KNOWN-ISSUES.md`;
-6. the current milestone ledger;
-7. relevant PRD requirements;
-8. selected Superpowers spec/plan;
-9. active PR, reviews, source and tests.
-
-`docs/progress/STATUS.md` is the compact global index. Milestone ledgers carry detailed scope/evidence. Task or milestone closeout files under `docs/progress/` should be created only when they preserve real evidence; do not pre-create empty bureaucracy.
+Start from actual Git/GitHub + exact-head CI, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md`, known issues, `CURRENT.md`, active milestone ledger, relevant PRD/traceability, active Superpowers spec/plan, PR/reviews, source/tests.

@@ -2,49 +2,32 @@
 
 Only unresolved or materially relevant issues belong here.
 
-## Resolved during foundation closeout
+## Resolved foundation issues
 
-### KI-001 — Requirements corpus durability
+The Product Foundation requirements-durability, dependency-lockfile, requirements-source-integrity, recovery-marker, and unified-verification issues were resolved before PR #2 integration. PR #2 was merged as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI run `34486610200` / run #57 passed on that exact `main` SHA.
 
-- **Previous severity:** Important / milestone blocker
+## Resolved during M01.1
+
+### KI-007 — Component test DOM leaked between tests
+
+- **Previous severity:** Important / active-CI blocker
 - **Status:** RESOLVED
-- **Resolution evidence:** the verified owner-supplied requirements source is persisted under `docs/requirements/source/AI-Interviewer-Codex-Pack/`; `docs/requirements/SOURCE-MANIFEST.json` records source ZIP size `121574` bytes and SHA-256 `900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba`; PRD coverage passed in CI run `34473131246` and again in run `34474528983`.
+- **Root cause:** Vitest globals are disabled, so Testing Library's automatic cleanup hook was not registered by the test environment. A first `render()` remained in `document.body` for the next test, duplicating named regions.
+- **Evidence / fix:** CI run `34488549294` / run #62 failed on `f8bf5c915acc7ba2dc7630adef516b4e43182cee`. Commit `97513c5357aa82b1bbf8c6ea093c61962e9407ab` registered explicit `afterEach(cleanup)` in `test/setup.ts`.
 
-### KI-002 — Exact-head CI unavailable
+### KI-008 — Human-decision assertion assumed globally unique copy
 
-- **Previous severity:** Important
-- **Status:** RESOLVED for the reviewed pre-closeout head
-- **Resolution evidence:** GitHub Actions CI run `34474528983` completed successfully on exact PR head `4ea1eed4c822c3667d575a13c6b735e5148c69df`, including frozen install, lint, typecheck, application tests, framework tests/verifier, requirements-source tests/verifier, build, smoke E2E, and PRD coverage.
-- **Note:** the final durable review-evidence commit requires its own exact-head CI before this run can claim final-head green.
-
-### KI-003 — Dependency lockfile reproducibility
-
-- **Previous severity:** Important
+- **Previous severity:** Important / active-CI blocker
 - **Status:** RESOLVED
-- **Resolution evidence:** `pnpm-lock.yaml` is committed; CI uses `pnpm install --frozen-lockfile`; frozen installation passed in CI run `34474528983`.
-
-### KI-004 — Requirements source integrity was not continuously verified
-
-- **Previous severity:** Important
-- **Status:** RESOLVED, pending final-head re-verification
-- **Evidence / fix:** review found that PRD section coverage did not prove the archived source tree still matched `SOURCE-MANIFEST.json`. A new `scripts/verify_requirements_source.py` validates exact file set, sizes and SHA-256 hashes and rejects unsafe/duplicate manifest paths. Five focused tests cover valid, tampered, missing/extra, traversal-like and duplicate-path cases. CI run `34474152336` provided genuine RED because the verifier did not yet exist; CI run `34474310301` showed the five tests GREEN; CI run `34474528983` passed both tests and the real source verifier.
-
-### KI-005 — Durable status reconciliation dropped a required recovery marker
-
-- **Previous severity:** Important
-- **Status:** RESOLVED
-- **Evidence / fix:** CI run `34474310301` failed `scripts/verify_autonomous_framework.py` because `docs/progress/STATUS.md` lacked the required literal `CI status:` marker. Commit `4ea1eed4c822c3667d575a13c6b735e5148c69df` restored the invariant and CI run `34474528983` passed the framework verifier.
-
-### KI-006 — Unified local verification omitted requirements-source integrity
-
-- **Previous severity:** Important
-- **Status:** RESOLVED, pending final-head verification
-- **Evidence / fix:** final skeptical review found CI enforced source integrity while `pnpm verify` did not. `package.json` now includes `verify:requirements` and the unified `verify` command includes it, keeping local and CI verification intent aligned.
+- **Root cause:** after DOM isolation was restored, the page legitimately contained two human-decision safety statements while `getByText()` required a single global match.
+- **Evidence / fix:** CI run `34491773023` / run #63 exposed the selector defect. Commit `6107253fdde1639097a6e6a6d8fd3777f242e5a4` scoped the assertion to the named Security & fairness region. CI run `34492022676` / run #64 passed all required gates.
 
 ## Current unresolved issues
 
 No Critical or Important implementation/review issue is currently known.
 
-A non-blocking Vitest/Vite warning remains: `vitest.config.ts` is loaded as CommonJS while using ESM syntax; current tests pass, so this is classified **Minor** and does not block Product Foundation closeout. Address it in a future maintenance slice when changing module/config conventions rather than broadening this PR.
+A non-blocking Vitest/Vite warning remains: `vitest.config.ts` is loaded as CommonJS while using ESM syntax. It is classified **Minor** because the exact reviewed code head passes tests/build/E2E; address it in focused module/config maintenance instead of broadening the current capability.
 
-The only remaining gate for this run is fresh exact-head CI on the final durable review-evidence commit. PR #2 must remain open and unmerged without explicit owner authorization.
+M01 is intentionally incomplete. Provider-backed authentication E2E, profile RLS/cross-user isolation evidence, and the remaining M01 capability slices are required before milestone completion; these are planned work, not defects in M01.1.
+
+The durable reconciliation head created after reviewed code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4` requires its own exact-head CI before a fresh worker may treat the latest branch head as green.
