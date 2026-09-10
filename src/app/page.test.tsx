@@ -13,20 +13,35 @@ describe("Home", () => {
         name: /create structured ai interviews once\. interview candidates anytime\./i,
       }),
     ).toBeVisible();
-    expect(screen.getByRole("link", { name: /create your first interviewer/i })).toHaveAttribute(
-      "href",
-      "/auth/signup",
-    );
-    expect(screen.getByRole("link", { name: /log in/i })).toHaveAttribute("href", "/auth/login");
+
+    const signupLinks = screen.getAllByRole("link", { name: /create your first interviewer/i });
+    expect(signupLinks.length).toBeGreaterThan(0);
+    for (const link of signupLinks) {
+      expect(link).toHaveAttribute("href", "/auth/signup");
+    }
+
+    const loginLinks = screen.getAllByRole("link", { name: /log in/i });
+    expect(loginLinks.length).toBeGreaterThan(0);
+    expect(loginLinks[0]).toHaveAttribute("href", "/auth/login");
   });
 
   it("explains the evidence-first workflow and preserves human decision authority", () => {
     render(<Home />);
 
-    expect(screen.getByRole("heading", { name: /how it works/i })).toBeVisible();
-    expect(screen.getByRole("heading", { name: /security & fairness/i })).toBeVisible();
-    expect(screen.getByRole("heading", { name: /pricing/i })).toBeVisible();
-    expect(screen.getByRole("heading", { name: /frequently asked questions/i })).toBeVisible();
+    expect(
+      screen.getByRole("region", { name: /structure first\. evidence throughout\./i }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("region", { name: /security & fairness are constraints/i }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("region", {
+        name: /start with the workflow\. add billing when it is ready/i,
+      }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("region", { name: /frequently asked questions/i }),
+    ).toBeVisible();
     expect(screen.getByText(/humans make hiring decisions/i)).toBeVisible();
   });
 });
