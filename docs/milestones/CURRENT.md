@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M01
 
 Current capability:
-Basic profile implemented provider-independently; provider-backed isolation and milestone closeout remain
+Provider-independent accessibility/browser closeout advanced; provider-backed auth and RLS evidence remain
 
 Status:
 IMPLEMENTING
@@ -34,20 +34,22 @@ Product Foundation is COMPLETE. PR #2 was already merged to `main` as `64ebeb4f7
 ## Completed / Implemented in M01
 
 - M01.1–M01.5: VERIFIED provider-independently.
-- M01.6 profile persistence/RLS: IMPLEMENTED provider-independently at reviewed head `e9c2ad64f2f9065d53a44652ac1116f91538e7f7`; CI `34510856609` / #130 SUCCESS. Real Supabase cross-user denial remains mandatory before VERIFIED.
+- M01.6 profile persistence/RLS: IMPLEMENTED provider-independently at reviewed head `e9c2ad64f2f9065d53a44652ac1116f91538e7f7`; CI #130 SUCCESS. Real Supabase cross-user denial remains mandatory before VERIFIED.
+- M01.7 provider-independent accessibility/browser slice: VERIFIED at `061762ec28a9f95ed97c433f35df8eee060389fe`; CI `34516697315` / #134 SUCCESS. Covers mobile no-horizontal-overflow, keyboard focus path to authentication, labeled login/signup credentials, and mobile unauthenticated `/app` return-path behavior. It does not substitute for provider-backed E2E.
 
 ## Remaining
 
 1. Execute real Supabase migration + User A/User B profile isolation verification.
-2. M01.7 provider-backed auth/recovery/profile E2E plus accessibility/security closeout.
+2. Execute provider-backed signup/email verification/login/logout/password-recovery/authenticated `/app` + `/app/profile` E2E.
+3. Reconcile final milestone security/accessibility/performance review and exact-final-head CI after provider evidence exists.
 
 ## Blocker
 
-Configured Supabase provider/database evidence is mandatory before M01.6 or the milestone is called VERIFIED/COMPLETE. This cannot be replaced with mocks or static SQL inspection.
+Configured Supabase provider/database evidence is mandatory before M01.6 or the milestone is called VERIFIED/COMPLETE. This cannot be replaced with mocks, placeholder credentials, or static SQL inspection.
 
 ## Verification state
 
-M01.6 RED `8656902…` failed CI #128 as intended. Reviewed code/test head `e9c2ad64…` passed frozen install, lint, typecheck, unit/component tests, framework verifier tests, requirements-source verifier tests, both repository verifiers, production build, Chromium smoke E2E, and PRD coverage in CI #130.
+M01.7 browser verification initially failed at `caa82b59…`, CI #133, because an unscoped Playwright locator matched both header and footer `Log in` links. Root-cause fix `061762ec…` scoped the assertion to the banner landmark. CI #134 then passed frozen install, lint, typecheck, 54 unit/component tests, framework/source verifier tests, autonomous/source integrity verification, production build, all 7 Chromium E2E tests, and PRD coverage.
 
 ## Next Action
 

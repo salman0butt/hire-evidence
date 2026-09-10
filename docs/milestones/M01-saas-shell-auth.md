@@ -43,25 +43,29 @@ Product Foundation — COMPLETE and integrated on `main` at `64ebeb4f7b2a39fc055
 4. **VERIFIED (provider-independent)** — M01.4 password recovery; security GREEN `b048782…`, CI #121; durable repair `6833d47…`, CI #123.
 5. **VERIFIED (provider-independent)** — M01.5 protected app shell; final reconciliation `f912da9…`, CI #127.
 6. **IMPLEMENTED (provider verification pending)** — M01.6 basic profile persistence/settings with RLS; reviewed code/test head `e9c2ad64f2f9065d53a44652ac1116f91538e7f7`, CI #130. Real two-user Supabase RLS isolation is still required before VERIFIED.
-7. **NOT STARTED** — M01.7 accessibility + provider-backed E2E/security/review closeout.
+7. **IN PROGRESS** — M01.7 accessibility + provider-backed E2E/security/review closeout. Provider-independent browser slice is verified at `061762ec28a9f95ed97c433f35df8eee060389fe`, CI #134; provider-backed scenarios remain blocked on external Supabase test configuration.
 
 ## TDD Evidence
-M01.6 RED `8656902db4774ab91075e7dbadeb29464577917f`; GitHub Actions `34510379628` / #128 passed frozen install and lint, then failed typecheck for the intended reason: profile validation/form production modules did not yet exist. Minimum implementation `78f2602124486f417af19c057f71cb9192cc3590` added the profile schema/RLS, validation, repository, action, page and accessible form. Review-fix head `e9c2ad64f2f9065d53a44652ac1116f91538e7f7` passed CI `34510856609` / #130.
+M01.6 RED `8656902db4774ab91075e7dbadeb29464577917f`; GitHub Actions #128 failed at typecheck for intentionally absent production modules. Reviewed profile implementation `e9c2ad64f2f9065d53a44652ac1116f91538e7f7` passed CI #130.
+
+M01.7 is verification-only rather than new product behavior. Initial browser test commit `caa82b59ebd85e20b4c02702c85587b6ce7b68cd` produced a genuine CI #133 RED: two new tests failed under Playwright strict mode because an unscoped `Log in` locator matched both header and footer links. Systematic debugging confirmed the failure was test ambiguity, not product behavior. Minimum fix `061762ec28a9f95ed97c433f35df8eee060389fe` scoped the intended locator through the `banner` landmark; CI #134 passed all gates.
 
 ## Integration Test Evidence
 Profile action tests prove invalid input is rejected before authentication/persistence, row ownership comes only from server-validated `requireUser()`, forged `id` and `user_id` form fields are ignored, trimmed display names are persisted, and repository failures map to bounded user-safe errors. Structural migration tests verify RLS enablement, own-user select/insert/update policies, update `USING` plus `WITH CHECK`, auth-user ownership FK, and the 120-character database constraint. Real database execution remains mandatory.
 
 ## E2E / Visual Verification
-CI #130 passes the existing Chromium smoke suite and confirms no regression to public/auth/protected route behavior. Provider-backed authenticated `/app/profile` interaction, mobile profile flow, and cross-user denial remain M01.7/provider-environment work.
+CI #134 passes seven Chromium E2E tests. Provider-independent coverage now verifies the marketing path, unauthenticated protected-route redirect, health endpoint, a 390×844 mobile homepage without horizontal overflow, keyboard focus navigation from the home link to the header login link, labeled email/password controls on login/signup, and mobile unauthenticated `/app` return-path behavior without horizontal overflow.
+
+This evidence does not simulate or replace provider-backed signup/email verification/login/logout/recovery/authenticated app/profile or cross-user RLS verification. Those remain mandatory before M01 completion.
 
 ## Security Review
-Profile ownership is not caller-selectable: `updateProfileAction` reads only `display_name` and passes the authenticated `requireUser()` ID to persistence. `public.profiles` has RLS enabled; authenticated select/insert/update policies constrain `auth.uid() = id`, and update uses both `USING` and `WITH CHECK`. No delete policy or service-role browser path is introduced. Static SQL assertions are not accepted as deployed RLS proof, so real cross-user isolation remains an explicit gate.
+Existing auth/profile boundaries remain unchanged by the M01.7 browser-only slice. Profile ownership is not caller-selectable; RLS remains mandatory; tokens and secrets are not added to browser tests; placeholder CI Supabase values are not treated as provider evidence. Redirect coverage continues to prove an internal `/app` return path. No service-role browser path is introduced.
 
 ## Accessibility Review
-The profile form uses a visible associated label, help text via `aria-describedby`, bounded native `maxLength`, visible submit text, disabled pending state, and alert/status semantics. Provider-backed keyboard/mobile verification remains M01.7.
+Provider-independent browser verification now proves narrow-mobile no-horizontal-overflow on the public and unauthenticated auth-entry path, keyboard focus reaches the semantically scoped header login link, and login/signup credential inputs have accessible labels. Existing visible `:focus-visible` styling and reduced-motion rules remain in place. Provider-backed keyboard/mobile verification of authenticated/profile flows remains outstanding.
 
 ## Performance Review
-Profile rendering performs one authenticated identity verification and one own-row query; saving performs one upsert. No polling, client state framework, queue, trigger, or speculative infrastructure was added.
+The M01.7 slice adds test-only browser assertions and no runtime dependencies, polling, client state, network calls, or production JavaScript. Existing profile rendering remains one authenticated identity verification plus one own-row query; save remains one upsert.
 
 ## AI / Eval Review
 No assessment AI is introduced in M01. Humans remain hiring decision makers; prohibited sensitive/proxy scoring remains out of scope.
@@ -69,12 +73,12 @@ No assessment AI is introduced in M01. Humans remain hiring decision makers; pro
 ## Code Review Findings
 - Critical: 0 unresolved.
 - Important: 0 unresolved.
-- Resolved Important: initial M01.6 implementation lacked explicit tests proving forged owner fields cannot influence persistence and machine-checked policy structure. Fixed in `e9c2ad64…`; CI #130 passed.
+- Resolved test defect: CI #133 exposed ambiguous Playwright login locators in the new browser verification; fixed by semantic banner scoping in `061762ec…`, with CI #134 green.
 - Minor: existing Vitest/Vite ESM-in-CommonJS configuration-loader warning remains deferred maintenance.
 - Minor: logout default scope remains unchanged absent an explicit product-semantics requirement.
 
 ## Fixes / Re-review
-The M01.6 Important testing gap was fixed by action-level ownership/error coverage and migration-policy structural tests. Re-review found no remaining Critical or Important code issue. The provider-backed RLS gate remains open by design and is documented as an external verification dependency rather than falsely closed with mocks.
+The M01.7 browser test failure was debugged from exact CI logs and fixed at the locator boundary without changing production behavior or weakening assertions. Re-review confirms the new tests stay provider-independent, make no fabricated provider claims, and introduce no security or hiring-AI behavior. No unresolved Critical or Important finding is known for this slice.
 
 ## Fresh Verification Commands
 ```bash
@@ -92,13 +96,13 @@ python3 scripts/verify_prd_coverage.py
 ```
 
 ## Fresh Verification Results
-Reviewed M01.6 code/test head `e9c2ad64f2f9065d53a44652ac1116f91538e7f7` passed GitHub Actions `34510856609` / #130 across every repository CI gate. Durable reconciliation commits produced after that code head require their own exact-SHA CI before being called green.
+Provider-independent browser code head `061762ec28a9f95ed97c433f35df8eee060389fe` passed GitHub Actions `34516697315` / #134 across frozen install, lint, typecheck, 54 unit/component tests, framework/source verifier tests, both repository verifiers, production build, all 7 Chromium E2E tests, and PRD coverage. Durable reconciliation commits after that code head require their own exact-SHA CI before being called green.
 
 ## Known Limitations
-M01 is not complete. The profile migration has not yet been executed against a configured Supabase test project in this repository's available environment, so User A/User B RLS denial is not yet proven. Provider-backed signup/login/verification/recovery/logout/authenticated app/profile E2E and milestone-wide accessibility/security closeout also remain unfinished.
+M01 is not complete. The profile migration has not yet been executed against a configured Supabase test project, so User A/User B RLS denial is not proven. Provider-backed signup/email verification/login/logout/recovery/authenticated `/app` and `/app/profile` E2E also remain unfinished. Browser accessibility coverage is intentionally provider-independent and does not replace those gates.
 
 ## Documentation Updated
-Status, known issues, current milestone, feature matrix, requirements traceability, Supabase setup, M01 ledger, and M01.6 Superpowers evidence are reconciled with the reviewed code head.
+Status, known issues, current milestone, feature matrix, requirements traceability, M01 ledger, milestone program, and M01.7 Superpowers evidence are reconciled with the browser verification state.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → actual Git/PR/CI → `docs/progress/STATUS.md` → `docs/progress/KNOWN-ISSUES.md` → `docs/milestones/CURRENT.md` → this ledger → PRD/traceability → M01 Superpowers spec/plan/evidence → source/tests.
@@ -108,14 +112,15 @@ Status, known issues, current milestone, feature matrix, requirements traceabili
 - [x] Server-authoritative `/app` shell implemented provider-independently.
 - [x] Unauthenticated `/app` browser redirect verified.
 - [x] Basic profile schema, settings flow and own-user authorization boundary implemented.
+- [x] Provider-independent mobile overflow, keyboard auth focus path, and auth-control labels verified in Chromium.
 - [ ] Provider-backed authenticated user can enter `/app`.
 - [ ] Provider-backed signup/login/verification/recovery/logout E2E passes.
 - [ ] Profile own-user RLS and cross-user denial are verified against real Supabase.
-- [ ] Milestone-wide security/accessibility/performance review complete.
+- [ ] Milestone-wide provider-backed security/accessibility closeout complete.
 - [ ] Exact-final-head CI green with durable closeout current.
 
 ## Exact Next Capability
-M01.7 — provider-backed/authenticated E2E and final accessibility/security closeout, including the outstanding M01.6 two-user RLS isolation gate when a configured Supabase test environment is available. Do not claim provider-backed verification without real evidence.
+M01.7 — execute provider-backed/authenticated E2E and the outstanding M01.6 two-user RLS isolation gate when a configured Supabase test environment is available. Until then, preserve the verified provider-independent browser evidence and do not claim provider-backed verification.
 
 ## Next Milestone
 M02 — Organizations + RBAC. Do not start until M01 is objectively complete and integrated/authorized according to repository policy.
