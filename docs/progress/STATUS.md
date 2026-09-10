@@ -6,26 +6,27 @@ Last reconciled: 2026-09-10
 
 None formally COMPLETE yet.
 
-The application foundation from PR #1 is on `main`. PR #2 now contains the durable requirements corpus, reproducible dependency lockfile, upgraded autonomous-development framework, living milestone ledgers, and verification tooling. Foundation closeout is in **VERIFYING** while the reconciled durable-state commit receives fresh exact-head CI and final skeptical review.
+The application foundation from PR #1 is on `main`. PR #2 now contains the durable requirements corpus, reproducible dependency lockfile, upgraded autonomous-development framework, living milestone ledgers, PRD verification, and requirements-source integrity verification. Foundation closeout is in **VERIFYING** while the current exact head receives full CI and final skeptical review.
 
 ## Current Milestone
 
 Product Foundation — **VERIFYING**.
 
-Current capability slice: foundation closeout and durable recovery reconciliation.
+Current capability slice: foundation closeout, source-integrity hardening, and durable recovery reconciliation.
 
 ## Current Task State
 
 - repository bootstrap: COMPLETE;
 - testing foundation: COMPLETE;
 - CI foundation: COMPLETE;
-- autonomous long-project control plane: IMPLEMENTED and verified on PR head `dcf54ace909345194b873b51a44e94dce825d9db`;
+- autonomous long-project control plane: IMPLEMENTED;
 - durable milestone-ledger migration: IMPLEMENTED;
 - complete requirements corpus persistence: IMPLEMENTED;
 - PRD coverage for sections 1–242: VERIFIED on CI run `34473131246`;
 - reproducible `pnpm-lock.yaml`: IMPLEMENTED;
-- frozen dependency install in CI: IMPLEMENTED and VERIFIED on CI run `34473131246`;
-- final durable-state reconciliation + exact-head CI/review: IN PROGRESS.
+- frozen dependency install in CI: IMPLEMENTED and previously verified;
+- requirements-source integrity gate: IMPLEMENTED with genuine CI RED→GREEN test evidence; full standalone verifier/full-suite verification pending current exact head;
+- final exact-head CI/review: IN PROGRESS.
 
 ## Active Branch
 
@@ -39,29 +40,34 @@ Do not merge without explicit owner authorization.
 
 ## CI Status
 
-Latest verified pre-reconciliation head: `dcf54ace909345194b873b51a44e94dce825d9db`.
+CI status: VERIFYING current exact head.
 
-GitHub Actions CI run `34473131246` completed successfully on that exact SHA. The `quality` job passed frozen dependency installation, lint, typecheck, unit/component tests, autonomous-framework verifier tests, autonomous-framework verification, production build, Chromium installation, smoke E2E, and PRD coverage verification.
+Verified historical branch head `dcf54ace909345194b873b51a44e94dce825d9db` passed GitHub Actions CI run `34473131246`, including frozen dependency installation, lint, typecheck, unit/component tests, autonomous-framework verifier tests, autonomous-framework verification, production build, Chromium installation, smoke E2E, and PRD coverage verification.
 
-Because this status reconciliation itself creates a newer head, completion still requires fresh exact-head CI for the final documentation head.
+Source-integrity TDD evidence:
+
+- RED: commit `e2cf842f2d6db16e6b5c41d15cac584fca8a3ab3`, CI run `34474152336`, failed exactly because `scripts/verify_requirements_source.py` did not exist;
+- GREEN test evidence: commit `051a400bc2571b94f4c8e61ef63a4b08e401c386`, CI run `34474310301`, passed all 5 new requirements-source verifier tests;
+- that same run then exposed a separate durable-status regression: `docs/progress/STATUS.md` no longer contained the machine-required literal `CI status:` marker. This document restores that invariant. Full exact-head verification must still pass after this correction.
 
 ## Blockers
 
 No external blocker is currently known.
 
-The former requirements-transport, PRD-coverage, dependency-lockfile, and exact-head-CI blockers were resolved on the verified branch head above.
+The former requirements-transport, PRD-coverage, dependency-lockfile, and historical exact-head-CI blockers are resolved. Current failed CI was caused by the stale-status reconciliation dropping a required recovery marker and is being corrected at the source.
 
 ## Critical / Important Findings
 
 - Critical: none recorded.
-- Important: none currently recorded; final review of the reconciled PR head remains required before formal completion.
+- Important: requirements source integrity lacked continuous manifest verification — fixed with a new verifier/test/CI gate, pending full exact-head verification.
+- Important: reconciliation dropped required `CI status:` marker — fixed in this document, pending full exact-head verification.
 
 ## Milestone Program
 
 - M00 Product Foundation — VERIFYING
 - M01–M15 — NOT STARTED
 
-Do not start M01 until M00 closeout is objectively complete and PR #2 remains subject to explicit-owner merge authorization.
+Do not start M01 until M00 closeout is objectively complete. PR #2 remains subject to explicit-owner merge authorization.
 
 ## Durable Recovery
 
@@ -79,4 +85,4 @@ Read in this order after recovering GitHub reality:
 
 ## Exact next work
 
-Exact next work: verify the final reconciled PR #2 head with skeptical review plus exact-SHA GitHub Actions; if all required checks are green and no Critical/Important findings remain, record Product Foundation closeout while keeping PR #2 open and unmerged pending explicit owner authorization.
+Exact next work: verify the current PR #2 head through full GitHub Actions, confirm the requirements-source integrity gate and all existing quality/PRD gates pass, complete skeptical review with 0 unresolved Critical/Important findings, then preserve PR #2 open and unmerged for explicit owner-controlled integration.
