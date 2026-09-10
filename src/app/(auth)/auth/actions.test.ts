@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { idleAuthActionState } from "@/lib/auth/action-state";
 import { createClient } from "@/lib/supabase/server";
@@ -27,6 +27,13 @@ function credentials(email = "person@example.com", password = "correct-horse") {
 describe("authentication server actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://hire-evidence.example");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "sb_publishable_test");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("rejects invalid credentials before calling Supabase", async () => {
