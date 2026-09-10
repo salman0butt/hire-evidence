@@ -4,7 +4,7 @@ Only unresolved or materially relevant issues belong here.
 
 ## Resolved foundation issues
 
-The Product Foundation requirements-durability, dependency-lockfile, requirements-source-integrity, recovery-marker, and unified-verification issues were resolved before PR #2 integration. PR #2 was merged as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI run `34486610200` / run #57 passed on that exact `main` SHA.
+Product Foundation requirements durability, dependency-lockfile, requirements-source-integrity, recovery-marker, and unified-verification issues were resolved before PR #2 integration. PR #2 merged as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI `34486610200` / #57 passed.
 
 ## Resolved during M01.1
 
@@ -12,22 +12,52 @@ The Product Foundation requirements-durability, dependency-lockfile, requirement
 
 - **Previous severity:** Important / active-CI blocker
 - **Status:** RESOLVED
-- **Root cause:** Vitest globals are disabled, so Testing Library's automatic cleanup hook was not registered by the test environment. A first `render()` remained in `document.body` for the next test, duplicating named regions.
-- **Evidence / fix:** CI run `34488549294` / run #62 failed on `f8bf5c915acc7ba2dc7630adef516b4e43182cee`. Commit `97513c5357aa82b1bbf8c6ea093c61962e9407ab` registered explicit `afterEach(cleanup)` in `test/setup.ts`.
+- **Root cause:** Vitest globals were disabled, so Testing Library automatic cleanup was not registered.
+- **Evidence / fix:** CI `34488549294` / #62 failed on `f8bf5c9…`; `97513c5357aa82b1bbf8c6ea093c61962e9407ab` registered explicit cleanup.
 
 ### KI-008 — Human-decision assertion assumed globally unique copy
 
 - **Previous severity:** Important / active-CI blocker
 - **Status:** RESOLVED
-- **Root cause:** after DOM isolation was restored, the page legitimately contained two human-decision safety statements while `getByText()` required a single global match.
-- **Evidence / fix:** CI run `34491773023` / run #63 exposed the selector defect. Commit `6107253fdde1639097a6e6a6d8fd3777f242e5a4` scoped the assertion to the named Security & fairness region. CI run `34492022676` / run #64 passed all required gates.
+- **Root cause:** two legitimate safety statements existed while the test required a single global text match.
+- **Evidence / fix:** CI `34491773023` / #63 exposed it; `6107253fdde1639097a6e6a6d8fd3777f242e5a4` scoped the assertion semantically; CI #64 passed.
+
+## Resolved during M01.2
+
+### KI-009 — Missing Supabase environment contract
+
+- **Previous severity:** Expected TDD RED / capability blocker
+- **Status:** RESOLVED
+- **Evidence:** `883853a231650487d9c5fda8bf8029550194ed36` introduced tests first; CI `34498258324` / #67 failed because production configuration had no Supabase fields. The implementation added required URL/key validation and request-scoped configuration use.
+
+### KI-010 — Optional-property test encoded missing as explicit undefined
+
+- **Previous severity:** Important / CI blocker in test construction
+- **Status:** RESOLVED
+- **Root cause:** `exactOptionalPropertyTypes` correctly rejected an explicitly assigned `undefined` where the test intended an omitted key.
+- **Evidence / fix:** CI `34498441763` / #70; fixed in `c7d5d2160cd3c3d1ea8d956bc574fbfcb1d0ccda` without weakening runtime validation.
+
+### KI-011 — Provider-independent CI lacked public Supabase configuration
+
+- **Previous severity:** Important / integration gap
+- **Status:** RESOLVED
+- **Root cause:** the request proxy validates Supabase configuration, while build/smoke CI previously supplied only the application URL.
+- **Fix:** CI now supplies explicit non-secret placeholder public credentials for provider-independent build/smoke execution. These values are not provider-backed auth evidence.
+
+### KI-012 — Backslash network-path redirect escape
+
+- **Previous severity:** Important / security
+- **Status:** RESOLVED
+- **Root cause:** the first redirect guard rejected `//host` and absolute URLs but accepted `/\\host`, which URL consumers can normalize into a network-path-style destination.
+- **RED evidence:** `ea8f6d628935bb942f0fd26b824c603bd1380e4f`; CI `34499549698` / #82 failed exactly on the new regression test while 15 other tests passed.
+- **GREEN evidence:** `c1a11206916684546c8b8dcdd89f4a3908fe359e` rejects backslashes; CI `34499829397` / #83 passed every repository gate.
 
 ## Current unresolved issues
 
-No Critical or Important implementation/review issue is currently known.
+No Critical or Important implementation/review issue is known after M01.2 re-review.
 
-A non-blocking Vitest/Vite warning remains: `vitest.config.ts` is loaded as CommonJS while using ESM syntax. It is classified **Minor** because the exact reviewed code head passes tests/build/E2E; address it in focused module/config maintenance instead of broadening the current capability.
+A non-blocking Vitest/Vite warning remains: `vitest.config.ts` is loaded as CommonJS while using ESM syntax. Classification: **Minor**; defer to focused configuration maintenance.
 
-M01 is intentionally incomplete. Provider-backed authentication E2E, profile RLS/cross-user isolation evidence, and the remaining M01 capability slices are required before milestone completion; these are planned work, not defects in M01.1.
+M01 remains intentionally incomplete. Core auth/recovery, authenticated shell, profile/RLS, provider-backed authentication E2E, cross-user isolation evidence, and final accessibility/security closeout remain planned work.
 
-The durable reconciliation head created after reviewed code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4` requires its own exact-head CI before a fresh worker may treat the latest branch head as green.
+The documentation reconciliation commits after reviewed code head `c1a11206916684546c8b8dcdd89f4a3908fe359e` require fresh exact-head CI before the latest branch head may be treated as green.
