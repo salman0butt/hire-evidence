@@ -31,7 +31,7 @@ No milestone is COMPLETE without requirements/iterations accounted for, acceptan
 | [M15](./M15-enterprise-compliance.md) | Enterprise Compliance | **NOT STARTED** |
 
 ## Current evidence
-M00 is integrated on `main` at `64ebeb4…`, CI #57. M01 draft PR #3 remains open/unmerged. M01.1–M01.5 are provider-independently verified; latest M01.5 code/E2E head `d5ee32a4ceab57df9ea8108a0e7600a1244c070c` passed CI #126. M01.6 profile/RLS is next.
+M00 is integrated on `main` at `64ebeb4…`, CI #57. M01 draft PR #3 remains open/unmerged. M01.1–M01.5 are provider-independently verified. M01.6 profile/RLS is implemented and reviewed at `e9c2ad64…`, CI #130, but remains short of VERIFIED until real Supabase cross-user isolation is executed. M01.7 provider-backed closeout is next.
 
 ## Recovery
 Start from actual Git/GitHub + exact-head CI, then autonomy docs, compact status, known issues, current/active milestone ledgers, PRD/traceability, Superpowers artifacts, PR/reviews, source/tests.
