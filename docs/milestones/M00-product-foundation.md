@@ -10,7 +10,6 @@ Deliver the authoritative PRD milestone below as a reviewable, evidence-backed c
 # 195. MILESTONE 00 — PRODUCT FOUNDATION
 
 ## Goal
-
 Bootstrap repository and persistent project-management structure.
 
 Deliver:
@@ -49,12 +48,12 @@ The authoritative definition plus every default iteration listed below.
 Later milestones, speculative abstractions, and behavior not justified by the PRD.
 
 ## Architecture Notes
-Single Next.js App Router application with strict TypeScript, minimal product shell, deterministic environment validation, health endpoint, Vitest/Testing Library, Playwright smoke coverage, Tailwind, ESLint, and GitHub Actions. The repository itself is the durable execution memory.
+Single Next.js App Router application with strict TypeScript, minimal product shell, deterministic environment validation, health endpoint, Vitest/Testing Library, Playwright smoke coverage, Tailwind, ESLint, and GitHub Actions. The repository itself is durable execution memory.
 
 ## Selected Design / Implementation Plan
 - Design: `docs/superpowers/specs/2026-09-10-autonomous-long-project-framework-design.md` and `docs/superpowers/specs/2026-09-10-durable-milestone-ledger-design.md`
 - Plan: `docs/superpowers/plans/2026-09-10-autonomous-long-project-framework.md` and `docs/superpowers/plans/2026-09-10-durable-milestone-ledger-migration.md`
-- Both are pre-authorized under repository autonomous mode.
+- Routine decisions are pre-authorized under repository autonomous mode.
 
 ## Acceptance Criteria
 - PRD deliverables and exit criteria pass.
@@ -72,34 +71,40 @@ Single Next.js App Router application with strict TypeScript, minimal product sh
 5. **COMPLETE** — M00.5 — Milestone recovery: CURRENT.md, living milestone ledgers, autonomous framework, verification scripts, fresh-session recovery.
 
 ## TDD Evidence
-Foundation implementation used RED→GREEN during PR #1. The autonomous framework verifier also records genuine RED→GREEN evidence and its focused test suite passes in exact-head CI run `34473131246` on `dcf54ace909345194b873b51a44e94dce825d9db`.
+Foundation behavior used genuine RED→GREEN work. The requirements-source hardening also has direct CI evidence: run `34474152336` failed because the new verifier script was absent; after implementation run `34474310301` passed all five focused source-integrity tests; run `34474528983` passed those tests plus the real verifier.
 
 ## Integration Test Evidence
-The current CI quality job passed unit/component tests, autonomous-framework verification, build, smoke E2E, and PRD coverage together on exact head `dcf54ace909345194b873b51a44e94dce825d9db`.
+CI run `34474528983` on exact head `4ea1eed4c822c3667d575a13c6b735e5148c69df` passed frozen install, lint, typecheck, application tests, autonomous-framework tests/verifier, requirements-source tests/verifier, build, smoke E2E, and PRD coverage together.
 
 ## E2E / Visual Verification
-Playwright smoke E2E passed in CI run `34473131246`. No substantial product UI is introduced by this milestone, so separate visual regression evidence is not required for foundation closeout.
+Playwright smoke E2E passed in CI run `34474528983`. PR #2 adds no substantial user-facing product workflow, so separate visual-regression evidence is not required for this foundation slice.
 
 ## Security Review
-The current milestone introduces governance, source requirements, build/test infrastructure, and a minimal application shell. No tenant persistence, candidate authorization, billing, realtime, or AI assessment execution is introduced here. The non-negotiable hiring-AI safety boundaries remain enforced in `AGENTS.md` and the preserved source requirements.
+No tenant persistence, candidate authorization, billing, realtime interview execution, or AI assessment execution is introduced in this PR. Requirements-source verification rejects unsafe traversal-like manifest paths and checks exact source file identities. Non-negotiable hiring-AI safety boundaries remain in `AGENTS.md` and the preserved requirements.
 
 ## Accessibility Review
-The foundation UI remains minimal and existing component/smoke coverage passed. No new user-facing product workflow is added by PR #2.
+No new substantive user-facing workflow is added by PR #2. Existing foundation UI smoke/component coverage remains green.
 
 ## Performance Review
-No performance-critical product path is introduced. PR #2 primarily adds requirements/governance/recovery artifacts and verification tooling.
+No performance-critical product path is introduced. The source-integrity verifier operates over the small committed requirements corpus during verification and is not a runtime product path.
 
 ## AI / Eval Review
-AI product behavior is not implemented in this milestone. Safety/evaluation documents are governance inputs only; later AI milestones require their own eval evidence.
+AI product behavior is not implemented in this milestone. Safety/evaluation documents are governance inputs only; later AI milestones require dedicated eval evidence.
 
 ## Code Review Findings
-At the latest recovery check PR #2 had no submitted reviews and no unresolved review threads. Final skeptical review of the reconciled head is still required before formal completion.
+Skeptical review covered PRD compliance, correctness, architecture/YAGNI, testing, security, and hiring-AI safety.
+
+- Critical: 0.
+- Important: 3 found — continuous requirements-source integrity missing; required `CI status:` recovery marker dropped during reconciliation; unified local `pnpm verify` omitted source-integrity verification.
+- Important fixes: source-integrity verifier/tests/CI gate added; recovery marker restored; unified verification command aligned with requirements checks.
+- Minor: Vitest/Vite warns that `vitest.config.ts` uses ESM syntax while loaded as CommonJS. Tests pass; defer until module/config maintenance rather than broaden foundation scope.
+- Remaining Critical/Important: 0 known, subject to final exact-head CI.
 
 ## Fixes / Re-review
-Former Important blockers—requirements durability, PRD coverage, dependency lockfile reproducibility, and exact-head CI—have been resolved. Reconciliation updates stale status documents to match repository evidence.
+The Important findings above were corrected without weakening existing checks. Re-review found no remaining Critical/Important implementation issue. A final exact-head CI run is required because this review-evidence/config commit creates a newer head.
 
 ## Fresh Verification Commands
-Baseline required by repository policy:
+Baseline:
 
 ```bash
 pnpm install --frozen-lockfile
@@ -107,36 +112,40 @@ pnpm lint
 pnpm typecheck
 pnpm test
 python3 -m unittest tests/python/test_verify_autonomous_framework.py
+python3 -m unittest tests/python/test_verify_requirements_source.py
 python3 scripts/verify_autonomous_framework.py
+python3 scripts/verify_requirements_source.py
 pnpm build
 pnpm e2e
 python3 scripts/verify_prd_coverage.py
 ```
 
+The unified local command `pnpm verify` now includes framework and requirements verification.
+
 ## Fresh Verification Results
-Exact head `dcf54ace909345194b873b51a44e94dce825d9db`: GitHub Actions CI run `34473131246` — PASS. All quality steps above passed. The durable-state reconciliation commit creates a newer head and therefore requires its own fresh exact-head CI before M00 can be marked COMPLETE.
+Reviewed pre-closeout head `4ea1eed4c822c3667d575a13c6b735e5148c69df`: GitHub Actions CI run `34474528983` — PASS for every required step. This final durable review-evidence/config commit requires fresh exact-head CI before the run can claim final-head green.
 
 ## Commits / Files Changed
-Recover exact current state from PR #2/GitHub. Do not hard-code a final head beyond the evidence recorded for the specific verification run.
+Recover exact current state from PR #2/GitHub; do not treat historical SHA text as stronger than current Git state.
 
 ## Known Limitations
-PR #2 remains a draft/open integration boundary and must not be merged without explicit owner authorization. Later product milestones remain intentionally unimplemented.
+PR #2 remains draft/open and must not be merged without explicit owner authorization. Later product milestones remain intentionally unimplemented. The Vitest/Vite module-loader warning is Minor technical debt.
 
 ## Documentation Updated
-Requirements README/traceability, feature matrix, project status, known issues, current milestone, and this ledger are reconciled against current branch and CI evidence.
+Requirements/progress state, known issues, feature matrix, current milestone, and this living ledger have been reconciled against repository/CI evidence.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → relevant PRD → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
 
 ## Completion Checklist
 - [x] Requirements and iterations accounted for.
-- [x] Acceptance criteria implemented for the foundation scope.
+- [x] Acceptance criteria implemented for foundation scope.
 - [x] Required TDD/integration/E2E evidence recorded.
 - [x] Security/accessibility/performance/AI-eval review scope documented.
-- [ ] 0 Critical / 0 Important findings confirmed on final reconciled head.
+- [x] 0 known Critical / 0 known Important findings after fixes/re-review.
 - [x] Traceability/feature matrix reconciled.
-- [ ] Exact-final-head CI green after durable-state reconciliation.
-- [x] Durable status/closeout state current for the reconciliation commit.
+- [ ] Exact-final-head CI green after this final review-evidence/config commit.
+- [x] Durable status/review evidence current at commit creation time.
 
 ## Next Milestone
-M01 — SaaS Shell + Auth, but do not begin it until M00 closeout is formally COMPLETE. PR #2 still remains subject to explicit owner-controlled merge authorization.
+M01 — SaaS Shell + Auth, but do not begin it until M00 closeout is objectively complete. PR #2 remains subject to explicit owner-controlled merge authorization.

@@ -6,13 +6,13 @@ Last reconciled: 2026-09-10
 
 None formally COMPLETE yet.
 
-The application foundation from PR #1 is on `main`. PR #2 now contains the durable requirements corpus, reproducible dependency lockfile, upgraded autonomous-development framework, living milestone ledgers, PRD verification, and requirements-source integrity verification. Foundation closeout is in **VERIFYING** while the current exact head receives full CI and final skeptical review.
+The application foundation from PR #1 is on `main`. PR #2 now contains the durable requirements corpus, reproducible dependency lockfile, upgraded autonomous-development framework, living milestone ledgers, PRD verification, and requirements-source integrity verification. Product Foundation is **VERIFYING** pending fresh exact-head CI for the final review-evidence/config commit. PR #2 must remain open and unmerged without explicit owner authorization.
 
 ## Current Milestone
 
 Product Foundation — **VERIFYING**.
 
-Current capability slice: foundation closeout, source-integrity hardening, and durable recovery reconciliation.
+Current capability slice: foundation closeout, requirements integrity, verification alignment, and durable recovery reconciliation.
 
 ## Current Task State
 
@@ -22,11 +22,11 @@ Current capability slice: foundation closeout, source-integrity hardening, and d
 - autonomous long-project control plane: IMPLEMENTED;
 - durable milestone-ledger migration: IMPLEMENTED;
 - complete requirements corpus persistence: IMPLEMENTED;
-- PRD coverage for sections 1–242: VERIFIED on CI run `34473131246`;
-- reproducible `pnpm-lock.yaml`: IMPLEMENTED;
-- frozen dependency install in CI: IMPLEMENTED and previously verified;
-- requirements-source integrity gate: IMPLEMENTED with genuine CI RED→GREEN test evidence; full standalone verifier/full-suite verification pending current exact head;
-- final exact-head CI/review: IN PROGRESS.
+- PRD sections 1–242 coverage: VERIFIED on CI run `34474528983`;
+- reproducible `pnpm-lock.yaml` + frozen CI install: VERIFIED on CI run `34474528983`;
+- requirements-source exact file/size/SHA-256 integrity gate: IMPLEMENTED and VERIFIED on CI run `34474528983`;
+- skeptical review: COMPLETE with 0 Critical and 3 Important findings found/fixed; 1 Minor warning deferred;
+- final exact-head CI after review-evidence/config alignment: IN PROGRESS/PENDING.
 
 ## Active Branch
 
@@ -40,49 +40,41 @@ Do not merge without explicit owner authorization.
 
 ## CI Status
 
-CI status: VERIFYING current exact head.
+CI status: VERIFYING final exact head.
 
-Verified historical branch head `dcf54ace909345194b873b51a44e94dce825d9db` passed GitHub Actions CI run `34473131246`, including frozen dependency installation, lint, typecheck, unit/component tests, autonomous-framework verifier tests, autonomous-framework verification, production build, Chromium installation, smoke E2E, and PRD coverage verification.
+Latest fully verified pre-finalization head: `4ea1eed4c822c3667d575a13c6b735e5148c69df`.
 
-Source-integrity TDD evidence:
+GitHub Actions CI run `34474528983` passed frozen install, lint, typecheck, application tests, framework verifier tests, requirements-source verifier tests, framework verification, requirements-source integrity verification, build, Chromium installation, smoke E2E, and PRD coverage.
 
-- RED: commit `e2cf842f2d6db16e6b5c41d15cac584fca8a3ab3`, CI run `34474152336`, failed exactly because `scripts/verify_requirements_source.py` did not exist;
-- GREEN test evidence: commit `051a400bc2571b94f4c8e61ef63a4b08e401c386`, CI run `34474310301`, passed all 5 new requirements-source verifier tests;
-- that same run then exposed a separate durable-status regression: `docs/progress/STATUS.md` no longer contained the machine-required literal `CI status:` marker. This document restores that invariant. Full exact-head verification must still pass after this correction.
+Requirements-source TDD evidence:
+
+- RED: `e2cf842f2d6db16e6b5c41d15cac584fca8a3ab3`, CI `34474152336`, expected failure because `scripts/verify_requirements_source.py` did not exist;
+- GREEN tests: `051a400bc2571b94f4c8e61ef63a4b08e401c386`, CI `34474310301`, all 5 focused source-integrity tests passed;
+- full GREEN: `4ea1eed4c822c3667d575a13c6b735e5148c69df`, CI `34474528983`, tests plus the real source verifier and all other gates passed.
 
 ## Blockers
 
-No external blocker is currently known.
-
-The former requirements-transport, PRD-coverage, dependency-lockfile, and historical exact-head-CI blockers are resolved. Current failed CI was caused by the stale-status reconciliation dropping a required recovery marker and is being corrected at the source.
+No external blocker is known. The only remaining run gate is fresh exact-head CI after the final review-evidence/config commit.
 
 ## Critical / Important Findings
 
-- Critical: none recorded.
-- Important: requirements source integrity lacked continuous manifest verification — fixed with a new verifier/test/CI gate, pending full exact-head verification.
-- Important: reconciliation dropped required `CI status:` marker — fixed in this document, pending full exact-head verification.
+- Critical: 0.
+- Important 1: archived requirements source lacked continuous manifest integrity verification — FIXED.
+- Important 2: status reconciliation dropped mandatory `CI status:` marker — FIXED.
+- Important 3: unified local `pnpm verify` omitted requirements-source verification while CI enforced it — FIXED in the final review-evidence/config commit, pending exact-head CI.
+- Minor: Vitest/Vite warns about ESM syntax in `vitest.config.ts` loaded as CommonJS; tests pass and this is deferred to focused module/config maintenance.
 
 ## Milestone Program
 
 - M00 Product Foundation — VERIFYING
 - M01–M15 — NOT STARTED
 
-Do not start M01 until M00 closeout is objectively complete. PR #2 remains subject to explicit-owner merge authorization.
+Do not start M01 until M00 closeout is objectively complete.
 
 ## Durable Recovery
 
-Read in this order after recovering GitHub reality:
-
-1. `AGENTS.md`
-2. `docs/AUTONOMOUS-DEVELOPMENT.md`
-3. this file
-4. `docs/progress/KNOWN-ISSUES.md`
-5. current milestone ledger
-6. relevant PRD sections
-7. selected Superpowers spec/plan
-8. active PR/reviews/exact-head CI
-9. source/tests
+Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, current/active milestone ledger, relevant PRD/traceability, Superpowers spec/plan, and source/tests.
 
 ## Exact next work
 
-Exact next work: verify the current PR #2 head through full GitHub Actions, confirm the requirements-source integrity gate and all existing quality/PRD gates pass, complete skeptical review with 0 unresolved Critical/Important findings, then preserve PR #2 open and unmerged for explicit owner-controlled integration.
+Exact next work: inspect GitHub Actions for the exact final PR #2 head; if every required gate is green and no new Critical/Important finding appears, leave PR #2 open and unmerged for explicit owner-controlled integration and do not start M01 from this unmerged branch.
