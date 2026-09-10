@@ -71,9 +71,19 @@ export function AuthForm({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor={`${mode}-password`} className="block text-sm font-medium text-zinc-800">
-              Password
-            </label>
+            <div className="flex items-center justify-between gap-4">
+              <label htmlFor={`${mode}-password`} className="block text-sm font-medium text-zinc-800">
+                Password
+              </label>
+              {isLogin ? (
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-sm font-semibold text-zinc-950 underline underline-offset-4"
+                >
+                  Forgot password?
+                </Link>
+              ) : null}
+            </div>
             <input
               id={`${mode}-password`}
               name="password"

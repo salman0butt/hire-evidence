@@ -130,12 +130,18 @@ export async function resetPasswordAction(
     return errorState("Use at least 8 characters for your password.");
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.updateUser({ password });
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.updateUser({ password });
 
-  if (error) {
+    if (error) {
+      return errorState(
+        "Your password reset link is invalid or expired. Request a new reset link.",
+      );
+    }
+  } catch {
     return errorState(
-      "Your password reset link is invalid or expired. Request a new reset link.",
+      "We could not update your password. Request a new reset link and try again.",
     );
   }
 
