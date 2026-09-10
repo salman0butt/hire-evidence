@@ -64,8 +64,16 @@ describe("parseEnvironment", () => {
     }
   });
 
-  it("rejects a missing or blank Supabase publishable key", () => {
-    for (const value of [undefined, "", "   "]) {
+  it("rejects a missing Supabase publishable key", () => {
+    expect(() =>
+      parseEnvironment({
+        NEXT_PUBLIC_SUPABASE_URL: "https://project.supabase.co",
+      }),
+    ).toThrow("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY must be non-empty");
+  });
+
+  it("rejects a blank Supabase publishable key", () => {
+    for (const value of ["", "   "]) {
       expect(() =>
         parseEnvironment({
           NEXT_PUBLIC_SUPABASE_URL: "https://project.supabase.co",
