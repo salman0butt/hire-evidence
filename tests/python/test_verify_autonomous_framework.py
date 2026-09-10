@@ -73,6 +73,19 @@ class VerifyAutonomousFrameworkTests(unittest.TestCase):
         errors = module.validate_repository(root)
         self.assertTrue(any("exact-sha" in error.lower() for error in errors))
 
+    def test_multiple_exact_next_work_markers_fail(self) -> None:
+        root = self.make_valid_repo()
+        (root / "docs/progress/STATUS.md").write_text(
+            "Active branch: feat/example\n"
+            "Active PR: #2 DRAFT\n"
+            "CI status: UNKNOWN\n"
+            "Exact next work: First task.\n"
+            "Exact next work: Conflicting task.\n",
+            encoding="utf-8",
+        )
+        errors = module.validate_repository(root)
+        self.assertTrue(any("exactly one 'Exact next work:'" in error for error in errors))
+
     def test_valid_repository_passes(self) -> None:
         root = self.make_valid_repo()
         self.assertEqual(module.validate_repository(root), [])
