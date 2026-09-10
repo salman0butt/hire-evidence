@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M01
 
 Current capability:
-Protected application shell verified; basic profile + RLS next
+Basic profile implemented provider-independently; provider-backed isolation and milestone closeout remain
 
 Status:
 IMPLEMENTING
@@ -31,26 +31,23 @@ Detailed known issues:
 
 Product Foundation is COMPLETE. PR #2 was already merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI #57 passed.
 
-## Completed in M01
+## Completed / Implemented in M01
 
-- M01.1 marketing shell: VERIFIED; CI #64.
-- M01.2 Supabase SSR/session infrastructure: VERIFIED; CI #83.
-- M01.3 core email authentication: VERIFIED provider-independently; CI #103.
-- M01.4 password recovery: VERIFIED provider-independently; security GREEN `b048782…`, CI #121; durable-reconciliation repair `6833d47…`, CI #123.
-- M01.5 protected application shell: VERIFIED provider-independently. RED `0d3aa49…`, CI #124; implementation `361ff9a…`, CI #125; browser-evidence head `d5ee32a4ceab57df9ea8108a0e7600a1244c070c`, CI `34508795038` / #126 PASS.
+- M01.1–M01.5: VERIFIED provider-independently.
+- M01.6 profile persistence/RLS: IMPLEMENTED provider-independently at reviewed head `e9c2ad64f2f9065d53a44652ac1116f91538e7f7`; CI `34510856609` / #130 SUCCESS. Real Supabase cross-user denial remains mandatory before VERIFIED.
 
 ## Remaining
 
-1. M01.6 — basic profile persistence with RLS/cross-user isolation.
-2. M01.7 — accessibility/provider-backed E2E/security-review/closeout.
+1. Execute real Supabase migration + User A/User B profile isolation verification.
+2. M01.7 provider-backed auth/recovery/profile E2E plus accessibility/security closeout.
 
 ## Blocker
 
-No blocker prevents M01.6 code work. Configured Supabase provider/database evidence is mandatory before profile/RLS or final M01 completion is claimed VERIFIED.
+Configured Supabase provider/database evidence is mandatory before M01.6 or the milestone is called VERIFIED/COMPLETE. This cannot be replaced with mocks or static SQL inspection.
 
 ## Verification state
 
-M01.5 browser-evidence head `d5ee32a4ceab57df9ea8108a0e7600a1244c070c` passed frozen install, lint, typecheck, tests, both verifier test suites, both repository verifiers, production build, Chromium smoke E2E, and PRD coverage in CI #126.
+M01.6 RED `8656902…` failed CI #128 as intended. Reviewed code/test head `e9c2ad64…` passed frozen install, lint, typecheck, unit/component tests, framework verifier tests, requirements-source verifier tests, both repository verifiers, production build, Chromium smoke E2E, and PRD coverage in CI #130.
 
 ## Next Action
 

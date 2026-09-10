@@ -6,24 +6,20 @@ Only unresolved or materially relevant issues belong here.
 
 Product Foundation requirements durability, dependency reproducibility, requirements-source integrity, and autonomous-framework issues are resolved and integrated on `main` at `64ebeb4f7b2a39fc0557685ef34035650211aad9` with CI #57 green.
 
-M01 resolved issues include Testing Library DOM leakage, overly broad human-decision selectors, environment-contract/test-fixture defects, backslash redirect escape, bounded provider-error verification gaps, durable Supabase token-hash setup documentation, and the M01.4 confirmation-route request-origin trust issue.
+M01 resolved issues include Testing Library DOM leakage, overly broad human-decision selectors, environment-contract/test-fixture defects, backslash redirect escape, bounded provider-error verification gaps, durable Supabase token-hash setup documentation, confirmation-route request-origin trust, milestone-ledger reconciliation, and the M01.6 forged-profile-owner test gap.
 
-### KI-017 — Confirmation redirects trusted request origin
+### KI-019 — Profile owner boundary lacked explicit action-level regression coverage
 
-Status: RESOLVED. RED `ee8fd9b4706c47530d3268542ee5495d8ea3796c`, CI #120; GREEN `b048782e0644213727f16fdf376d87f6bebb1d1e`, CI #121. Redirects now derive from validated `NEXT_PUBLIC_APP_URL`.
-
-### KI-018 — M01.4 reconciliation omitted required milestone-ledger headings
-
-Status: RESOLVED. Documentation head `6c001265bd71076bd67eaca34a9a23f208d46a6a` failed the autonomous-framework verifier in CI #122 while install/lint/typecheck/tests passed. Root cause was a documentation-contract regression, not verifier behavior. Required headings were restored without weakening verification in `6833d47340c1210235ac501c93a95a178fdfe3cd`; CI #123 passed all gates.
+Status: RESOLVED. Skeptical review found that the server action correctly derived row ownership from `requireUser()`, but no test proved forged `id` / `user_id` form fields were ignored. `e9c2ad64f2f9065d53a44652ac1116f91538e7f7` added the ownership-boundary test plus structural RLS migration tests; CI #130 passed.
 
 ## Current unresolved issues
 
-No Critical or Important implementation/review issue is known after M01.5 re-review.
+### KI-020 — Provider-backed profile RLS isolation evidence unavailable
 
-The profile link in the authenticated navigation targets `/app/profile`, whose behavior belongs to exact-next M01.6. Classification: **Minor / expected staged implementation**; M01.5 must not imply profile persistence is already available.
+Status: BLOCKED ON EXTERNAL TEST CONFIGURATION. The profile schema, own-user repository/action, and RLS policies are implemented, but M01.6 may not be called VERIFIED until the migration runs against a configured Supabase test project and two real authenticated users prove User A cannot select/update User B. Required human/environment action: provide/configure a safe Supabase test environment with the documented public application variables and test identities; never commit service-role secrets.
 
 A non-blocking Vitest/Vite warning remains: `vitest.config.ts` is loaded as CommonJS while using ESM syntax. Classification: **Minor**; defer to focused configuration maintenance.
 
 Supabase logout currently uses the SDK default session scope. Classification: **Minor / product-semantics decision**; do not alter multi-device logout behavior without an explicit product requirement.
 
-M01 remains incomplete. Profile/RLS, provider-backed auth/recovery E2E, cross-user isolation evidence, and final accessibility/security closeout remain planned work.
+M01 remains incomplete. Provider-backed auth/recovery/profile E2E, cross-user isolation evidence, and final accessibility/security closeout remain planned work.
