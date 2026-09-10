@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M01
 
 Current capability:
-Supabase SSR infrastructure and environment boundary
+Core email authentication flows
 
 Status:
 IMPLEMENTING
@@ -29,41 +29,39 @@ Detailed known issues:
 
 ## Dependency closeout
 
-Product Foundation is COMPLETE. PR #2 was merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`, and post-merge CI run `34486610200` / run #57 passed on that exact SHA.
+Product Foundation is COMPLETE. PR #2 merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI `34486610200` / #57 passed.
 
 ## Completed in M01
 
-- Architectural design: `docs/superpowers/specs/2026-09-10-saas-shell-auth-design.md`.
-- Executable plan: `docs/superpowers/plans/2026-09-10-saas-shell-auth.md`.
-- M01.1 marketing shell: premium public homepage, typed pricing placeholder, SEO metadata, responsive layout baseline, explicit human hiring-decision boundary, focus-visible/reduced-motion styles, component tests, and smoke E2E.
-- Active-CI regressions were root-caused and fixed without weakening product behavior: explicit Testing Library cleanup and a semantically scoped safety assertion.
-- Reviewed code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4` passed CI run `34492022676` / run #64 across all required repository gates.
+- M01.1 marketing shell: VERIFIED on `6107253fdde1639097a6e6a6d8fd3777f242e5a4`; CI `34492022676` / #64 PASS.
+- M01.2 Supabase SSR/session infrastructure: environment validation, generated Supabase dependency lock state, browser/server clients, request proxy token verification/refresh, public CI placeholders for provider-independent execution, and safe internal redirects.
+- M01.2 reviewed code head `c1a11206916684546c8b8dcdd89f4a3908fe359e` passed CI `34499829397` / #83 across frozen install, lint, typecheck, tests, framework/source verifiers, build, Chromium, smoke E2E, and PRD coverage.
+- Security regression `/\\evil.example` was proven RED in CI `34499549698` / #82 and fixed before M01.2 verification.
 
 ## In progress
 
-- Durable recovery reconciliation for the transition from merged Product Foundation to active M01.
+- Durable recovery reconciliation after verified M01.2 code head.
 
 ## Remaining
 
-1. M01.2 — Supabase SSR infrastructure, environment validation, and safe internal redirects.
-2. M01.3 — signup/login/logout/email verification.
-3. M01.4 — password recovery.
-4. M01.5 — protected application shell.
-5. M01.6 — basic profile persistence with RLS/cross-user isolation.
-6. M01.7 — accessibility/provider-backed E2E/security-review/closeout.
+1. M01.3 — signup/login/logout/email verification.
+2. M01.4 — password recovery.
+3. M01.5 — protected application shell.
+4. M01.6 — basic profile persistence with RLS/cross-user isolation.
+5. M01.7 — accessibility/provider-backed E2E/security-review/closeout.
 
 ## Blocker
 
-None currently known for continuing M01.2. Provider-backed Supabase verification is required for later M01 closeout.
+None for beginning M01.3. Provider-backed Supabase verification remains mandatory before final M01 completion.
 
 ## Verification state
 
-Reviewed M01.1 code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4`:
+Reviewed M01.2 code head `c1a11206916684546c8b8dcdd89f4a3908fe359e`:
 
 - frozen dependency install: PASS;
 - lint: PASS;
 - typecheck: PASS;
-- unit/component tests: PASS;
+- unit/component tests: PASS (16 tests);
 - framework verifier tests: PASS;
 - requirements-source verifier tests: PASS;
 - autonomous-framework verification: PASS;
@@ -71,10 +69,10 @@ Reviewed M01.1 code head `6107253fdde1639097a6e6a6d8fd3777f242e5a4`:
 - production build: PASS;
 - Chromium install + smoke E2E: PASS;
 - PRD coverage: PASS;
-- exact-head CI: PASS in run `34492022676` / run #64.
+- exact-head CI: PASS in `34499829397` / #83.
 
-The newer durable-state reconciliation documentation head requires fresh exact-head CI.
+Newer documentation-only reconciliation heads require fresh CI.
 
 ## Next Action
 
-Follow `docs/progress/STATUS.md` `Exact next work:`. After reconciliation-head CI is green, begin M01.2 with genuine RED tests for Supabase environment validation and safe internal redirects. Keep PR #3 open/draft and unmerged unless explicitly authorized.
+Follow `docs/progress/STATUS.md` `Exact next work:`. Begin M01.3 test-first and keep PR #3 open/draft and unmerged unless explicitly authorized.
