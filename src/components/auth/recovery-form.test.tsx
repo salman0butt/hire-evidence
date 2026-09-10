@@ -8,8 +8,8 @@ describe("RecoveryForm", () => {
     render(<RecoveryForm mode="request" />);
 
     expect(screen.getByRole("heading", { name: /reset your password/i })).toBeVisible();
-    expect(screen.getByLabelText(/email/i)).toHaveAttribute("name", "email");
-    expect(screen.getByLabelText(/email/i)).toHaveAttribute("autocomplete", "email");
+    expect(screen.getByLabelText(/^email$/i)).toHaveAttribute("name", "email");
+    expect(screen.getByLabelText(/^email$/i)).toHaveAttribute("autocomplete", "email");
     expect(screen.getByRole("button", { name: /send reset link/i })).toBeVisible();
     expect(screen.getByRole("link", { name: /back to log in/i })).toHaveAttribute(
       "href",
@@ -21,12 +21,10 @@ describe("RecoveryForm", () => {
     render(<RecoveryForm mode="reset" />);
 
     expect(screen.getByRole("heading", { name: /choose a new password/i })).toBeVisible();
-    expect(screen.getByLabelText(/new password/i)).toHaveAttribute("name", "password");
-    expect(screen.getByLabelText(/new password/i)).toHaveAttribute(
-      "autocomplete",
-      "new-password",
-    );
-    expect(screen.getByLabelText(/new password/i)).toHaveAttribute("minlength", "8");
+    const passwordInput = screen.getByLabelText(/^new password$/i);
+    expect(passwordInput).toHaveAttribute("name", "password");
+    expect(passwordInput).toHaveAttribute("autocomplete", "new-password");
+    expect(passwordInput).toHaveAttribute("minlength", "8");
     expect(screen.getByRole("button", { name: /update password/i })).toBeVisible();
   });
 
