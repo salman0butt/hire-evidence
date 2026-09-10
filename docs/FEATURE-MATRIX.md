@@ -16,8 +16,8 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Password recovery | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | Provider-independent; `b048782…`, CI #121. |
 | Protected authenticated application shell | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | Server-authoritative guard/navigation + unauthenticated browser redirect; `f912da9…`, CI #127. |
 | Basic own-user profile + RLS | PRD 17, 196 | SaaS Shell + Auth | IMPLEMENTED | Migration, own-user repository/action, validation/UI and ownership-policy tests at `e9c2ad64…`, CI #130. Real Supabase User A/User B denial still required before VERIFIED. |
-| M01 provider-independent accessibility/browser closeout | PRD 15–17, 196 | SaaS Shell + Auth | VERIFIED | Mobile no-overflow, keyboard auth focus, labeled auth controls, mobile protected-route redirect; `061762ec…`, CI #134. Provider-backed accessibility/auth evidence remains separate. |
-| M01 provider-backed auth/profile E2E | PRD 16–17, 196 | SaaS Shell + Auth | BLOCKED | Requires configured Supabase test project and real test identities; placeholder CI credentials/mocks do not count. |
+| M01 provider-independent accessibility/browser closeout | PRD 15–17, 196 | SaaS Shell + Auth | VERIFIED | Mobile no-overflow, keyboard auth focus, labeled auth controls, mobile protected-route redirect; `061762ec…`, CI #134. Durable recovery head `b072290b…` passed CI #139. |
+| M01 provider-backed auth/profile E2E | PRD 16–17, 196 | SaaS Shell + Auth | BLOCKED | Dedicated Hire Evidence Supabase test project/identities required. 2026-09-11 connected-account discovery found no clearly identifiable project; unrelated projects, placeholders, mocks, service-role clients and static SQL do not count. |
 | Organizations and RBAC | PRD roadmap | Organizations + RBAC | PLANNED | Requires complete M01. |
 | Jobs and interviewer builder | PRD roadmap | Jobs + Interviewer Builder | PLANNED | Immutable published configuration/versioning. |
 | Candidates and invitations | PRD roadmap | Candidates + Invitations | PLANNED | Narrow invitation-scoped authorization. |
