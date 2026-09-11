@@ -6,7 +6,10 @@ import { hasOrganizationCapability } from "@/lib/organization/rbac";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
 
 import { updateJobAction } from "../job-actions";
-import { createCompetencyAction } from "./competency-actions";
+import {
+  createCompetencyAction,
+  saveCompetencyRubricAction,
+} from "./competency-actions";
 
 type JobPageProps = Readonly<{
   params: Promise<{ organizationId: string; jobId: string }>;
@@ -37,6 +40,7 @@ export default async function JobPage({ params }: JobPageProps) {
         <CompetencySection
           competencies={competencies}
           action={createCompetencyAction.bind(null, organizationId, jobId)}
+          rubricAction={saveCompetencyRubricAction.bind(null, organizationId, jobId)}
         />
       ) : (
         <CompetencySection competencies={competencies} readOnly />
