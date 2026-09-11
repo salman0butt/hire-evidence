@@ -60,6 +60,7 @@ export async function createInvitationAction(
       email,
       role,
     });
+    revalidatePath(`/app/o/${organizationId}/team`);
     return {
       status: "success",
       message: "Invitation link created.",
