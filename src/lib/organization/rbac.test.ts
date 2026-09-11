@@ -8,21 +8,24 @@ import {
   type OrganizationRole,
 } from "./rbac";
 
-const adminCapabilities: readonly OrganizationCapability[] = [
+const jobsView = "jobs:view" as unknown as OrganizationCapability;
+const jobsManage = "jobs:manage" as unknown as OrganizationCapability;
+
+const adminCapabilities = [
   "organization:view",
   "organization:update",
   "team:view",
   "team:invite",
   "team:manage_roles",
-  "jobs:view",
-  "jobs:manage",
-];
+  jobsView,
+  jobsManage,
+] as const;
 
-const memberCapabilities: readonly OrganizationCapability[] = [
+const memberCapabilities = [
   "organization:view",
   "team:view",
-  "jobs:view",
-];
+  jobsView,
+] as const satisfies readonly OrganizationCapability[];
 
 describe("organization RBAC", () => {
   it("exposes exactly the fixed milestone roles and capabilities", () => {
@@ -46,8 +49,8 @@ describe("organization RBAC", () => {
   );
 
   it("recruiter can manage jobs without receiving organization/team administration", () => {
-    expect(hasOrganizationCapability("recruiter", "jobs:view")).toBe(true);
-    expect(hasOrganizationCapability("recruiter", "jobs:manage")).toBe(true);
+    expect(hasOrganizationCapability("recruiter", jobsView)).toBe(true);
+    expect(hasOrganizationCapability("recruiter", jobsManage)).toBe(true);
     expect(hasOrganizationCapability("recruiter", "organization:update")).toBe(false);
     expect(hasOrganizationCapability("recruiter", "team:invite")).toBe(false);
     expect(hasOrganizationCapability("recruiter", "team:manage_roles")).toBe(false);
