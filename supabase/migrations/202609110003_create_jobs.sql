@@ -31,7 +31,7 @@ create table public.job_requirements (
   requirement text not null check (char_length(btrim(requirement)) between 1 and 500),
   position integer not null default 0 check (position >= 0),
   created_at timestamptz not null default now(),
-  unique (job_id, kind, position),
+  unique (job_id, position),
   foreign key (job_id, organization_id)
     references public.jobs(id, organization_id)
     on delete cascade
