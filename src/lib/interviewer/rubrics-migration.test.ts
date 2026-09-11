@@ -27,7 +27,7 @@ describe("observable rubric tenancy migration", () => {
     expect(migration).toMatch(/score_level smallint not null/i);
     expect(migration).toMatch(/score_level between 1 and 5/i);
     expect(migration).toMatch(/definition text not null/i);
-    expect(migration).toMatch(/char_length\(definition\) between 1 and 2000/i);
+    expect(migration).toMatch(/char_length\(btrim\(definition\)\) between 1 and 2000/i);
     expect(migration).toMatch(/unique\s*\(competency_id,\s*score_level\)/i);
     expect(migration).toMatch(/alter table public\.competency_rubrics enable row level security/i);
   });
