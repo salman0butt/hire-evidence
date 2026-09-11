@@ -5,9 +5,11 @@ import { requireOrganizationMembership } from "@/lib/organization/require-member
 
 import NewJobPage from "./page";
 
-const redirectMock = vi.fn((href: string) => {
-  throw new Error(`REDIRECT:${href}`);
-});
+const { redirectMock } = vi.hoisted(() => ({
+  redirectMock: vi.fn((href: string) => {
+    throw new Error(`REDIRECT:${href}`);
+  }),
+}));
 
 vi.mock("next/navigation", () => ({ redirect: redirectMock }));
 vi.mock("@/components/jobs/job-form", () => ({
