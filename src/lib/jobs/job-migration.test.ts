@@ -8,12 +8,14 @@ const migrationPath = join(
   "supabase/migrations/202609110003_create_jobs.sql",
 );
 
+function readMigration() {
+  expect(existsSync(migrationPath)).toBe(true);
+  return existsSync(migrationPath) ? readFileSync(migrationPath, "utf8") : "";
+}
+
 describe("job tenancy migration", () => {
   it("defines organization-owned jobs and separated requirement kinds", () => {
-    expect(existsSync(migrationPath)).toBe(true);
-    if (!existsSync(migrationPath)) return;
-
-    const migration = readFileSync(migrationPath, "utf8");
+    const migration = readMigration();
 
     expect(migration).toMatch(/create table public\.jobs/i);
     expect(migration).toMatch(/organization_id uuid not null references public\.organizations\(id\)/i);
@@ -22,5 +24,27 @@ describe("job tenancy migration", () => {
     expect(migration).toMatch(/nice_to_have/i);
     expect(migration).toMatch(/alter table public\.jobs enable row level security/i);
     expect(migration).toMatch(/alter table public\.job_requirements enable row level security/i);
+  });
+
+  it("creates a job and its requirements atomically through an authenticated role-gated RPC", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(/create or replace function public\.create_job/i);
+    expect(migration).toMatch(/security definer/i);
+    expect(migration).toMatch(/set search_path\s*=\s*''/i);
+    expect(migration).toMatch(/auth\.uid\(\)/i);
+    expect(migration).toMatch(/private\.has_organization_role/i);
+    expect(migration).toMatch(/array\['owner',\s*'admin',\s*'recruiter'\]::public\.organization_role\[\]/i);
+    expect(migration).toMatch(/insert into public\.jobs/i);
+    expect(migration).toMatch(/insert into public\.job_requirements/i);
+    expect(migration).toMatch(/jsonb_array_elements/i);
+    expect(migration).toMatch(/grant execute on function public\.create_job/i);
+
+    expect(migration).not.toMatch(
+      /grant\s+(?:insert|update|delete).*public\.jobs.*to\s+authenticated/is,
+    );
+    expect(migration).not.toMatch(
+      /grant\s+(?:insert|update|delete).*public\.job_requirements.*to\s+authenticated/is,
+    );
   });
 });
