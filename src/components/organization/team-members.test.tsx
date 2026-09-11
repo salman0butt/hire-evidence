@@ -13,7 +13,8 @@ describe("TeamMembers", () => {
     render(<TeamMembers members={members} canManage />);
 
     expect(screen.getByText("Owner")).toBeVisible();
-    expect(screen.getByText("Recruiter")).toBeVisible();
+    const roleSelect = screen.getByRole("combobox", { name: /^role$/i });
+    expect(roleSelect).toHaveValue("recruiter");
     expect(screen.getAllByRole("combobox")).toHaveLength(1);
     expect(screen.getAllByRole("button", { name: /remove member/i })).toHaveLength(1);
     expect(screen.queryByRole("option", { name: /^owner$/i })).not.toBeInTheDocument();
