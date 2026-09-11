@@ -3,23 +3,12 @@
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/require-user";
+import type { InvitationActionState } from "@/lib/organization/invitation-action-state";
 import {
   acceptOrganizationInvitation,
   createOrganizationInvitation,
 } from "@/lib/organization/invitations";
 import { isManageableOrganizationRole } from "@/lib/organization/rbac";
-
-export type InvitationActionState = Readonly<{
-  status: "idle" | "error" | "success";
-  message: string | null;
-  invitationUrl: string | null;
-}>;
-
-export const idleInvitationActionState: InvitationActionState = {
-  status: "idle",
-  message: null,
-  invitationUrl: null,
-};
 
 function errorState(message: string): InvitationActionState {
   return { status: "error", message, invitationUrl: null };

@@ -2,16 +2,13 @@ import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireUser } from "@/lib/auth/require-user";
+import { idleInvitationActionState } from "@/lib/organization/invitation-action-state";
 import {
   acceptOrganizationInvitation,
   createOrganizationInvitation,
 } from "@/lib/organization/invitations";
 
-import {
-  acceptInvitationAction,
-  createInvitationAction,
-  idleInvitationActionState,
-} from "./invite-actions";
+import { acceptInvitationAction, createInvitationAction } from "./invite-actions";
 
 vi.mock("@/lib/auth/require-user", () => ({ requireUser: vi.fn() }));
 vi.mock("@/lib/organization/invitations", () => ({
