@@ -2,49 +2,34 @@
 
 Only unresolved or materially relevant issues belong here.
 
-## Resolved during foundation closeout
+## Resolved foundation and M01 issues
 
-### KI-001 — Requirements corpus durability
+Product Foundation requirements durability, dependency reproducibility, requirements-source integrity, and autonomous-framework issues are resolved and integrated on `main` at `64ebeb4f7b2a39fc0557685ef34035650211aad9` with CI #57 green.
 
-- **Previous severity:** Important / milestone blocker
-- **Status:** RESOLVED
-- **Resolution evidence:** the verified owner-supplied requirements source is persisted under `docs/requirements/source/AI-Interviewer-Codex-Pack/`; `docs/requirements/SOURCE-MANIFEST.json` records source ZIP size `121574` bytes and SHA-256 `900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba`; PRD coverage passed in CI run `34473131246` and again in run `34474528983`.
+M01 resolved issues include Testing Library DOM leakage, overly broad human-decision selectors, environment-contract/test-fixture defects, backslash redirect escape, bounded provider-error verification gaps, durable Supabase token-hash setup documentation, confirmation-route request-origin trust, milestone-ledger reconciliation, forged-profile-owner test coverage, ambiguous Playwright locators, the Vitest/Vite ESM-in-CommonJS configuration-loader warning, missing provider-backed auth evidence, and missing real profile RLS-isolation evidence.
 
-### KI-002 — Exact-head CI unavailable
+### KI-020 — Provider-backed profile RLS isolation evidence unavailable
 
-- **Previous severity:** Important
-- **Status:** RESOLVED for the reviewed pre-closeout head
-- **Resolution evidence:** GitHub Actions CI run `34474528983` completed successfully on exact PR head `4ea1eed4c822c3667d575a13c6b735e5148c69df`, including frozen install, lint, typecheck, application tests, framework tests/verifier, requirements-source tests/verifier, build, smoke E2E, and PRD coverage.
-- **Note:** the final durable review-evidence commit requires its own exact-head CI before this run can claim final-head green.
+Status: RESOLVED. CI `34582926587` / #148 on `7348526cb466a66b907e4c92148b7c6d68daf674` started the real Supabase local stack, reset the database, applied `20260910_create_profiles.sql`, created two independently authenticated users through the product/provider flow, and proved User A/User B mutual cross-profile SELECT/UPDATE denial while preserving each user's own row. Evidence: `docs/superpowers/evidence/2026-09-11-m01-provider-backed-closeout.md`.
 
-### KI-003 — Dependency lockfile reproducibility
+### KI-022 — Provider-backed M01 auth E2E evidence unavailable
 
-- **Previous severity:** Important
-- **Status:** RESOLVED
-- **Resolution evidence:** `pnpm-lock.yaml` is committed; CI uses `pnpm install --frozen-lockfile`; frozen installation passed in CI run `34474528983`.
+Status: RESOLVED. CI #148 ran Supabase Auth/PostgREST/Mailpit plus the production Next.js app and passed signup, email confirmation/token exchange, login, logout, forgot/reset password, authenticated `/app`, authenticated `/app/profile`, profile persistence, authenticated narrow-mobile/keyboard evidence, and consumed-confirmation-link safety. Playwright result: 8/8 passed.
 
-### KI-004 — Requirements source integrity was not continuously verified
+### KI-021 — Accessibility browser test used an ambiguous login locator
 
-- **Previous severity:** Important
-- **Status:** RESOLVED, pending final-head re-verification
-- **Evidence / fix:** review found that PRD section coverage did not prove the archived source tree still matched `SOURCE-MANIFEST.json`. A new `scripts/verify_requirements_source.py` validates exact file set, sizes and SHA-256 hashes and rejects unsafe/duplicate manifest paths. Five focused tests cover valid, tampered, missing/extra, traversal-like and duplicate-path cases. CI run `34474152336` provided genuine RED because the verifier did not yet exist; CI run `34474310301` showed the five tests GREEN; CI run `34474528983` passed both tests and the real source verifier.
+Status: RESOLVED. Initial M01.7 browser verification `caa82b59ebd85e20b4c02702c85587b6ce7b68cd` failed CI #133 because an unscoped `Log in` locator matched both header and footer login links under Playwright strict mode. `061762ec28a9f95ed97c433f35df8eee060389fe` scoped the intended link through the `banner` landmark; CI #134 passed all gates.
 
-### KI-005 — Durable status reconciliation dropped a required recovery marker
+### KI-023 — Vitest configuration loaded as CommonJS while using ESM syntax
 
-- **Previous severity:** Important
-- **Status:** RESOLVED
-- **Evidence / fix:** CI run `34474310301` failed `scripts/verify_autonomous_framework.py` because `docs/progress/STATUS.md` lacked the required literal `CI status:` marker. Commit `4ea1eed4c822c3667d575a13c6b735e5148c69df` restored the invariant and CI run `34474528983` passed the framework verifier.
-
-### KI-006 — Unified local verification omitted requirements-source integrity
-
-- **Previous severity:** Important
-- **Status:** RESOLVED, pending final-head verification
-- **Evidence / fix:** final skeptical review found CI enforced source integrity while `pnpm verify` did not. `package.json` now includes `verify:requirements` and the unified `verify` command includes it, keeping local and CI verification intent aligned.
+Status: RESOLVED. Exact CI #140 reproduced the warning at `vitest.config.ts:1:1`. Root cause was the `.ts` config being interpreted as CommonJS while containing ESM imports. `85ff10741875892e2787631b106cfc48bfad0d5c` renamed the config to `vitest.config.mts` and used `fileURLToPath(new URL("./src", import.meta.url))`; CI #141 passed and the warning disappeared.
 
 ## Current unresolved issues
 
-No Critical or Important implementation/review issue is currently known.
+No Critical or Important M01 issue is currently unresolved.
 
-A non-blocking Vitest/Vite warning remains: `vitest.config.ts` is loaded as CommonJS while using ESM syntax; current tests pass, so this is classified **Minor** and does not block Product Foundation closeout. Address it in a future maintenance slice when changing module/config conventions rather than broadening this PR.
+Supabase logout uses the SDK default session scope. Classification: **Minor / product-semantics decision**; do not alter multi-device logout behavior without an explicit product requirement.
 
-The only remaining gate for this run is fresh exact-head CI on the final durable review-evidence commit. PR #2 must remain open and unmerged without explicit owner authorization.
+GitHub-hosted CI emits deprecation notices from third-party action runtimes being forced from Node 20 to Node 24, plus transitive runtime deprecation notices. Classification: **Informational/external maintenance**, not an application correctness blocker.
+
+M01 completion is now gated on final durable reconciliation, fresh exact-head CI for that reconciliation, and final PR merge/post-merge-main verification rather than missing provider evidence.

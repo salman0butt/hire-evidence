@@ -3,11 +3,15 @@ export type NodeEnvironment = "development" | "test" | "production";
 export type AppEnvironment = Readonly<{
   nodeEnv: NodeEnvironment;
   appUrl: URL;
+  supabaseUrl: URL;
+  supabasePublishableKey: string;
 }>;
 
 export type EnvironmentInput = Readonly<{
-  NODE_ENV?: string;
-  NEXT_PUBLIC_APP_URL?: string;
+  NODE_ENV?: string | undefined;
+  NEXT_PUBLIC_APP_URL?: string | undefined;
+  NEXT_PUBLIC_SUPABASE_URL?: string | undefined;
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?: string | undefined;
 }>;
 
 const DEFAULT_APP_URL = "http://localhost:3000";
@@ -27,27 +31,46 @@ function parseNodeEnvironment(value: string | undefined): NodeEnvironment {
   return candidate as NodeEnvironment;
 }
 
-function parseAppUrl(value: string | undefined): URL {
-  let appUrl: URL;
+function parseHttpUrl(value: string | undefined, variableName: string): URL {
+  let parsed: URL;
 
   try {
-    appUrl = new URL(value ?? DEFAULT_APP_URL);
+    parsed = new URL(value ?? "");
   } catch {
-    throw new Error("NEXT_PUBLIC_APP_URL must be an absolute http(s) URL");
+    throw new Error(`${variableName} must be an absolute http(s) URL`);
   }
 
-  if (appUrl.protocol !== "http:" && appUrl.protocol !== "https:") {
-    throw new Error("NEXT_PUBLIC_APP_URL must be an absolute http(s) URL");
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error(`${variableName} must be an absolute http(s) URL`);
   }
 
-  return appUrl;
+  return parsed;
+}
+
+function parseAppUrl(value: string | undefined): URL {
+  return parseHttpUrl(value ?? DEFAULT_APP_URL, "NEXT_PUBLIC_APP_URL");
+}
+
+function parsePublishableKey(value: string | undefined): string {
+  const key = value?.trim();
+
+  if (!key) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY must be non-empty");
+  }
+
+  return key;
 }
 
 export function parseEnvironment(input: EnvironmentInput): AppEnvironment {
   return {
     nodeEnv: parseNodeEnvironment(input.NODE_ENV),
     appUrl: parseAppUrl(input.NEXT_PUBLIC_APP_URL),
+    supabaseUrl: parseHttpUrl(
+      input.NEXT_PUBLIC_SUPABASE_URL,
+      "NEXT_PUBLIC_SUPABASE_URL",
+    ),
+    supabasePublishableKey: parsePublishableKey(
+      input.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    ),
   };
 }
-
-export const appEnvironment = parseEnvironment(process.env);

@@ -1,0 +1,23 @@
+project_id = "hire-evidence-ci"
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = [
+  "http://127.0.0.1:3000/auth/confirm",
+  "http://127.0.0.1:3000/auth/reset-password",
+]
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+max_frequency = "1s"
+
+[auth.email.template.confirmation]
+subject = "Confirm your Hire Evidence account"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Reset your Hire Evidence password"
+content_path = "./supabase/templates/recovery.html"

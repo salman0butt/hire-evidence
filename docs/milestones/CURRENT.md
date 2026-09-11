@@ -1,25 +1,25 @@
 # Current Milestone
 
 Milestone:
-Product Foundation
+SaaS Shell + Auth
 
 Legacy roadmap identifier:
-M00
+M01
 
 Current capability:
-Foundation verification and durable closeout
+Provider-backed auth/profile/RLS closeout verified on implementation head; durable closeout and exact-final-head CI pending before merge
 
 Status:
 VERIFYING
 
 Branch:
-`feat/product-foundation-requirements`
+`feat/saas-shell-auth`
 
 Base:
 `main`
 
 PR:
-#2 — open draft, `Persist product requirements and recovery state`
+#3 — open draft, `Build SaaS shell and authentication`
 
 Canonical compact recovery state:
 `docs/progress/STATUS.md`
@@ -27,47 +27,34 @@ Canonical compact recovery state:
 Detailed known issues:
 `docs/progress/KNOWN-ISSUES.md`
 
-## Completed
+## Dependency closeout
 
-- Repository/application foundation implemented with TDD and merged through PR #1.
-- Next.js/TypeScript app shell, environment validation, `/api/health`, unit/component harness, Playwright smoke harness, and CI are present on `main`.
-- Complete owner-supplied requirements source is durably persisted under `docs/requirements/source/AI-Interviewer-Codex-Pack/` with `docs/requirements/SOURCE-MANIFEST.json` recording the verified source ZIP metadata.
-- Canonical operational product requirements are present under `docs/product/` and iteration roadmap under `docs/iterations/`.
-- `scripts/verify_prd_coverage.py` is present and verifies PRD sections 1–242 and milestone definitions M00–M15.
-- `pnpm-lock.yaml` is committed and CI uses `pnpm install --frozen-lockfile`.
-- Autonomous long-project framework, living milestone ledgers, feature matrix, traceability, architecture/decisions, progress state, and Superpowers design/plan artifacts are present.
-- Exact head `dcf54ace909345194b873b51a44e94dce825d9db` passed GitHub Actions CI run `34473131246`, including frozen install, lint, typecheck, tests, framework verification, build, smoke E2E, and PRD coverage.
-- PR #2 has no submitted reviews and no unresolved review threads at the latest recovery check.
+Product Foundation is COMPLETE. PR #2 was already merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI #57 passed.
 
-## In progress
+## Completed / Verified in M01
 
-- Reconcile stale durable recovery documents with the already-completed requirements/lockfile/CI state.
-- Perform final skeptical review and verify CI on the resulting exact reconciliation head.
+- M01.1–M01.5: VERIFIED.
+- M01.6 profile persistence/RLS: VERIFIED provider-backed. CI #148 on `7348526cb466a66b907e4c92148b7c6d68daf674` applied the real profile migration to local Supabase and proved two independently authenticated users cannot read/update each other's profiles.
+- M01.7 auth/accessibility/provider closeout: VERIFIED on the implementation head. CI #148 passed the full auth lifecycle, authenticated `/app` and `/app/profile`, profile persistence, authenticated narrow-mobile/keyboard checks, consumed-token safety, and 8/8 Chromium E2E tests.
+- Focused Vitest configuration maintenance: VERIFIED at `85ff10741875892e2787631b106cfc48bfad0d5c`, CI #141.
 
 ## Remaining
 
-- Inspect the complete final PR diff from PRD compliance, correctness, architecture/YAGNI, testing, security, and hiring-AI safety perspectives.
-- Fix any Critical/Important findings if discovered.
-- Verify GitHub Actions on the exact final reconciliation SHA.
-- If all gates remain green, record M00 closeout state without merging PR #2.
+1. Reconcile durable M01 closeout state across milestone, feature, traceability, status, known-issues, and evidence docs.
+2. Obtain fresh exact-head CI for the final reconciliation commit.
+3. Re-check PR head/reviews/threads/mergeability; if all completion gates remain green, mark PR #3 ready and squash-merge under the owner's standing auto-merge authorization.
+4. Verify post-merge `main` CI before starting M02.
 
 ## Blocker
 
-None currently known.
+No provider/configuration blocker remains for M01. The only remaining gate is evidence-preserving integration closeout on the final documentation head.
 
 ## Verification state
 
-- dependency install: PASS using frozen lockfile on CI run `34473131246`;
-- lint: PASS on CI run `34473131246`;
-- typecheck: PASS on CI run `34473131246`;
-- unit/component tests: PASS on CI run `34473131246`;
-- autonomous framework verifier tests: PASS on CI run `34473131246`;
-- autonomous framework verification: PASS on CI run `34473131246`;
-- production build: PASS on CI run `34473131246`;
-- smoke E2E: PASS on CI run `34473131246`;
-- PRD coverage: PASS on CI run `34473131246`;
-- final reconciliation head verification: PENDING because durable-state edits create a newer SHA.
+Implementation/provider head `7348526cb466a66b907e4c92148b7c6d68daf674` passed CI `34582926587` / #148 across frozen install, lint, typecheck, 54 unit/component tests, framework/source verifier tests, autonomous/source integrity verification, real local Supabase startup and migration reset, production build, 8/8 Chromium E2E tests, PRD sections 1–242 coverage, and teardown.
+
+Provider-backed E2E covers signup, confirmation, login/logout, forgot/reset password, authenticated application/profile entry, profile persistence, two-user RLS isolation, authenticated mobile/keyboard evidence, and replayed confirmation-token failure without token leakage.
 
 ## Next Action
 
-Follow `docs/progress/STATUS.md` `Exact next work:`. Review and verify the exact final PR #2 head, fix any blocking findings, then record foundation closeout while leaving PR #2 open unless the owner explicitly authorizes merge.
+Follow `docs/progress/STATUS.md` `Exact next work:`. Merge only after fresh exact-head CI and final PR review state are green.
