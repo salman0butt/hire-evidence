@@ -83,7 +83,7 @@ test.describe("organization tenant UI accessibility and responsiveness", () => {
     await expect(page.getByRole("link", { name: "Settings" })).toBeFocused();
 
     await page.goto(`/app/o/${organizationId}/team`);
-    await expect(page.getByRole("heading", { name: "Team" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Team", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Invite teammate" })).toBeVisible();
     await expectNoHorizontalOverflow(page);
 
