@@ -1,9 +1,12 @@
+import { CompetencySection } from "@/components/jobs/competency-section";
 import { JobForm } from "@/components/jobs/job-form";
+import { listCompetencies } from "@/lib/interviewer/competencies";
 import { getJob } from "@/lib/jobs/jobs";
 import { hasOrganizationCapability } from "@/lib/organization/rbac";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
 
 import { updateJobAction } from "../job-actions";
+import { createCompetencyAction } from "./competency-actions";
 
 type JobPageProps = Readonly<{
   params: Promise<{ organizationId: string; jobId: string }>;
@@ -12,18 +15,33 @@ type JobPageProps = Readonly<{
 export default async function JobPage({ params }: JobPageProps) {
   const { organizationId, jobId } = await params;
   const context = await requireOrganizationMembership(organizationId);
-  const job = await getJob(organizationId, jobId);
+  const [job, competencies] = await Promise.all([
+    getJob(organizationId, jobId),
+    listCompetencies(organizationId, jobId),
+  ]);
   const canManage = hasOrganizationCapability(context.role, "jobs:manage");
 
-  if (!canManage) {
-    return <JobForm mode="edit" initialJob={job} readOnly />;
-  }
-
   return (
-    <JobForm
-      mode="edit"
-      initialJob={job}
-      action={updateJobAction.bind(null, organizationId, jobId)}
-    />
+    <div className="space-y-10">
+      {canManage ? (
+        <JobForm
+          mode="edit"
+          initialJob={job}
+          action={updateJobAction.bind(null, organizationId, jobId)}
+        />
+      ) : (
+        <JobForm mode="edit" initialJob={job} readOnly />
+      )}
+
+      <CompetencySection
+        competencies={competencies}
+        readOnly={!canManage}
+        action={
+          canManage
+            ? createCompetencyAction.bind(null, organizationId, jobId)
+            : undefined
+        }
+      />
+    </div>
   );
 }
