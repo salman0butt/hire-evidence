@@ -1,48 +1,43 @@
 # Project Status
 
-Last reconciled: 2026-09-11
+Last reconciled: 2026-09-12
 
 ## Completed Milestones
 
 - Product Foundation — **COMPLETE**. PR #2 merged as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI #57 passed.
-- SaaS Shell + Auth — **COMPLETE**. PR #3 final head `b8844130118453e56009284b9498c8357429f1af` passed CI #156, squash-merged as `ed10e1b55bb62cf202585c8c50e6487014e83c29`, and post-merge CI `34584310345` / #157 passed all gates.
+- SaaS Shell + Auth — **COMPLETE**. PR #3 squash-merged as `ed10e1b55bb62cf202585c8c50e6487014e83c29`; post-merge CI #157 passed.
+- Organizations + RBAC — **COMPLETE**. PR #4 squash-merged as `835d7d571a69cd13e3e802be4872e873ffdd34fe`; post-merge CI #232 / `34624252208` passed.
 
 ## Current Milestone
 
-Organizations + RBAC — **CLOSEOUT COMPLETE / AWAITING EXPLICIT MERGE AUTHORIZATION**.
+Jobs + Interviewer Builder — **ACTIVE**.
 
 ## Current Task State
 
-- M02.1 organization schema + memberships — **VERIFIED SLICE**. CI #161.
-- M02.2 fixed RBAC + organization validation — **VERIFIED SLICE**. RED #162 → GREEN #163.
-- M02.3 organization onboarding — **VERIFIED SLICE**. RED #165; build defect #167; GREEN #168.
-- M02.4 tenant-aware shell/navigation — **VERIFIED SLICE**. RED #169 → GREEN #170.
-- M02.5 membership management + owner invariants — **VERIFIED SLICE**. Final implementation `fa7a996d19d790e87fb7123cb0071910424ea3a9`; CI #190.
-- M02.6 secure team invitations — **VERIFIED SLICE**. Final invitation implementation `5abee48be6236e5616941d9ced73515628199e38`; CI #215.
-- M02.7 bounded organization settings — **VERIFIED SLICE**. Genuine RED `8a080819ef387fbbdcfad34cd0a9802b2d9974ea` / CI #217 → GREEN `43b7c23122ec775253bbca0e38b701a694545205` / CI #218.
-- Provider-backed tenant isolation — **VERIFIED SLICE**. `3e0c35557a8cd21e9a223909753a6fdf412d2557`; CI `34608235065` / #219 passed real local-Supabase Org A vs Org B vs unauthenticated read/write and recruiter mutation-denial checks.
-- Responsive/keyboard browser closeout — **VERIFIED**. The first full run exposed a Playwright substring-locator defect in CI #222; minimal exact-heading fix `62301204cc8d92051d1eec5a34bce45fc7b63006` resolved it. Exact implementation/documentation head `fd8907cf20498466c2d62cb1b12abd29eb584686` passed CI #224 / `34610615757`, including Chromium E2E at desktop and 390×844.
-- Whole-milestone skeptical security/accessibility/YAGNI review — **COMPLETE**. Evidence: `docs/superpowers/evidence/2026-09-11-m02-organizations-rbac-closeout.md`. Critical: 0 unresolved. Important: 0 unresolved.
+- M03.1 Jobs + requirements — **IMPLEMENTED / VERIFIED SLICE, closeout reconciliation in progress**. Tenant-scoped job CRUD, explicit `must_have | nice_to_have` requirements, route-bound server actions, accessible list/create/edit surfaces, fixed-role mutation authorization, and provider-backed Org A/Org B/unauthenticated isolation are implemented on PR #5.
+- M03.1 review finding — **RESOLVED**. Database requirement ordering initially used `unique (job_id, kind, position)`, which allowed the same position across kinds. Genuine RED `268afaaca87e3bf3dffa0a552a66e1dfab1f2ca9` / CI #272 (`34642095960`) failed only the new deterministic-ordering assertion after 160 unrelated tests passed. Minimal GREEN `5db7708f1aecc5122b4a4883f7875b9e02df3fe5` / CI #273 (`34642360290`) changed the invariant to `unique (job_id, position)` and passed the full repository quality gate.
+- M03.2 Competency model — **NOT STARTED**.
+- M03.3–M03.11 — **NOT STARTED**.
 
-Active branch: `feat/organizations-rbac`
+Active branch: `feat/jobs-interviewer-builder`
 
-Active PR: #4 — `Build organization tenancy and role-based access` — OPEN / DRAFT / unmerged.
+Active PR: #5 — `Build jobs and interviewer configuration` — OPEN / DRAFT / unmerged.
 
-CI status: CI #224 / `34610615757` passed all required quality gates on reviewed head `fd8907cf20498466c2d62cb1b12abd29eb584686`: frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase, production build, Chromium E2E, PRD coverage, and teardown. Closeout documentation commits after that SHA create a newer head and therefore require fresh exact-final-head CI before PR readiness can be finalized.
+CI status: CI #273 / `34642360290` passed on exact implementation head `5db7708f1aecc5122b4a4883f7875b9e02df3fe5`: frozen install, lint, typecheck, 161 unit/component tests, framework/source verifiers, local Supabase, production build, Chromium E2E, PRD coverage, and teardown. This documentation reconciliation creates a newer head and therefore requires fresh exact-head CI before any integration claim.
 
 ## Review State
 
 - Critical: 0 unresolved.
-- Important: 0 unresolved.
-- PR #4 has no submitted reviews and no unresolved review threads at the latest inspection.
-- No new blocking security, tenancy, accessibility, performance, YAGNI, or hiring-safety issue was found in final whole-milestone review.
+- Important: 0 unresolved from the reviewed M03.1 deterministic-ordering finding.
+- PR #5 has no submitted reviews and no unresolved review threads at the latest inspection.
+- Milestone-wide review remains pending because M03.2–M03.11 are not implemented.
 
 ## Blockers
 
-No engineering blocker is known. Merge is intentionally blocked by policy until the user explicitly authorizes it in chat.
+No engineering blocker is currently known. PR #5 is intentionally draft and must not merge until the full M03 milestone acceptance, review, documentation, exact-final-head CI, safety, and concurrency gates pass.
 
 ## Durable Recovery
 
-Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, `docs/milestones/CURRENT.md`, `docs/milestones/M02-organizations-rbac.md`, `docs/requirements/TRACEABILITY.md`, the M02 design/plan/closeout evidence, and current source/tests.
+Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M03-jobs-interviewer-builder.md`, requirements/traceability, the M03 design/plan, and current source/tests.
 
-Exact next work: verify GitHub Actions against the exact latest documentation-closeout head, reconcile PR metadata if green, then stop at the merge authorization gate. Do not merge PR #4 and do not begin M03 until explicit merge authorization and green post-merge `main` CI.
+Exact next work: begin M03.2 by writing and verifying genuine RED tests for the tenant-scoped competency model (job ownership, bounded fields/weight, deterministic ordering, and role-gated mutation).
