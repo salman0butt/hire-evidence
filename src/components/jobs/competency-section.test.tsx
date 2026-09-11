@@ -26,6 +26,10 @@ async function idleAction() {
   return { status: "idle" as const, message: null };
 }
 
+async function idleRubricAction(_competencyId: string) {
+  return { status: "idle" as const, message: null };
+}
+
 describe("CompetencySection", () => {
   it("renders job-related competencies and weights in deterministic input order", () => {
     render(<CompetencySection competencies={competencies} readOnly />);
@@ -80,5 +84,24 @@ describe("CompetencySection", () => {
     expect(
       screen.getByRole("button", { name: "Save Technical communication rubric" }),
     ).toBeInTheDocument();
+  });
+
+  it("enables rubric save controls only when a verified save action is supplied", () => {
+    render(
+      <CompetencySection
+        {...({
+          competencies,
+          action: idleAction,
+          rubricAction: idleRubricAction,
+        } as Parameters<typeof CompetencySection>[0])}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Save Systems design rubric" }),
+    ).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Save Technical communication rubric" }),
+    ).toBeEnabled();
   });
 });
