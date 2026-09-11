@@ -7,6 +7,7 @@ import type { InvitationActionState } from "@/lib/organization/invitation-action
 import {
   acceptOrganizationInvitation,
   createOrganizationInvitation,
+  revokeOrganizationInvitation,
 } from "@/lib/organization/invitations";
 import { isManageableOrganizationRole } from "@/lib/organization/rbac";
 
@@ -25,6 +26,16 @@ function normalizeEmail(value: FormDataEntryValue | null): string | null {
     return null;
   }
   return email;
+}
+
+function normalizeUuid(value: FormDataEntryValue | null): string | null {
+  if (typeof value !== "string") return null;
+  const candidate = value.trim();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    candidate,
+  )
+    ? candidate
+    : null;
 }
 
 export async function createInvitationAction(
@@ -55,6 +66,30 @@ export async function createInvitationAction(
     };
   } catch {
     return errorState("We could not create this invitation. Please try again.");
+  }
+}
+
+export async function revokeInvitationAction(
+  organizationId: string,
+  _previousState: InvitationActionState,
+  formData: FormData,
+): Promise<InvitationActionState> {
+  const invitationId = normalizeUuid(formData.get("invitation_id"));
+  if (!invitationId) {
+    return errorState("We could not revoke this invitation. Please try again.");
+  }
+
+  await requireUser(`/app/o/${organizationId}/team`);
+
+  try {
+    await revokeOrganizationInvitation({ organizationId, invitationId });
+    return {
+      status: "success",
+      message: "Invitation revoked.",
+      invitationUrl: null,
+    };
+  } catch {
+    return errorState("We could not revoke this invitation. Please try again.");
   }
 }
 
