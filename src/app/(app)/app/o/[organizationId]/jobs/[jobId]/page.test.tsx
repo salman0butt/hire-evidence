@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { listCompetencies } from "@/lib/interviewer/competencies";
 import { getJob } from "@/lib/jobs/jobs";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
 
@@ -19,13 +20,30 @@ vi.mock("@/components/jobs/job-form", () => ({
     </div>
   ),
 }));
+vi.mock("@/components/jobs/competency-section", () => ({
+  CompetencySection: ({
+    competencies,
+    readOnly,
+  }: {
+    competencies: Array<{ name: string }>;
+    readOnly?: boolean;
+  }) => (
+    <div>
+      Competencies: {competencies.map((competency) => competency.name).join(", ")} —{" "}
+      {readOnly ? "read only" : "editable"}
+    </div>
+  ),
+}));
 vi.mock("@/lib/jobs/jobs", () => ({ getJob: vi.fn() }));
+vi.mock("@/lib/interviewer/competencies", () => ({ listCompetencies: vi.fn() }));
 vi.mock("@/lib/organization/require-membership", () => ({
   requireOrganizationMembership: vi.fn(),
 }));
 vi.mock("../job-actions", () => ({ updateJobAction: vi.fn() }));
+vi.mock("./competency-actions", () => ({ createCompetencyAction: vi.fn() }));
 
 const mockedGetJob = vi.mocked(getJob);
+const mockedListCompetencies = vi.mocked(listCompetencies);
 const mockedRequireMembership = vi.mocked(requireOrganizationMembership);
 const organizationId = "11111111-1111-4111-8111-111111111111";
 const jobId = "22222222-2222-4222-8222-222222222222";
@@ -42,6 +60,16 @@ const job = {
   interviewInstructions: "Use job-related evidence.",
   requirements: [{ kind: "must_have" as const, requirement: "TypeScript" }],
 };
+const competencies = [
+  {
+    id: "33333333-3333-4333-8333-333333333333",
+    jobId,
+    name: "Systems design",
+    description: "Designs reliable job-relevant systems.",
+    weight: 40,
+    position: 0,
+  },
+];
 
 async function renderPage() {
   render(
@@ -55,9 +83,10 @@ describe("job detail page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockedGetJob.mockResolvedValue(job);
+    mockedListCompetencies.mockResolvedValue(competencies);
   });
 
-  it("loads the route-bound tenant job as editable for a manager", async () => {
+  it("loads route-bound job and competencies as editable for a manager", async () => {
     mockedRequireMembership.mockResolvedValue({
       organizationId,
       organizationName: "Evidence Co",
@@ -68,10 +97,12 @@ describe("job detail page", () => {
 
     expect(mockedRequireMembership).toHaveBeenCalledWith(organizationId);
     expect(mockedGetJob).toHaveBeenCalledWith(organizationId, jobId);
+    expect(mockedListCompetencies).toHaveBeenCalledWith(organizationId, jobId);
     expect(screen.getByText(/Senior Platform Engineer — editable/)).toBeInTheDocument();
+    expect(screen.getByText(/Competencies: Systems design — editable/)).toBeInTheDocument();
   });
 
-  it("renders the same tenant job read-only for a reviewer", async () => {
+  it("renders the same tenant job and competencies read-only for a reviewer", async () => {
     mockedRequireMembership.mockResolvedValue({
       organizationId,
       organizationName: "Evidence Co",
@@ -81,6 +112,8 @@ describe("job detail page", () => {
     await renderPage();
 
     expect(mockedGetJob).toHaveBeenCalledWith(organizationId, jobId);
+    expect(mockedListCompetencies).toHaveBeenCalledWith(organizationId, jobId);
     expect(screen.getByText(/Senior Platform Engineer — read only/)).toBeInTheDocument();
+    expect(screen.getByText(/Competencies: Systems design — read only/)).toBeInTheDocument();
   });
 });
