@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { requireUser } from "@/lib/auth/require-user";
 import type { OrganizationActionState } from "@/lib/organization/action-state";
 import {
@@ -13,6 +15,10 @@ const UUID_PATTERN =
 
 function errorState(message: string): OrganizationActionState {
   return { status: "error", message };
+}
+
+function teamPath(organizationId: string): string {
+  return `/app/o/${organizationId}/team`;
 }
 
 export async function updateMemberRoleAction(
@@ -35,10 +41,11 @@ export async function updateMemberRoleAction(
     return errorState("Choose a valid team role.");
   }
 
-  await requireUser(`/app/o/${organizationId}/team`);
+  await requireUser(teamPath(organizationId));
 
   try {
     await updateOrganizationMemberRole({ organizationId, userId, role });
+    revalidatePath(teamPath(organizationId));
     return { status: "idle", message: null };
   } catch {
     return errorState("We could not update this team member. Please try again.");
@@ -60,10 +67,11 @@ export async function removeMemberAction(
     return errorState("Choose a valid team member.");
   }
 
-  await requireUser(`/app/o/${organizationId}/team`);
+  await requireUser(teamPath(organizationId));
 
   try {
     await removeOrganizationMember({ organizationId, userId });
+    revalidatePath(teamPath(organizationId));
     return { status: "idle", message: null };
   } catch {
     return errorState("We could not remove this team member. Please try again.");
