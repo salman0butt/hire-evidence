@@ -3,10 +3,10 @@
 import { requireUser } from "@/lib/auth/require-user";
 import type { OrganizationActionState } from "@/lib/organization/action-state";
 import {
-  isManageableOrganizationRole,
   removeOrganizationMember,
   updateOrganizationMemberRole,
 } from "@/lib/organization/members";
+import { isManageableOrganizationRole } from "@/lib/organization/rbac";
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
