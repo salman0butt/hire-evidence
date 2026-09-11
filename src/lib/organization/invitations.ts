@@ -1,9 +1,19 @@
 import { createHash, randomBytes } from "node:crypto";
 
-import type { ManageableOrganizationRole } from "@/lib/organization/rbac";
+import {
+  isManageableOrganizationRole,
+  type ManageableOrganizationRole,
+} from "@/lib/organization/rbac";
 import { createClient } from "@/lib/supabase/server";
 
 export const INVITATION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+export type PendingOrganizationInvitation = Readonly<{
+  id: string;
+  email: string;
+  role: ManageableOrganizationRole;
+  expiresAt: string;
+}>;
 
 export function hashInvitationToken(rawToken: string): string {
   return createHash("sha256").update(rawToken, "utf8").digest("hex");
@@ -15,6 +25,46 @@ export function generateInvitationToken(): {
 } {
   const rawToken = randomBytes(32).toString("base64url");
   return { rawToken, tokenHash: hashInvitationToken(rawToken) };
+}
+
+export async function listPendingOrganizationInvitations(
+  organizationId: string,
+): Promise<PendingOrganizationInvitation[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("organization_invitations")
+    .select("id,email,role,expires_at")
+    .eq("organization_id", organizationId)
+    .is("accepted_at", null)
+    .is("revoked_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (error) {
+    throw new Error("Unable to load organization invitations.");
+  }
+
+  const invitations: PendingOrganizationInvitation[] = [];
+  for (const row of data ?? []) {
+    if (
+      typeof row.id !== "string" ||
+      typeof row.email !== "string" ||
+      !isManageableOrganizationRole(row.role) ||
+      typeof row.expires_at !== "string"
+    ) {
+      throw new Error("Invalid organization invitation data.");
+    }
+
+    invitations.push({
+      id: row.id,
+      email: row.email,
+      role: row.role,
+      expiresAt: row.expires_at,
+    });
+  }
+
+  return invitations;
 }
 
 export async function createOrganizationInvitation(input: {
