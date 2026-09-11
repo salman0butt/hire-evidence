@@ -1,6 +1,8 @@
 import { CompetencySection } from "@/components/jobs/competency-section";
 import { JobForm } from "@/components/jobs/job-form";
+import { QuestionSection } from "@/components/jobs/question-section";
 import { listCompetencies } from "@/lib/interviewer/competencies";
+import { listQuestions } from "@/lib/interviewer/questions";
 import { getJob } from "@/lib/jobs/jobs";
 import { hasOrganizationCapability } from "@/lib/organization/rbac";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
@@ -10,6 +12,7 @@ import {
   createCompetencyAction,
   saveCompetencyRubricAction,
 } from "./competency-actions";
+import { createQuestionAction } from "./question-actions";
 
 type JobPageProps = Readonly<{
   params: Promise<{ organizationId: string; jobId: string }>;
@@ -18,9 +21,10 @@ type JobPageProps = Readonly<{
 export default async function JobPage({ params }: JobPageProps) {
   const { organizationId, jobId } = await params;
   const context = await requireOrganizationMembership(organizationId);
-  const [job, competencies] = await Promise.all([
+  const [job, competencies, questions] = await Promise.all([
     getJob(organizationId, jobId),
     listCompetencies(organizationId, jobId),
+    listQuestions(organizationId, jobId),
   ]);
   const canManage = hasOrganizationCapability(context.role, "jobs:manage");
 
@@ -44,6 +48,16 @@ export default async function JobPage({ params }: JobPageProps) {
         />
       ) : (
         <CompetencySection competencies={competencies} readOnly />
+      )}
+
+      {canManage ? (
+        <QuestionSection
+          questions={questions}
+          competencies={competencies}
+          action={createQuestionAction.bind(null, organizationId, jobId)}
+        />
+      ) : (
+        <QuestionSection questions={questions} competencies={competencies} readOnly />
       )}
     </div>
   );
