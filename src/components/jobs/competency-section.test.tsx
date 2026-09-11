@@ -57,7 +57,7 @@ describe("CompetencySection", () => {
     expect(screen.getByLabelText("Weight")).toHaveAttribute("min", "0.01");
     expect(screen.getByRole("button", { name: "Add competency" })).toBeInTheDocument();
 
-    expect(container.querySelector('input[name="position"]')).toHaveValue(3);
+    expect(container.querySelector('input[name="position"]')).toHaveValue("3");
     expect(container.querySelector('input[name="organization_id"]')).toBeNull();
     expect(container.querySelector('input[name="job_id"]')).toBeNull();
   });
