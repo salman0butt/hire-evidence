@@ -10,9 +10,9 @@ M01 provider-backed authentication/profile/RLS/accessibility evidence is resolve
 
 ## Current unresolved issues
 
-No Critical or Important issue is currently known for implemented M02.1–M02.7 or the real provider-backed Org A/Org B/unauthenticated isolation matrix.
+No Critical or Important M02 implementation issue is currently known. Final whole-milestone security/accessibility/YAGNI review recorded 0 unresolved Critical and 0 unresolved Important findings.
 
-M02 is not complete: final desktop + 390×844 responsive/keyboard browser verification for tenant navigation, team, invitation and settings surfaces, whole-milestone skeptical review, final durable reconciliation, and exact-final-head CI remain. Classification: **Milestone closeout remaining**, not an external blocker.
+M02 engineering closeout is complete on the reviewed implementation head. The remaining gate is procedural/evidence-only: the closeout documentation series creates a newer branch head that must pass exact-final-head CI before PR readiness is finalized, after which PR #4 must remain unmerged until explicit user authorization.
 
 Supabase logout uses the SDK default session scope. Classification: **Minor / product-semantics decision**; do not alter multi-device logout behavior without an explicit product requirement.
 
@@ -26,3 +26,8 @@ GitHub-hosted CI emits deprecation notices from third-party action runtimes bein
 - Task 6 secure invitation lifecycle culminated at `5abee48b…`; CI #215 verified hash-at-rest token and abuse protections.
 - Task 7 settings RED `8a080819…` / CI #217 failed for the intended missing production modules/export. GREEN `43b7c231…` / CI #218 passed the complete suite.
 - Provider-backed tenant-isolation verification `3e0c3555…` passed CI `34608235065` / #219, including cross-tenant read/write denial, unauthenticated non-exposure, recruiter mutation denial and authorized owner settings update.
+- Final responsive/keyboard browser run CI #222 failed because Playwright substring matching made the `Team` heading locator ambiguous with `Invite teammate`. Minimal exact-name locator fix `62301204…` resolved the root cause. Reviewed head `fd8907cf…` passed full CI #224 / `34610615757`, including Chromium E2E.
+
+## Merge gate
+
+`AUTO_MERGE=false`. PR #4 must not be merged until the user explicitly authorizes merge in chat. Do not begin M03 until PR #4 is merged under that authorization and post-merge `main` CI is green.
