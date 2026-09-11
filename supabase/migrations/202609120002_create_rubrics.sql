@@ -30,22 +30,25 @@ for select
 to authenticated
 using (private.is_organization_member(organization_id));
 
-create or replace function public.upsert_competency_rubric_level(
+create or replace function public.save_competency_rubric(
   p_organization_id uuid,
   p_job_id uuid,
   p_competency_id uuid,
-  p_score_level smallint,
-  p_definition text
+  p_level_1 text,
+  p_level_2 text,
+  p_level_3 text,
+  p_level_4 text,
+  p_level_5 text
 )
-returns uuid
+returns void
 language plpgsql
 security definer
 set search_path = ''
 as $$
 declare
   actor_id uuid := auth.uid();
-  normalized_definition text := btrim(p_definition);
-  rubric_id uuid;
+  definitions text[] := array[p_level_1, p_level_2, p_level_3, p_level_4, p_level_5];
+  definition text;
 begin
   if actor_id is null then
     raise exception 'Authentication required.' using errcode = '42501';
@@ -68,15 +71,14 @@ begin
     raise exception 'Competency not found.' using errcode = 'P0002';
   end if;
 
-  if p_score_level is null or p_score_level < 1 or p_score_level > 5 then
-    raise exception 'Rubric score level must be between 1 and 5.' using errcode = '22023';
-  end if;
-
-  if normalized_definition is null
-     or char_length(normalized_definition) < 1
-     or char_length(normalized_definition) > 2000 then
-    raise exception 'Rubric definition must be between 1 and 2000 characters.' using errcode = '22023';
-  end if;
+  foreach definition in array definitions loop
+    if definition is null
+       or char_length(btrim(definition)) < 1
+       or char_length(btrim(definition)) > 2000 then
+      raise exception 'Every rubric level must have a definition between 1 and 2000 characters.'
+        using errcode = '22023';
+    end if;
+  end loop;
 
   insert into public.competency_rubrics (
     organization_id,
@@ -85,23 +87,27 @@ begin
     score_level,
     definition
   )
-  values (
+  select
     p_organization_id,
     p_job_id,
     p_competency_id,
-    p_score_level,
-    normalized_definition
-  )
+    levels.score_level,
+    btrim(levels.definition)
+  from (
+    values
+      (1::smallint, p_level_1),
+      (2::smallint, p_level_2),
+      (3::smallint, p_level_3),
+      (4::smallint, p_level_4),
+      (5::smallint, p_level_5)
+  ) as levels(score_level, definition)
   on conflict (competency_id, score_level)
   do update
     set definition = excluded.definition,
-        updated_at = now()
-  returning id into rubric_id;
-
-  return rubric_id;
+        updated_at = now();
 end;
 $$;
 
-revoke all on function public.upsert_competency_rubric_level(uuid, uuid, uuid, smallint, text) from public;
-revoke all on function public.upsert_competency_rubric_level(uuid, uuid, uuid, smallint, text) from anon;
-grant execute on function public.upsert_competency_rubric_level(uuid, uuid, uuid, smallint, text) to authenticated;
+revoke all on function public.save_competency_rubric(uuid, uuid, uuid, text, text, text, text, text) from public;
+revoke all on function public.save_competency_rubric(uuid, uuid, uuid, text, text, text, text, text) from anon;
+grant execute on function public.save_competency_rubric(uuid, uuid, uuid, text, text, text, text, text) to authenticated;
