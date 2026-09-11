@@ -33,15 +33,14 @@ export default async function JobPage({ params }: JobPageProps) {
         <JobForm mode="edit" initialJob={job} readOnly />
       )}
 
-      <CompetencySection
-        competencies={competencies}
-        readOnly={!canManage}
-        action={
-          canManage
-            ? createCompetencyAction.bind(null, organizationId, jobId)
-            : undefined
-        }
-      />
+      {canManage ? (
+        <CompetencySection
+          competencies={competencies}
+          action={createCompetencyAction.bind(null, organizationId, jobId)}
+        />
+      ) : (
+        <CompetencySection competencies={competencies} readOnly />
+      )}
     </div>
   );
 }
