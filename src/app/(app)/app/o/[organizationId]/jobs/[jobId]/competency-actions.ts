@@ -16,6 +16,8 @@ export type CompetencyActionState = Readonly<{
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const RUBRIC_DEFINITION_ERROR =
+  "Every rubric score must have an observable definition between 1 and 2000 characters.";
 
 function errorState(message: string): CompetencyActionState {
   return { status: "error", message };
@@ -89,6 +91,13 @@ export async function saveCompetencyRubricAction(
     return errorState("Choose a valid competency.");
   }
 
+  const definitions = [1, 2, 3, 4, 5].map((level) =>
+    textField(formData, `level_${level}`),
+  );
+  if (definitions.some((definition) => definition.length < 1 || definition.length > 2000)) {
+    return errorState(RUBRIC_DEFINITION_ERROR);
+  }
+
   await requireUser(jobPath(organizationId, jobId));
   const organization = await requireOrganizationMembership(organizationId);
   if (!hasOrganizationCapability(organization.role, "jobs:manage")) {
@@ -100,11 +109,11 @@ export async function saveCompetencyRubricAction(
     p_organization_id: organizationId,
     p_job_id: jobId,
     p_competency_id: competencyId,
-    p_level_1: textField(formData, "level_1"),
-    p_level_2: textField(formData, "level_2"),
-    p_level_3: textField(formData, "level_3"),
-    p_level_4: textField(formData, "level_4"),
-    p_level_5: textField(formData, "level_5"),
+    p_level_1: definitions[0],
+    p_level_2: definitions[1],
+    p_level_3: definitions[2],
+    p_level_4: definitions[3],
+    p_level_5: definitions[4],
   });
 
   if (error) {
