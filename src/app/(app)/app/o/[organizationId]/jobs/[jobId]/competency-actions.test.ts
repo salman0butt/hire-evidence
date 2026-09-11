@@ -172,4 +172,28 @@ describe("competency server action", () => {
       `/app/o/${organizationId}/jobs/${jobId}`,
     );
   });
+
+  it("rejects an incomplete rubric before any provider persistence", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: null, error: null });
+    vi.mocked(createClient).mockResolvedValue({ rpc } as never);
+    const data = rubricFormData();
+    data.set("level_3", "   ");
+
+    await expect(
+      saveCompetencyRubricAction(
+        organizationId,
+        jobId,
+        competencyId,
+        idleState,
+        data,
+      ),
+    ).resolves.toEqual({
+      status: "error",
+      message:
+        "Every rubric score must have an observable definition between 1 and 2000 characters.",
+    });
+
+    expect(createClient).not.toHaveBeenCalled();
+    expect(rpc).not.toHaveBeenCalled();
+  });
 });
