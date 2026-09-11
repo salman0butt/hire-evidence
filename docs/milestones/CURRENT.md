@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M03
 
 Current capability:
-Tenant-scoped Jobs + Requirements are implemented and verified on draft PR #5. Work is advancing next into the competency model, then rubrics, question bank, deterministic interview plan, interviewer configuration, guardrails, publish/versioning, preview, and end-to-end closeout.
+Tenant-scoped Jobs + Requirements and the tenant/job-bound competency model are implemented and verified slices on draft PR #5. Work is advancing next into observable 1–5 rubrics, then question bank, deterministic interview plan, interviewer configuration, guardrails, publish/versioning, preview, and end-to-end closeout.
 
 Status:
 ACTIVE
@@ -45,9 +45,9 @@ Detailed known issues:
 
 ## Iterations
 
-1. M03.1 — Jobs + requirements — IMPLEMENTED / VERIFIED SLICE. Tenant CRUD, requirements, route-bound UI/actions and provider-backed authorization/isolation are present. Review found a deterministic-ordering invariant gap; RED `268afaaca87e3bf3dffa0a552a66e1dfab1f2ca9` / CI #272 proved it, and GREEN `5db7708f1aecc5122b4a4883f7875b9e02df3fe5` / CI #273 fixed it with full quality-gate success.
-2. M03.2 — Competency model — NOT STARTED.
-3. M03.3 — Observable 1–5 rubrics — NOT STARTED.
+1. M03.1 — Jobs + requirements — VERIFIED SLICE. Tenant CRUD, requirements, route-bound UI/actions and provider-backed authorization/isolation are present. Deterministic ordering review issue was resolved by RED `268afaaca87e3bf3dffa0a552a66e1dfab1f2ca9` / CI #272 → GREEN `5db7708f1aecc5122b4a4883f7875b9e02df3fe5` / CI #273.
+2. M03.2 — Competency model — VERIFIED SLICE. Tenant/job-bound competency persistence, bounded text/weight/position validation, deterministic ordering, route-bound action/UI, provider-backed fixed-role authorization and Org A/Org B/anonymous isolation are implemented. Publication-time total-weight validation is explicit. Exact implementation head `18504de66a11ea6f5944fae4cf2c2522ca5f7c88` passed CI #292 / `34647354026`.
+3. M03.3 — Observable 1–5 rubrics — NEXT / NOT STARTED.
 4. M03.4 — Question bank — NOT STARTED.
 5. M03.5 — Deterministic interview plan — NOT STARTED.
 6. M03.6 — Interviewer configuration — NOT STARTED.
@@ -59,12 +59,12 @@ Detailed known issues:
 
 ## Verification state
 
-Exact implementation head `5db7708f1aecc5122b4a4883f7875b9e02df3fe5` passed CI #273 / `34642360290` across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase, production build, Chromium E2E, PRD coverage and teardown. Documentation reconciliation after that head requires fresh exact-head CI before later integration claims.
+Exact implementation head `18504de66a11ea6f5944fae4cf2c2522ca5f7c88` passed CI #292 / `34647354026` across the repository quality gate. Commit `76093b65d745c4e48c427f541026df947de94b00` / CI #291 failed during typecheck before tests, so it is not accepted as genuine behavioral RED evidence. Documentation reconciliation after the verified implementation head creates newer SHAs that require fresh exact-head CI before later integration claims.
 
 ## Review state
 
-0 unresolved Critical findings and 0 unresolved Important findings for the reviewed M03.1 deterministic-ordering issue. PR #5 currently has no submitted reviews or unresolved review threads. Milestone-wide skeptical review remains pending until later M03 iterations are implemented.
+0 unresolved Critical findings and 0 unresolved Important findings for the reviewed M03.1/M03.2 scope. PR #5 currently has no unresolved review threads. Milestone-wide skeptical review remains pending until later M03 iterations are implemented.
 
 ## Next Action
 
-Follow `docs/progress/STATUS.md` `Exact next work:`: begin M03.2 with genuine RED tests for tenant-scoped competencies, then implement the minimum schema/domain behavior only after RED is verified.
+Follow `docs/progress/STATUS.md` `Exact next work:`: begin M03.3 with genuine RED tests for complete observable rubric levels 1–5, bounded/meaningful definitions, tenant-bound competency ownership, deterministic ordering, and fixed-role mutation permissions. Verify RED before adding production rubric persistence.
