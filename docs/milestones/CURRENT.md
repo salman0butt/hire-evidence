@@ -7,10 +7,10 @@ Legacy roadmap identifier:
 M01
 
 Current capability:
-Provider-independent accessibility/browser closeout and Vitest configuration maintenance verified; provider-backed auth and RLS evidence remain blocked on a dedicated Supabase test environment
+Provider-backed auth/profile/RLS closeout verified on implementation head; durable closeout and exact-final-head CI pending before merge
 
 Status:
-IMPLEMENTING
+VERIFYING
 
 Branch:
 `feat/saas-shell-auth`
@@ -31,29 +31,30 @@ Detailed known issues:
 
 Product Foundation is COMPLETE. PR #2 was already merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI #57 passed.
 
-## Completed / Implemented in M01
+## Completed / Verified in M01
 
-- M01.1–M01.5: VERIFIED provider-independently.
-- M01.6 profile persistence/RLS: IMPLEMENTED provider-independently at reviewed head `e9c2ad64f2f9065d53a44652ac1116f91538e7f7`; CI #130 SUCCESS. Real Supabase cross-user denial remains mandatory before VERIFIED.
-- M01.7 provider-independent accessibility/browser slice: VERIFIED at `061762ec28a9f95ed97c433f35df8eee060389fe`; CI #134 SUCCESS.
-- Focused provider-independent configuration maintenance: VERIFIED at `85ff10741875892e2787631b106cfc48bfad0d5c`; CI `34528888577` / #141 SUCCESS. The prior Vitest/Vite ESM-in-CommonJS configuration warning no longer appears in the test logs.
+- M01.1–M01.5: VERIFIED.
+- M01.6 profile persistence/RLS: VERIFIED provider-backed. CI #148 on `7348526cb466a66b907e4c92148b7c6d68daf674` applied the real profile migration to local Supabase and proved two independently authenticated users cannot read/update each other's profiles.
+- M01.7 auth/accessibility/provider closeout: VERIFIED on the implementation head. CI #148 passed the full auth lifecycle, authenticated `/app` and `/app/profile`, profile persistence, authenticated narrow-mobile/keyboard checks, consumed-token safety, and 8/8 Chromium E2E tests.
+- Focused Vitest configuration maintenance: VERIFIED at `85ff10741875892e2787631b106cfc48bfad0d5c`, CI #141.
 
 ## Remaining
 
-1. Execute real Supabase migration + User A/User B profile isolation verification.
-2. Execute provider-backed signup/email verification/login/logout/password-recovery/authenticated `/app` + `/app/profile` E2E.
-3. Reconcile final milestone security/accessibility/performance review and exact-final-head CI after provider evidence exists.
+1. Reconcile durable M01 closeout state across milestone, feature, traceability, status, known-issues, and evidence docs.
+2. Obtain fresh exact-head CI for the final reconciliation commit.
+3. Re-check PR head/reviews/threads/mergeability; if all completion gates remain green, mark PR #3 ready and squash-merge under the owner's standing auto-merge authorization.
+4. Verify post-merge `main` CI before starting M02.
 
 ## Blocker
 
-Configured Supabase provider/database evidence is mandatory before M01.6 or the milestone is called VERIFIED/COMPLETE. Connected-account discovery on 2026-09-11 found only clearly unrelated existing projects by schema and neither was modified. Creating a new project/development branch requires explicit organization/cost confirmation. Mocks, placeholder credentials, unrelated projects, service-role clients, and static SQL inspection do not satisfy the provider gate.
+No provider/configuration blocker remains for M01. The only remaining gate is evidence-preserving integration closeout on the final documentation head.
 
 ## Verification state
 
-M01.7 browser verification initially failed at `caa82b59…`, CI #133, because an unscoped Playwright locator matched both header and footer `Log in` links. Root-cause fix `061762ec…` scoped the assertion to the banner landmark and CI #134 passed.
+Implementation/provider head `7348526cb466a66b907e4c92148b7c6d68daf674` passed CI `34582926587` / #148 across frozen install, lint, typecheck, 54 unit/component tests, framework/source verifier tests, autonomous/source integrity verification, real local Supabase startup and migration reset, production build, 8/8 Chromium E2E tests, PRD sections 1–242 coverage, and teardown.
 
-The configuration-maintenance head `85ff10741875892e2787631b106cfc48bfad0d5c` passed CI #141 across frozen install, lint, typecheck, 54 unit/component tests, framework/source verifier tests, autonomous/source integrity verification, production build, seven Chromium E2E tests, and PRD coverage. Test logs confirm the prior Vite config-loader warning is absent. This documentation reconciliation is newer and requires fresh exact-head CI before being called green.
+Provider-backed E2E covers signup, confirmation, login/logout, forgot/reset password, authenticated application/profile entry, profile persistence, two-user RLS isolation, authenticated mobile/keyboard evidence, and replayed confirmation-token failure without token leakage.
 
 ## Next Action
 
-Follow `docs/progress/STATUS.md` `Exact next work:`. Keep PR #3 open/draft and unmerged unless explicitly authorized.
+Follow `docs/progress/STATUS.md` `Exact next work:`. Merge only after fresh exact-head CI and final PR review state are green.
