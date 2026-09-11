@@ -6,10 +6,8 @@ import {
   idleOrganizationActionState,
   type OrganizationActionState,
 } from "@/lib/organization/action-state";
-import {
-  MANAGEABLE_ORGANIZATION_ROLES,
-  type OrganizationMember,
-} from "@/lib/organization/members";
+import type { OrganizationMember } from "@/lib/organization/members";
+import { MANAGEABLE_ORGANIZATION_ROLES } from "@/lib/organization/rbac";
 
 export type MembershipAction = (
   previousState: OrganizationActionState,
