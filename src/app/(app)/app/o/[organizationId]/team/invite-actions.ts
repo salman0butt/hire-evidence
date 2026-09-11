@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/require-user";
@@ -83,6 +84,7 @@ export async function revokeInvitationAction(
 
   try {
     await revokeOrganizationInvitation({ organizationId, invitationId });
+    revalidatePath(`/app/o/${organizationId}/team`);
     return {
       status: "success",
       message: "Invitation revoked.",
