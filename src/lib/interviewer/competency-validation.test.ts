@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { validateCompetencyInput } from "./competency-validation";
+import {
+  validateCompetencyInput,
+  validateCompetencyWeightTotal,
+} from "./competency-validation";
 
 describe("validateCompetencyInput", () => {
   it("normalizes bounded competency fields", () => {
@@ -106,5 +109,26 @@ describe("validateCompetencyInput", () => {
         message: "Competency position must be a non-negative integer.",
       });
     }
+  });
+});
+
+describe("validateCompetencyWeightTotal", () => {
+  it("requires configured competency weights to total exactly 100 before publication", () => {
+    expect(validateCompetencyWeightTotal([40, 30, 30])).toEqual({
+      ok: true,
+      total: 100,
+    });
+
+    expect(validateCompetencyWeightTotal([40, 30])).toEqual({
+      ok: false,
+      total: 70,
+      message: "Competency weights must total 100 before publication.",
+    });
+
+    expect(validateCompetencyWeightTotal([60, 50])).toEqual({
+      ok: false,
+      total: 110,
+      message: "Competency weights must total 100 before publication.",
+    });
   });
 });
