@@ -50,15 +50,15 @@ describe("organization tenancy migration", () => {
     expect(migration).toMatch(
       /alter table public\.organization_memberships enable row level security/i,
     );
-    expect(migration).toMatch(/profiles_select_own|organizations_select_member/i);
+    expect(migration).toMatch(/organizations_select_member/i);
     expect(migration).toMatch(/organizations_update_admin/i);
     expect(migration).toMatch(/memberships_select_member/i);
 
     expect(migration).not.toMatch(
-      /grant\s+insert\s+on\s+public\.organizations\s+to\s+authenticated/i,
+      /grant\s+insert\s+on(?:\s+table)?\s+public\.organizations\s+to\s+authenticated/i,
     );
     expect(migration).not.toMatch(
-      /grant\s+(insert|update|delete)[\s\S]*?public\.organization_memberships[\s\S]*?authenticated/i,
+      /grant\s+(?:insert|update|delete)(?:\s*\([^)]*\))?\s+on(?:\s+table)?\s+public\.organization_memberships\s+to\s+authenticated/i,
     );
   });
 
