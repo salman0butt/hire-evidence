@@ -72,11 +72,14 @@ test.describe("organization tenant UI accessibility and responsiveness", () => {
     await page.reload();
     await expect(page.getByRole("navigation", { name: "Organization navigation" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Overview" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Jobs" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Team" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
     await expectNoHorizontalOverflow(page);
 
     await page.getByRole("link", { name: "Overview" }).focus();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "Jobs" })).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: "Team" })).toBeFocused();
     await page.keyboard.press("Tab");
