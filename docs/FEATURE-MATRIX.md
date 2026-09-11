@@ -17,11 +17,12 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Protected authenticated application shell | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | Server-authoritative guard/navigation + browser evidence. |
 | Basic own-user profile + RLS | PRD 17, 196 | SaaS Shell + Auth | VERIFIED | Own-row persistence and mutual cross-user denial verified. |
 | M01 accessibility/browser closeout | PRD 15–17, 196 | SaaS Shell + Auth | VERIFIED | Public/authenticated browser evidence. |
-| Organization + membership database foundation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Fixed role enum, organizations/memberships, private auth helpers, RLS, authenticated atomic organization bootstrap; CI #161 and later. |
-| Fixed organization RBAC + input validation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED `6c2719c…` CI #162 → GREEN `ed9b3d52…` CI #163. |
-| Organization onboarding | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED `955ea259…` CI #165; build defect isolated in CI #167; fix `b817f49a…` passed full CI #168. |
-| Tenant-aware organization shell/navigation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED `6a47c0ee…` CI #169 → GREEN `709993dd…` CI #170; membership context is authenticated/RLS-backed. |
-| Organizations and RBAC milestone | PRD 8–14, 18–19, 197 | Organizations + RBAC | ACTIVE | Draft PR #4. Membership-management owner invariants, invitations, settings and final Org A/Org B/unauthenticated isolation remain mandatory. |
+| Organization + membership database foundation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Fixed roles, organizations/memberships, RLS and atomic owner bootstrap; CI #161+. |
+| Fixed organization RBAC + input validation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED #162 → GREEN #163. |
+| Organization onboarding | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED #165; build fix #167; CI #168 green. |
+| Tenant-aware organization shell/navigation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED #169 → GREEN #170; RLS-backed membership context. |
+| Membership management + owner invariants | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Authenticated narrow RPCs + team actions/UI; owner role immutable/non-assignable; final implementation `fa7a996d…`, CI #190 green. |
+| Organizations and RBAC milestone | PRD 8–14, 18–19, 197 | Organizations + RBAC | ACTIVE | Draft PR #4. Invitations, settings and final Org A/Org B/unauthenticated isolation remain mandatory. |
 | Jobs and interviewer builder | PRD roadmap | Jobs + Interviewer Builder | PLANNED | Immutable published configuration/versioning. |
 | Candidates and invitations | PRD roadmap | Candidates + Invitations | PLANNED | Narrow invitation-scoped authorization. |
 | Realtime AI interview | PRD roadmap | Realtime AI Interview | PLANNED | Realtime failure/continuity scenarios required. |
