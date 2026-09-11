@@ -6,7 +6,7 @@ import { requireUser } from "@/lib/auth/require-user";
 import { createCompetency } from "@/lib/interviewer/competencies";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
 
-import { createCompetencyAction } from "./competency-actions";
+import * as competencyActions from "./competency-actions";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/auth/require-user", () => ({ requireUser: vi.fn() }));
@@ -14,6 +14,8 @@ vi.mock("@/lib/organization/require-membership", () => ({
   requireOrganizationMembership: vi.fn(),
 }));
 vi.mock("@/lib/interviewer/competencies", () => ({ createCompetency: vi.fn() }));
+
+const { createCompetencyAction } = competencyActions;
 
 const organizationId = "11111111-1111-4111-8111-111111111111";
 const attackerOrganizationId = "99999999-9999-4999-8999-999999999999";
@@ -120,5 +122,11 @@ describe("competency server action", () => {
       status: "error",
       message: "We could not add the competency. Please try again.",
     });
+  });
+
+  it("exposes a dedicated route-bound rubric save action", () => {
+    expect(
+      (competencyActions as Record<string, unknown>).saveCompetencyRubricAction,
+    ).toBeTypeOf("function");
   });
 });
