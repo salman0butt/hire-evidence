@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireUser } from "@/lib/auth/require-user";
@@ -19,6 +20,7 @@ vi.mock("next/navigation", () => ({
 
 const mockedRequireUser = vi.mocked(requireUser);
 const mockedCreateOrganization = vi.mocked(createOrganization);
+const mockedRedirect = vi.mocked(redirect);
 
 function organizationForm(
   name: string,
@@ -51,9 +53,10 @@ describe("createOrganizationAction", () => {
     });
     expect(mockedRequireUser).not.toHaveBeenCalled();
     expect(mockedCreateOrganization).not.toHaveBeenCalled();
+    expect(mockedRedirect).not.toHaveBeenCalled();
   });
 
-  it("uses trusted authentication and normalized organization fields", async () => {
+  it("uses trusted authentication, normalized fields, and redirects to the new tenant", async () => {
     const formData = organizationForm(
       "  Acme Hiring  ",
       "  51-200  ",
@@ -70,6 +73,9 @@ describe("createOrganizationAction", () => {
       companySize: "51-200",
       hiringUseCase: "Structured technical interviews",
     });
+    expect(mockedRedirect).toHaveBeenCalledWith(
+      "/app/o/11111111-1111-4111-8111-111111111111",
+    );
   });
 
   it("maps persistence failures to bounded user-safe copy", async () => {
@@ -86,5 +92,6 @@ describe("createOrganizationAction", () => {
       status: "error",
       message: "We could not create your organization. Please try again.",
     });
+    expect(mockedRedirect).not.toHaveBeenCalled();
   });
 });
