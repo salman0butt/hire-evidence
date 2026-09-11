@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M02
 
 Current capability:
-Organization tenancy foundation and fixed RBAC are implemented/verified slices; organization onboarding is the next active implementation task.
+Organization tenancy foundation, fixed RBAC, onboarding and the RLS-backed tenant shell are implemented/verified slices; membership management with owner invariants is next.
 
 Status:
 IMPLEMENTING
@@ -44,13 +44,13 @@ Detailed known issues:
 
 ## Iterations
 
-1. M02.1 — organization schema + memberships — VERIFIED SLICE; CI #161 and later #163 green.
+1. M02.1 — organization schema + memberships — VERIFIED SLICE; CI #161 green.
 2. M02.2 — fixed RBAC + organization validation — VERIFIED SLICE; RED #162 → GREEN #163.
-3. M02.3 — tenant RLS — ACTIVE foundation; broader mutation/isolation cases remain.
-4. M02.4 — organization UI/navigation — NEXT via Task 3 onboarding, then tenant shell.
-5. M02.5 — secure team invitations — PLANNED.
-6. M02.6 — bounded organization settings — PLANNED.
-7. M02.7 — adversarial Org A/Org B/unauthenticated verification — PLANNED / completion gate.
+3. M02.3 — organization onboarding — VERIFIED SLICE; RED #165, build-debug CI #167, final GREEN #168.
+4. M02.4 — tenant-aware application shell/navigation — VERIFIED SLICE; RED #169 → GREEN #170.
+5. M02.5 — membership management + owner invariants — NEXT.
+6. M02.6 — secure team invitations — PLANNED.
+7. M02.7 — organization settings + adversarial Org A/Org B/unauthenticated verification — PLANNED / completion gate.
 
 ## Blocker
 
@@ -58,8 +58,8 @@ None currently known. Do not confuse unfinished planned work with an external bl
 
 ## Verification state
 
-Task 1 database foundation exact head `0e24fcfc02c6df809ad1555f6fb5a7e5a5963737` passed CI `34585418940` / #161. Task 2 used genuine RED `6c2719c9502a4a23c59023322eeed247e362eb21`, CI #162, then GREEN `ed9b3d52db6674fb15bb91c366f18940544e31ae`, CI `34586305688` / #163, which passed install, lint, typecheck, unit/component tests, framework/source verification, local Supabase, build, E2E, PRD coverage and teardown. This durable-state reconciliation requires fresh exact-head CI.
+Task 3 final implementation/fix head `b817f49ac5beaa8a07bbbf0b32d4e798dcff8484` passed CI `34591943413` / #168. Task 4 GREEN head `709993dd37fe60cb8db7647c9c8251b6011fc977` passed CI `34592533041` / #170 across frozen install, lint, typecheck, 83 unit/component tests, framework/source verification, local Supabase migrations, build, E2E, PRD coverage and teardown. This durable-state reconciliation requires fresh exact-head CI.
 
 ## Next Action
 
-Follow `docs/progress/STATUS.md` `Exact next work:` and begin Task 3 with failing organization onboarding action/component tests before implementation.
+Follow `docs/progress/STATUS.md` `Exact next work:` and begin Task 5 with failing membership-management migration/action tests before implementation.

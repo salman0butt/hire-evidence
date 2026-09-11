@@ -13,26 +13,26 @@ Organizations + RBAC — **IMPLEMENTING**.
 
 ## Current Task State
 
-- M02.1 organization schema + memberships — **VERIFIED SLICE**. Migration/RLS/RPC foundation is present; CI #161 passed full repository verification including local Supabase migration execution.
-- M02.2 fixed RBAC + organization input validation — **VERIFIED SLICE**. RED commit `6c2719c9502a4a23c59023322eeed247e362eb21` failed CI #162 because `./rbac` and `./validation` did not exist. GREEN commit `ed9b3d52db6674fb15bb91c366f18940544e31ae` passed CI `34586305688` / #163 across the full suite.
-- M02.3 tenant RLS — foundation active; broader mutation/isolation verification remains pending.
-- M02.4 tenant-aware application shell/navigation — planned.
-- M02.5 secure team invitations — planned.
-- M02.6 bounded organization settings — planned.
-- M02.7 adversarial two-organization verification — planned and required for milestone completion.
+- M02.1 organization schema + memberships — **VERIFIED SLICE**. Migration/RLS/RPC foundation passed full CI #161.
+- M02.2 fixed RBAC + organization input validation — **VERIFIED SLICE**. RED `6c2719c…` / CI #162 → GREEN `ed9b3d52…` / CI #163.
+- M02.3 organization onboarding — **VERIFIED SLICE**. RED `955ea259…` / CI #165. Production-build defect exposed by CI #167 was root-caused to a non-function export from a `"use server"` module and fixed in `b817f49a…`; CI `34591943413` / #168 passed the complete suite.
+- M02.4 tenant-aware application shell/navigation — **VERIFIED SLICE**. RED `6a47c0ee…` / CI #169 → GREEN `709993dd…` / CI `34592533041` / #170. Membership context is RLS-backed and forged/missing tenant IDs fail uniformly.
+- M02.5 membership management + owner invariants — **NEXT**.
+- M02.6 secure team invitations — planned.
+- M02.7 bounded organization settings and final adversarial two-organization verification — planned and required for completion.
 
 Active branch: `feat/organizations-rbac`
 
 Active PR: #4 — `Build organization tenancy and role-based access` — OPEN / DRAFT / unmerged.
 
-CI status: implementation head `ed9b3d52db6674fb15bb91c366f18940544e31ae` passed GitHub Actions `34586305688` / #163. This reconciliation commit requires fresh exact-head CI before being treated as final evidence.
+CI status: implementation head `709993dd37fe60cb8db7647c9c8251b6011fc977` passed GitHub Actions `34592533041` / #170 across the complete repository suite. This reconciliation commit requires fresh exact-head CI before being treated as final evidence.
 
 ## Review State
 
-- Critical: 0 unresolved for implemented M02.1–M02.2 slices.
-- Important: 0 unresolved for implemented M02.1–M02.2 slices.
+- Critical: 0 unresolved for implemented M02.1–M02.4 slices.
+- Important: 0 unresolved for implemented M02.1–M02.4 slices.
 - PR #4 currently has no submitted reviews and no unresolved review threads.
-- Full M02 security/accessibility review and adversarial two-organization evidence remain mandatory before merge.
+- Full M02 membership/invitation/settings security review and adversarial two-organization evidence remain mandatory before merge.
 
 ## Blockers
 
@@ -42,4 +42,4 @@ None currently known. M02 is incomplete by planned scope, not externally blocked
 
 Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, `docs/milestones/CURRENT.md`, `docs/milestones/M02-organizations-rbac.md`, PRD sections 8–14/18–19/197, M02 design/plan/evidence, and current source/tests.
 
-Exact next work: begin M02 Task 3 organization onboarding by writing genuine failing server-action and form-component tests before adding the organization repository/action/form/page implementation.
+Exact next work: begin M02 Task 5 membership management with genuine failing migration/action tests for owner/admin authorization, rejection of owner-role assignment, immutable owner membership, self-escalation denial and forged organization/member IDs before implementing the minimum secure RPCs/UI.
