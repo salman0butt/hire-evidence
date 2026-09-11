@@ -48,25 +48,25 @@ describe("organization RBAC", () => {
     },
   );
 
-  it("recruiter can manage jobs without receiving organization/team administration", () => {
-    expect(hasOrganizationCapability("recruiter", jobsView)).toBe(true);
-    expect(hasOrganizationCapability("recruiter", jobsManage)).toBe(true);
-    expect(hasOrganizationCapability("recruiter", "organization:update")).toBe(false);
-    expect(hasOrganizationCapability("recruiter", "team:invite")).toBe(false);
-    expect(hasOrganizationCapability("recruiter", "team:manage_roles")).toBe(false);
-  });
-
   it.each([
+    "recruiter",
     "hiring_manager",
-    "reviewer",
   ] satisfies readonly OrganizationRole[])(
-    "%s can view jobs but cannot manage them or organization settings",
+    "%s can manage jobs without receiving organization/team administration",
     (role) => {
-      for (const capability of ORGANIZATION_CAPABILITIES) {
-        expect(hasOrganizationCapability(role, capability)).toBe(
-          memberCapabilities.includes(capability),
-        );
-      }
+      expect(hasOrganizationCapability(role, jobsView)).toBe(true);
+      expect(hasOrganizationCapability(role, jobsManage)).toBe(true);
+      expect(hasOrganizationCapability(role, "organization:update")).toBe(false);
+      expect(hasOrganizationCapability(role, "team:invite")).toBe(false);
+      expect(hasOrganizationCapability(role, "team:manage_roles")).toBe(false);
     },
   );
+
+  it("reviewer can view jobs but cannot manage them or organization settings", () => {
+    for (const capability of ORGANIZATION_CAPABILITIES) {
+      expect(hasOrganizationCapability("reviewer", capability)).toBe(
+        memberCapabilities.includes(capability),
+      );
+    }
+  });
 });
