@@ -24,13 +24,16 @@ vi.mock("@/components/jobs/competency-section", () => ({
   CompetencySection: ({
     competencies,
     readOnly,
+    rubricAction,
   }: {
     competencies: Array<{ name: string }>;
     readOnly?: boolean;
+    rubricAction?: unknown;
   }) => (
     <div>
       Competencies: {competencies.map((competency) => competency.name).join(", ")} —{" "}
-      {readOnly ? "read only" : "editable"}
+      {readOnly ? "read only" : "editable"} —{" "}
+      {rubricAction ? "rubric save connected" : "rubric save disconnected"}
     </div>
   ),
 }));
@@ -40,7 +43,10 @@ vi.mock("@/lib/organization/require-membership", () => ({
   requireOrganizationMembership: vi.fn(),
 }));
 vi.mock("../job-actions", () => ({ updateJobAction: vi.fn() }));
-vi.mock("./competency-actions", () => ({ createCompetencyAction: vi.fn() }));
+vi.mock("./competency-actions", () => ({
+  createCompetencyAction: vi.fn(),
+  saveCompetencyRubricAction: vi.fn(),
+}));
 
 const mockedGetJob = vi.mocked(getJob);
 const mockedListCompetencies = vi.mocked(listCompetencies);
@@ -86,7 +92,7 @@ describe("job detail page", () => {
     mockedListCompetencies.mockResolvedValue(competencies);
   });
 
-  it("loads route-bound job and competencies as editable for a manager", async () => {
+  it("loads route-bound job and competencies as editable for a manager with rubric saving connected", async () => {
     mockedRequireMembership.mockResolvedValue({
       organizationId,
       organizationName: "Evidence Co",
@@ -99,10 +105,12 @@ describe("job detail page", () => {
     expect(mockedGetJob).toHaveBeenCalledWith(organizationId, jobId);
     expect(mockedListCompetencies).toHaveBeenCalledWith(organizationId, jobId);
     expect(screen.getByText(/Senior Platform Engineer — editable/)).toBeInTheDocument();
-    expect(screen.getByText(/Competencies: Systems design — editable/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Competencies: Systems design — editable — rubric save connected/),
+    ).toBeInTheDocument();
   });
 
-  it("renders the same tenant job and competencies read-only for a reviewer", async () => {
+  it("renders the same tenant job and competencies read-only without rubric persistence for a reviewer", async () => {
     mockedRequireMembership.mockResolvedValue({
       organizationId,
       organizationName: "Evidence Co",
@@ -114,6 +122,8 @@ describe("job detail page", () => {
     expect(mockedGetJob).toHaveBeenCalledWith(organizationId, jobId);
     expect(mockedListCompetencies).toHaveBeenCalledWith(organizationId, jobId);
     expect(screen.getByText(/Senior Platform Engineer — read only/)).toBeInTheDocument();
-    expect(screen.getByText(/Competencies: Systems design — read only/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Competencies: Systems design — read only — rubric save disconnected/),
+    ).toBeInTheDocument();
   });
 });
