@@ -14,11 +14,14 @@ const adminCapabilities: readonly OrganizationCapability[] = [
   "team:view",
   "team:invite",
   "team:manage_roles",
+  "jobs:view",
+  "jobs:manage",
 ];
 
 const memberCapabilities: readonly OrganizationCapability[] = [
   "organization:view",
   "team:view",
+  "jobs:view",
 ];
 
 describe("organization RBAC", () => {
@@ -42,12 +45,19 @@ describe("organization RBAC", () => {
     },
   );
 
+  it("recruiter can manage jobs without receiving organization/team administration", () => {
+    expect(hasOrganizationCapability("recruiter", "jobs:view")).toBe(true);
+    expect(hasOrganizationCapability("recruiter", "jobs:manage")).toBe(true);
+    expect(hasOrganizationCapability("recruiter", "organization:update")).toBe(false);
+    expect(hasOrganizationCapability("recruiter", "team:invite")).toBe(false);
+    expect(hasOrganizationCapability("recruiter", "team:manage_roles")).toBe(false);
+  });
+
   it.each([
-    "recruiter",
     "hiring_manager",
     "reviewer",
   ] satisfies readonly OrganizationRole[])(
-    "%s can view organization/team data but cannot mutate it",
+    "%s can view jobs but cannot manage them or organization settings",
     (role) => {
       for (const capability of ORGANIZATION_CAPABILITIES) {
         expect(hasOrganizationCapability(role, capability)).toBe(
