@@ -61,4 +61,24 @@ describe("CompetencySection", () => {
     expect(container.querySelector('input[name="organization_id"]')).toBeNull();
     expect(container.querySelector('input[name="job_id"]')).toBeNull();
   });
+
+  it("exposes an observable five-level rubric editor for every competency", () => {
+    render(<CompetencySection competencies={competencies} action={idleAction} />);
+
+    for (let level = 1; level <= 5; level += 1) {
+      expect(
+        screen.getByLabelText(`Systems design score ${level}`),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(`Technical communication score ${level}`),
+      ).toBeInTheDocument();
+    }
+
+    expect(
+      screen.getByRole("button", { name: "Save Systems design rubric" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Save Technical communication rubric" }),
+    ).toBeInTheDocument();
+  });
 });
