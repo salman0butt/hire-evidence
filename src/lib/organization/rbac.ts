@@ -8,6 +8,25 @@ export const ORGANIZATION_ROLES = [
 
 export type OrganizationRole = (typeof ORGANIZATION_ROLES)[number];
 
+export const MANAGEABLE_ORGANIZATION_ROLES = [
+  "admin",
+  "recruiter",
+  "hiring_manager",
+  "reviewer",
+] as const satisfies readonly OrganizationRole[];
+
+export type ManageableOrganizationRole =
+  (typeof MANAGEABLE_ORGANIZATION_ROLES)[number];
+
+export function isManageableOrganizationRole(
+  value: unknown,
+): value is ManageableOrganizationRole {
+  return (
+    typeof value === "string" &&
+    (MANAGEABLE_ORGANIZATION_ROLES as readonly string[]).includes(value)
+  );
+}
+
 export const ORGANIZATION_CAPABILITIES = [
   "organization:view",
   "organization:update",
