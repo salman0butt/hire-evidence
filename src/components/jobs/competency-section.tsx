@@ -46,7 +46,7 @@ function nextPosition(competencies: readonly Competency[]): number {
 function RubricEditor({
   competency,
   action,
-}: Readonly<{ competency: Competency; action?: RubricAction }>) {
+}: Readonly<{ competency: Competency; action?: RubricAction | undefined }>) {
   const boundAction: CompetencyAction = action
     ? action.bind(null, competency.id)
     : idleAction;
