@@ -14,10 +14,17 @@ type CompetencyAction = (
   formData: FormData,
 ) => Promise<CompetencyActionState>;
 
+type RubricAction = (
+  competencyId: string,
+  previousState: CompetencyActionState,
+  formData: FormData,
+) => Promise<CompetencyActionState>;
+
 type CompetencySectionProps = Readonly<{
   competencies: readonly Competency[];
   readOnly?: boolean;
   action?: CompetencyAction;
+  rubricAction?: RubricAction;
 }>;
 
 const idleState: CompetencyActionState = { status: "idle", message: null };
@@ -36,51 +43,73 @@ function nextPosition(competencies: readonly Competency[]): number {
   ) + 1;
 }
 
-function RubricEditor({ competency }: Readonly<{ competency: Competency }>) {
-  return (
-    <fieldset className="mt-5 space-y-4 border-t border-zinc-200 pt-5">
-      <legend className="text-sm font-semibold text-zinc-900">
-        Observable scoring rubric
-      </legend>
-      <p className="text-xs leading-5 text-zinc-500">
-        Describe job-related evidence an interviewer can directly observe at every score level.
-      </p>
+function RubricEditor({
+  competency,
+  action,
+}: Readonly<{ competency: Competency; action?: RubricAction }>) {
+  const boundAction: CompetencyAction = action
+    ? action.bind(null, competency.id)
+    : idleAction;
+  const [state, formAction, pending] = useActionState(boundAction, idleState);
 
-      <div className="grid gap-4">
-        {[1, 2, 3, 4, 5].map((level) => {
-          const inputId = `rubric-${competency.id}-level-${level}`;
-          return (
-            <div key={level} className="space-y-2">
-              <label
-                htmlFor={inputId}
-                className="block text-sm font-medium text-zinc-800"
-              >
-                {competency.name} score {level}
-              </label>
-              <textarea
-                id={inputId}
-                name={`level_${level}`}
-                rows={3}
-                maxLength={2000}
-                className={inputClass}
-              />
-            </div>
-          );
-        })}
-      </div>
+  return (
+    <form action={formAction} className="mt-5 space-y-4 border-t border-zinc-200 pt-5">
+      <fieldset className="space-y-4">
+        <legend className="text-sm font-semibold text-zinc-900">
+          Observable scoring rubric
+        </legend>
+        <p className="text-xs leading-5 text-zinc-500">
+          Describe job-related evidence an interviewer can directly observe at every score level.
+        </p>
+
+        <div className="grid gap-4">
+          {[1, 2, 3, 4, 5].map((level) => {
+            const inputId = `rubric-${competency.id}-level-${level}`;
+            return (
+              <div key={level} className="space-y-2">
+                <label
+                  htmlFor={inputId}
+                  className="block text-sm font-medium text-zinc-800"
+                >
+                  {competency.name} score {level}
+                </label>
+                <textarea
+                  id={inputId}
+                  name={`level_${level}`}
+                  rows={3}
+                  maxLength={2000}
+                  required
+                  className={inputClass}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </fieldset>
+
+      {state.message ? (
+        <p
+          role={state.status === "success" ? "status" : "alert"}
+          className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-700"
+        >
+          {state.message}
+        </p>
+      ) : null}
 
       <button
-        type="button"
+        type="submit"
         aria-label={`Save ${competency.name} rubric`}
-        className="rounded-xl bg-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-500"
-        disabled
+        className="rounded-xl bg-zinc-950 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+        disabled={!action || pending}
       >
-        Save rubric
+        {pending ? "Saving…" : "Save rubric"}
       </button>
-      <p className="text-xs leading-5 text-zinc-500">
-        Saving will be enabled after the server-side rubric action is connected and verified.
-      </p>
-    </fieldset>
+      {!action ? (
+        <p className="text-xs leading-5 text-zinc-500">
+          Saving is unavailable until a verified server-side rubric action is connected.
+        </p>
+      ) : null}
+    </form>
   );
 }
 
@@ -88,6 +117,7 @@ export function CompetencySection({
   competencies,
   readOnly = false,
   action = idleAction,
+  rubricAction,
 }: CompetencySectionProps) {
   const [state, formAction, pending] = useActionState(action, idleState);
 
@@ -129,7 +159,9 @@ export function CompetencySection({
                 </span>
               </div>
 
-              {!readOnly ? <RubricEditor competency={competency} /> : null}
+              {!readOnly ? (
+                <RubricEditor competency={competency} action={rubricAction} />
+              ) : null}
             </li>
           ))}
         </ul>
