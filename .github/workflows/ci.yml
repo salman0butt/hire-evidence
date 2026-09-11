@@ -16,7 +16,7 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,19 +45,36 @@ jobs:
         run: python3 scripts/verify_autonomous_framework.py
       - name: Verify requirements source integrity
         run: python3 scripts/verify_requirements_source.py
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 2.117.0
+      - name: Start local Supabase
+        run: |
+          supabase start
+          supabase db reset
+      - name: Export local Supabase environment
+        shell: bash
+        run: |
+          eval "$(supabase status -o env \
+            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)"
+          echo "NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+          echo "SUPABASE_MAILPIT_URL=http://127.0.0.1:54324" >> "$GITHUB_ENV"
       - name: Build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+          NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
         run: pnpm build
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
-      - name: Smoke E2E
+      - name: E2E
         env:
           CI: "true"
           NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
-          NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
         run: pnpm e2e
       - name: Verify PRD coverage
         run: python3 scripts/verify_prd_coverage.py
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop --no-backup
