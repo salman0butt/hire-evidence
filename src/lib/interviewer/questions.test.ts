@@ -20,6 +20,8 @@ const input = {
   position: 1,
 };
 
+type QuestionFixture = typeof input;
+
 async function questionsModule() {
   const modulePath = "./questions";
   return import(/* @vite-ignore */ modulePath) as Promise<{
@@ -27,7 +29,7 @@ async function questionsModule() {
       organizationId: string,
       jobId: string,
       competencyId: string,
-      input: typeof input,
+      questionInput: QuestionFixture,
     ) => Promise<string>;
     listQuestions: (organizationId: string, jobId: string) => Promise<unknown[]>;
   }>;
