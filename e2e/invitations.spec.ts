@@ -6,7 +6,13 @@ import { createClient } from "@supabase/supabase-js";
 const PASSWORD = "InvitationTest-1234";
 const HOUR_MS = 60 * 60 * 1000;
 
-type TestClient = ReturnType<typeof createClient>;
+function createTestClient(supabaseUrl: string, key: string) {
+  return createClient(supabaseUrl, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+type TestClient = ReturnType<typeof createTestClient>;
 
 function requireProviderEnvironment() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -20,6 +26,14 @@ function requireProviderEnvironment() {
   }
 
   return { supabaseUrl, publishableKey, serviceRoleKey };
+}
+
+function requireString(value: unknown, label: string): string {
+  expect(typeof value).toBe("string");
+  if (typeof value !== "string") {
+    throw new Error(`${label} must be a string.`);
+  }
+  return value;
 }
 
 function makeToken() {
@@ -40,16 +54,16 @@ async function createConfirmedUser(
     email_confirm: true,
   });
   expect(created.error).toBeNull();
-  expect(created.data.user?.id).toBeTruthy();
+  const userId = created.data.user?.id;
+  expect(userId).toBeTruthy();
+  if (!userId) throw new Error(`Supabase did not create ${email}.`);
 
-  const client = createClient(supabaseUrl, publishableKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const client = createTestClient(supabaseUrl, publishableKey);
   const signedIn = await client.auth.signInWithPassword({ email, password: PASSWORD });
   expect(signedIn.error).toBeNull();
-  expect(signedIn.data.user?.id).toBe(created.data.user!.id);
+  expect(signedIn.data.user?.id).toBe(userId);
 
-  return { client, userId: created.data.user!.id };
+  return { client, userId };
 }
 
 async function createInvitation(
@@ -78,9 +92,7 @@ test.describe("provider-backed organization invitation security", () => {
     test.setTimeout(120_000);
 
     const { supabaseUrl, publishableKey, serviceRoleKey } = requireProviderEnvironment();
-    const admin = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
+    const admin = createTestClient(supabaseUrl, serviceRoleKey);
     const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const ownerEmail = `invite-owner-${suffix}@example.test`;
     const reviewerEmail = `invite-reviewer-${suffix}@example.test`;
@@ -118,8 +130,7 @@ test.describe("provider-backed organization invitation security", () => {
       p_hiring_use_case: null,
     });
     expect(organization.error).toBeNull();
-    expect(typeof organization.data).toBe("string");
-    const organizationId = organization.data as string;
+    const organizationId = requireString(organization.data, "organization id");
 
     const ownerMembership = await owner.client
       .from("organization_memberships")
@@ -138,12 +149,12 @@ test.describe("provider-backed organization invitation security", () => {
       tokenHash: reviewerToken.tokenHash,
     });
     expect(reviewerInvite.error).toBeNull();
-    expect(typeof reviewerInvite.data).toBe("string");
+    const reviewerInviteId = requireString(reviewerInvite.data, "reviewer invitation id");
 
     const storedReviewerInvite = await admin
       .from("organization_invitations")
       .select("id,email,role,token_hash,accepted_at,revoked_at")
-      .eq("id", reviewerInvite.data as string)
+      .eq("id", reviewerInviteId)
       .single();
     expect(storedReviewerInvite.error).toBeNull();
     expect(storedReviewerInvite.data).toMatchObject({
@@ -215,6 +226,10 @@ test.describe("provider-backed organization invitation security", () => {
       tokenHash: wrongEmailToken.tokenHash,
     });
     expect(wrongEmailInvite.error).toBeNull();
+    const wrongEmailInviteId = requireString(
+      wrongEmailInvite.data,
+      "wrong-email invitation id",
+    );
 
     const wrongEmailAttempt = await reviewer.client.rpc(
       "accept_organization_invitation",
@@ -225,7 +240,7 @@ test.describe("provider-backed organization invitation security", () => {
     const afterWrongEmail = await admin
       .from("organization_invitations")
       .select("accepted_at,revoked_at")
-      .eq("id", wrongEmailInvite.data as string)
+      .eq("id", wrongEmailInviteId)
       .single();
     expect(afterWrongEmail.error).toBeNull();
     expect(afterWrongEmail.data).toEqual({ accepted_at: null, revoked_at: null });
@@ -259,12 +274,16 @@ test.describe("provider-backed organization invitation security", () => {
       tokenHash: adminManagedToken.tokenHash,
     });
     expect(adminManagedInvite.error).toBeNull();
+    const adminManagedInviteId = requireString(
+      adminManagedInvite.data,
+      "admin-managed invitation id",
+    );
 
     const reviewerRevokes = await reviewer.client.rpc(
       "revoke_organization_invitation",
       {
         p_organization_id: organizationId,
-        p_invitation_id: adminManagedInvite.data as string,
+        p_invitation_id: adminManagedInviteId,
       },
     );
     expect(reviewerRevokes.error).not.toBeNull();
@@ -273,7 +292,7 @@ test.describe("provider-backed organization invitation security", () => {
       "revoke_organization_invitation",
       {
         p_organization_id: organizationId,
-        p_invitation_id: adminManagedInvite.data as string,
+        p_invitation_id: adminManagedInviteId,
       },
     );
     expect(adminRevokes.error).toBeNull();
