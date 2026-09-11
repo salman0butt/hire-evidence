@@ -1,15 +1,9 @@
-import { ORGANIZATION_ROLES, type OrganizationRole } from "@/lib/organization/rbac";
+import {
+  ORGANIZATION_ROLES,
+  type ManageableOrganizationRole,
+  type OrganizationRole,
+} from "@/lib/organization/rbac";
 import { createClient } from "@/lib/supabase/server";
-
-export const MANAGEABLE_ORGANIZATION_ROLES = [
-  "admin",
-  "recruiter",
-  "hiring_manager",
-  "reviewer",
-] as const satisfies readonly OrganizationRole[];
-
-export type ManageableOrganizationRole =
-  (typeof MANAGEABLE_ORGANIZATION_ROLES)[number];
 
 export type OrganizationMember = Readonly<{
   userId: string;
@@ -20,15 +14,6 @@ function isOrganizationRole(value: unknown): value is OrganizationRole {
   return (
     typeof value === "string" &&
     (ORGANIZATION_ROLES as readonly string[]).includes(value)
-  );
-}
-
-export function isManageableOrganizationRole(
-  value: unknown,
-): value is ManageableOrganizationRole {
-  return (
-    typeof value === "string" &&
-    (MANAGEABLE_ORGANIZATION_ROLES as readonly string[]).includes(value)
   );
 }
 
