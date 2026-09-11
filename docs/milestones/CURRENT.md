@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M02
 
 Current capability:
-Organization tenancy foundation, fixed RBAC, onboarding and the RLS-backed tenant shell are implemented/verified slices; membership management with owner invariants is next.
+Organization tenancy foundation, fixed RBAC, onboarding, tenant shell, and owner-safe membership management are implemented/verified slices; secure invitations are next.
 
 Status:
 IMPLEMENTING
@@ -40,6 +40,7 @@ Detailed known issues:
 - PostgreSQL RLS/RPCs are authoritative; TypeScript capabilities are UX/preflight only.
 - Fixed roles: `owner`, `admin`, `recruiter`, `hiring_manager`, `reviewer`.
 - Organization creation atomically creates owner membership through an authenticated RPC.
+- Membership role/removal mutations use authenticated `SECURITY DEFINER` RPCs and preserve immutable owner membership.
 - Invitation tokens will be cryptographically random, SHA-256 hash-at-rest, expiring, and authenticated-email-bound.
 
 ## Iterations
@@ -48,8 +49,8 @@ Detailed known issues:
 2. M02.2 — fixed RBAC + organization validation — VERIFIED SLICE; RED #162 → GREEN #163.
 3. M02.3 — organization onboarding — VERIFIED SLICE; RED #165, build-debug CI #167, final GREEN #168.
 4. M02.4 — tenant-aware application shell/navigation — VERIFIED SLICE; RED #169 → GREEN #170.
-5. M02.5 — membership management + owner invariants — NEXT.
-6. M02.6 — secure team invitations — PLANNED.
+5. M02.5 — membership management + owner invariants — VERIFIED SLICE; RED tests at `80506379…` / `35b83c95…`; implementation/regression fixes culminated at `fa7a996d…`, CI #190 green.
+6. M02.6 — secure team invitations — NEXT.
 7. M02.7 — organization settings + adversarial Org A/Org B/unauthenticated verification — PLANNED / completion gate.
 
 ## Blocker
@@ -58,8 +59,8 @@ None currently known. Do not confuse unfinished planned work with an external bl
 
 ## Verification state
 
-Task 3 final implementation/fix head `b817f49ac5beaa8a07bbbf0b32d4e798dcff8484` passed CI `34591943413` / #168. Task 4 GREEN head `709993dd37fe60cb8db7647c9c8251b6011fc977` passed CI `34592533041` / #170 across frozen install, lint, typecheck, 83 unit/component tests, framework/source verification, local Supabase migrations, build, E2E, PRD coverage and teardown. This durable-state reconciliation requires fresh exact-head CI.
+Task 5 final implementation head `fa7a996d19d790e87fb7123cb0071910424ea3a9` passed GitHub Actions `34594961808` / #190 across the complete repository suite, including local Supabase migrations, production build and browser tests. This durable-state reconciliation creates a newer head and therefore requires fresh exact-head CI.
 
 ## Next Action
 
-Follow `docs/progress/STATUS.md` `Exact next work:` and begin Task 5 with failing membership-management migration/action tests before implementation.
+Follow `docs/progress/STATUS.md` `Exact next work:` and begin Task 6 with failing invitation token/action/migration abuse tests before implementation.
