@@ -26,8 +26,8 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Bounded organization settings | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED `8a080819…` / #217 → GREEN `43b7c231…` / #218; owner/admin only, route-bound validated fields. |
 | Org A / Org B / unauthenticated tenant isolation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Real local-Supabase read/write/role matrix at `3e0c3555…`, CI #219. |
 | M02 responsive/keyboard closeout | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Desktop + 390×844 keyboard/overflow matrix; reviewed head `fd8907cf…`, CI #224 / `34610615757`. |
-| Organizations and RBAC milestone | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Implementation, adversarial tenancy, responsive/browser closeout, and skeptical review complete with 0 Critical/Important findings; closeout docs await exact-final-head CI, then explicit merge authorization. |
-| Jobs and interviewer builder | PRD roadmap | Jobs + Interviewer Builder | PLANNED | Immutable published configuration/versioning. |
+| Organizations and RBAC milestone | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | PR #4 integrated; post-merge main CI #232 passed. |
+| Jobs and interviewer builder | PRD 20–41, 198 | Jobs + Interviewer Builder | ACTIVE | M03.1 jobs, M03.2 competencies, M03.3 observable rubrics and M03.4 question bank are verified slices. Question-bank provider-backed head `c5a8688f…`, CI #330; M03.5–M03.11 remain. |
 | Candidates and invitations | PRD roadmap | Candidates + Invitations | PLANNED | Narrow invitation-scoped authorization. |
 | Realtime AI interview | PRD roadmap | Realtime AI Interview | PLANNED | Realtime failure/continuity scenarios required. |
 | Durable transcript/session continuity | PRD roadmap | Transcript + Durable Session | PLANNED | Finalized immutable chronological turns. |
