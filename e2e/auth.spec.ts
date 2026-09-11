@@ -115,7 +115,7 @@ test.describe("provider-backed Supabase auth and profile isolation", () => {
     const recoveryLink = await waitForAuthLink(mailpitUrl, userAEmail, "recovery");
     await page.goto(recoveryLink);
     await expect(page).toHaveURL(/\/auth\/reset-password$/);
-    await page.getByLabel("New password").fill(updatedPassword);
+    await page.locator("#recovery-password").fill(updatedPassword);
     await page.getByRole("button", { name: "Update password" }).click();
     await expect(page).toHaveURL(/\/app$/);
 
