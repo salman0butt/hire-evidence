@@ -2,9 +2,10 @@ import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireUser } from "@/lib/auth/require-user";
+import { idleOrganizationActionState } from "@/lib/organization/action-state";
 import { createOrganization } from "@/lib/organization/repository";
 
-import { createOrganizationAction, idleOrganizationActionState } from "./actions";
+import { createOrganizationAction } from "./actions";
 
 vi.mock("@/lib/auth/require-user", () => ({
   requireUser: vi.fn(),

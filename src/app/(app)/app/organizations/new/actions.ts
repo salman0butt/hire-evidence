@@ -3,14 +3,9 @@
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/require-user";
-import {
-  idleOrganizationActionState,
-  type OrganizationActionState,
-} from "@/lib/organization/action-state";
+import type { OrganizationActionState } from "@/lib/organization/action-state";
 import { createOrganization } from "@/lib/organization/repository";
 import { validateOrganizationInput } from "@/lib/organization/validation";
-
-export { idleOrganizationActionState };
 
 export async function createOrganizationAction(
   _previousState: OrganizationActionState,
