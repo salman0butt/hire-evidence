@@ -15,12 +15,15 @@ export default async function JobPage({ params }: JobPageProps) {
   const job = await getJob(organizationId, jobId);
   const canManage = hasOrganizationCapability(context.role, "jobs:manage");
 
+  if (!canManage) {
+    return <JobForm mode="edit" initialJob={job} readOnly />;
+  }
+
   return (
     <JobForm
       mode="edit"
       initialJob={job}
-      readOnly={!canManage}
-      action={canManage ? updateJobAction.bind(null, organizationId, jobId) : undefined}
+      action={updateJobAction.bind(null, organizationId, jobId)}
     />
   );
 }
