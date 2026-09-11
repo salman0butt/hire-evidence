@@ -71,7 +71,7 @@ async function addMember(
   member: TestClient,
   organizationId: string,
   email: string,
-  role: "recruiter" | "reviewer",
+  role: "recruiter" | "hiring_manager" | "reviewer",
 ) {
   const hash = tokenHash();
   const invite = await owner.rpc("create_organization_invitation", {
@@ -119,6 +119,7 @@ test.describe("provider-backed job tenant isolation", () => {
     const ownerAEmail = `jobs-a-owner-${suffix}@example.test`;
     const ownerBEmail = `jobs-b-owner-${suffix}@example.test`;
     const recruiterEmail = `jobs-a-recruiter-${suffix}@example.test`;
+    const hiringManagerEmail = `jobs-a-manager-${suffix}@example.test`;
     const reviewerEmail = `jobs-a-reviewer-${suffix}@example.test`;
 
     const ownerA = await confirmedUser(
@@ -139,6 +140,12 @@ test.describe("provider-backed job tenant isolation", () => {
       publishableKey,
       recruiterEmail,
     );
+    const hiringManager = await confirmedUser(
+      admin,
+      supabaseUrl,
+      publishableKey,
+      hiringManagerEmail,
+    );
     const reviewer = await confirmedUser(
       admin,
       supabaseUrl,
@@ -149,6 +156,13 @@ test.describe("provider-backed job tenant isolation", () => {
     const orgA = await createOrganization(ownerA, `Jobs Org A ${suffix}`);
     const orgB = await createOrganization(ownerB, `Jobs Org B ${suffix}`);
     await addMember(ownerA, recruiter, orgA, recruiterEmail, "recruiter");
+    await addMember(
+      ownerA,
+      hiringManager,
+      orgA,
+      hiringManagerEmail,
+      "hiring_manager",
+    );
     await addMember(ownerA, reviewer, orgA, reviewerEmail, "reviewer");
 
     const created = await ownerA.rpc("create_job", {
@@ -195,6 +209,14 @@ test.describe("provider-backed job tenant isolation", () => {
     });
     expect(recruiterCreated.error).toBeNull();
     expect(typeof recruiterCreated.data).toBe("string");
+
+    const hiringManagerCreated = await hiringManager.rpc("create_job", {
+      p_organization_id: orgA,
+      ...jobPayload,
+      p_title: "Hiring-manager-created role",
+    });
+    expect(hiringManagerCreated.error).toBeNull();
+    expect(typeof hiringManagerCreated.data).toBe("string");
 
     const reviewerMutation = await reviewer.rpc("create_job", {
       p_organization_id: orgA,
