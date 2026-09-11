@@ -12,6 +12,10 @@ Last reconciled: 2026-09-12
 
 Jobs + Interviewer Builder — **ACTIVE** on draft PR #5 / `feat/jobs-interviewer-builder`.
 
+Active branch: `feat/jobs-interviewer-builder`
+Active PR: #5 — `Build jobs and interviewer configuration` — OPEN / DRAFT / unmerged.
+CI status: exact-head CI #331 / `34657801282` failed at `Verify autonomous framework` because this status file omitted mandatory recovery markers; lint, typecheck, unit/component tests, framework verifier tests and requirements-source verifier tests passed before that step. The marker-only repair is pending fresh exact-head CI.
+
 ## Current Task State
 
 - M03.1 Jobs + requirements — **VERIFIED SLICE**. Tenant CRUD, explicit `must_have | nice_to_have` requirements, route-bound actions/UI and real Org A/Org B/anonymous authorization isolation are verified.
@@ -53,4 +57,4 @@ No engineering blocker is currently known. PR #5 remains intentionally draft and
 
 Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M03-jobs-interviewer-builder.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the active M03 design/plan.
 
-Exact next work: begin M03.5 Deterministic Interview Plan with genuine RED tests for positive bounded section duration, deterministic section ordering, tenant/job-bound question ownership, total-duration consistency, and required-question/competency coverage before adding plan persistence.
+Exact next work: after fresh exact-head CI verifies this recovery-marker repair, begin M03.5 Deterministic Interview Plan with genuine RED tests for positive bounded section duration, deterministic section ordering, tenant/job-bound question ownership, total-duration consistency, and required-question/competency coverage before adding plan persistence.
