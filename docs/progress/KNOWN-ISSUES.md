@@ -10,9 +10,9 @@ M01 provider-backed authentication/profile/RLS/accessibility evidence is resolve
 
 ## Current unresolved issues
 
-No Critical or Important issue is currently known for the implemented M02.1–M02.5 slices.
+No Critical or Important issue is currently known for implemented M02.1–M02.7 or the real provider-backed Org A/Org B/unauthenticated isolation matrix.
 
-M02 is not complete: secure invitations, bounded organization settings, and real Org A/Org B/unauthenticated read/write isolation remain planned work. Classification: **Milestone scope remaining**, not a blocker.
+M02 is not complete: final desktop + 390×844 responsive/keyboard browser verification for tenant navigation, team, invitation and settings surfaces, whole-milestone skeptical review, final durable reconciliation, and exact-final-head CI remain. Classification: **Milestone closeout remaining**, not an external blocker.
 
 Supabase logout uses the SDK default session scope. Classification: **Minor / product-semantics decision**; do not alter multi-device logout behavior without an explicit product requirement.
 
@@ -20,6 +20,9 @@ GitHub-hosted CI emits deprecation notices from third-party action runtimes bein
 
 ## Recently resolved M02 execution issues
 
-- Task 3 RED `955ea25927e0fa5ee2195f319d3d036be956c8b0` intentionally failed CI #165 because onboarding production modules were absent. CI #167 exposed a Next.js production-build server-action export defect; root cause was fixed in `b817f49ac5beaa8a07bbbf0b32d4e798dcff8484`, CI #168 green.
-- Task 4 RED `6a47c0ee42f2a95fe8bdc2a8e07024db7bf9f09f` intentionally failed CI #169 because membership/navigation production modules were absent. GREEN `709993dd37fe60cb8db7647c9c8251b6011fc977` passed full CI #170.
-- Task 5 began with migration/action RED tests at `80506379…` / `35b83c95…`. Follow-up fixes addressed unique migration ordering, client/server boundary separation, role-validation purity, and stale team UI after mutation. Final implementation head `fa7a996d19d790e87fb7123cb0071910424ea3a9` passed full CI #190.
+- Task 3 RED `955ea259…` intentionally failed because onboarding modules were absent; CI #167 exposed a Next.js server-action export defect; root cause fixed in `b817f49a…`, CI #168 green.
+- Task 4 RED `6a47c0ee…` intentionally failed because membership/navigation modules were absent; GREEN `709993dd…`, CI #170.
+- Task 5 began with migration/action RED tests at `80506379…` / `35b83c95…`; final implementation `fa7a996d…`, CI #190.
+- Task 6 secure invitation lifecycle culminated at `5abee48b…`; CI #215 verified hash-at-rest token and abuse protections.
+- Task 7 settings RED `8a080819…` / CI #217 failed for the intended missing production modules/export. GREEN `43b7c231…` / CI #218 passed the complete suite.
+- Provider-backed tenant-isolation verification `3e0c3555…` passed CI `34608235065` / #219, including cross-tenant read/write denial, unauthenticated non-exposure, recruiter mutation denial and authorized owner settings update.

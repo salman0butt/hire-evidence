@@ -1,85 +1,42 @@
 # Session Handoff
 
-This file is retained as a compatibility handoff for workers that were started before the upgraded autonomous framework existed.
+This compatibility handoff never outranks actual Git/code/current exact-SHA CI. New workers must recover in this order: `CODEX-START-HERE.md` → `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → actual GitHub state → `docs/progress/STATUS.md` → known issues/current milestone → active requirements/spec/plan.
 
-For all new sessions, recover in this order:
-
-1. `CODEX-START-HERE.md`
-2. `AGENTS.md`
-3. `docs/AUTONOMOUS-DEVELOPMENT.md`
-4. actual GitHub branches/PRs/reviews/CI
-5. `docs/progress/STATUS.md`
-6. `docs/progress/KNOWN-ISSUES.md`
-7. `docs/milestones/CURRENT.md`
-8. relevant requirements/traceability/spec/plan
-
-Actual Git/code/current exact-SHA CI always outranks stale prose in this file.
-
-## Repository state at framework upgrade
+## Current repository state
 
 - Repository: `salman0butt/hire-evidence`
-- Base branch: `main`
-- Base SHA for the active continuation: `2f64d4aa10aef2b328f2a6fa64d5008dc82253c6`
-- Active continuation branch: `feat/product-foundation-requirements`
-- Active PR: #2 — draft, `Persist product requirements and recovery state`
-- PR #1 (`Bootstrap product foundation`) was merged into `main` on 2026-09-10.
-- Do not merge PR #2 unless the owner explicitly authorizes it.
+- Default branch: `main`
+- Verified M02 base on main: `ed10e1b55bb62cf202585c8c50e6487014e83c29`
+- Active branch: `feat/organizations-rbac`
+- Active PR: #4 — `Build organization tenancy and role-based access` — OPEN / DRAFT / unmerged
+- Current implementation/isolation evidence head before this handoff reconciliation: `3e0c35557a8cd21e9a223909753a6fdf412d2557`
+- CI for that head: GitHub Actions `34608235065` / #219 — PASS across install, lint, typecheck, tests, framework/source checks, local Supabase, build, Chromium E2E, PRD coverage and teardown
+- Merge policy: `AUTO_MERGE=false`. Do not merge PR #4 without explicit user authorization.
 
-## What is already implemented
+## Current milestone
 
-The application foundation on `main` includes the Next.js/TypeScript shell, environment validation, `/api/health`, unit/component testing, Playwright smoke testing, and GitHub Actions CI.
+Organizations + RBAC is in closeout. Verified slices now cover:
 
-Previous application CI reached the following result before requirements persistence became the blocker:
+- organization/membership RLS foundation;
+- fixed five-role RBAC and validation;
+- organization onboarding;
+- tenant-aware shell/navigation;
+- owner-safe membership role/removal RPCs;
+- secure hash-at-rest invitations with expiry/revocation/email binding/replay protection;
+- bounded owner/admin organization settings;
+- real local-Supabase Org A vs Org B vs unauthenticated isolation, including cross-tenant read/write denial and recruiter mutation denial.
 
-- dependency install: PASS
-- lint: PASS
-- typecheck: PASS
-- unit/component tests: PASS
-- production build: PASS
-- Chromium install: PASS
-- smoke E2E: PASS
-- PRD coverage: FAIL because the complete requirements corpus was not yet present
+Task 7 settings followed genuine TDD: RED `8a080819ef387fbbdcfad34cd0a9802b2d9974ea` / CI #217 failed for missing production modules/export; GREEN `43b7c23122ec775253bbca0e38b701a694545205` / CI #218 passed the full suite.
 
-That older run is historical evidence only; it is not exact-head proof for newer commits.
+Task 8 provider-backed tenant isolation is implemented in `e2e/organizations.spec.ts`; exact head `3e0c35557a8cd21e9a223909753a6fdf412d2557` passed CI #219.
 
-## Upgraded autonomous framework
+## Review / blockers
 
-PR #2 now contains:
-
-- `docs/AUTONOMOUS-DEVELOPMENT.md`
-- `docs/PRODUCT.md`
-- `docs/ARCHITECTURE.md`
-- `docs/DECISIONS.md`
-- `docs/FEATURE-MATRIX.md`
-- `docs/requirements/README.md`
-- `docs/requirements/TRACEABILITY.md`
-- `docs/progress/STATUS.md`
-- `docs/progress/KNOWN-ISSUES.md`
-- Superpowers framework design + executable plan
-- `scripts/verify_autonomous_framework.py`
-- focused Python verifier tests
-- CI integration for the framework verifier
-- upgraded `AGENTS.md` and `CODEX-START-HERE.md`
-
-The framework verifier was developed with a genuine local RED→GREEN cycle: tests first failed because the verifier module was absent, then 4/4 focused tests passed after implementation.
-
-Known-invalid 20,000-byte ZIP transport copies, marker files, and the obsolete one-time requirements importer were removed from the active branch.
-
-## Requirements source of truth
-
-Original uploaded archive:
-
-- filename: `AI-Interviewer-Codex-Pack(1).zip`
-- size: `121574` bytes
-- SHA-256: `900353885ef4911b9ebb7a656f9e0771227df008db773919a632aedefa4596ba`
-- expected master PRD coverage: numbered sections 1–242
-
-Do not trust any reconstructed source archive unless its SHA-256 matches exactly.
-
-## Current blocker
-
-The complete requirements corpus is still not durably persisted in GitHub. Prior connector-based large binary transfer attempts truncated/altered the archive, so the safe continuation path is direct filesystem/Git access to the original uploaded ZIP.
+- PR #4 has no submitted reviews and no unresolved review threads at the latest inspection.
+- Current self-review has 0 unresolved Critical and 0 unresolved Important findings for implemented M02.1–M02.7 plus the tenant-isolation matrix.
+- No external blocker is known.
+- M02 is intentionally not marked complete because the plan-specific desktop + 390×844 responsive/keyboard browser matrix for tenant navigation/team/invitation/settings and final whole-milestone skeptical review remain unfinished.
 
 ## Exact next work
 
-Use `docs/progress/STATUS.md` as the canonical next-action source. At this handoff, the legitimate next work is to recover and verify the original ZIP, import every missing source-of-truth file using direct filesystem/Git tooling, run PRD coverage, review the complete PR diff, fix Critical/Important findings, and run full CI against the exact final PR head.
+Use `docs/progress/STATUS.md` as canonical state. Add/run the final responsive/keyboard browser matrix across all M02 tenant surfaces, perform the whole-milestone security/accessibility/YAGNI review, fix any Critical/Important findings through TDD where behavioral, reconcile final closeout docs, and verify GitHub Actions against the exact final head. Keep PR #4 draft/unmerged unless the user explicitly authorizes merge.

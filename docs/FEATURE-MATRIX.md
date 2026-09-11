@@ -19,10 +19,13 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | M01 accessibility/browser closeout | PRD 15–17, 196 | SaaS Shell + Auth | VERIFIED | Public/authenticated browser evidence. |
 | Organization + membership database foundation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Fixed roles, organizations/memberships, RLS and atomic owner bootstrap; CI #161+. |
 | Fixed organization RBAC + input validation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED #162 → GREEN #163. |
-| Organization onboarding | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED #165; build fix #167; CI #168 green. |
+| Organization onboarding | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED #165; build fix #167; CI #168. |
 | Tenant-aware organization shell/navigation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED #169 → GREEN #170; RLS-backed membership context. |
-| Membership management + owner invariants | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Authenticated narrow RPCs + team actions/UI; owner role immutable/non-assignable; final implementation `fa7a996d…`, CI #190 green. |
-| Organizations and RBAC milestone | PRD 8–14, 18–19, 197 | Organizations + RBAC | ACTIVE | Draft PR #4. Invitations, settings and final Org A/Org B/unauthenticated isolation remain mandatory. |
+| Membership management + owner invariants | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Narrow authenticated RPCs; owner immutable/non-assignable; `fa7a996d…`, CI #190. |
+| Secure organization invitations | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Hash-at-rest, expiring, email-bound, revocable/replay-protected invitation lifecycle; `5abee48b…`, CI #215. |
+| Bounded organization settings | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED `8a080819…` / #217 → GREEN `43b7c231…` / #218; owner/admin only, route-bound validated fields. |
+| Org A / Org B / unauthenticated tenant isolation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Real local-Supabase read/write/role matrix at `3e0c3555…`, CI #219. |
+| Organizations and RBAC milestone | PRD 8–14, 18–19, 197 | Organizations + RBAC | ACTIVE | Draft PR #4. Final responsive/keyboard browser closeout, whole-milestone review, durable final reconciliation and exact-final-head CI remain. |
 | Jobs and interviewer builder | PRD roadmap | Jobs + Interviewer Builder | PLANNED | Immutable published configuration/versioning. |
 | Candidates and invitations | PRD roadmap | Candidates + Invitations | PLANNED | Narrow invitation-scoped authorization. |
 | Realtime AI interview | PRD roadmap | Realtime AI Interview | PLANNED | Realtime failure/continuity scenarios required. |

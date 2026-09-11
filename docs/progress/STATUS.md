@@ -9,37 +9,39 @@ Last reconciled: 2026-09-11
 
 ## Current Milestone
 
-Organizations + RBAC — **IMPLEMENTING**.
+Organizations + RBAC — **IMPLEMENTING / CLOSEOUT**.
 
 ## Current Task State
 
-- M02.1 organization schema + memberships — **VERIFIED SLICE**. Migration/RLS/RPC foundation passed full CI #161.
-- M02.2 fixed RBAC + organization input validation — **VERIFIED SLICE**. RED `6c2719c…` / CI #162 → GREEN `ed9b3d52…` / CI #163.
-- M02.3 organization onboarding — **VERIFIED SLICE**. RED `955ea259…` / CI #165. Production-build defect exposed by CI #167 was root-caused and fixed in `b817f49a…`; CI #168 passed the complete suite.
-- M02.4 tenant-aware application shell/navigation — **VERIFIED SLICE**. RED `6a47c0ee…` / CI #169 → GREEN `709993dd…` / CI #170.
-- M02.5 membership management + owner invariants — **VERIFIED SLICE**. RED migration/action tests began at `80506379…` / `35b83c95…`; secure membership RPCs, team UI/actions and regression fixes culminated at `fa7a996d19d790e87fb7123cb0071910424ea3a9`, CI #190 green.
-- M02.6 secure team invitations — **VERIFIED SLICE**. Hash-at-rest 32-byte URL-safe tokens, owner/admin create/revoke, owner-role denial, verified-email binding, expiry/revocation/replay denial, atomic acceptance, invitation UI/actions, and provider-backed local-Supabase abuse coverage are implemented through `5abee48be6236e5616941d9ced73515628199e38`; CI `34599675755` / #215 passed the complete repository suite.
-- M02.7 bounded organization settings and final adversarial two-organization verification — **NEXT** and required for milestone completion.
+- M02.1 organization schema + memberships — **VERIFIED SLICE**. CI #161.
+- M02.2 fixed RBAC + organization validation — **VERIFIED SLICE**. RED #162 → GREEN #163.
+- M02.3 organization onboarding — **VERIFIED SLICE**. RED #165; build defect #167; GREEN #168.
+- M02.4 tenant-aware shell/navigation — **VERIFIED SLICE**. RED #169 → GREEN #170.
+- M02.5 membership management + owner invariants — **VERIFIED SLICE**. Final implementation `fa7a996d19d790e87fb7123cb0071910424ea3a9`; CI #190.
+- M02.6 secure team invitations — **VERIFIED SLICE**. Final invitation implementation `5abee48be6236e5616941d9ced73515628199e38`; CI #215.
+- M02.7 bounded organization settings — **VERIFIED SLICE**. Genuine RED `8a080819ef387fbbdcfad34cd0a9802b2d9974ea` / CI #217 failed because the settings production modules/export were absent. GREEN `43b7c23122ec775253bbca0e38b701a694545205` / CI #218 passed the complete repository suite.
+- M02 final provider-backed tenant-isolation matrix — **VERIFIED SLICE**. `3e0c35557a8cd21e9a223909753a6fdf412d2557` added real local-Supabase Org A vs Org B vs unauthenticated read/write checks plus recruiter settings/invite/role denials; CI `34608235065` / #219 passed every required step.
+- Final responsive/keyboard browser closeout for tenant navigation/team/invitation/settings surfaces, skeptical milestone review, durable closeout, and exact-final-head CI — **NEXT**.
 
 Active branch: `feat/organizations-rbac`
 
 Active PR: #4 — `Build organization tenancy and role-based access` — OPEN / DRAFT / unmerged.
 
-CI status: invitation implementation head `5abee48be6236e5616941d9ced73515628199e38` passed GitHub Actions `34599675755` / #215 across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup/migrations, production build, Chromium E2E including invitation security, PRD coverage and teardown. This documentation reconciliation creates a newer head and therefore requires fresh exact-head CI before final milestone closeout.
+CI status: implementation/isolation head `3e0c35557a8cd21e9a223909753a6fdf412d2557` passed GitHub Actions `34608235065` / #219 across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup/migrations, production build, Chromium E2E including the two-organization isolation matrix, PRD coverage and teardown. This documentation reconciliation creates a newer head and therefore requires fresh exact-head CI before milestone completion can be claimed.
 
 ## Review State
 
-- Critical: 0 unresolved for implemented M02.1–M02.6 slices.
-- Important: 0 unresolved for implemented M02.1–M02.6 slices based on current diff/review-thread inspection.
+- Critical: 0 unresolved for implemented M02.1–M02.7 and provider-backed isolation verification based on current self-review and PR thread inspection.
+- Important: 0 unresolved for implemented M02.1–M02.7 and provider-backed isolation verification based on current self-review and PR thread inspection.
 - PR #4 has no submitted reviews and no unresolved review threads at this reconciliation.
-- Organization-settings review and final adversarial Org A/Org B/unauthenticated evidence remain mandatory before merge.
+- Final accessibility/responsiveness and whole-milestone skeptical closeout review remain mandatory.
 
 ## Blockers
 
-None currently known. M02 is incomplete by planned scope, not externally blocked.
+None currently known. M02 remains incomplete only because final planned closeout evidence is unfinished.
 
 ## Durable Recovery
 
 Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, `docs/milestones/CURRENT.md`, `docs/milestones/M02-organizations-rbac.md`, PRD sections 8–14/18–19/197, M02 design/plan/evidence, and current source/tests.
 
-Exact next work: begin M02 Task 7 with genuine failing organization-settings action/component tests, then implement bounded owner/admin settings and complete the real local-Supabase Org A vs Org B vs unauthenticated read/write and role-restricted adversarial verification required for milestone closeout.
+Exact next work: add and run responsive/keyboard browser coverage for tenant navigation, team, invitation and settings surfaces at desktop and 390×844, then perform the final whole-M02 skeptical security/accessibility review, reconcile closeout evidence, and verify GitHub Actions against the exact final head without merging PR #4.

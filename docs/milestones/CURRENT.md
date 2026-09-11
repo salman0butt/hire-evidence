@@ -7,10 +7,10 @@ Legacy roadmap identifier:
 M02
 
 Current capability:
-Organization tenancy foundation, fixed RBAC, onboarding, tenant shell, and owner-safe membership management are implemented/verified slices; secure invitations are next.
+Organization tenancy, fixed RBAC, onboarding, tenant shell, owner-safe membership management, secure invitations, bounded settings, and real two-organization adversarial isolation are implemented and verified slices. Final responsive/keyboard browser closeout and whole-milestone review remain.
 
 Status:
-IMPLEMENTING
+IMPLEMENTING / CLOSEOUT
 
 Branch:
 `feat/organizations-rbac`
@@ -40,27 +40,29 @@ Detailed known issues:
 - PostgreSQL RLS/RPCs are authoritative; TypeScript capabilities are UX/preflight only.
 - Fixed roles: `owner`, `admin`, `recruiter`, `hiring_manager`, `reviewer`.
 - Organization creation atomically creates owner membership through an authenticated RPC.
-- Membership role/removal mutations use authenticated `SECURITY DEFINER` RPCs and preserve immutable owner membership.
-- Invitation tokens will be cryptographically random, SHA-256 hash-at-rest, expiring, and authenticated-email-bound.
+- Membership mutations use narrow authenticated RPCs and preserve owner invariants.
+- Invitation tokens are cryptographically random, SHA-256 hash-at-rest, expiring, revocable, replay-protected and authenticated-email-bound.
+- Settings update only `name`, `company_size`, `hiring_use_case` plus `updated_at`, with owner/admin RLS authority.
 
 ## Iterations
 
-1. M02.1 — organization schema + memberships — VERIFIED SLICE; CI #161 green.
+1. M02.1 — organization schema + memberships — VERIFIED SLICE; CI #161.
 2. M02.2 — fixed RBAC + organization validation — VERIFIED SLICE; RED #162 → GREEN #163.
-3. M02.3 — organization onboarding — VERIFIED SLICE; RED #165, build-debug CI #167, final GREEN #168.
+3. M02.3 — organization onboarding — VERIFIED SLICE; RED #165, build-debug #167, GREEN #168.
 4. M02.4 — tenant-aware application shell/navigation — VERIFIED SLICE; RED #169 → GREEN #170.
-5. M02.5 — membership management + owner invariants — VERIFIED SLICE; RED tests at `80506379…` / `35b83c95…`; implementation/regression fixes culminated at `fa7a996d…`, CI #190 green.
-6. M02.6 — secure team invitations — NEXT.
-7. M02.7 — organization settings + adversarial Org A/Org B/unauthenticated verification — PLANNED / completion gate.
+5. M02.5 — membership management + owner invariants — VERIFIED SLICE; final implementation `fa7a996d…`, CI #190.
+6. M02.6 — secure team invitations — VERIFIED SLICE; final implementation `5abee48b…`, CI #215.
+7. M02.7 — bounded organization settings — VERIFIED SLICE; RED `8a080819…` / CI #217 → GREEN `43b7c231…` / CI #218.
+8. M02 closeout — provider-backed Org A/Org B/unauthenticated isolation VERIFIED at `3e0c3555…`, CI `34608235065` / #219; responsive/keyboard browser evidence and final skeptical review remain.
 
 ## Blocker
 
-None currently known. Do not confuse unfinished planned work with an external blocker.
+None currently known. Remaining work is planned closeout, not an external blocker.
 
 ## Verification state
 
-Task 5 final implementation head `fa7a996d19d790e87fb7123cb0071910424ea3a9` passed GitHub Actions `34594961808` / #190 across the complete repository suite, including local Supabase migrations, production build and browser tests. This durable-state reconciliation creates a newer head and therefore requires fresh exact-head CI.
+Exact isolation head `3e0c35557a8cd21e9a223909753a6fdf412d2557` passed GitHub Actions `34608235065` / #219 across frozen install, lint, typecheck, tests, local Supabase, production build, Chromium E2E including tenant-isolation assertions, PRD coverage and teardown. Any later documentation or closeout commit requires new exact-head CI before completion.
 
 ## Next Action
 
-Follow `docs/progress/STATUS.md` `Exact next work:` and begin Task 6 with failing invitation token/action/migration abuse tests before implementation.
+Follow `docs/progress/STATUS.md` `Exact next work:`: complete responsive/keyboard browser verification for all M02 surfaces, perform final whole-milestone review, reconcile durable closeout evidence, and verify exact-final-head CI. Do not merge PR #4 without explicit user authorization.
