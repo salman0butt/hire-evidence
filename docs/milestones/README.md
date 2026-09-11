@@ -14,8 +14,8 @@ No milestone is COMPLETE without requirements/iterations accounted for, acceptan
 | Milestone | Capability | Status |
 |---|---|---|
 | [M00](./M00-product-foundation.md) | Product Foundation | **COMPLETE** |
-| [M01](./M01-saas-shell-auth.md) | SaaS Shell + Auth | **VERIFYING** |
-| [M02](./M02-organizations-rbac.md) | Organizations + RBAC | **NOT STARTED** |
+| [M01](./M01-saas-shell-auth.md) | SaaS Shell + Auth | **COMPLETE** |
+| [M02](./M02-organizations-rbac.md) | Organizations + RBAC | **IMPLEMENTING** |
 | [M03](./M03-jobs-interviewer-builder.md) | Jobs + Interviewer Builder | **NOT STARTED** |
 | [M04](./M04-candidates-invitations.md) | Candidates + Invitations | **NOT STARTED** |
 | [M05](./M05-realtime-ai-interview.md) | Realtime AI Interview | **NOT STARTED** |
@@ -31,7 +31,9 @@ No milestone is COMPLETE without requirements/iterations accounted for, acceptan
 | [M15](./M15-enterprise-compliance.md) | Enterprise Compliance | **NOT STARTED** |
 
 ## Current evidence
-M00 is integrated on `main` at `64ebeb4…`, CI #57. M01 draft PR #3 remains the active integration boundary. M01.1–M01.5 are verified; M01.6 profile/RLS and M01.7 provider-backed auth/accessibility closeout are now verified on implementation head `7348526cb466a66b907e4c92148b7c6d68daf674`, CI `34582926587` / #148. That run started a real local Supabase stack, applied the profile migration, passed the complete auth lifecycle, authenticated profile persistence/mobile/keyboard checks, mutual User A/User B cross-profile SELECT/UPDATE denial, 54 unit/component tests, 8/8 Chromium E2E tests, build, framework/source verification, and PRD sections 1–242 coverage. Critical: 0 unresolved. Important: 0 unresolved. M01 is now VERIFYING while the reconciled documentation head receives fresh exact-SHA CI before authorized integration.
+M00 is integrated at `64ebeb4f7b2a39fc0557685ef34035650211aad9`, post-merge CI #57 green. M01 is COMPLETE: PR #3 final head `b8844130118453e56009284b9498c8357429f1af` passed CI #156, squash-merged as `ed10e1b55bb62cf202585c8c50e6487014e83c29`, and post-merge CI #157 passed including local Supabase provider E2E.
+
+M02 is active in draft PR #4 on `feat/organizations-rbac`. M02.1 organization/membership tenancy foundation passed full CI #161. M02.2 fixed RBAC and bounded organization input validation used genuine RED `6c2719c…` / CI #162 and GREEN `ed9b3d52…` / CI #163. Organization onboarding is the next planned implementation slice. M02 remains incomplete and must not merge until all acceptance/security/two-organization evidence gates pass.
 
 ## Recovery
 Start from actual Git/GitHub + exact-head CI, then autonomy docs, compact status, known issues, current/active milestone ledgers, PRD/traceability, Superpowers artifacts, PR/reviews, source/tests.
