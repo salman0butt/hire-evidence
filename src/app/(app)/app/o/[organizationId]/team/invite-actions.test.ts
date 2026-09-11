@@ -6,23 +6,31 @@ import { idleInvitationActionState } from "@/lib/organization/invitation-action-
 import {
   acceptOrganizationInvitation,
   createOrganizationInvitation,
+  revokeOrganizationInvitation,
 } from "@/lib/organization/invitations";
 
-import { acceptInvitationAction, createInvitationAction } from "./invite-actions";
+import {
+  acceptInvitationAction,
+  createInvitationAction,
+  revokeInvitationAction,
+} from "./invite-actions";
 
 vi.mock("@/lib/auth/require-user", () => ({ requireUser: vi.fn() }));
 vi.mock("@/lib/organization/invitations", () => ({
   acceptOrganizationInvitation: vi.fn(),
   createOrganizationInvitation: vi.fn(),
+  revokeOrganizationInvitation: vi.fn(),
 }));
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
 
 const mockedRequireUser = vi.mocked(requireUser);
 const mockedCreateInvitation = vi.mocked(createOrganizationInvitation);
 const mockedAcceptInvitation = vi.mocked(acceptOrganizationInvitation);
+const mockedRevokeInvitation = vi.mocked(revokeOrganizationInvitation);
 const mockedRedirect = vi.mocked(redirect);
 
 const organizationId = "11111111-1111-4111-8111-111111111111";
+const invitationId = "22222222-2222-4222-8222-222222222222";
 const rawToken = "raw_invitation_token_abcdefghijklmnopqrstuvwxyz0123456789";
 
 function form(values: Record<string, string>) {
@@ -37,6 +45,7 @@ describe("organization invitation actions", () => {
     mockedRequireUser.mockResolvedValue({ id: "trusted-user-id" } as never);
     mockedCreateInvitation.mockResolvedValue(rawToken);
     mockedAcceptInvitation.mockResolvedValue(organizationId);
+    mockedRevokeInvitation.mockResolvedValue(undefined);
   });
 
   it("creates a normalized non-owner invitation in the route-bound organization", async () => {
@@ -96,6 +105,56 @@ describe("organization invitation actions", () => {
     expect(result).toEqual({
       status: "error",
       message: "We could not create this invitation. Please try again.",
+      invitationUrl: null,
+    });
+  });
+
+  it("revokes only the route-bound organization's invitation", async () => {
+    const formData = form({ invitation_id: invitationId });
+    formData.set("organization_id", "attacker-selected-organization");
+
+    const result = await revokeInvitationAction(
+      organizationId,
+      idleInvitationActionState,
+      formData,
+    );
+
+    expect(mockedRequireUser).toHaveBeenCalledWith(`/app/o/${organizationId}/team`);
+    expect(mockedRevokeInvitation).toHaveBeenCalledWith({
+      organizationId,
+      invitationId,
+    });
+    expect(result).toEqual({
+      status: "success",
+      message: "Invitation revoked.",
+      invitationUrl: null,
+    });
+  });
+
+  it("rejects malformed revoke identifiers before persistence", async () => {
+    const result = await revokeInvitationAction(
+      organizationId,
+      idleInvitationActionState,
+      form({ invitation_id: "not-an-id" }),
+    );
+
+    expect(result.status).toBe("error");
+    expect(mockedRequireUser).not.toHaveBeenCalled();
+    expect(mockedRevokeInvitation).not.toHaveBeenCalled();
+  });
+
+  it("maps revoke authorization failures to bounded copy", async () => {
+    mockedRevokeInvitation.mockRejectedValue(new Error("42501 policy internals"));
+
+    const result = await revokeInvitationAction(
+      organizationId,
+      idleInvitationActionState,
+      form({ invitation_id: invitationId }),
+    );
+
+    expect(result).toEqual({
+      status: "error",
+      message: "We could not revoke this invitation. Please try again.",
       invitationUrl: null,
     });
   });
