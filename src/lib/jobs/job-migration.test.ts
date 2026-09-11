@@ -34,7 +34,9 @@ describe("job tenancy migration", () => {
     expect(migration).toMatch(/set search_path\s*=\s*''/i);
     expect(migration).toMatch(/auth\.uid\(\)/i);
     expect(migration).toMatch(/private\.has_organization_role/i);
-    expect(migration).toMatch(/array\['owner',\s*'admin',\s*'recruiter'\]::public\.organization_role\[\]/i);
+    expect(migration).toMatch(
+      /array\['owner',\s*'admin',\s*'recruiter',\s*'hiring_manager'\]::public\.organization_role\[\]/i,
+    );
     expect(migration).toMatch(/insert into public\.jobs/i);
     expect(migration).toMatch(/insert into public\.job_requirements/i);
     expect(migration).toMatch(/jsonb_array_elements/i);
@@ -53,7 +55,11 @@ describe("job tenancy migration", () => {
 
     expect(migration).toMatch(/create or replace function public\.update_job/i);
     expect(migration).toMatch(/create or replace function public\.delete_job/i);
-    expect(migration.match(/private\.has_organization_role/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
+    expect(
+      migration.match(
+        /array\['owner',\s*'admin',\s*'recruiter',\s*'hiring_manager'\]::public\.organization_role\[\]/gi,
+      )?.length ?? 0,
+    ).toBeGreaterThanOrEqual(3);
     expect(migration).toMatch(/where\s+id\s*=\s*p_job_id\s+and\s+organization_id\s*=\s*p_organization_id/is);
     expect(migration).toMatch(/delete from public\.job_requirements[\s\S]*organization_id\s*=\s*p_organization_id[\s\S]*job_id\s*=\s*p_job_id/i);
     expect(migration).toMatch(/delete from public\.jobs[\s\S]*id\s*=\s*p_job_id[\s\S]*organization_id\s*=\s*p_organization_id/i);
