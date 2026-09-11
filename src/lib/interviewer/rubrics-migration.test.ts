@@ -35,7 +35,6 @@ describe("observable rubric tenancy migration", () => {
   it("keeps rubric mutation behind authenticated fixed-role RPC authority", () => {
     const migration = readMigration();
 
-    expect(migration).toMatch(/create or replace function public\.upsert_competency_rubric_level/i);
     expect(migration).toMatch(/security definer/i);
     expect(migration).toMatch(/set search_path\s*=\s*''/i);
     expect(migration).toMatch(/private\.has_organization_role/i);
@@ -44,6 +43,22 @@ describe("observable rubric tenancy migration", () => {
     );
     expect(migration).not.toMatch(
       /grant\s+(?:insert|update|delete).*public\.competency_rubrics.*to\s+authenticated/is,
+    );
+  });
+
+  it("only exposes an atomic save contract that requires all five observable levels", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(/create or replace function public\.save_competency_rubric/i);
+    for (const level of [1, 2, 3, 4, 5]) {
+      expect(migration).toMatch(new RegExp(`p_level_${level} text`, "i"));
+    }
+    expect(migration).toMatch(
+      /array\[p_level_1,\s*p_level_2,\s*p_level_3,\s*p_level_4,\s*p_level_5\]/i,
+    );
+    expect(migration).toMatch(/grant execute on function public\.save_competency_rubric/i);
+    expect(migration).not.toMatch(
+      /grant execute on function public\.upsert_competency_rubric_level[\s\S]*to authenticated/i,
     );
   });
 });
