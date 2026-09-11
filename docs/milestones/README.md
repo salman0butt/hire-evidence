@@ -14,7 +14,7 @@ No milestone is COMPLETE without requirements/iterations accounted for, acceptan
 | Milestone | Capability | Status |
 |---|---|---|
 | [M00](./M00-product-foundation.md) | Product Foundation | **COMPLETE** |
-| [M01](./M01-saas-shell-auth.md) | SaaS Shell + Auth | **IMPLEMENTING** |
+| [M01](./M01-saas-shell-auth.md) | SaaS Shell + Auth | **VERIFYING** |
 | [M02](./M02-organizations-rbac.md) | Organizations + RBAC | **NOT STARTED** |
 | [M03](./M03-jobs-interviewer-builder.md) | Jobs + Interviewer Builder | **NOT STARTED** |
 | [M04](./M04-candidates-invitations.md) | Candidates + Invitations | **NOT STARTED** |
@@ -31,7 +31,7 @@ No milestone is COMPLETE without requirements/iterations accounted for, acceptan
 | [M15](./M15-enterprise-compliance.md) | Enterprise Compliance | **NOT STARTED** |
 
 ## Current evidence
-M00 is integrated on `main` at `64ebeb4…`, CI #57. M01 draft PR #3 remains open/unmerged. M01.1–M01.5 are provider-independently verified. M01.6 profile/RLS is implemented and reviewed at `e9c2ad64…`, CI #130, but remains short of VERIFIED until real Supabase cross-user isolation is executed. M01.7 provider-independent browser coverage is verified at `061762ec…`, CI #134. Focused Vitest configuration maintenance is verified at `85ff107…`, CI #141, with the prior ESM-in-CommonJS loader warning removed. Connected-account discovery on 2026-09-11 found only unrelated existing Supabase projects, so provider-backed auth/profile E2E and RLS isolation remain evidence blockers and M01 remains IMPLEMENTING.
+M00 is integrated on `main` at `64ebeb4…`, CI #57. M01 draft PR #3 remains the active integration boundary. M01.1–M01.5 are verified; M01.6 profile/RLS and M01.7 provider-backed auth/accessibility closeout are now verified on implementation head `7348526cb466a66b907e4c92148b7c6d68daf674`, CI `34582926587` / #148. That run started a real local Supabase stack, applied the profile migration, passed the complete auth lifecycle, authenticated profile persistence/mobile/keyboard checks, mutual User A/User B cross-profile SELECT/UPDATE denial, 54 unit/component tests, 8/8 Chromium E2E tests, build, framework/source verification, and PRD sections 1–242 coverage. Critical: 0 unresolved. Important: 0 unresolved. M01 is now VERIFYING while the reconciled documentation head receives fresh exact-SHA CI before authorized integration.
 
 ## Recovery
 Start from actual Git/GitHub + exact-head CI, then autonomy docs, compact status, known issues, current/active milestone ledgers, PRD/traceability, Superpowers artifacts, PR/reviews, source/tests.
