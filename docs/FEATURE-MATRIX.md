@@ -25,7 +25,8 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Secure organization invitations | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Hash-at-rest, expiring, email-bound, revocable/replay-protected invitation lifecycle; `5abee48b…`, CI #215. |
 | Bounded organization settings | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | RED `8a080819…` / #217 → GREEN `43b7c231…` / #218; owner/admin only, route-bound validated fields. |
 | Org A / Org B / unauthenticated tenant isolation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Real local-Supabase read/write/role matrix at `3e0c3555…`, CI #219. |
-| Organizations and RBAC milestone | PRD 8–14, 18–19, 197 | Organizations + RBAC | ACTIVE | Draft PR #4. Final responsive/keyboard browser closeout, whole-milestone review, durable final reconciliation and exact-final-head CI remain. |
+| M02 responsive/keyboard closeout | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Desktop + 390×844 keyboard/overflow matrix; reviewed head `fd8907cf…`, CI #224 / `34610615757`. |
+| Organizations and RBAC milestone | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | Implementation, adversarial tenancy, responsive/browser closeout, and skeptical review complete with 0 Critical/Important findings; closeout docs await exact-final-head CI, then explicit merge authorization. |
 | Jobs and interviewer builder | PRD roadmap | Jobs + Interviewer Builder | PLANNED | Immutable published configuration/versioning. |
 | Candidates and invitations | PRD roadmap | Candidates + Invitations | PLANNED | Narrow invitation-scoped authorization. |
 | Realtime AI interview | PRD roadmap | Realtime AI Interview | PLANNED | Realtime failure/continuity scenarios required. |
