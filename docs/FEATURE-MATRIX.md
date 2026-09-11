@@ -12,14 +12,14 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Reproducible dependency graph | Product Foundation | Product Foundation | VERIFIED | `pnpm-lock.yaml` + frozen CI installs. |
 | M01.1 premium marketing shell + pricing + SEO | PRD 15–17, 196 | SaaS Shell + Auth | VERIFIED | `6107253…`, CI #64. |
 | Supabase SSR/session infrastructure | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | `c1a1120…`, CI #83. |
-| Core signup/login/logout/verification | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | Provider-independent; `32326d4…`, CI #103. |
-| Password recovery | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | Provider-independent; `b048782…`, CI #121. |
-| Protected authenticated application shell | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | Server-authoritative guard/navigation + unauthenticated browser redirect; `f912da9…`, CI #127. |
-| Basic own-user profile + RLS | PRD 17, 196 | SaaS Shell + Auth | IMPLEMENTED | Migration, own-user repository/action, validation/UI and ownership-policy tests at `e9c2ad64…`, CI #130. Real Supabase User A/User B denial still required before VERIFIED. |
-| M01 provider-independent accessibility/browser closeout | PRD 15–17, 196 | SaaS Shell + Auth | VERIFIED | Mobile no-overflow, keyboard auth focus, labeled auth controls, mobile protected-route redirect; `061762ec…`, CI #134. |
-| Vitest ESM configuration maintenance | Engineering quality | SaaS Shell + Auth | VERIFIED | `85ff107…`, CI #141. Config moved to `.mts`, ESM-safe alias resolution used, full suite passed, and prior Vite ESM-in-CommonJS warning disappeared. |
-| M01 provider-backed auth/profile E2E | PRD 16–17, 196 | SaaS Shell + Auth | BLOCKED | Dedicated Hire Evidence Supabase test project/identities required. 2026-09-11 discovery found only clearly unrelated projects; placeholders, mocks, service-role clients and static SQL do not count. |
-| Organizations and RBAC | PRD roadmap | Organizations + RBAC | PLANNED | Requires complete M01. |
+| Core signup/login/logout/verification | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | Unit/integration evidence plus real provider lifecycle in CI #148. |
+| Password recovery | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | Unit/integration evidence plus real recovery email/reset/login in CI #148. |
+| Protected authenticated application shell | PRD 16, 196 | SaaS Shell + Auth | VERIFIED | Server-authoritative guard/navigation and authenticated `/app` entry verified in CI #148. |
+| Basic own-user profile + RLS | PRD 17, 196 | SaaS Shell + Auth | VERIFIED | Real local Supabase migration + own-row persistence + User A/User B mutual cross-profile SELECT/UPDATE denial; `7348526…`, CI #148. |
+| M01 accessibility/browser closeout | PRD 15–17, 196 | SaaS Shell + Auth | VERIFIED | Public/unauthenticated coverage plus authenticated 390×844 profile no-overflow and keyboard focus in CI #148. |
+| Vitest ESM configuration maintenance | Engineering quality | SaaS Shell + Auth | VERIFIED | `85ff107…`, CI #141; prior loader warning removed. |
+| M01 provider-backed auth/profile E2E | PRD 16–17, 196 | SaaS Shell + Auth | VERIFIED | Local Supabase Auth/PostgREST/Mailpit + production app; full auth lifecycle, profile persistence, RLS isolation, replayed-token safety; 8/8 Playwright, CI #148. |
+| Organizations and RBAC | PRD roadmap | Organizations + RBAC | PLANNED | Starts only after M01 merge + post-merge main verification. |
 | Jobs and interviewer builder | PRD roadmap | Jobs + Interviewer Builder | PLANNED | Immutable published configuration/versioning. |
 | Candidates and invitations | PRD roadmap | Candidates + Invitations | PLANNED | Narrow invitation-scoped authorization. |
 | Realtime AI interview | PRD roadmap | Realtime AI Interview | PLANNED | Realtime failure/continuity scenarios required. |
