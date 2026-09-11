@@ -26,6 +26,32 @@ type RawCompetencyInput = Readonly<{
   position: unknown;
 }>;
 
+export type CompetencyWeightTotalValidationResult =
+  | Readonly<{ ok: true; total: number }>
+  | Readonly<{ ok: false; total: number; message: string }>;
+
+function roundToHundredths(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+export function validateCompetencyWeightTotal(
+  weights: readonly number[],
+): CompetencyWeightTotalValidationResult {
+  const total = roundToHundredths(
+    weights.reduce((sum, weight) => sum + weight, 0),
+  );
+
+  if (total !== 100) {
+    return {
+      ok: false,
+      total,
+      message: "Competency weights must total 100 before publication.",
+    };
+  }
+
+  return { ok: true, total };
+}
+
 export function validateCompetencyInput(
   input: RawCompetencyInput,
 ): CompetencyValidationResult {
