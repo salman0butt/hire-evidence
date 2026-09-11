@@ -99,7 +99,7 @@ begin
 
   if not private.has_organization_role(
     p_organization_id,
-    array['owner', 'admin', 'recruiter']::public.organization_role[]
+    array['owner', 'admin', 'recruiter', 'hiring_manager']::public.organization_role[]
   ) then
     raise exception 'Not authorized to manage jobs.' using errcode = '42501';
   end if;
@@ -291,7 +291,7 @@ begin
 
   if not private.has_organization_role(
     p_organization_id,
-    array['owner', 'admin', 'recruiter']::public.organization_role[]
+    array['owner', 'admin', 'recruiter', 'hiring_manager']::public.organization_role[]
   ) then
     raise exception 'Not authorized to manage jobs.' using errcode = '42501';
   end if;
@@ -456,7 +456,7 @@ begin
 
   if not private.has_organization_role(
     p_organization_id,
-    array['owner', 'admin', 'recruiter']::public.organization_role[]
+    array['owner', 'admin', 'recruiter', 'hiring_manager']::public.organization_role[]
   ) then
     raise exception 'Not authorized to manage jobs.' using errcode = '42501';
   end if;
