@@ -36,6 +36,54 @@ function nextPosition(competencies: readonly Competency[]): number {
   ) + 1;
 }
 
+function RubricEditor({ competency }: Readonly<{ competency: Competency }>) {
+  return (
+    <fieldset className="mt-5 space-y-4 border-t border-zinc-200 pt-5">
+      <legend className="text-sm font-semibold text-zinc-900">
+        Observable scoring rubric
+      </legend>
+      <p className="text-xs leading-5 text-zinc-500">
+        Describe job-related evidence an interviewer can directly observe at every score level.
+      </p>
+
+      <div className="grid gap-4">
+        {[1, 2, 3, 4, 5].map((level) => {
+          const inputId = `rubric-${competency.id}-level-${level}`;
+          return (
+            <div key={level} className="space-y-2">
+              <label
+                htmlFor={inputId}
+                className="block text-sm font-medium text-zinc-800"
+              >
+                {competency.name} score {level}
+              </label>
+              <textarea
+                id={inputId}
+                name={`level_${level}`}
+                rows={3}
+                maxLength={2000}
+                className={inputClass}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        aria-label={`Save ${competency.name} rubric`}
+        className="rounded-xl bg-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-500"
+        disabled
+      >
+        Save rubric
+      </button>
+      <p className="text-xs leading-5 text-zinc-500">
+        Saving will be enabled after the server-side rubric action is connected and verified.
+      </p>
+    </fieldset>
+  );
+}
+
 export function CompetencySection({
   competencies,
   readOnly = false,
@@ -56,7 +104,7 @@ export function CompetencySection({
           Competencies
         </h2>
         <p className="text-sm leading-6 text-zinc-600">
-          Define job-related dimensions the interview should evaluate. Observable scoring rubrics are configured in the next step.
+          Define job-related dimensions the interview should evaluate. Observable scoring rubrics are configured for every competency below.
         </p>
       </div>
 
@@ -80,6 +128,8 @@ export function CompetencySection({
                   Weight: {competency.weight}
                 </span>
               </div>
+
+              {!readOnly ? <RubricEditor competency={competency} /> : null}
             </li>
           ))}
         </ul>
