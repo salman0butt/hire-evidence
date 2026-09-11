@@ -14,23 +14,24 @@ Jobs + Interviewer Builder — **ACTIVE**.
 
 ## Current Task State
 
-- M03.1 Jobs + requirements — **IMPLEMENTED / VERIFIED SLICE, closeout reconciliation in progress**. Tenant-scoped job CRUD, explicit `must_have | nice_to_have` requirements, route-bound server actions, accessible list/create/edit surfaces, fixed-role mutation authorization, and provider-backed Org A/Org B/unauthenticated isolation are implemented on PR #5.
-- M03.1 review finding — **RESOLVED**. Database requirement ordering initially used `unique (job_id, kind, position)`, which allowed the same position across kinds. Genuine RED `268afaaca87e3bf3dffa0a552a66e1dfab1f2ca9` / CI #272 (`34642095960`) failed only the new deterministic-ordering assertion after 160 unrelated tests passed. Minimal GREEN `5db7708f1aecc5122b4a4883f7875b9e02df3fe5` / CI #273 (`34642360290`) changed the invariant to `unique (job_id, position)` and passed the full repository quality gate.
-- M03.2 Competency model — **NOT STARTED**.
-- M03.3–M03.11 — **NOT STARTED**.
+- M03.1 Jobs + requirements — **VERIFIED SLICE**. Tenant-scoped job CRUD, explicit `must_have | nice_to_have` requirements, route-bound actions/UI, fixed-role mutation authorization, and provider-backed Org A/Org B/unauthenticated isolation are implemented. Deterministic requirement ordering was corrected through the recorded RED `268afaaca87e3bf3dffa0a552a66e1dfab1f2ca9` / CI #272 → GREEN `5db7708f1aecc5122b4a4883f7875b9e02df3fe5` / CI #273 cycle.
+- M03.2 Competency model — **IMPLEMENTED / VERIFIED SLICE**. The branch now contains tenant/job-bound competency persistence, bounded validation, deterministic ordering, fixed-role create authority, provider-backed Org A/Org B/anonymous isolation, route-bound server actions, job-detail UI integration, and an explicit publication-time total-weight policy. Exact implementation head `18504de66a11ea6f5944fae4cf2c2522ca5f7c88` passed CI #292 / `34647354026` across the full repository quality gate.
+- M03.2 evidence note — commit `76093b65d745c4e48c427f541026df947de94b00` / CI #291 failed during typecheck before tests, so it is **NOT accepted as behavioral RED evidence**. The weight-total policy is nevertheless covered by passing tests on the verified head; future behavioral changes must preserve genuine RED-first evidence.
+- M03.3 Observable 1–5 rubrics — **NEXT / NOT STARTED**.
+- M03.4–M03.11 — **NOT STARTED**.
 
 Active branch: `feat/jobs-interviewer-builder`
 
 Active PR: #5 — `Build jobs and interviewer configuration` — OPEN / DRAFT / unmerged.
 
-CI status: CI #273 / `34642360290` passed on exact implementation head `5db7708f1aecc5122b4a4883f7875b9e02df3fe5`: frozen install, lint, typecheck, 161 unit/component tests, framework/source verifiers, local Supabase, production build, Chromium E2E, PRD coverage, and teardown. This documentation reconciliation creates a newer head and therefore requires fresh exact-head CI before any integration claim.
+CI status: CI #292 / `34647354026` passed on exact implementation head `18504de66a11ea6f5944fae4cf2c2522ca5f7c88`. This documentation reconciliation creates a newer branch head and therefore requires fresh exact-head CI before any later integration claim.
 
 ## Review State
 
-- Critical: 0 unresolved.
-- Important: 0 unresolved from the reviewed M03.1 deterministic-ordering finding.
-- PR #5 has no submitted reviews and no unresolved review threads at the latest inspection.
-- Milestone-wide review remains pending because M03.2–M03.11 are not implemented.
+- Critical: 0 unresolved in the reviewed M03.1/M03.2 scope.
+- Important: 0 unresolved in the reviewed M03.1/M03.2 scope.
+- PR #5 has no unresolved review threads at the latest inspection.
+- Milestone-wide review remains pending because M03.3–M03.11 are not implemented.
 
 ## Blockers
 
@@ -40,4 +41,4 @@ No engineering blocker is currently known. PR #5 is intentionally draft and must
 
 Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M03-jobs-interviewer-builder.md`, requirements/traceability, the M03 design/plan, and current source/tests.
 
-Exact next work: begin M03.2 by writing and verifying genuine RED tests for the tenant-scoped competency model (job ownership, bounded fields/weight, deterministic ordering, and role-gated mutation).
+Exact next work: begin M03.3 with the smallest genuine RED tests for observable per-competency rubric levels 1–5, including missing levels, empty/non-observable definitions, tenant/job ownership, deterministic ordering, and fixed-role mutation authorization; verify RED before production rubric code.
