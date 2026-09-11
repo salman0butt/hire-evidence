@@ -47,4 +47,17 @@ describe("job tenancy migration", () => {
       /grant\s+(?:insert|update|delete).*public\.job_requirements.*to\s+authenticated/is,
     );
   });
+
+  it("updates and deletes only route-bound organization jobs through role-gated RPCs", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(/create or replace function public\.update_job/i);
+    expect(migration).toMatch(/create or replace function public\.delete_job/i);
+    expect(migration.match(/private\.has_organization_role/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
+    expect(migration).toMatch(/where\s+id\s*=\s*p_job_id\s+and\s+organization_id\s*=\s*p_organization_id/is);
+    expect(migration).toMatch(/delete from public\.job_requirements[\s\S]*organization_id\s*=\s*p_organization_id[\s\S]*job_id\s*=\s*p_job_id/i);
+    expect(migration).toMatch(/delete from public\.jobs[\s\S]*id\s*=\s*p_job_id[\s\S]*organization_id\s*=\s*p_organization_id/i);
+    expect(migration).toMatch(/grant execute on function public\.update_job/i);
+    expect(migration).toMatch(/grant execute on function public\.delete_job/i);
+  });
 });
