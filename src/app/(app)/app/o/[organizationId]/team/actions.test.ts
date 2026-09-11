@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireUser } from "@/lib/auth/require-user";
@@ -9,6 +10,7 @@ import {
 
 import { removeMemberAction, updateMemberRoleAction } from "./actions";
 
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/auth/require-user", () => ({ requireUser: vi.fn() }));
 vi.mock("@/lib/organization/members", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/organization/members")>();
@@ -19,6 +21,7 @@ vi.mock("@/lib/organization/members", async (importOriginal) => {
   };
 });
 
+const mockedRevalidatePath = vi.mocked(revalidatePath);
 const mockedRequireUser = vi.mocked(requireUser);
 const mockedRemoveMember = vi.mocked(removeOrganizationMember);
 const mockedUpdateRole = vi.mocked(updateOrganizationMemberRole);
@@ -56,6 +59,7 @@ describe("team membership actions", () => {
       userId: memberId,
       role: "recruiter",
     });
+    expect(mockedRevalidatePath).toHaveBeenCalledWith(`/app/o/${organizationId}/team`);
     expect(result).toEqual({ status: "idle", message: null });
   });
 
@@ -72,6 +76,7 @@ describe("team membership actions", () => {
     });
     expect(mockedRequireUser).not.toHaveBeenCalled();
     expect(mockedUpdateRole).not.toHaveBeenCalled();
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
   });
 
   it("rejects malformed target identifiers before persistence", async () => {
@@ -83,6 +88,7 @@ describe("team membership actions", () => {
 
     expect(result.status).toBe("error");
     expect(mockedRemoveMember).not.toHaveBeenCalled();
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
   });
 
   it("removes a member only from the route-bound organization", async () => {
@@ -96,6 +102,7 @@ describe("team membership actions", () => {
     );
 
     expect(mockedRemoveMember).toHaveBeenCalledWith({ organizationId, userId: memberId });
+    expect(mockedRevalidatePath).toHaveBeenCalledWith(`/app/o/${organizationId}/team`);
     expect(result).toEqual({ status: "idle", message: null });
   });
 
@@ -112,5 +119,6 @@ describe("team membership actions", () => {
       status: "error",
       message: "We could not update this team member. Please try again.",
     });
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
   });
 });
