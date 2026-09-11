@@ -40,6 +40,15 @@ export function TenantNavigation({
           Overview
         </Link>
 
+        {hasOrganizationCapability(role, "jobs:view") ? (
+          <Link
+            href={`${basePath}/jobs`}
+            className="rounded-lg px-3 py-2 font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950"
+          >
+            Jobs
+          </Link>
+        ) : null}
+
         {hasOrganizationCapability(role, "team:view") ? (
           <Link
             href={`${basePath}/team`}
