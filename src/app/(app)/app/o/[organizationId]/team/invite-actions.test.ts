@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -21,12 +22,14 @@ vi.mock("@/lib/organization/invitations", () => ({
   createOrganizationInvitation: vi.fn(),
   revokeOrganizationInvitation: vi.fn(),
 }));
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
 
 const mockedRequireUser = vi.mocked(requireUser);
 const mockedCreateInvitation = vi.mocked(createOrganizationInvitation);
 const mockedAcceptInvitation = vi.mocked(acceptOrganizationInvitation);
 const mockedRevokeInvitation = vi.mocked(revokeOrganizationInvitation);
+const mockedRevalidatePath = vi.mocked(revalidatePath);
 const mockedRedirect = vi.mocked(redirect);
 
 const organizationId = "11111111-1111-4111-8111-111111111111";
@@ -109,7 +112,7 @@ describe("organization invitation actions", () => {
     });
   });
 
-  it("revokes only the route-bound organization's invitation", async () => {
+  it("revokes only the route-bound organization's invitation and refreshes the team page", async () => {
     const formData = form({ invitation_id: invitationId });
     formData.set("organization_id", "attacker-selected-organization");
 
@@ -124,6 +127,7 @@ describe("organization invitation actions", () => {
       organizationId,
       invitationId,
     });
+    expect(mockedRevalidatePath).toHaveBeenCalledWith(`/app/o/${organizationId}/team`);
     expect(result).toEqual({
       status: "success",
       message: "Invitation revoked.",
@@ -141,9 +145,10 @@ describe("organization invitation actions", () => {
     expect(result.status).toBe("error");
     expect(mockedRequireUser).not.toHaveBeenCalled();
     expect(mockedRevokeInvitation).not.toHaveBeenCalled();
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
   });
 
-  it("maps revoke authorization failures to bounded copy", async () => {
+  it("maps revoke authorization failures to bounded copy without refreshing", async () => {
     mockedRevokeInvitation.mockRejectedValue(new Error("42501 policy internals"));
 
     const result = await revokeInvitationAction(
@@ -157,6 +162,7 @@ describe("organization invitation actions", () => {
       message: "We could not revoke this invitation. Please try again.",
       invitationUrl: null,
     });
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
   });
 
   it("accepts through the trusted authenticated user and redirects to the tenant", async () => {
