@@ -10,10 +10,14 @@ import {
 import { removeMemberAction, updateMemberRoleAction } from "./actions";
 
 vi.mock("@/lib/auth/require-user", () => ({ requireUser: vi.fn() }));
-vi.mock("@/lib/organization/members", () => ({
-  removeOrganizationMember: vi.fn(),
-  updateOrganizationMemberRole: vi.fn(),
-}));
+vi.mock("@/lib/organization/members", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/organization/members")>();
+  return {
+    ...actual,
+    removeOrganizationMember: vi.fn(),
+    updateOrganizationMemberRole: vi.fn(),
+  };
+});
 
 const mockedRequireUser = vi.mocked(requireUser);
 const mockedRemoveMember = vi.mocked(removeOrganizationMember);
