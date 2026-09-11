@@ -1,6 +1,6 @@
 # M01 — SaaS Shell + Auth
 
-Status: **IMPLEMENTING**
+Status: **VERIFYING**
 
 ## Goal
 Deliver a premium public SaaS experience plus secure Supabase email/password authentication, protected application entry, and a minimal user profile while preserving human hiring authority and deferring organization/RBAC scope to M02.
@@ -39,51 +39,66 @@ Product Foundation — COMPLETE and integrated on `main` at `64ebeb4f7b2a39fc055
 ## Tasks / Iterations
 1. **VERIFIED** — M01.1 marketing shell; CI #64.
 2. **VERIFIED** — M01.2 Supabase SSR/session infrastructure; CI #83.
-3. **VERIFIED (provider-independent)** — M01.3 core email auth; CI #103.
-4. **VERIFIED (provider-independent)** — M01.4 password recovery; security GREEN `b048782…`, CI #121; durable repair `6833d47…`, CI #123.
-5. **VERIFIED (provider-independent)** — M01.5 protected app shell; final reconciliation `f912da9…`, CI #127.
-6. **IMPLEMENTED (provider verification pending)** — M01.6 basic profile persistence/settings with RLS; reviewed code/test head `e9c2ad64f2f9065d53a44652ac1116f91538e7f7`, CI #130. Real two-user Supabase RLS isolation is still required before VERIFIED.
-7. **IN PROGRESS** — M01.7 accessibility + provider-backed E2E/security/review closeout. Provider-independent browser slice is verified at `061762ec28a9f95ed97c433f35df8eee060389fe`, CI #134. Focused test-runner configuration maintenance is verified at `85ff10741875892e2787631b106cfc48bfad0d5c`, CI #141. Provider-backed scenarios remain blocked on dedicated Supabase test configuration.
+3. **VERIFIED** — M01.3 core email auth; provider-independent coverage plus real provider lifecycle in CI #148.
+4. **VERIFIED** — M01.4 password recovery; provider-independent security GREEN `b048782…`, CI #121; real recovery email/reset/login in CI #148.
+5. **VERIFIED** — M01.5 protected app shell; provider-independent `f912da9…`, CI #127 plus real authenticated `/app` entry in CI #148.
+6. **VERIFIED** — M01.6 basic profile persistence/settings with RLS. Reviewed implementation `e9c2ad64…`, CI #130; real local Supabase migration, own-row persistence and mutual User A/User B cross-profile SELECT/UPDATE denial in `7348526…`, CI #148.
+7. **VERIFIED** — M01.7 accessibility + provider-backed E2E/security/review closeout. Provider-independent browser evidence #134; real Supabase auth/profile lifecycle, authenticated mobile/keyboard evidence and replayed-token safety in `7348526…`, CI #148.
 
 ## TDD Evidence
 M01.6 RED `8656902db4774ab91075e7dbadeb29464577917f`; GitHub Actions #128 failed at typecheck for intentionally absent production modules. Reviewed profile implementation `e9c2ad64f2f9065d53a44652ac1116f91538e7f7` passed CI #130.
 
 M01.7 browser verification initially produced genuine CI #133 RED because an unscoped `Log in` locator matched both header and footer links. Systematic debugging established a test-selector defect rather than product behavior. `061762ec28a9f95ed97c433f35df8eee060389fe` scoped the assertion to the `banner` landmark; CI #134 passed.
 
-The Vitest config warning was a configuration-only maintenance issue, so artificial behavioral RED was not created. Exact CI #140 provided reproducible failure evidence: Vite reported ESM syntax in `vitest.config.ts` loaded as CommonJS. The minimal fix moved the config to explicit ESM `vitest.config.mts` and replaced `__dirname` with an `import.meta.url`-based path. CI #141 passed the complete suite and no longer emitted that loader warning.
+Provider-backed closeout was then exercised against a real local Supabase stack. Workflow hardening commit `a30c4f540522bfcbb6991be54db6f76286e4af50` restored `set -o pipefail` so a failing Playwright run cannot be masked by `tee`. The remaining password-reset E2E failure was traced to an ambiguous label locator; `7348526cb466a66b907e4c92148b7c6d68daf674` addressed the concrete `#recovery-password` control and CI #148 passed all eight Playwright tests.
+
+The Vitest config warning was configuration-only maintenance, so artificial behavioral RED was not created. CI #140 reproduced ESM syntax being loaded as CommonJS. `85ff10741875892e2787631b106cfc48bfad0d5c` moved the config to explicit ESM `.mts` semantics and used `import.meta.url` path resolution; CI #141 passed and the loader warning disappeared.
 
 ## Integration Test Evidence
-Profile action tests prove invalid input is rejected before authentication/persistence, row ownership comes only from server-validated `requireUser()`, forged `id` and `user_id` form fields are ignored, trimmed display names are persisted, and repository failures map to bounded user-safe errors. Structural migration tests verify RLS enablement, own-user select/insert/update policies, update `USING` plus `WITH CHECK`, auth-user ownership FK, and the 120-character database constraint. Real database execution remains mandatory.
+Profile action tests prove invalid input is rejected before authentication/persistence, row ownership comes only from server-validated `requireUser()`, forged `id` and `user_id` form fields are ignored, trimmed display names are persisted, and repository failures map to bounded user-safe errors. Structural migration tests verify RLS enablement, own-user select/insert/update policies, update `USING` plus `WITH CHECK`, auth-user ownership FK, and the 120-character database constraint.
+
+CI #148 adds real execution evidence: `supabase start` followed by `supabase db reset` applied `20260910_create_profiles.sql` to PostgreSQL. Two users authenticated independently with the publishable key. Each could read its own profile; cross-user SELECTs returned no rows; cross-user UPDATEs returned no rows; and each own profile remained unchanged after the forged update attempts. No service-role client is used by browser/RLS tests.
 
 ## E2E / Visual Verification
-CI #134 passes seven Chromium E2E tests. Provider-independent coverage verifies the marketing path, unauthenticated protected-route redirect, health endpoint, a 390×844 mobile homepage without horizontal overflow, keyboard focus navigation from the home link to the header login link, labeled email/password controls on login/signup, and mobile unauthenticated `/app` return-path behavior without horizontal overflow. CI #141 re-ran all seven successfully after configuration maintenance.
+Provider-independent CI #134 passed seven Chromium tests for marketing/auth route behavior, unauthenticated protection, health, 390×844 layout without horizontal overflow, keyboard focus, labeled auth inputs, and safe return-path handling.
 
-This evidence does not simulate or replace provider-backed signup/email verification/login/logout/recovery/authenticated app/profile or cross-user RLS verification. Those remain mandatory before M01 completion.
+Provider-backed CI #148 passed eight Chromium tests total. The added serial lifecycle uses Supabase Auth/PostgREST/Mailpit and the production Next.js routes to verify:
+
+- signup and verification-email delivery;
+- `/auth/confirm` token exchange and authenticated `/app` entry;
+- `/app/profile` persistence across reload;
+- logout and password login;
+- forgot-password request and recovery-email delivery;
+- password reset followed by login with the updated password;
+- a second independent user and own-profile persistence;
+- authenticated 390×844 profile layout without horizontal overflow;
+- keyboard focus on authenticated profile navigation;
+- two-user RLS read/update isolation;
+- replay of a consumed confirmation link fails safely without exposing `token_hash`.
 
 ## Security Review
-Existing auth/profile boundaries remain unchanged by the provider-independent browser/configuration/documentation slices. Profile ownership is not caller-selectable; RLS remains mandatory; tokens and secrets are not added to browser tests; placeholder CI Supabase values are not treated as provider evidence. No service-role browser path is introduced.
+The auth boundary uses publishable credentials only; the provider E2E does not introduce a service-role browser path. Protected routes remain server-authoritative. Redirect validation, bounded provider errors, token secrecy, caller-independent profile ownership, and RLS are preserved. CI #148 proves the migration and RLS policies against real local PostgreSQL/PostgREST rather than mocks or static inspection.
 
-Connected-account discovery on 2026-09-11 found two existing Supabase projects; read-only schema inspection established both as unrelated to Hire Evidence. Neither was modified. Creating a new Supabase project/development branch is cost-bearing and requires explicit organization/cost confirmation, so no provider infrastructure was fabricated or silently created.
+The earlier need for a dedicated hosted test project is no longer a blocker because the repository now provisions an isolated disposable Supabase local stack in CI. This is provider-backed execution while avoiding unrelated hosted projects, production credentials, cost-bearing infrastructure, or committed secrets.
 
 ## Accessibility Review
-Provider-independent browser verification proves narrow-mobile no-horizontal-overflow on the public and unauthenticated auth-entry path, keyboard focus reaches the semantically scoped header login link, and login/signup credential inputs have accessible labels. Existing visible `:focus-visible` styling and reduced-motion rules remain in place. Provider-backed keyboard/mobile verification of authenticated/profile flows remains outstanding.
+Provider-independent browser verification proves narrow-mobile no-horizontal-overflow on public/unauthenticated paths, keyboard focus navigation, and accessible labels. Provider-backed CI #148 additionally verifies the authenticated profile route at 390×844 without horizontal overflow and keyboard focus on the product/profile navigation. Existing visible `:focus-visible` styling and reduced-motion rules remain in place. No Important accessibility defect is known.
 
 ## Performance Review
-The configuration maintenance changes no application runtime dependency, route behavior, client state, network call, polling, or production JavaScript. Existing profile rendering remains one authenticated identity verification plus one own-row query; save remains one upsert. Vitest still reports an informational test-environment performance suggestion; no isolation change is justified without evidence because shared jsdom state previously caused leakage.
+M01 remains a single Next.js application and introduces no speculative service boundary. Profile rendering is one authenticated identity validation plus one own-row query; save is one upsert. Provider E2E adds CI-only local Supabase startup cost, not production runtime cost. Vitest still emits an informational environment-performance suggestion; disabling isolation is intentionally not used because shared jsdom state previously caused test leakage.
 
 ## AI / Eval Review
-No assessment AI is introduced in M01. Humans remain hiring decision makers; prohibited sensitive/proxy scoring remains out of scope.
+No assessment AI is introduced in M01. Humans remain hiring decision makers; prohibited sensitive/proxy scoring remains out of scope. No candidate evidence is generated or altered by this milestone.
 
 ## Code Review Findings
 - Critical: 0 unresolved.
 - Important: 0 unresolved.
-- Resolved test defect: CI #133 exposed ambiguous Playwright login locators; fixed by semantic banner scoping in `061762ec…`, with CI #134 green.
-- Resolved maintenance finding: Vite ESM-in-CommonJS configuration-loader warning; root cause fixed by explicit `.mts` config in `85ff107…`, with CI #141 green and warning absent.
-- Minor: logout default scope remains unchanged absent an explicit product-semantics requirement.
-- Informational: GitHub-hosted third-party action/runtime deprecation notices remain external maintenance and do not affect application verification.
+- Resolved: ambiguous Playwright login locator, provider E2E pipe failure masking, password-reset locator ambiguity, and Vitest ESM config-loader warning.
+- Minor: Supabase logout retains SDK default session scope absent an explicit product-semantics requirement.
+- Informational: GitHub-hosted third-party action/runtime Node deprecation notices remain external maintenance and do not affect application verification.
 
 ## Fixes / Re-review
-The focused configuration diff was reviewed for correctness, portability, YAGNI, test integrity, security, and interaction with the active M01 boundary. Using `.mts` scopes ESM semantics to the Vitest config rather than changing all package semantics, and `fileURLToPath(new URL("./src", import.meta.url))` is portable path resolution. The complete required CI suite passed. No unresolved Critical or Important finding was identified. Provider-backed gates remain explicitly open rather than falsely closed with mocks or unrelated infrastructure.
+The complete active boundary has been reviewed from PRD compliance, correctness/edge cases, architecture/YAGNI, testing quality, auth/session security, profile data isolation/RLS, accessibility/responsiveness, CI failure semantics, and hiring-AI safety perspectives. The provider slice uses the publishable key and independently authenticated users, exercises real provider/database behavior, and does not weaken any test or authorization boundary. Critical: 0 unresolved. Important: 0 unresolved.
 
 ## Fresh Verification Commands
 ```bash
@@ -95,38 +110,47 @@ python3 -m unittest tests/python/test_verify_autonomous_framework.py
 python3 -m unittest tests/python/test_verify_requirements_source.py
 python3 scripts/verify_autonomous_framework.py
 python3 scripts/verify_requirements_source.py
+supabase start
+supabase db reset
 pnpm build
 pnpm e2e
 python3 scripts/verify_prd_coverage.py
+supabase stop --no-backup
 ```
 
 ## Fresh Verification Results
-Configuration head `85ff10741875892e2787631b106cfc48bfad0d5c` passed GitHub Actions `34528888577` / CI #141 across frozen install, lint, typecheck, 54 unit/component tests, framework/source verifier tests, both repository verifiers, production build, all seven Chromium E2E tests, and PRD coverage. The prior Vite ESM-in-CommonJS config-loader warning does not appear in the test output. Any documentation reconciliation commit after that head requires fresh exact-SHA CI before being called green.
+Provider implementation head `7348526cb466a66b907e4c92148b7c6d68daf674` passed GitHub Actions `34582926587` / CI #148. The quality job passed frozen dependency installation, lint, typecheck, 54/54 unit/component tests, six autonomous-framework verifier tests, five requirements-source verifier tests, autonomous-framework verification, requirements-source integrity verification, real local Supabase startup and database reset with `20260910_create_profiles.sql` applied, production build, 8/8 Chromium E2E tests, PRD sections 1–242 coverage, and Supabase teardown.
+
+The current durable closeout documentation is newer than `7348526…`; it must receive fresh exact-head CI before PR #3 is integration-ready.
 
 ## Known Limitations
-M01 is not complete. The profile migration has not yet been executed against a dedicated configured Supabase test project, so User A/User B RLS denial is not proven. Provider-backed signup/email verification/login/logout/recovery/authenticated `/app` and `/app/profile` E2E also remain unfinished. Browser accessibility coverage is intentionally provider-independent and does not replace those gates.
+No remaining Critical/Important M01 limitation is known. Supabase logout currently uses the SDK default session scope; this is Minor and intentionally unchanged absent an explicit product requirement for all-device logout. GitHub-hosted action/runtime deprecation notices are informational external maintenance.
+
+M02 organization membership/RBAC remains deliberately out of scope until M01 is merged and post-merge `main` is verified.
 
 ## Documentation Updated
-Status, known issues, current milestone, this active milestone ledger, feature matrix, requirements traceability, milestone program, PR #3, provider-blocker evidence, and Vitest configuration-maintenance evidence are reconciled with the latest verified implementation/configuration state.
+Status, known issues, current milestone, this active milestone ledger, feature matrix, requirements traceability, milestone program, and `docs/superpowers/evidence/2026-09-11-m01-provider-backed-closeout.md` are reconciled with CI #148 provider evidence. PR #3 must be updated with the final exact-head CI before merge.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → actual Git/PR/CI → `docs/progress/STATUS.md` → `docs/progress/KNOWN-ISSUES.md` → `docs/milestones/CURRENT.md` → this ledger → PRD/traceability → M01 Superpowers spec/plan/evidence → source/tests.
 
 ## Completion Checklist
-- [ ] All M01 requirements and iterations accounted for.
-- [x] Server-authoritative `/app` shell implemented provider-independently.
+- [x] All M01 requirements and iterations accounted for.
+- [x] Server-authoritative `/app` shell implemented and provider-backed entry verified.
 - [x] Unauthenticated `/app` browser redirect verified.
 - [x] Basic profile schema, settings flow and own-user authorization boundary implemented.
-- [x] Provider-independent mobile overflow, keyboard auth focus, and auth-control labels verified in Chromium.
+- [x] Local Supabase migration execution verified.
+- [x] Real User A/User B own-profile access and mutual cross-user read/update denial verified.
+- [x] Signup/login/email verification/recovery/logout provider lifecycle verified.
+- [x] Authenticated `/app` and `/app/profile` behavior verified.
+- [x] Provider-independent and authenticated mobile/keyboard accessibility closeout verified.
 - [x] Test runner config uses explicit ESM semantics without the prior loader warning.
-- [ ] Provider-backed authenticated user can enter `/app`.
-- [ ] Provider-backed signup/login/verification/recovery/logout E2E passes.
-- [ ] Profile own-user RLS and cross-user denial are verified against real Supabase.
-- [ ] Milestone-wide provider-backed security/accessibility closeout complete.
-- [ ] Exact-final-head CI green with durable closeout current.
+- [x] Milestone-wide security/accessibility/performance/review closeout complete with 0 unresolved Critical/Important findings.
+- [ ] Exact-final-head CI green after durable closeout reconciliation.
+- [ ] PR #3 integrated and post-merge `main` CI green.
 
 ## Exact Next Capability
-M01.7 — identify or configure a dedicated safe Supabase test environment, then execute provider-backed/authenticated E2E and the outstanding M01.6 two-user RLS isolation gate. Until then, preserve provider-independent evidence and do not claim provider-backed verification.
+Complete the final durable reconciliation, obtain fresh exact-head CI, re-check PR #3 head/reviews/threads/mergeability, then mark it ready and squash-merge under the owner's standing authorization if all gates remain green. Verify post-merge `main` CI before starting M02.
 
 ## Next Milestone
-M02 — Organizations + RBAC. Do not start until M01 is objectively complete and integrated/authorized according to repository policy.
+M02 — Organizations + RBAC. Start only after PR #3 is integrated and post-merge `main` is green.
