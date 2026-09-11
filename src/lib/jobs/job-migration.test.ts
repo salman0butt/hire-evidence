@@ -26,6 +26,13 @@ describe("job tenancy migration", () => {
     expect(migration).toMatch(/alter table public\.job_requirements enable row level security/i);
   });
 
+  it("keeps requirement positions unique per job for deterministic ordering", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(/unique\s*\(job_id,\s*position\)/i);
+    expect(migration).not.toMatch(/unique\s*\(job_id,\s*kind,\s*position\)/i);
+  });
+
   it("creates a job and its requirements atomically through an authenticated role-gated RPC", () => {
     const migration = readMigration();
 
