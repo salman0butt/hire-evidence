@@ -46,6 +46,11 @@ const MEMBER_CAPABILITIES = new Set<OrganizationCapability>([
   "jobs:view",
 ]);
 
+const JOB_MANAGER_ROLES = new Set<OrganizationRole>([
+  "recruiter",
+  "hiring_manager",
+]);
+
 export function hasOrganizationCapability(
   role: OrganizationRole,
   capability: OrganizationCapability,
@@ -54,7 +59,7 @@ export function hasOrganizationCapability(
     return true;
   }
 
-  if (role === "recruiter" && capability === "jobs:manage") {
+  if (JOB_MANAGER_ROLES.has(role) && capability === "jobs:manage") {
     return true;
   }
 
