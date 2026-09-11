@@ -1,25 +1,25 @@
 # Current Milestone
 
 Milestone:
-SaaS Shell + Auth
+Organizations + RBAC
 
 Legacy roadmap identifier:
-M01
+M02
 
 Current capability:
-Provider-backed auth/profile/RLS closeout verified on implementation head; durable closeout and exact-final-head CI pending before merge
+Organization tenancy, fixed RBAC, onboarding, tenant shell, owner-safe membership management, secure invitations, bounded settings, provider-backed two-organization isolation, and responsive/keyboard closeout are implemented and reviewed. The branch is awaiting exact-final-head CI after documentation reconciliation and then explicit merge authorization.
 
 Status:
-VERIFYING
+CLOSEOUT COMPLETE / AWAITING EXPLICIT MERGE AUTHORIZATION
 
 Branch:
-`feat/saas-shell-auth`
+`feat/organizations-rbac`
 
 Base:
-`main`
+`main` at verified SHA `ed10e1b55bb62cf202585c8c50e6487014e83c29`
 
 PR:
-#3 — open draft, `Build SaaS shell and authentication`
+#4 — `Build organization tenancy and role-based access` — OPEN / DRAFT / unmerged.
 
 Canonical compact recovery state:
 `docs/progress/STATUS.md`
@@ -29,32 +29,45 @@ Detailed known issues:
 
 ## Dependency closeout
 
-Product Foundation is COMPLETE. PR #2 was already merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI #57 passed.
+- Product Foundation: COMPLETE.
+- SaaS Shell + Auth: COMPLETE. PR #3 squash-merged as `ed10e1b55bb62cf202585c8c50e6487014e83c29`; post-merge main CI #157 passed.
 
-## Completed / Verified in M01
+## Selected M02 Architecture
 
-- M01.1–M01.5: VERIFIED.
-- M01.6 profile persistence/RLS: VERIFIED provider-backed. CI #148 on `7348526cb466a66b907e4c92148b7c6d68daf674` applied the real profile migration to local Supabase and proved two independently authenticated users cannot read/update each other's profiles.
-- M01.7 auth/accessibility/provider closeout: VERIFIED on the implementation head. CI #148 passed the full auth lifecycle, authenticated `/app` and `/app/profile`, profile persistence, authenticated narrow-mobile/keyboard checks, consumed-token safety, and 8/8 Chromium E2E tests.
-- Focused Vitest configuration maintenance: VERIFIED at `85ff10741875892e2787631b106cfc48bfad0d5c`, CI #141.
+- Design: `docs/superpowers/specs/2026-09-11-organizations-rbac-design.md`.
+- Plan: `docs/superpowers/plans/2026-09-11-organizations-rbac.md`.
+- Closeout evidence: `docs/superpowers/evidence/2026-09-11-m02-organizations-rbac-closeout.md`.
+- Tenant context is URL-scoped under `/app/o/[organizationId]`.
+- PostgreSQL RLS/RPCs are authoritative; TypeScript capabilities are UX/preflight only.
+- Fixed roles: `owner`, `admin`, `recruiter`, `hiring_manager`, `reviewer`.
+- Organization creation atomically creates owner membership through an authenticated RPC.
+- Membership mutations use narrow authenticated RPCs and preserve owner invariants.
+- Invitation tokens are cryptographically random, SHA-256 hash-at-rest, expiring, revocable, replay-protected and authenticated-email-bound.
+- Settings update only `name`, `company_size`, `hiring_use_case` plus `updated_at`, with owner/admin RLS authority.
 
-## Remaining
+## Iterations
 
-1. Reconcile durable M01 closeout state across milestone, feature, traceability, status, known-issues, and evidence docs.
-2. Obtain fresh exact-head CI for the final reconciliation commit.
-3. Re-check PR head/reviews/threads/mergeability; if all completion gates remain green, mark PR #3 ready and squash-merge under the owner's standing auto-merge authorization.
-4. Verify post-merge `main` CI before starting M02.
+1. M02.1 — organization schema + memberships — VERIFIED SLICE; CI #161.
+2. M02.2 — fixed RBAC + organization validation — VERIFIED SLICE; RED #162 → GREEN #163.
+3. M02.3 — organization onboarding — VERIFIED SLICE; RED #165, build-debug #167, GREEN #168.
+4. M02.4 — tenant-aware application shell/navigation — VERIFIED SLICE; RED #169 → GREEN #170.
+5. M02.5 — membership management + owner invariants — VERIFIED SLICE; final implementation `fa7a996d…`, CI #190.
+6. M02.6 — secure team invitations — VERIFIED SLICE; final implementation `5abee48b…`, CI #215.
+7. M02.7 — bounded organization settings — VERIFIED SLICE; RED `8a080819…` / CI #217 → GREEN `43b7c231…` / CI #218.
+8. M02 closeout — provider-backed Org A/Org B/unauthenticated isolation VERIFIED at `3e0c3555…`, CI #219; responsive/keyboard browser matrix and whole-milestone review VERIFIED on reviewed head `fd8907cf…`, CI #224 / `34610615757`.
 
 ## Blocker
 
-No provider/configuration blocker remains for M01. The only remaining gate is evidence-preserving integration closeout on the final documentation head.
+No engineering blocker is known. Merge is blocked only by the standing explicit-authorization policy.
 
 ## Verification state
 
-Implementation/provider head `7348526cb466a66b907e4c92148b7c6d68daf674` passed CI `34582926587` / #148 across frozen install, lint, typecheck, 54 unit/component tests, framework/source verifier tests, autonomous/source integrity verification, real local Supabase startup and migration reset, production build, 8/8 Chromium E2E tests, PRD sections 1–242 coverage, and teardown.
+Reviewed implementation/documentation head `fd8907cf20498466c2d62cb1b12abd29eb584686` passed GitHub Actions #224 / `34610615757` across frozen install, lint, typecheck, tests, framework/source checks, local Supabase, production build, Chromium E2E, PRD coverage and teardown. Closeout documentation written after that SHA requires a fresh exact-final-head run before PR readiness is finalized.
 
-Provider-backed E2E covers signup, confirmation, login/logout, forgot/reset password, authenticated application/profile entry, profile persistence, two-user RLS isolation, authenticated mobile/keyboard evidence, and replayed confirmation-token failure without token leakage.
+## Review state
+
+Final skeptical security/accessibility/YAGNI review: 0 unresolved Critical, 0 unresolved Important. PR #4 had no submitted reviews and no unresolved review threads at closeout inspection.
 
 ## Next Action
 
-Follow `docs/progress/STATUS.md` `Exact next work:`. Merge only after fresh exact-head CI and final PR review state are green.
+Follow `docs/progress/STATUS.md` `Exact next work:`: verify GitHub Actions against the exact latest closeout-documentation head, reconcile PR metadata if green, then stop at the explicit merge-authorization gate. Do not merge PR #4 and do not start M03 before explicit authorization and green post-merge `main` CI.

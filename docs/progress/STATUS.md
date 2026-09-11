@@ -4,51 +4,45 @@ Last reconciled: 2026-09-11
 
 ## Completed Milestones
 
-Product Foundation — **COMPLETE**. PR #2 was already merged to `main` as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI #57 passed.
+- Product Foundation — **COMPLETE**. PR #2 merged as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI #57 passed.
+- SaaS Shell + Auth — **COMPLETE**. PR #3 final head `b8844130118453e56009284b9498c8357429f1af` passed CI #156, squash-merged as `ed10e1b55bb62cf202585c8c50e6487014e83c29`, and post-merge CI `34584310345` / #157 passed all gates.
 
 ## Current Milestone
 
-SaaS Shell + Auth — **VERIFYING / CLOSEOUT**.
+Organizations + RBAC — **CLOSEOUT COMPLETE / AWAITING EXPLICIT MERGE AUTHORIZATION**.
 
 ## Current Task State
 
-- M01.1 marketing shell: VERIFIED; CI #64.
-- M01.2 Supabase SSR/session infrastructure: VERIFIED; CI #83.
-- M01.3 core email auth: VERIFIED provider-independently; CI #103.
-- M01.4 password recovery: VERIFIED provider-independently; security GREEN `b048782e0644213727f16fdf376d87f6bebb1d1e`, CI #121; durable repair `6833d47340c1210235ac501c93a95a178fdfe3cd`, CI #123.
-- M01.5 protected application shell: VERIFIED provider-independently; final reconciliation `f912da9137a684f44be55abe1d271fec6cb90ac6`, CI #127.
-- M01.6 basic profile + RLS: VERIFIED provider-backed. Local Supabase migration execution plus real User A/User B own-row access and mutual cross-user read/update denial passed in CI #148 at `7348526cb466a66b907e4c92148b7c6d68daf674`.
-- M01.7 accessibility/provider-backed closeout: VERIFIED on the implementation head. CI #148 ran the real Supabase local stack and passed signup, confirmation, login, logout, password recovery/reset, authenticated `/app`, profile persistence, authenticated mobile/keyboard evidence, replayed-token safety, and all eight Playwright tests.
-- Provider-independent configuration maintenance: VERIFIED. `85ff10741875892e2787631b106cfc48bfad0d5c` removed the prior Vite ESM-in-CommonJS warning; CI #141 passed.
+- M02.1 organization schema + memberships — **VERIFIED SLICE**. CI #161.
+- M02.2 fixed RBAC + organization validation — **VERIFIED SLICE**. RED #162 → GREEN #163.
+- M02.3 organization onboarding — **VERIFIED SLICE**. RED #165; build defect #167; GREEN #168.
+- M02.4 tenant-aware shell/navigation — **VERIFIED SLICE**. RED #169 → GREEN #170.
+- M02.5 membership management + owner invariants — **VERIFIED SLICE**. Final implementation `fa7a996d19d790e87fb7123cb0071910424ea3a9`; CI #190.
+- M02.6 secure team invitations — **VERIFIED SLICE**. Final invitation implementation `5abee48be6236e5616941d9ced73515628199e38`; CI #215.
+- M02.7 bounded organization settings — **VERIFIED SLICE**. Genuine RED `8a080819ef387fbbdcfad34cd0a9802b2d9974ea` / CI #217 → GREEN `43b7c23122ec775253bbca0e38b701a694545205` / CI #218.
+- Provider-backed tenant isolation — **VERIFIED SLICE**. `3e0c35557a8cd21e9a223909753a6fdf412d2557`; CI `34608235065` / #219 passed real local-Supabase Org A vs Org B vs unauthenticated read/write and recruiter mutation-denial checks.
+- Responsive/keyboard browser closeout — **VERIFIED**. The first full run exposed a Playwright substring-locator defect in CI #222; minimal exact-heading fix `62301204cc8d92051d1eec5a34bce45fc7b63006` resolved it. Exact implementation/documentation head `fd8907cf20498466c2d62cb1b12abd29eb584686` passed CI #224 / `34610615757`, including Chromium E2E at desktop and 390×844.
+- Whole-milestone skeptical security/accessibility/YAGNI review — **COMPLETE**. Evidence: `docs/superpowers/evidence/2026-09-11-m02-organizations-rbac-closeout.md`. Critical: 0 unresolved. Important: 0 unresolved.
 
-Active branch: `feat/saas-shell-auth`
+Active branch: `feat/organizations-rbac`
 
-Active PR: #3 DRAFT — `Build SaaS shell and authentication`; open and unmerged pending durable closeout + fresh exact-head CI.
+Active PR: #4 — `Build organization tenancy and role-based access` — OPEN / DRAFT / unmerged.
 
-CI status: implementation/provider head `7348526cb466a66b907e4c92148b7c6d68daf674` passed GitHub Actions `34582926587` / #148. That run passed frozen dependency installation, lint, typecheck, 54 unit/component tests, framework/source verifier tests, autonomous/source integrity verification, real local Supabase startup + migration reset, production build, 8/8 Chromium E2E tests, PRD sections 1–242 coverage, and Supabase teardown. Current documentation reconciliation is newer and requires fresh exact-head CI before merge.
+CI status: CI #224 / `34610615757` passed all required quality gates on reviewed head `fd8907cf20498466c2d62cb1b12abd29eb584686`: frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase, production build, Chromium E2E, PRD coverage, and teardown. Closeout documentation commits after that SHA create a newer head and therefore require fresh exact-final-head CI before PR readiness can be finalized.
 
-## M01 Provider-Backed Verification Evidence
-
-- Durable closeout evidence: `docs/superpowers/evidence/2026-09-11-m01-provider-backed-closeout.md`.
-- Local Supabase CI applied `20260910_create_profiles.sql` against PostgreSQL and exercised Supabase Auth/PostgREST/Mailpit rather than mocks.
-- User A/User B isolation: each authenticated client can read its own profile; cross-user selects return no rows; cross-user updates return no rows; own rows remain unchanged.
-- Auth lifecycle: signup → confirmation email/token exchange → authenticated `/app` → logout/login → forgot/reset password → login with updated password → profile persistence.
-- Authenticated mobile/keyboard closeout and consumed-confirmation-link safety are covered in the same provider-backed Playwright scenario.
-- Skeptical review: Critical 0 unresolved; Important 0 unresolved.
-
-## Blockers
-
-No remaining M01 implementation/provider blocker is known. Merge remains gated only on durable reconciliation and fresh exact-head CI/review state for the final documentation head.
-
-## Critical / Important Findings
+## Review State
 
 - Critical: 0 unresolved.
 - Important: 0 unresolved.
-- Minor: Supabase logout uses SDK default session scope; unchanged absent an explicit product-semantics requirement.
-- Informational CI notices remain from GitHub-hosted action runtimes and are not application defects.
+- PR #4 has no submitted reviews and no unresolved review threads at the latest inspection.
+- No new blocking security, tenancy, accessibility, performance, YAGNI, or hiring-safety issue was found in final whole-milestone review.
+
+## Blockers
+
+No engineering blocker is known. Merge is intentionally blocked by policy until the user explicitly authorizes it in chat.
 
 ## Durable Recovery
 
-Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, `docs/milestones/CURRENT.md`, `docs/milestones/M01-saas-shell-auth.md`, relevant PRD/traceability, M01 Superpowers spec/plan/evidence, and source/tests.
+Read actual Git/PR/CI first, then `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, known issues, `docs/milestones/CURRENT.md`, `docs/milestones/M02-organizations-rbac.md`, `docs/requirements/TRACEABILITY.md`, the M02 design/plan/closeout evidence, and current source/tests.
 
-Exact next work: finish M01 durable closeout, wait for fresh exact-head CI on the reconciled branch, re-check PR reviews/threads and head SHA, then mark PR #3 ready and squash-merge if every completion gate remains green; verify post-merge `main` CI before starting M02.
+Exact next work: verify GitHub Actions against the exact latest documentation-closeout head, reconcile PR metadata if green, then stop at the merge authorization gate. Do not merge PR #4 and do not begin M03 until explicit merge authorization and green post-merge `main` CI.

@@ -1,35 +1,46 @@
 # Requirements Traceability
 
-This matrix tracks durable framework requirements plus the active product capability. Expand product mappings incrementally from the canonical PRD; never reconstruct missing scope from chat memory.
+This matrix tracks durable framework requirements plus active product capabilities. Expand mappings incrementally from the canonical PRD; never reconstruct missing scope from chat memory.
 
 | Requirement | Milestone | Spec / Plan | Implementation | Tests | Verification | Status |
 |---|---|---|---|---|---|---|
-| AUTO-001 — Git/GitHub is durable execution memory | Product Foundation | autonomy framework | recovery/control plane | framework tests | `main` CI #57 | VERIFIED |
-| AUTO-002 — Fresh recovery before writes | Product Foundation | autonomy framework | recovery policy | framework tests | current run recovered PR/Git/CI before closeout writes | VERIFIED |
-| AUTO-003 — Evidence precedence | Product Foundation | autonomy framework | policy/docs | framework tests | stale provider blocker was corrected from actual source + CI #148 evidence | VERIFIED |
-| AUTO-004 — Highest-priority unfinished work first | Active capabilities | autonomy framework | existing PR continuation | recovery evidence | PR #3 reused; M01 provider closeout completed before M02 | VERIFIED |
-| AUTO-005 — Genuine RED → GREEN / root-cause debugging | Active capabilities | M01 plan | test-first/verification commits + focused debugging | capability tests/CI logs | M01 browser RED #133 → fix #134; provider CI failure semantics hardened at `a30c4f…`; reset locator fixed at `7348526…`; CI #148 green | VERIFIED |
-| AUTO-006 — Critical/Important findings block completion | Product Foundation | autonomy framework | review workflow | skeptical review | complete M01 boundary + provider slice: 0 unresolved Critical/Important | VERIFIED |
-| AUTO-007 — Fresh exact-SHA CI | Product Foundation | autonomy framework | CI | full quality job | provider implementation `7348526cb466a66b907e4c92148b7c6d68daf674`, CI #148; final documentation head requires fresh CI before merge | ACTIVE |
-| AUTO-008 — PRs default open/unmerged until authorized | Product Foundation | autonomy framework | GitHub policy | recovery | PR #3 remains draft/open during closeout; owner has standing auto-merge authorization once all gates pass | VERIFIED |
-| AUTO-009 — Durable recovery state | Product Foundation | autonomy framework | status/milestone/evidence docs | framework tests | provider closeout evidence and durable ledgers reconciled; final head awaits exact-SHA CI | ACTIVE |
-| AUTO-010 — Avoid duplicate concurrent work | Product Foundation | autonomy framework | active PR reuse | recovery | no duplicate PR; branch head rechecked during closeout | VERIFIED |
+| AUTO-001 — Git/GitHub is durable execution memory | Product Foundation | autonomy framework | recovery/control plane | framework tests | `main` CI #57 and later | VERIFIED |
+| AUTO-002 — Fresh recovery before writes | Active capabilities | autonomy framework | recovery policy | framework tests | current run recovered Git/PR/review/CI/docs before writes | VERIFIED |
+| AUTO-003 — Evidence precedence | Active capabilities | autonomy framework | policy/docs | framework tests | stale M02 durable state reconciled against Git/source/CI | VERIFIED |
+| AUTO-004 — Highest-priority unfinished work first | Active capabilities | autonomy framework | active PR continuation | recovery evidence | existing draft PR #4 reused; no duplicate PR | VERIFIED |
+| AUTO-005 — Genuine RED → GREEN / root-cause debugging | Active capabilities | active milestone plans | test-first commits + CI logs | capability tests | settings RED #217 → GREEN #218; final browser defect CI #222 → exact-locator fix → CI #224 | VERIFIED |
+| AUTO-006 — Critical/Important findings block completion | Active capabilities | autonomy framework | review workflow | skeptical review | final M02 review: 0 unresolved Critical / 0 unresolved Important | VERIFIED |
+| AUTO-007 — Fresh exact-SHA CI | Active capabilities | autonomy framework | GitHub Actions | full quality job | reviewed head `fd8907cf…` passed CI #224; closeout docs require one fresh exact-final-head run | ACTIVE |
+| AUTO-008 — Explicit merge authorization required | Product Foundation | autonomy framework | GitHub policy | recovery | `AUTO_MERGE=false`; PR #4 remains draft/unmerged | VERIFIED |
+| AUTO-009 — Durable recovery state | Active capabilities | autonomy framework | status/milestone/evidence docs | framework verifier | M02 closeout evidence/status/milestone/feature/traceability reconciled | VERIFIED |
+| AUTO-010 — Avoid duplicate concurrent work | Product Foundation | autonomy framework | PR reuse/concurrency recovery | recovery | one active product PR; current head checked before continuation | VERIFIED |
 | PRD-195 — Product Foundation | Product Foundation | foundation designs | foundation + requirements control plane | full suite | `main` CI #57 | VERIFIED |
 | REQ-DURABILITY — Preserve owner requirements | Product Foundation | foundation closeout | source tree + manifest | source/PRD verifiers | CI #57 and later | VERIFIED |
-| DEP-REPRO — Reproducible dependency graph | Product Foundation | foundation closeout | lockfile/frozen installs | CI install | provider implementation CI #148 | VERIFIED |
-| PRD-015/016/017/196 — Public SaaS positioning, auth/profile foundations, M01 deliverables | SaaS Shell + Auth | M01 design + plan | M01.1–M01.7 implemented including provider-backed closeout | marketing/auth/recovery/protection/profile tests + browser/provider E2E | #64/#83/#103/#121/#127/#130/#134/#148 | VERIFIED |
-| SESSION-001 — Cookie-backed Supabase SSR/session boundary and safe redirects | SaaS Shell + Auth | M01 Task 2 | env/clients/proxy/safe redirect | env/redirect tests | `c1a1120…`, CI #83; real provider lifecycle CI #148 | VERIFIED |
-| AUTH-001 — Signup/login/logout/email verification | SaaS Shell + Auth | M01 Task 3 | auth forms/actions/confirm | auth tests + provider E2E | real signup/confirmation/login/logout in CI #148 | VERIFIED |
-| AUTH-002 — Password recovery and trusted confirmation redirects | SaaS Shell + Auth | M01 Task 4 | recovery forms/actions/confirm | recovery/route tests + provider E2E | real recovery email/reset/login in CI #148 | VERIFIED |
-| AUTH-003 — Server-authoritative authenticated application entry | SaaS Shell + Auth | M01 Task 5 | `require-user.ts`, app layout/navigation/page | guard/navigation tests + browser/provider E2E | authenticated `/app` entry in CI #148 | VERIFIED |
-| PROFILE-001 — Own-user profile persistence with `auth.uid()` RLS (PRD 17, 196) | SaaS Shell + Auth | M01 Task 6 | profiles migration + validation + repository + server action + profile UI | validation/component/action/migration-policy tests + real two-user E2E | local Supabase migration, own-row persistence, mutual cross-user SELECT/UPDATE denial; `7348526…`, CI #148 | VERIFIED |
-| A11Y-001 — Responsive, keyboard-accessible public/auth entry (PRD 15–17, 196) | SaaS Shell + Auth | M01 Task 7 | semantic/focus/responsive UI | public + authenticated Playwright coverage | provider-independent #134 plus authenticated narrow-mobile/keyboard evidence in CI #148 | VERIFIED |
-| ENG-CONFIG-001 — Test runner config has explicit ESM semantics | SaaS Shell + Auth | provider-independent closeout | `vitest.config.mts` | full CI quality suite | `85ff107…`, CI #141; prior Vite loader warning absent | VERIFIED |
-| AUTH-E2E-001 — Provider-backed M01 auth/profile end-to-end evidence | SaaS Shell + Auth | M01 Task 7 | local Supabase config/templates + production auth/profile flows | `e2e/auth.spec.ts` | Supabase Auth/PostgREST/Mailpit + production app; 8/8 Playwright, CI #148 | VERIFIED |
+| DEP-REPRO — Reproducible dependency graph | Product Foundation | foundation closeout | lockfile/frozen installs | CI install | CI #224 and later | VERIFIED |
+| PRD-015/016/017/196 — SaaS positioning, auth/profile foundations, M01 deliverables | SaaS Shell + Auth | M01 design + plan | M01.1–M01.7 | unit/component/provider E2E | PR #3 merged; post-merge CI #157 | VERIFIED |
+| SESSION-001 — Cookie-backed Supabase SSR/session boundary and safe redirects | SaaS Shell + Auth | M01 Task 2 | env/clients/proxy/safe redirect | env/redirect tests + E2E | M01 closeout/post-merge #157 | VERIFIED |
+| AUTH-001 — Signup/login/logout/email verification | SaaS Shell + Auth | M01 Task 3 | auth forms/actions/confirm | auth tests + provider E2E | M01 closeout/post-merge #157 | VERIFIED |
+| AUTH-002 — Password recovery and trusted confirmation redirects | SaaS Shell + Auth | M01 Task 4 | recovery forms/actions/confirm | recovery tests + provider E2E | M01 closeout/post-merge #157 | VERIFIED |
+| AUTH-003 — Server-authoritative authenticated application entry | SaaS Shell + Auth | M01 Task 5 | app guard/navigation | tests + browser E2E | post-merge CI #157 | VERIFIED |
+| PROFILE-001 — Own-user profile persistence with `auth.uid()` RLS | SaaS Shell + Auth | M01 Task 6 | profile migration/repository/action/UI | tests + real two-user E2E | post-merge CI #157 | VERIFIED |
+| A11Y-001 — Responsive, keyboard-accessible public/auth entry | SaaS Shell + Auth | M01 Task 7 | semantic/focus/responsive UI | browser coverage | post-merge CI #157 | VERIFIED |
+| ORG-001 — Organization/membership bootstrap with database-enforced membership boundary | Organizations + RBAC | M02 Task 1 | organization migration + RLS/RPC bootstrap | migration contract + local Supabase | CI #161 and retained green later | VERIFIED |
+| RBAC-001 — Fixed `owner/admin/recruiter/hiring_manager/reviewer` model | Organizations + RBAC | M02 Task 2 | `rbac.ts` | `rbac.test.ts` | RED #162 → GREEN #163 | VERIFIED |
+| ORG-INPUT-001 — Bounded normalized organization onboarding/settings text | Organizations + RBAC | M02 Task 2 | organization validation | validation tests | RED #162 → GREEN #163, reused by settings #218 | VERIFIED |
+| ORG-ONBOARD-001 — Authenticated organization onboarding | Organizations + RBAC | M02 Task 3 | repository + create RPC action/form/page | action/component/browser tests | RED #165; build fix #167; CI #168 | VERIFIED |
+| TENANT-SHELL-001 — Tenant-aware application membership boundary and navigation | Organizations + RBAC | M02 Task 4 | membership boundary + tenant layout/navigation | focused tests + build/E2E | RED #169 → GREEN #170 | VERIFIED |
+| MEMBER-MGMT-001 — Owner/admin membership mutations preserve owner invariants | Organizations + RBAC | M02 Task 5 | membership RPCs/repository/actions/UI | migration/action/component tests | final `fa7a996d…`, CI #190 | VERIFIED |
+| INVITE-001 — Hash-at-rest, expiring, email-bound organization invitations | Organizations + RBAC | M02 Task 6 | invitation migration/RPCs/token helper/actions/UI | token/action/provider abuse tests | final `5abee48b…`, CI #215 | VERIFIED |
+| ORG-SETTINGS-001 — Role-bounded organization settings | Organizations + RBAC | M02 Task 7 | settings repository/action/page/form over owner/admin RLS | action/component/provider tests | RED `8a080819…` / #217 → GREEN `43b7c231…` / #218 | VERIFIED |
+| TENANT-ISO-001 — Aggressive Org A / Org B / unauthenticated isolation | Organizations + RBAC | M02 Task 8 | authoritative RLS/RPCs + tenant flows | `e2e/organizations.spec.ts` plus invitation abuse E2E | `3e0c3555…`, CI #219 | VERIFIED |
+| M02-A11Y-001 — Responsive/keyboard tenant closeout | Organizations + RBAC | M02 Task 8 | tenant/team/invitation/settings UI | desktop + 390×844 browser matrix | reviewed head `fd8907cf…`, CI #224 / `34610615757` | VERIFIED |
+| M02-REVIEW-001 — Whole-milestone skeptical closeout review | Organizations + RBAC | M02 Task 8 | closeout evidence | full diff/security/accessibility/YAGNI review | `docs/superpowers/evidence/2026-09-11-m02-organizations-rbac-closeout.md`; 0 Critical / 0 Important | VERIFIED |
 
 ## Active requirement interpretation
 
-All M01 product requirements and provider-backed evidence gates are satisfied on implementation head `7348526cb466a66b907e4c92148b7c6d68daf674`, CI #148. The local Supabase stack is real provider/database execution: the profile migration ran against PostgreSQL, auth email flows used Supabase Auth + Mailpit, and independently authenticated users proved mutual cross-profile denial through PostgREST/RLS. M01 is in integration closeout only: the reconciled documentation head must pass fresh exact-SHA CI, PR review/mergeability must be rechecked, then PR #3 may be auto-merged under the owner's standing authorization and post-merge `main` must be verified before M02 begins.
+M00 and M01 are integrated and verified. M02 implementation and engineering closeout are verified in draft PR #4: organization/membership foundation, fixed RBAC/input validation, onboarding, tenant shell, membership management, secure invitations, bounded settings, real provider-backed Org A/Org B/unauthenticated isolation, responsive/keyboard browser coverage, and final skeptical review are complete. PostgreSQL RLS/RPCs remain authoritative; AI has no authority in tenancy decisions and humans remain hiring decision makers.
+
+The only remaining M02 gates are exact-final-head CI for the closeout-documentation head and the explicit user merge authorization required by repository policy. M03 must not start until PR #4 is merged under that authorization and post-merge `main` CI is green.
 
 ## Expansion rule
 

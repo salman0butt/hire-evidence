@@ -1,128 +1,105 @@
 # M02 — Organizations + RBAC
 
-Status: **NOT STARTED**
+Status: **CLOSEOUT COMPLETE / AWAITING EXPLICIT MERGE AUTHORIZATION**
 
 ## Goal
-Deliver the authoritative PRD milestone below as a reviewable, evidence-backed capability.
+Deliver organization creation, memberships, fixed role-based access, secure invitations, bounded settings, tenant-aware navigation and database-enforced tenant isolation as a reviewable, evidence-backed capability.
 
 ## Authoritative PRD Milestone Definition
-
-# 197. MILESTONE 02 — ORGANIZATIONS + RBAC
-
-Deliver:
-
-```text
-organization creation
-memberships
-owner/admin/recruiter/reviewer roles
-team invitations
-organization settings
-tenant-aware navigation
-RLS
-```
-
-Test two organizations aggressively.
-
-Exit:
-
-tenant isolation verified.
+PRD milestone 197 requires organization creation, memberships, owner/admin/recruiter/reviewer roles, team invitations, organization settings, tenant-aware navigation and RLS, with two organizations tested aggressively and tenant isolation verified. The durable design also includes the explicit `hiring_manager` role.
 
 ## Dependencies
-SaaS Shell + Auth.
+SaaS Shell + Auth — COMPLETE on `main` at `ed10e1b55bb62cf202585c8c50e6487014e83c29`, post-merge CI #157 green.
 
 ## In Scope
-The authoritative definition plus every default iteration listed below.
+PRD sections 8–14, 18–19 and 197; organization bootstrap, memberships, five fixed roles, authoritative RLS/RPCs, onboarding, tenant shell, bounded membership management, hash-at-rest invitations, organization settings, and real two-organization adversarial verification.
 
 ## Out of Scope
-Later milestones, speculative abstractions, and behavior not justified by the PRD.
+Ownership transfer, arbitrary permission editors, service-role browser authorization, billing/branding/retention, email-provider integration solely for invitations, and later product milestones.
 
-## Architecture Notes
-Tenant-owned data is organization-scoped. Authorization combines explicit role/capability checks with database RLS; tests must prove Org A cannot read or mutate Org B.
-
-## Selected Design / Implementation Plan
-- Not created yet. On activation, recover requirements, use Superpowers brainstorming/design, write an executable plan, and record the selected paths here.
+## Selected Design / Plan
+- Design: `docs/superpowers/specs/2026-09-11-organizations-rbac-design.md`.
+- Plan: `docs/superpowers/plans/2026-09-11-organizations-rbac.md`.
+- PostgreSQL RLS/RPC authority is security-critical; TypeScript capabilities are UX/preflight only.
+- Tenant context is URL-scoped under `/app/o/[organizationId]` and route IDs never grant authorization.
 
 ## Acceptance Criteria
 - PRD deliverables and exit criteria pass.
-- All required iterations are complete or explicitly resolved.
-- Relevant security/privacy/tenancy/accessibility/performance/AI-safety gates pass.
+- Org A vs Org B vs unauthenticated isolation is proven against real local Supabase.
+- Fixed role restrictions and owner-preservation invariants are verified.
+- Invitation abuse cases are verified and raw tokens are not persisted.
+- Relevant security/accessibility/performance gates pass.
 - 0 unresolved Critical or Important review findings.
 - Traceability and feature state are reconciled.
-- Exact-final-head CI is green.
+- Exact-final-head CI is green before any completion claim or merge.
 
 ## Tasks / Iterations
-1. **NOT STARTED** — M02.1 — Organization schema: organizations + memberships.
-2. **NOT STARTED** — M02.2 — Explicit RBAC: owner/admin/recruiter/hiring-manager/reviewer capabilities.
-3. **NOT STARTED** — M02.3 — RLS policies: tenant-owned read/write isolation.
-4. **NOT STARTED** — M02.4 — Organization UI/navigation: onboarding and tenant-aware shell.
-5. **NOT STARTED** — M02.5 — Team invitations: secure invitation lifecycle/roles/expiry.
-6. **NOT STARTED** — M02.6 — Organization settings: bounded MVP settings.
-7. **NOT STARTED** — M02.7 — Adversarial tenancy verification: Org A vs Org B vs unauthenticated direct API attempts.
+1. **VERIFIED SLICE** — M02.1 organization schema + memberships. CI #161.
+2. **VERIFIED SLICE** — M02.2 fixed RBAC + validation. RED #162 → GREEN #163.
+3. **VERIFIED SLICE** — M02.3 onboarding. RED #165; build defect #167; fix #168 green.
+4. **VERIFIED SLICE** — M02.4 tenant shell/navigation. RED #169 → GREEN #170.
+5. **VERIFIED SLICE** — M02.5 membership management + owner invariants. Final `fa7a996d19d790e87fb7123cb0071910424ea3a9`, CI #190.
+6. **VERIFIED SLICE** — M02.6 secure invitations. Final `5abee48be6236e5616941d9ced73515628199e38`, CI #215.
+7. **VERIFIED SLICE** — M02.7 bounded settings. RED `8a080819ef387fbbdcfad34cd0a9802b2d9974ea` / #217 → GREEN `43b7c23122ec775253bbca0e38b701a694545205` / #218.
+8. **CLOSEOUT VERIFIED** — provider-backed isolation verified at `3e0c35557a8cd21e9a223909753a6fdf412d2557`, CI #219; responsive/keyboard browser coverage fixed and fully green by exact reviewed head `fd8907cf20498466c2d62cb1b12abd29eb584686`, CI #224 / `34610615757`; whole-milestone review complete with 0 Critical and 0 Important findings.
 
 ## TDD Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+- Task 1 RED `6db6188d…` → GREEN `881f786c…`; CI #161.
+- Task 2 RED `6c2719c9…` → GREEN `ed9b3d52…`; CI #163.
+- Task 3 RED `955ea259…`; build root-cause fix `b817f49a…`; CI #168.
+- Task 4 RED `6a47c0ee…` → GREEN `709993dd…`; CI #170.
+- Task 5 RED `80506379…` / `35b83c95…`; final `fa7a996d…`; CI #190.
+- Task 6 secure invitations culminated at `5abee48b…`; CI #215.
+- Task 7 RED `8a080819…` / #217 reported missing settings production modules/export; GREEN `43b7c231…` / #218 passed all gates.
+- Final browser closeout defect: CI #222 reproduced Playwright substring matching on `Team` vs `Invite teammate`; minimal exact-heading fix `62301204…` was verified green in CI #224.
 
 ## Integration Test Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+`e2e/organizations.spec.ts` uses independently authenticated users against the CI local Supabase instance and verifies owner A/B visibility boundaries, cross-tenant membership/invitation non-exposure, direct cross-tenant update denial, authorized owner settings update, recruiter settings/invite/role denial, cross-org membership RPC denial, and unauthenticated non-exposure. Exact isolation head `3e0c35557a8cd21e9a223909753a6fdf412d2557` passed CI `34608235065` / #219.
 
-## E2E / Visual Verification
-PENDING — define milestone-specific browser/realtime/visual scenarios before closeout where applicable.
+`e2e/organization-ui.spec.ts` provides the plan-specific desktop and 390×844 browser matrix for tenant navigation, team, invitation and settings surfaces, including no-horizontal-overflow assertions and keyboard progression. Reviewed head `fd8907cf20498466c2d62cb1b12abd29eb584686` passed CI #224 / `34610615757` including Chromium E2E.
 
 ## Security Review
-PENDING — cover auth/authz, tenant isolation, untrusted input, secrets, data exposure, injection and milestone-specific threats.
+Final whole-milestone review is recorded in `docs/superpowers/evidence/2026-09-11-m02-organizations-rbac-closeout.md`.
 
-## Accessibility Review
-PENDING where UI exists — keyboard, focus, semantics, labels, status/error states, responsive and assistive-technology paths.
+RLS and authenticated `SECURITY DEFINER` RPCs remain authoritative. Membership writes are narrow RPC operations; owner membership is immutable and owner cannot be assigned. Invitation raw tokens are never persisted and acceptance is verified-email-bound, expiring, revocable and replay-protected. Settings UPDATE is column-limited and owner/admin RLS protected. Local service-role credentials are used only by provider-backed E2E setup/inspection, never as browser authorization. No AI authorization, autonomous hire/reject behavior, sensitive-trait inference or fabricated evidence is introduced.
 
-## Performance Review
-PENDING where relevant — bounded work, pagination, resource limits, retries and hot-path cost.
+Review result: Critical 0 unresolved; Important 0 unresolved.
 
-## AI / Eval Review
-AI has no authority to bypass tenancy or role policies.
+## Accessibility / Responsive Review
+Unit/component coverage verifies semantic labels, guidance, status/alert messaging and read-only settings behavior. Dedicated desktop and 390×844 Playwright coverage verifies keyboard traversal and horizontal-overflow behavior for tenant navigation, team/invitation and settings surfaces. CI #224 passed.
+
+## Performance / YAGNI Review
+Organization reads are tenant-bounded, writes are narrow, and no speculative permission engine, ownership-transfer workflow, background worker, provider abstraction, email integration or service decomposition was introduced.
 
 ## Code Review Findings
-None yet; milestone has not started.
-
-## Fixes / Re-review
-PENDING when evidence-backed findings exist.
-
-## Fresh Verification Commands
-Run repository-wide verification plus milestone-specific tests. Baseline:
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm e2e
-python3 scripts/verify_autonomous_framework.py
-python3 scripts/verify_prd_coverage.py
-```
+Current skeptical self-review plus GitHub PR inspection: Critical 0 unresolved; Important 0 unresolved. PR #4 has no submitted reviews and no unresolved review threads at the closeout review.
 
 ## Fresh Verification Results
-PENDING — milestone has not started.
-
-## Commits / Files Changed
-None yet.
-
-## Known Limitations
-Milestone is NOT STARTED; implementation-specific limitations are not yet known.
-
-## Documentation Updated
-This living ledger must be reconciled whenever milestone state/evidence changes.
+- Settings implementation `43b7c23122ec775253bbca0e38b701a694545205`: CI #218 PASS.
+- Tenant isolation `3e0c35557a8cd21e9a223909753a6fdf412d2557`: CI #219 PASS.
+- Responsive/keyboard reviewed head `fd8907cf20498466c2d62cb1b12abd29eb584686`: CI #224 / `34610615757` PASS across frozen install, lint, typecheck, unit/component tests, framework/source checks, local Supabase, production build, Chromium E2E, PRD coverage and teardown.
+- Closeout documentation commits after `fd8907cf…` require a fresh exact-final-head CI before the PR is declared merge-ready.
 
 ## Durable Recovery Sources
-`AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → relevant PRD → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
+Recover actual GitHub state first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md`, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, this ledger, `docs/requirements/TRACEABILITY.md`, the M02 design/plan/closeout evidence, PR #4, exact-head CI, current source and tests. Actual Git graph/source/tests/exact-SHA CI outrank prose.
+
+## Known Limitations
+No known Critical/Important implementation issue remains. The milestone is intentionally not merged because repository policy requires explicit user authorization. M03 must not begin before that merge and green post-merge `main` CI.
 
 ## Completion Checklist
-- [ ] Requirements and iterations accounted for.
-- [ ] Acceptance criteria verified.
-- [ ] Required TDD/integration/E2E evidence recorded.
-- [ ] Security/accessibility/performance/AI-eval reviews complete where relevant.
-- [ ] 0 Critical / 0 Important findings.
-- [ ] Traceability/feature matrix reconciled.
-- [ ] Exact-final-head CI green.
-- [ ] Durable status/closeout state current.
+- [x] Design/spec and plan durable.
+- [x] Organization/membership foundation verified.
+- [x] Fixed RBAC and validation verified.
+- [x] Onboarding and tenant shell verified.
+- [x] Membership management and owner invariants verified.
+- [x] Secure invitations verified.
+- [x] Bounded organization settings verified.
+- [x] Real Org A/Org B/unauthenticated isolation verified.
+- [x] Dedicated responsive/keyboard browser matrix green on reviewed exact head.
+- [x] Final whole-milestone skeptical review complete with 0 Critical / 0 Important.
+- [x] Final traceability/feature closeout reconciled in this closeout series.
+- [ ] Exact-final-head CI green after the documentation closeout series.
+- [x] PR remains unmerged until explicit user authorization.
 
 ## Next Milestone
-M03 — Jobs + Interviewer Builder.
+M03 — Jobs + Interviewer Builder, only after explicit merge authorization, PR #4 merge, and green post-merge `main` CI.

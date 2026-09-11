@@ -4,32 +4,30 @@ Only unresolved or materially relevant issues belong here.
 
 ## Resolved foundation and M01 issues
 
-Product Foundation requirements durability, dependency reproducibility, requirements-source integrity, and autonomous-framework issues are resolved and integrated on `main` at `64ebeb4f7b2a39fc0557685ef34035650211aad9` with CI #57 green.
+Product Foundation requirements durability, dependency reproducibility, requirements-source integrity and autonomous-framework issues are resolved and integrated on `main` at `64ebeb4f7b2a39fc0557685ef34035650211aad9`, CI #57 green.
 
-M01 resolved issues include Testing Library DOM leakage, overly broad human-decision selectors, environment-contract/test-fixture defects, backslash redirect escape, bounded provider-error verification gaps, durable Supabase token-hash setup documentation, confirmation-route request-origin trust, milestone-ledger reconciliation, forged-profile-owner test coverage, ambiguous Playwright locators, the Vitest/Vite ESM-in-CommonJS configuration-loader warning, missing provider-backed auth evidence, and missing real profile RLS-isolation evidence.
-
-### KI-020 — Provider-backed profile RLS isolation evidence unavailable
-
-Status: RESOLVED. CI `34582926587` / #148 on `7348526cb466a66b907e4c92148b7c6d68daf674` started the real Supabase local stack, reset the database, applied `20260910_create_profiles.sql`, created two independently authenticated users through the product/provider flow, and proved User A/User B mutual cross-profile SELECT/UPDATE denial while preserving each user's own row. Evidence: `docs/superpowers/evidence/2026-09-11-m01-provider-backed-closeout.md`.
-
-### KI-022 — Provider-backed M01 auth E2E evidence unavailable
-
-Status: RESOLVED. CI #148 ran Supabase Auth/PostgREST/Mailpit plus the production Next.js app and passed signup, email confirmation/token exchange, login, logout, forgot/reset password, authenticated `/app`, authenticated `/app/profile`, profile persistence, authenticated narrow-mobile/keyboard evidence, and consumed-confirmation-link safety. Playwright result: 8/8 passed.
-
-### KI-021 — Accessibility browser test used an ambiguous login locator
-
-Status: RESOLVED. Initial M01.7 browser verification `caa82b59ebd85e20b4c02702c85587b6ce7b68cd` failed CI #133 because an unscoped `Log in` locator matched both header and footer login links under Playwright strict mode. `061762ec28a9f95ed97c433f35df8eee060389fe` scoped the intended link through the `banner` landmark; CI #134 passed all gates.
-
-### KI-023 — Vitest configuration loaded as CommonJS while using ESM syntax
-
-Status: RESOLVED. Exact CI #140 reproduced the warning at `vitest.config.ts:1:1`. Root cause was the `.ts` config being interpreted as CommonJS while containing ESM imports. `85ff10741875892e2787631b106cfc48bfad0d5c` renamed the config to `vitest.config.mts` and used `fileURLToPath(new URL("./src", import.meta.url))`; CI #141 passed and the warning disappeared.
+M01 provider-backed authentication/profile/RLS/accessibility evidence is resolved and integrated through PR #3. Final M01 head `b8844130118453e56009284b9498c8357429f1af` passed CI #156, then squash-merged as `ed10e1b55bb62cf202585c8c50e6487014e83c29`; post-merge CI #157 passed.
 
 ## Current unresolved issues
 
-No Critical or Important M01 issue is currently unresolved.
+No Critical or Important M02 implementation issue is currently known. Final whole-milestone security/accessibility/YAGNI review recorded 0 unresolved Critical and 0 unresolved Important findings.
+
+M02 engineering closeout is complete on the reviewed implementation head. The remaining gate is procedural/evidence-only: the closeout documentation series creates a newer branch head that must pass exact-final-head CI before PR readiness is finalized, after which PR #4 must remain unmerged until explicit user authorization.
 
 Supabase logout uses the SDK default session scope. Classification: **Minor / product-semantics decision**; do not alter multi-device logout behavior without an explicit product requirement.
 
 GitHub-hosted CI emits deprecation notices from third-party action runtimes being forced from Node 20 to Node 24, plus transitive runtime deprecation notices. Classification: **Informational/external maintenance**, not an application correctness blocker.
 
-M01 completion is now gated on final durable reconciliation, fresh exact-head CI for that reconciliation, and final PR merge/post-merge-main verification rather than missing provider evidence.
+## Recently resolved M02 execution issues
+
+- Task 3 RED `955ea259…` intentionally failed because onboarding modules were absent; CI #167 exposed a Next.js server-action export defect; root cause fixed in `b817f49a…`, CI #168 green.
+- Task 4 RED `6a47c0ee…` intentionally failed because membership/navigation modules were absent; GREEN `709993dd…`, CI #170.
+- Task 5 began with migration/action RED tests at `80506379…` / `35b83c95…`; final implementation `fa7a996d…`, CI #190.
+- Task 6 secure invitation lifecycle culminated at `5abee48b…`; CI #215 verified hash-at-rest token and abuse protections.
+- Task 7 settings RED `8a080819…` / CI #217 failed for the intended missing production modules/export. GREEN `43b7c231…` / CI #218 passed the complete suite.
+- Provider-backed tenant-isolation verification `3e0c3555…` passed CI `34608235065` / #219, including cross-tenant read/write denial, unauthenticated non-exposure, recruiter mutation denial and authorized owner settings update.
+- Final responsive/keyboard browser run CI #222 failed because Playwright substring matching made the `Team` heading locator ambiguous with `Invite teammate`. Minimal exact-name locator fix `62301204…` resolved the root cause. Reviewed head `fd8907cf…` passed full CI #224 / `34610615757`, including Chromium E2E.
+
+## Merge gate
+
+`AUTO_MERGE=false`. PR #4 must not be merged until the user explicitly authorizes merge in chat. Do not begin M03 until PR #4 is merged under that authorization and post-merge `main` CI is green.

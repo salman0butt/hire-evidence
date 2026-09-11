@@ -63,3 +63,10 @@ test("mobile unauthenticated application entry preserves the internal return pat
 
   expect(hasHorizontalOverflow).toBe(false);
 });
+
+test("organization onboarding is protected from unauthenticated access", async ({ page }) => {
+  await page.goto("/app/organizations/new");
+
+  await expect(page).toHaveURL(/\/auth\/login\?next=\/app$/);
+  await expect(page.getByRole("heading", { name: /log in to hire evidence/i })).toBeVisible();
+});
