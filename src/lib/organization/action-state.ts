@@ -1,5 +1,5 @@
 export type OrganizationActionState = Readonly<{
-  status: "idle" | "error";
+  status: "idle" | "success" | "error";
   message: string | null;
 }>;
 

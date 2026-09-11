@@ -13,6 +13,13 @@ export type OrganizationSummary = Readonly<{
   hiringUseCase: string | null;
 }>;
 
+export type UpdateOrganizationSettingsInput = Readonly<{
+  organizationId: string;
+  name: string;
+  companySize: string | null;
+  hiringUseCase: string | null;
+}>;
+
 export async function createOrganization(
   input: CreateOrganizationInput,
 ): Promise<string> {
@@ -48,4 +55,47 @@ export async function listOrganizations(): Promise<OrganizationSummary[]> {
     companySize: organization.company_size,
     hiringUseCase: organization.hiring_use_case,
   }));
+}
+
+export async function getOrganization(
+  organizationId: string,
+): Promise<OrganizationSummary> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("organizations")
+    .select("id,name,company_size,hiring_use_case")
+    .eq("id", organizationId)
+    .maybeSingle();
+
+  if (error || !data) {
+    throw new Error("Unable to load organization.");
+  }
+
+  return {
+    id: data.id,
+    name: data.name,
+    companySize: data.company_size,
+    hiringUseCase: data.hiring_use_case,
+  };
+}
+
+export async function updateOrganizationSettings(
+  input: UpdateOrganizationSettingsInput,
+): Promise<void> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("organizations")
+    .update({
+      name: input.name,
+      company_size: input.companySize,
+      hiring_use_case: input.hiringUseCase,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", input.organizationId)
+    .select("id")
+    .maybeSingle();
+
+  if (error || data?.id !== input.organizationId) {
+    throw new Error("Unable to update organization settings.");
+  }
 }
