@@ -65,3 +65,23 @@ export async function createCompetencyAction(
   revalidatePath(jobPath(organizationId, jobId));
   return { status: "success", message: "Competency added." };
 }
+
+export async function saveCompetencyRubricAction(
+  organizationId: string,
+  jobId: string,
+  competencyId: string,
+  _previousState: CompetencyActionState,
+  _formData: FormData,
+): Promise<CompetencyActionState> {
+  if (!UUID_PATTERN.test(organizationId)) {
+    return errorState("Choose a valid organization.");
+  }
+  if (!UUID_PATTERN.test(jobId)) {
+    return errorState("Choose a valid job.");
+  }
+  if (!UUID_PATTERN.test(competencyId)) {
+    return errorState("Choose a valid competency.");
+  }
+
+  return errorState("Rubric saving is not available yet.");
+}
