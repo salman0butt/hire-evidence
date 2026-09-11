@@ -51,7 +51,7 @@ describe("organization invitation actions", () => {
     mockedRevokeInvitation.mockResolvedValue(undefined);
   });
 
-  it("creates a normalized non-owner invitation in the route-bound organization", async () => {
+  it("creates a normalized non-owner invitation in the route-bound organization and refreshes the team page", async () => {
     const formData = form({ email: "  Candidate.Team@Example.COM  ", role: "reviewer" });
     formData.set("organization_id", "attacker-selected-organization");
 
@@ -67,6 +67,7 @@ describe("organization invitation actions", () => {
       email: "candidate.team@example.com",
       role: "reviewer",
     });
+    expect(mockedRevalidatePath).toHaveBeenCalledWith(`/app/o/${organizationId}/team`);
     expect(result).toEqual({
       status: "success",
       message: "Invitation link created.",
@@ -97,7 +98,7 @@ describe("organization invitation actions", () => {
     expect(mockedCreateInvitation).not.toHaveBeenCalled();
   });
 
-  it("maps invitation persistence failures to bounded copy", async () => {
+  it("maps invitation persistence failures to bounded copy without refreshing", async () => {
     mockedCreateInvitation.mockRejectedValue(new Error("database policy internals"));
     const result = await createInvitationAction(
       organizationId,
@@ -110,6 +111,7 @@ describe("organization invitation actions", () => {
       message: "We could not create this invitation. Please try again.",
       invitationUrl: null,
     });
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
   });
 
   it("revokes only the route-bound organization's invitation and refreshes the team page", async () => {
