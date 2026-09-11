@@ -72,7 +72,9 @@ jobs:
         env:
           CI: "true"
           NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
-        run: pnpm e2e 2>&1 | tee e2e-output.log
+        run: |
+          set -o pipefail
+          pnpm e2e 2>&1 | tee e2e-output.log
       - name: Upload E2E failure diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
