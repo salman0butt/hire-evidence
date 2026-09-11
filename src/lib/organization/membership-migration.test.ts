@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 const migrationPath = join(
   process.cwd(),
-  "supabase/migrations/20260911_manage_memberships.sql",
+  "supabase/migrations/202609110001_manage_memberships.sql",
 );
 
 function readMigration(): string {
