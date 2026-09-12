@@ -134,6 +134,24 @@ describe("verifyRealtimeMicrophoneAccess", () => {
     expect(stop).toHaveBeenCalledTimes(1);
   });
 
+  it("requests the explicitly selected audio input when one is provided", async () => {
+    const stop = vi.fn();
+    const getUserMedia = vi.fn().mockResolvedValue({
+      getAudioTracks: () => [{ readyState: "live", stop }],
+      getTracks: () => [{ stop }],
+    });
+
+    await expect(
+      verifyRealtimeMicrophoneAccess({ getUserMedia }, "microphone-2"),
+    ).resolves.toEqual({ status: "ready" });
+
+    expect(getUserMedia).toHaveBeenCalledWith({
+      audio: { deviceId: { exact: "microphone-2" } },
+      video: false,
+    });
+    expect(stop).toHaveBeenCalledTimes(1);
+  });
+
   it("fails closed with recoverable permission guidance when acquisition is denied", async () => {
     const getUserMedia = vi.fn().mockRejectedValue(
       Object.assign(new Error("blocked"), { name: "NotAllowedError" }),
