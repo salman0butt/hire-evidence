@@ -75,7 +75,7 @@ Server-authorized realtime setup; short-lived provider credentials; provider-neu
 13. **NOT STARTED** — M05.13 Same-authoritative-attempt reconnect.
 14. **NOT STARTED** — M05.14 Full realtime E2E and closeout.
 
-## TDD / Verification Evidence
+## TDD Evidence
 
 Earlier M05.2–M05.4 evidence remains historically preserved in Git. Key later checkpoints:
 
@@ -94,13 +94,11 @@ Earlier M05.2–M05.4 evidence remains historically preserved in Git. Key later 
 - M05.8 review RED: `a3224b943c5b4613c58b54e0ca3953d97285975f`, CI #622 / `34721926133` — unit test proved the initial helper authorized future planned questions before the current cursor reached them.
 - M05.8 reviewed GREEN: `a184da9ec54aa317fa42c600591be422676797d1`, CI #623 / `34722042401` — current-question-only authority fix; complete repository gate GREEN.
 
-## Current Verification
+## Integration Test Evidence
 
-Latest verified behavioral SHA `a184da9ec54aa317fa42c600591be422676797d1` passed CI #623 / `34722042401`, including frozen dependency install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup/migrations, production build, Chromium E2E, PRD coverage, and cleanup.
+CI #623 / `34722042401` on `a184da9ec54aa317fa42c600591be422676797d1` passed the repository integration gate, including local Supabase startup/migrations, production build, Chromium E2E, and PRD coverage. Earlier M05 integration evidence remains in Git history and the compact status/handoff documents. Full stable multi-turn realtime browser E2E remains an M05.14 closeout requirement.
 
-Documentation reconciliation commits after this behavioral SHA must receive their own exact-head CI before they are treated as final milestone evidence.
-
-## Security / AI-Safety Review
+## Security Review
 
 Implemented M05 work does not create candidate scores or autonomous hire/reject decisions. Candidate speech remains untrusted. Technical failure, microphone/network/provider state, accent, prosody, emotion, protected traits, or infrastructure downtime cannot become negative candidate evidence.
 
@@ -129,6 +127,12 @@ No authoritative realtime provider SDK/configuration exists yet, so provider-spe
 
 M05.9–M05.14 remain required before milestone completion. The stable multi-turn browser exit criterion is not yet satisfied, so PR #7 must remain draft and unmerged.
 
+## Fresh Verification Results
+
+Latest verified behavioral SHA `a184da9ec54aa317fa42c600591be422676797d1` passed CI #623 / `34722042401`, including frozen dependency install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup/migrations, production build, Chromium E2E, PRD coverage, and cleanup.
+
+Documentation reconciliation after that behavioral SHA must receive its own exact-head CI before it is treated as final milestone evidence. The first reconciliation head `2b094e9fbc59ece7de02c31b042c1caa44116d0b`, CI #627 / `34722374737`, was **NOT GREEN** because this ledger had dropped mandatory framework-verifier headings; lint, typecheck, 107 test files / 425 tests, and verifier unit tests passed before `scripts/verify_autonomous_framework.py` rejected the missing headings. The cleanup `supabase stop` failure was downstream because setup was skipped after the verifier failure, not an independent product failure.
+
 ## Fresh Verification Commands
 
 ```bash
@@ -146,6 +150,10 @@ python3 scripts/verify_prd_coverage.py
 ```
 
 plus focused realtime/provider/browser/security tests required by the active unit.
+
+## Durable Recovery Sources
+
+Recover actual Git/GitHub first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md`, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, this ledger, `docs/SESSION-HANDOFF.md`, requirements/traceability records, and the selected M05 design/plan. Actual Git graph, source/tests, and exact-SHA CI outrank stale Markdown.
 
 ## Completion Checklist
 - [ ] Requirements and all M05 iterations accounted for.
