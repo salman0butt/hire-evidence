@@ -84,14 +84,21 @@ describe("RealtimeReadinessCheck", () => {
     expect(runCheck).toHaveBeenCalledTimes(2);
   });
 
-  it("lets the candidate choose an enumerated microphone and explicitly re-checks that device", async () => {
+  it("lets the candidate choose an enumerated microphone and explicitly checks its usable input signal", async () => {
     const runCheck = vi.fn().mockResolvedValue({ status: "ready" as const });
     const listInputs = vi.fn().mockResolvedValue([
       { deviceId: "mic-1", label: "Built-in microphone" },
       { deviceId: "mic-2", label: "USB microphone" },
     ]);
+    const runInputLevelCheck = vi.fn().mockResolvedValue({ status: "ready" as const });
 
-    render(<RealtimeReadinessCheck runCheck={runCheck} listInputs={listInputs} />);
+    render(
+      <RealtimeReadinessCheck
+        runCheck={runCheck}
+        listInputs={listInputs}
+        runInputLevelCheck={runInputLevelCheck}
+      />,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /run microphone check/i }));
 
@@ -100,15 +107,54 @@ describe("RealtimeReadinessCheck", () => {
     expect(screen.getByRole("option", { name: "Built-in microphone" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "USB microphone" })).toBeInTheDocument();
     expect(runCheck).toHaveBeenCalledTimes(1);
-    expect(runCheck).toHaveBeenLastCalledWith(undefined);
+    expect(runInputLevelCheck).not.toHaveBeenCalled();
 
     fireEvent.change(microphoneSelect, { target: { value: "mic-2" } });
     expect(runCheck).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByRole("button", { name: /check selected microphone/i }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent(/ready for the microphone check/i);
-    expect(runCheck).toHaveBeenCalledTimes(2);
-    expect(runCheck).toHaveBeenLastCalledWith("mic-2");
+    expect(await screen.findByRole("status", { name: /microphone input/i })).toHaveTextContent(
+      /microphone input detected/i,
+    );
+    expect(runInputLevelCheck).toHaveBeenCalledTimes(1);
+    expect(runInputLevelCheck).toHaveBeenLastCalledWith("mic-2");
+    expect(runCheck).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a silent selected microphone recoverable and retries the level check", async () => {
+    const runCheck = vi.fn().mockResolvedValue({ status: "ready" as const });
+    const listInputs = vi
+      .fn()
+      .mockResolvedValue([{ deviceId: "mic-1", label: "Built-in microphone" }]);
+    const runInputLevelCheck = vi
+      .fn()
+      .mockResolvedValueOnce({
+        status: "blocked" as const,
+        reason: "microphone-input-silent" as const,
+        recoverable: true,
+      })
+      .mockResolvedValueOnce({ status: "ready" as const });
+
+    render(
+      <RealtimeReadinessCheck
+        runCheck={runCheck}
+        listInputs={listInputs}
+        runInputLevelCheck={runInputLevelCheck}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /run microphone check/i }));
+    await screen.findByRole("combobox", { name: /microphone/i });
+
+    fireEvent.click(screen.getByRole("button", { name: /check selected microphone/i }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(/no usable input was detected/i);
+
+    fireEvent.click(screen.getByRole("button", { name: /retry microphone check/i }));
+    expect(await screen.findByRole("status", { name: /microphone input/i })).toHaveTextContent(
+      /microphone input detected/i,
+    );
+    expect(runInputLevelCheck).toHaveBeenCalledTimes(2);
+    expect(runInputLevelCheck).toHaveBeenLastCalledWith("mic-1");
   });
 });
