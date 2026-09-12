@@ -83,4 +83,32 @@ describe("RealtimeReadinessCheck", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(/ready for the microphone check/i);
     expect(runCheck).toHaveBeenCalledTimes(2);
   });
+
+  it("lets the candidate choose an enumerated microphone and explicitly re-checks that device", async () => {
+    const runCheck = vi.fn().mockResolvedValue({ status: "ready" as const });
+    const listInputs = vi.fn().mockResolvedValue([
+      { deviceId: "mic-1", label: "Built-in microphone" },
+      { deviceId: "mic-2", label: "USB microphone" },
+    ]);
+
+    render(<RealtimeReadinessCheck runCheck={runCheck} listInputs={listInputs} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /run microphone check/i }));
+
+    const microphoneSelect = await screen.findByRole("combobox", { name: /microphone/i });
+    expect(listInputs).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("option", { name: "Built-in microphone" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "USB microphone" })).toBeInTheDocument();
+    expect(runCheck).toHaveBeenCalledTimes(1);
+    expect(runCheck).toHaveBeenLastCalledWith(undefined);
+
+    fireEvent.change(microphoneSelect, { target: { value: "mic-2" } });
+    expect(runCheck).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("button", { name: /check selected microphone/i }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(/ready for the microphone check/i);
+    expect(runCheck).toHaveBeenCalledTimes(2);
+    expect(runCheck).toHaveBeenLastCalledWith("mic-2");
+  });
 });
