@@ -86,7 +86,13 @@ export function createRealtimeAudioCapture(
     };
 
     try {
-      stream = await options.getUserMedia(constraints);
+      const acquiredStream = await options.getUserMedia(constraints);
+      if (currentGeneration !== generation) {
+        acquiredStream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
+      stream = acquiredStream;
       context = options.createAudioContext();
       await context.audioWorklet.addModule(WORKLET_URL);
       source = context.createMediaStreamSource(stream);
@@ -139,7 +145,7 @@ export function createRealtimeAudioCapture(
   }
 
   async function stop() {
-    if (!stream && !context && !source && !workletNode) {
+    if (!startPromise && !stream && !context && !source && !workletNode) {
       return;
     }
 
