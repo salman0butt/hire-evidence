@@ -8,6 +8,8 @@ export type PublicInvitationProjection = Readonly<{
   interviewType: string;
   language: string;
   candidateInstructions: string;
+  candidateSupportEmail: string | null;
+  candidateSupportUrl: string | null;
 }>;
 
 export type PublicInvitationResolution =
@@ -24,12 +26,40 @@ type PublicInvitationRow = Readonly<{
   interview_type?: unknown;
   language?: unknown;
   candidate_instructions?: unknown;
+  candidate_support_email?: unknown;
+  candidate_support_url?: unknown;
 }>;
 
 const unavailable: PublicInvitationResolution = { status: "unavailable" };
+const SUPPORT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+$/;
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && Boolean(value.trim());
+}
+
+function parseOptionalSupportEmail(value: unknown): string | null {
+  if (value == null) return null;
+  if (typeof value !== "string") return null;
+  const normalized = value.trim();
+  return normalized.length <= 254 && SUPPORT_EMAIL_PATTERN.test(normalized)
+    ? normalized
+    : null;
+}
+
+function parseOptionalSupportUrl(value: unknown): string | null {
+  if (value == null) return null;
+  if (typeof value !== "string") return null;
+  const normalized = value.trim();
+  if (!normalized || normalized.length > 2048) return null;
+
+  try {
+    const url = new URL(normalized);
+    return url.protocol === "http:" || url.protocol === "https:"
+      ? normalized
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 function parseProjection(row: PublicInvitationRow): PublicInvitationProjection | null {
@@ -53,6 +83,8 @@ function parseProjection(row: PublicInvitationRow): PublicInvitationProjection |
     interviewType: row.interview_type,
     language: row.language,
     candidateInstructions: row.candidate_instructions,
+    candidateSupportEmail: parseOptionalSupportEmail(row.candidate_support_email),
+    candidateSupportUrl: parseOptionalSupportUrl(row.candidate_support_url),
   };
 }
 

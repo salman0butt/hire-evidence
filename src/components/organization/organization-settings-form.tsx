@@ -17,6 +17,8 @@ type OrganizationSettingsFormProps = Readonly<{
     name: string;
     companySize: string | null;
     hiringUseCase: string | null;
+    candidateSupportEmail?: string | null;
+    candidateSupportUrl?: string | null;
   }>;
   action?: OrganizationAction;
   canUpdate?: boolean;
@@ -122,6 +124,45 @@ export function OrganizationSettingsForm({
           />
           <p id="settings-hiring-use-case-help" className="text-xs leading-5 text-zinc-500">
             Optional. Describe the hiring workflow in 500 characters or fewer.
+          </p>
+        </div>
+
+        <div className="space-y-2 border-t border-zinc-200 pt-5">
+          <label htmlFor="settings-candidate-support-email" className="block text-sm font-medium text-zinc-800">
+            Candidate support email
+          </label>
+          <input
+            id="settings-candidate-support-email"
+            name="candidate_support_email"
+            type="email"
+            maxLength={254}
+            defaultValue={organization.candidateSupportEmail ?? ""}
+            disabled={!canUpdate || pending}
+            autoComplete="email"
+            aria-describedby="settings-candidate-support-email-help"
+            className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 disabled:bg-zinc-100 disabled:text-zinc-600"
+          />
+          <p id="settings-candidate-support-email-help" className="text-xs leading-5 text-zinc-500">
+            Optional. Shown to invited candidates as a trusted contact for accommodation or interview support.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="settings-candidate-support-url" className="block text-sm font-medium text-zinc-800">
+            Candidate support URL
+          </label>
+          <input
+            id="settings-candidate-support-url"
+            name="candidate_support_url"
+            type="url"
+            maxLength={2048}
+            defaultValue={organization.candidateSupportUrl ?? ""}
+            disabled={!canUpdate || pending}
+            aria-describedby="settings-candidate-support-url-help"
+            className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 disabled:bg-zinc-100 disabled:text-zinc-600"
+          />
+          <p id="settings-candidate-support-url-help" className="text-xs leading-5 text-zinc-500">
+            Optional. Use an http or https page controlled by your organization for candidate support.
           </p>
         </div>
 

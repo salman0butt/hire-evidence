@@ -64,6 +64,9 @@ export default async function CandidateInterviewPage({
 
   const preInterviewItems = buildPreInterviewItems(result.invitation);
   const consentAction = recordCandidateConsentAction.bind(null, token);
+  const hasCandidateSupport = Boolean(
+    result.invitation.candidateSupportEmail || result.invitation.candidateSupportUrl,
+  );
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-12 sm:py-16">
@@ -105,6 +108,43 @@ export default async function CandidateInterviewPage({
           ))}
         </dl>
       </section>
+
+      {hasCandidateSupport ? (
+        <section
+          className="mt-10 space-y-4 rounded-2xl border border-slate-200 p-5"
+          aria-labelledby="candidate-support-heading"
+        >
+          <div className="space-y-2">
+            <h2 id="candidate-support-heading" className="text-xl font-semibold">
+              Accommodation or interview support
+            </h2>
+            <p className="text-sm leading-6 text-slate-600">
+              Contact the hiring organization directly if you need an accommodation or
+              interview support. Using these links does not start or change your interview.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {result.invitation.candidateSupportEmail ? (
+              <a
+                href={`mailto:${result.invitation.candidateSupportEmail}`}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-900"
+              >
+                Email interview support
+              </a>
+            ) : null}
+            {result.invitation.candidateSupportUrl ? (
+              <a
+                href={result.invitation.candidateSupportUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-900"
+              >
+                Visit interview support
+              </a>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
       <div className="mt-10">
         <CandidateConsentForm action={consentAction} />

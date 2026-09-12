@@ -11,6 +11,7 @@ import { validateOrganizationInput } from "@/lib/organization/validation";
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const SUPPORT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+$/;
 
 function settingsPath(organizationId: string): string {
   return `/app/o/${organizationId}/settings`;
@@ -24,6 +25,10 @@ function optionalFormText(value: FormDataEntryValue | null): string | null {
   if (typeof value !== "string") return null;
   const normalized = value.trim();
   return normalized || null;
+}
+
+function isValidSupportEmail(value: string): boolean {
+  return value.length <= 254 && SUPPORT_EMAIL_PATTERN.test(value);
 }
 
 function isSafeSupportUrl(value: string): boolean {
@@ -60,6 +65,10 @@ export async function updateOrganizationSettingsAction(
   const candidateSupportUrl = optionalFormText(
     formData.get("candidate_support_url"),
   );
+
+  if (candidateSupportEmail && !isValidSupportEmail(candidateSupportEmail)) {
+    return errorState("Candidate support email must be valid.");
+  }
 
   if (candidateSupportUrl && !isSafeSupportUrl(candidateSupportUrl)) {
     return errorState("Candidate support URL must use http or https.");

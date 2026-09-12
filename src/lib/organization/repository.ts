@@ -11,6 +11,8 @@ export type OrganizationSummary = Readonly<{
   name: string;
   companySize: string | null;
   hiringUseCase: string | null;
+  candidateSupportEmail?: string | null;
+  candidateSupportUrl?: string | null;
 }>;
 
 export type UpdateOrganizationSettingsInput = Readonly<{
@@ -43,7 +45,7 @@ export async function listOrganizations(): Promise<OrganizationSummary[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("organizations")
-    .select("id,name,company_size,hiring_use_case")
+    .select("id,name,company_size,hiring_use_case,candidate_support_email,candidate_support_url")
     .order("name", { ascending: true })
     .order("id", { ascending: true });
 
@@ -56,6 +58,8 @@ export async function listOrganizations(): Promise<OrganizationSummary[]> {
     name: organization.name,
     companySize: organization.company_size,
     hiringUseCase: organization.hiring_use_case,
+    candidateSupportEmail: organization.candidate_support_email,
+    candidateSupportUrl: organization.candidate_support_url,
   }));
 }
 
@@ -65,7 +69,7 @@ export async function getOrganization(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("organizations")
-    .select("id,name,company_size,hiring_use_case")
+    .select("id,name,company_size,hiring_use_case,candidate_support_email,candidate_support_url")
     .eq("id", organizationId)
     .maybeSingle();
 
@@ -78,6 +82,8 @@ export async function getOrganization(
     name: data.name,
     companySize: data.company_size,
     hiringUseCase: data.hiring_use_case,
+    candidateSupportEmail: data.candidate_support_email,
+    candidateSupportUrl: data.candidate_support_url,
   };
 }
 
