@@ -9,7 +9,9 @@ describe("RealtimeAudioCapture", () => {
     const postMessage = vi.fn();
     const connect = vi.fn();
     const disconnect = vi.fn();
-    let workletMessage: ((event: { data: { type: string; pcm?: Float32Array } }) => void) | undefined;
+    let workletMessage:
+      | ((event: { data: { type: string; pcm?: Float32Array; level?: number } }) => void)
+      | undefined;
 
     const stream = {
       getTracks: () => [{ stop: stopTrack }],
