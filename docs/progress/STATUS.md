@@ -14,18 +14,18 @@ Last reconciled: 2026-09-12
 
 Realtime AI Interview — **ACTIVE** on `feat/realtime-ai-interview`.
 
-Active branch: `feat/realtime-ai-interview`
 Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
 Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`, CI #517 / `34692492691` GREEN.
 Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
-CI status: exact implementation head `ac529449ab3a9ad8a87500700995445b66472f98` passed CI #527 / `34693998554` end-to-end: frozen install, lint, typecheck, 95 Vitest files / 358 tests, framework and requirements-source verifiers, autonomous-framework verification, local Supabase migration startup, production build, Chromium E2E, PRD coverage, and cleanup. This status reconciliation creates a newer docs-only head that requires fresh exact-head CI before any integration-readiness claim.
+Latest exact verified branch SHA: `e821c88beec11e76a990b621b57c833cee455e00`, CI #545 / `34698304817` GREEN through frozen install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase migrations, production build, Chromium E2E, PRD coverage, and cleanup.
 
 ## Current Task State
 
-- M05.1 Reference characterization — **VERIFIED**. Talk Tutor pinned at `69b6beee90c8dbd186730389f8a1462c2239fe61`; reusable mechanics and hiring-specific non-reuse/safety decisions are durable in the design.
-- M05.2 Session authorization/provider boundary — **ACTIVE**. Domain authorization is implemented and tested; the authoritative attempt migration/RPC now creates or resumes one invitation-bound attempt, requires active invitation + current disclosure consent + immutable interviewer version, atomically advances the invitation to `started`, stores no raw capability token, exposes no attempt-table grants to browser roles, and returns only the opaque attempt UUID. The API route and short-lived provider-token issuer remain unfinished.
-- M05.3–M05.14 — **NOT STARTED**.
+- M05.1 Reference characterization — **VERIFIED**. Talk Tutor is pinned at `69b6beee90c8dbd186730389f8a1462c2239fe61`; reuse/non-reuse and hiring-safety decisions are durable in the selected design.
+- M05.2 Session authorization/provider boundary — **ACTIVE / PARTIALLY VERIFIED**. Invitation/consent/version authorization, one-authoritative-attempt persistence, hashed capability repository boundary, constant-safe handler, and short-lived provider-token lifetime enforcement are implemented. The actual Next.js route/provider adapter remains intentionally uncomposed because no authoritative realtime provider selection/SDK/config exists; do not guess a vendor merely to close the task.
+- M05.3 Browser compatibility + microphone diagnostics — **ACTIVE**. Pure fail-closed capability diagnostics are RED/GREEN verified; client-side acquisition/input-level/network readiness, accessible diagnostics UI, page integration, keyboard and narrow-viewport verification remain.
+- M05.4–M05.14 — **NOT STARTED**.
 
 ## M05 Safety / Architecture State
 
@@ -35,36 +35,31 @@ CI status: exact implementation head `ac529449ab3a9ad8a87500700995445b66472f98` 
 - Reconnect resumes the same authoritative attempt and cannot reset the plan.
 - Technical failures, microphone/provider/network problems, timeouts, and reconnects must never become negative candidate evidence.
 - M05 creates no candidate score and no autonomous hire/reject decision.
-- No realtime provider SDK is present; provider selection/SDK coupling remains intentionally deferred until justified by authoritative requirements.
+- Provider coupling remains behind an injected boundary until authoritative requirements justify a provider.
 
 ## TDD / Verification Evidence
 
-M05.1 is characterization/design and intentionally has no fabricated behavioral RED/GREEN history.
-
-M05.2 authorization-module RED: `89004863aaa8d5e456d7bed9c9cbd1e1d3f5e0e5`, CI #519 / `34693052261`, failed for the intended missing `session-authorization` implementation. Initial implementation later passed focused tests but needed durable-state verifier repair.
-
-M05.2 persistence RED: `02ed8e228cfd67ee24f6deb1badab4169beb1e6e`, CI #524 / `34693510005`. Lint/typecheck passed; unit tests failed exactly because `supabase/migrations/202609120017_realtime_interview_sessions.sql` did not exist.
-
-M05.2 persistence implementation: `0239ce3054856012b9630ebdcfb5127f5b5509c2` added authoritative attempt persistence and the token-hash/consent/version-bound RPC.
-
-M05.2 security-review RED: `17de3f6f93c25037dbcb9aaa1395a9c623ea9fe0`, CI #526 / `34693860526`. Install/lint/typecheck passed; 357 tests passed and exactly one new regression failed because the anonymous-capable RPC returned a full `interview_attempts` row instead of only an opaque UUID.
-
-M05.2 security fix GREEN: `ac529449ab3a9ad8a87500700995445b66472f98`, CI #527 / `34693998554` — complete repository gate GREEN including Supabase migration application, build, E2E, and PRD coverage.
-
-M04 merge verification: exact `main` SHA `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` passed post-merge CI #517 / `34692492691`.
+- M05.2 authorization RED: `89004863aaa8d5e456d7bed9c9cbd1e1d3f5e0e5`, CI #519 / `34693052261`.
+- M05.2 persistence RED: `02ed8e228cfd67ee24f6deb1badab4169beb1e6e`, CI #524 / `34693510005`.
+- M05.2 security-review RED: `17de3f6f93c25037dbcb9aaa1395a9c623ea9fe0`, CI #526 / `34693860526`.
+- M05.2 security GREEN: `ac529449ab3a9ad8a87500700995445b66472f98`, CI #527 / `34693998554`.
+- M05.2 later provider-neutral route-handler/token/repository work reached `c10a4a888454fe9c3612c869d8c6ba7b7b040cd6`, CI #543 / `34696198083` GREEN across the full repository gate.
+- M05.3 diagnostics RED: `c23a89c66d97c97f8a9be45e135bc8c1d0268950`, CI #544 / `34698263217`; lint passed and typecheck failed exactly because `./diagnostics` did not yet exist. The later Supabase cleanup error was cascading after setup was skipped and was not the RED cause.
+- M05.3 diagnostics GREEN: `e821c88beec11e76a990b621b57c833cee455e00`, CI #545 / `34698304817` — complete repository gate GREEN.
 
 ## Review State
 
 Critical findings: **0 unresolved**.
-Important findings: **0 unresolved** for the implemented attempt-persistence slice. Security review identified one Important exposure (full attempt-row return from an anonymous-capable RPC); it was fixed by returning only the opaque attempt UUID and verified by CI #527.
-M05.2 overall remains active until the server API/provider-token boundary is implemented and reviewed.
+Important findings: **0 unresolved** for implemented M05 slices. The earlier anonymous-capable RPC full-row exposure was fixed by returning only the opaque attempt UUID.
+PR #7 currently has no submitted reviews or unresolved review threads.
 
 ## Blockers
 
-No external blocker for provider-neutral server/API work. Provider-specific SDK integration is not yet justified by authoritative requirements and must not be guessed merely to advance the milestone.
+- M05.2 production provider issuance/route composition requires an authoritative provider choice and associated configuration; none exists in current requirements/source/dependencies. Preserve the provider-neutral boundary rather than inventing one.
+- This does not block independent M05.3 browser-diagnostics work.
 
 ## Durable Recovery
 
 Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M05-realtime-ai-interview.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the selected M05 design/plan.
 
-Exact next work: continue M05.2 with strict TDD for the public realtime-session API/server repository boundary: prove the route returns a constant-safe unavailable response without raw capability/log leakage and returns only the narrow authorized session projection on success; then implement the minimal provider-neutral route/repository wiring and injected short-lived provider-token issuer. Do not advance to M05.3 until M05.2 is genuinely verified.
+Exact next work: continue M05.3 with strict TDD for accessible candidate-facing diagnostics and browser microphone readiness while keeping M05.2 provider selection explicitly unresolved. Do not mark either iteration verified until its full acceptance boundary is complete.
