@@ -190,6 +190,7 @@ describe("job detail page", () => {
     expect(screen.getByText(/Questions: Describe a production incident you owned. — editable — question create connected/)).toBeInTheDocument();
     expect(screen.getByText(/Interview plan: 600s — editable — plan save connected/)).toBeInTheDocument();
     expect(screen.getByText(/Interviewer config: Technical interviewer — plan 55555555-5555-4555-8555-555555555555 — editable — config save connected/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Publish interviewer configuration" })).toBeInTheDocument();
   });
 
   it("renders the same tenant builder data read-only for a reviewer", async () => {
