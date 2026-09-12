@@ -29,7 +29,12 @@ create policy candidates_select_member
 on public.candidates
 for select
 to authenticated
-using (private.is_organization_member(organization_id));
+using (
+  private.has_organization_role(
+    organization_id,
+    array['owner', 'admin', 'recruiter', 'hiring_manager']::public.organization_role[]
+  )
+);
 
 create or replace function public.create_candidate(
   p_organization_id uuid,
