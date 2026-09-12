@@ -62,6 +62,11 @@ export type RealtimeMicrophoneAccessRuntime = Readonly<{
     | undefined;
 }>;
 
+export type RealtimeMicrophoneInputLevelRuntime = RealtimeMicrophoneAccessRuntime &
+  Readonly<{
+    measureInputLevel: (stream: RealtimeMicrophoneStream) => Promise<number>;
+  }>;
+
 export type RealtimeDiagnosticFailureReason =
   | "insecure-context"
   | "network-offline"
@@ -71,7 +76,8 @@ export type RealtimeDiagnosticFailureReason =
   | "audio-worklet-unavailable"
   | "microphone-permission-denied"
   | "microphone-permission-required"
-  | "microphone-input-unavailable";
+  | "microphone-input-unavailable"
+  | "microphone-input-silent";
 
 export type RealtimeDiagnosticResult =
   | Readonly<{ status: "ready" }>
@@ -235,6 +241,32 @@ export function diagnoseRealtimeBrowser(
   return { status: "ready" };
 }
 
+function microphoneConstraints(selectedInputDeviceId?: string) {
+  const audio: RealtimeAudioConstraint = selectedInputDeviceId
+    ? { deviceId: { exact: selectedInputDeviceId } }
+    : true;
+
+  return { audio, video: false } as const;
+}
+
+function microphoneFailure(error: unknown): RealtimeDiagnosticResult {
+  const name = error instanceof Error ? error.name : "";
+
+  if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+    return {
+      status: "blocked",
+      reason: "microphone-permission-denied",
+      recoverable: true,
+    };
+  }
+
+  return {
+    status: "blocked",
+    reason: "microphone-input-unavailable",
+    recoverable: true,
+  };
+}
+
 export async function verifyRealtimeMicrophoneAccess(
   runtime: RealtimeMicrophoneAccessRuntime,
   selectedInputDeviceId?: string,
@@ -250,11 +282,7 @@ export async function verifyRealtimeMicrophoneAccess(
   let stream: RealtimeMicrophoneStream | undefined;
 
   try {
-    const audio: RealtimeAudioConstraint = selectedInputDeviceId
-      ? { deviceId: { exact: selectedInputDeviceId } }
-      : true;
-
-    stream = await runtime.getUserMedia({ audio, video: false });
+    stream = await runtime.getUserMedia(microphoneConstraints(selectedInputDeviceId));
     const hasLiveAudioTrack = stream
       .getAudioTracks()
       .some((track) => track.readyState === undefined || track.readyState === "live");
@@ -269,21 +297,52 @@ export async function verifyRealtimeMicrophoneAccess(
 
     return { status: "ready" };
   } catch (error) {
-    const name = error instanceof Error ? error.name : "";
+    return microphoneFailure(error);
+  } finally {
+    stream?.getTracks().forEach((track) => track.stop());
+  }
+}
 
-    if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+export async function verifyRealtimeMicrophoneInputLevel(
+  runtime: RealtimeMicrophoneInputLevelRuntime,
+  selectedInputDeviceId?: string,
+): Promise<RealtimeDiagnosticResult> {
+  if (!runtime.getUserMedia) {
+    return {
+      status: "blocked",
+      reason: "get-user-media-unavailable",
+      recoverable: false,
+    };
+  }
+
+  let stream: RealtimeMicrophoneStream | undefined;
+
+  try {
+    stream = await runtime.getUserMedia(microphoneConstraints(selectedInputDeviceId));
+    const hasLiveAudioTrack = stream
+      .getAudioTracks()
+      .some((track) => track.readyState === undefined || track.readyState === "live");
+
+    if (!hasLiveAudioTrack) {
       return {
         status: "blocked",
-        reason: "microphone-permission-denied",
+        reason: "microphone-input-unavailable",
         recoverable: true,
       };
     }
 
-    return {
-      status: "blocked",
-      reason: "microphone-input-unavailable",
-      recoverable: true,
-    };
+    const inputLevel = await runtime.measureInputLevel(stream);
+    if (!Number.isFinite(inputLevel) || inputLevel < 0.01) {
+      return {
+        status: "blocked",
+        reason: "microphone-input-silent",
+        recoverable: true,
+      };
+    }
+
+    return { status: "ready" };
+  } catch (error) {
+    return microphoneFailure(error);
   } finally {
     stream?.getTracks().forEach((track) => track.stop());
   }
