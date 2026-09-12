@@ -1,54 +1,36 @@
 # M03 — Jobs + Interviewer Builder
 
-Status: **NOT STARTED**
+Status: **ACTIVE**
 
 ## Goal
-Deliver the authoritative PRD milestone below as a reviewable, evidence-backed capability.
+Deliver tenant-scoped jobs and an interviewer-builder domain that allows an organization to publish an immutable, safety-validated interviewer version.
 
 ## Authoritative PRD Milestone Definition
 
-# 198. MILESTONE 03 — JOBS + INTERVIEWER BUILDER
+Deliver: jobs, job criteria, competencies, rubrics, interview agent builder, persona, guidelines, question bank, interview sections, duration, draft/publish, versioning, preview, plus global guardrail validation.
 
-Deliver:
-
-```text
-jobs
-job criteria
-competencies
-rubrics
-interview agent builder
-persona
-guidelines
-question bank
-interview sections
-duration
-draft/publish
-versioning
-preview
-```
-
-Also global guardrail validation.
-
-Exit:
-
-organization can publish immutable interviewer version.
-
-## Dependencies
-Organizations + RBAC.
+Exit: organization can publish immutable interviewer version.
 
 ## In Scope
-The authoritative definition plus every default iteration listed below.
+
+Tenant-scoped jobs and requirements; job competencies and observable rubrics; question bank; deterministic interview plan; interviewer configuration; non-overridable safety validation; draft/publish state; immutable published versions; non-billable preview; provider-backed tenant/security checks; responsive accessible builder flows.
 
 ## Out of Scope
-Later milestones, speculative abstractions, and behavior not justified by the PRD.
 
-## Architecture Notes
-Versioned domain objects for jobs, competencies, rubrics, questions, interview plans, and interviewer configuration. Published interviewer versions are immutable snapshots; global safety guardrails outrank organization configuration.
+Candidate records/invitations, realtime interview execution, voice/session infrastructure, candidate assessment/scoring, and autonomous hire/reject decisions. Those belong to later milestones.
+
+## Dependencies
+Organizations + RBAC — **COMPLETE** on `main` at `835d7d571a69cd13e3e802be4872e873ffdd34fe`; post-merge CI #232 passed.
 
 ## Selected Design / Implementation Plan
-- Not created yet. On activation, recover requirements, use Superpowers brainstorming/design, write an executable plan, and record the selected paths here.
+
+- Design: `docs/superpowers/specs/2026-09-11-jobs-interviewer-builder-design.md`
+- Plan: `docs/superpowers/plans/2026-09-11-jobs-interviewer-builder.md`
+- Active branch: `feat/jobs-interviewer-builder`
+- Active PR: #5 — `Build jobs and interviewer configuration` — OPEN / DRAFT.
 
 ## Acceptance Criteria
+
 - PRD deliverables and exit criteria pass.
 - All required iterations are complete or explicitly resolved.
 - Relevant security/privacy/tenancy/accessibility/performance/AI-safety gates pass.
@@ -57,82 +39,108 @@ Versioned domain objects for jobs, competencies, rubrics, questions, interview p
 - Exact-final-head CI is green.
 
 ## Tasks / Iterations
-1. **NOT STARTED** — M03.1 — Jobs: CRUD, description, requirements, seniority and role metadata.
-2. **NOT STARTED** — M03.2 — Competencies: explicit job-related competency model.
-3. **NOT STARTED** — M03.3 — Rubrics: 1–5 observable evidence definitions, weights and validation.
-4. **NOT STARTED** — M03.4 — Question bank: questions, competency links, difficulty, expected areas, limits.
-5. **NOT STARTED** — M03.5 — Interview plan: deterministic sections, duration budgets, question coverage.
-6. **NOT STARTED** — M03.6 — Interviewer configuration: persona, language, type, guidelines and follow-up policy.
-7. **NOT STARTED** — M03.7 — Guardrail validation: reject prohibited/discriminatory configuration.
-8. **NOT STARTED** — M03.8 — Draft/publish: state transitions and validation.
-9. **NOT STARTED** — M03.9 — Immutable versioning: interviewer/rubric/prompt snapshots.
-10. **NOT STARTED** — M03.10 — Preview: simulated/non-billable preview workflow.
-11. **NOT STARTED** — M03.11 — Builder E2E: create job → configure → validate → publish immutable version.
+
+1. **VERIFIED SLICE** — M03.1 Jobs + Requirements.
+2. **VERIFIED SLICE** — M03.2 Competency Model. Exact implementation head `18504de66a11ea6f5944fae4cf2c2522ca5f7c88`, CI #292 / `34647354026`.
+3. **VERIFIED SLICE** — M03.3 Observable 1–5 Rubrics. Provider-backed head `b6607a5a9ad72dea585ac2af4cf374e3d319883d`, CI #301 / `34649940346`.
+4. **VERIFIED SLICE** — M03.4 Question Bank. Provider-backed security head `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`, CI #330 / `34657330228`.
+5. **VERIFIED SLICE** — M03.5 Deterministic Interview Plan. Validation, tenant/job-bound persistence, atomic fixed-role save authority, typed repository, route-bound action/editor, and provider-backed role/tenant/job isolation are present. Exact fully verified head `332caa332b1a6b978860f54f15227ce4d82b385d`, CI #358 / `34665349746`.
+6. **ACTIVE / PARTIALLY VERIFIED** — M03.6 Interviewer Configuration. Bounded configuration validation, tenant/job/plan-bound draft persistence, member-read RLS, fixed-role save authority, and the typed repository implementation are present. Route-bound action/editor/provider-backed isolation remain. Repository GREEN candidate `706822e7103fe16bdbe034bcc27e3dff96130f93`, CI #368 / `34667282268`, passed all 241 tests but is **NOT GREEN** because durable-document framework markers were missing; this reconciliation repairs them and requires fresh exact-head CI.
+7. **NOT STARTED** — M03.7 Guardrail Validation.
+8. **NOT STARTED** — M03.8 Draft / Publish.
+9. **NOT STARTED** — M03.9 Immutable Versioning.
+10. **NOT STARTED** — M03.10 Preview.
+11. **NOT STARTED** — M03.11 Builder E2E closeout.
 
 ## TDD Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+
+### M03.5 deterministic plan closeout
+
+- Fully verified implementation/provider-backed head: `332caa332b1a6b978860f54f15227ce4d82b385d`, CI #358 / `34665349746` PASS across the complete repository quality gate.
+- The verified slice includes route-bound save action, accessible ordered editor, page wiring, fixed-role mutation, member reads, and provider-backed cross-tenant/cross-job/anonymous isolation.
+
+### M03.6 interviewer configuration validation
+
+- RED: `2e8a88fc452d80bfa4ea59bbbc1f2cb1eb89829a`, CI #359 / `34666412220`. Install/lint/typecheck passed; 229 unrelated tests passed; only four new configuration-validation tests failed with `ERR_MODULE_NOT_FOUND` because the implementation was intentionally absent.
+- GREEN: `7ae46568e458f5efb3447707602ee1c77e750c04`, CI #360 / `34666523775`. Bounded interviewer type/persona/language/duration/difficulty/question strategy/guidelines/candidate-instructions/follow-up validation landed and the full repository quality gate passed.
+
+### M03.6 interviewer configuration persistence
+
+- RED: `73063d7029038924468dc9e27fc994a53abb5fdd`, CI #361 / `34666780326`. Install/lint/typecheck passed; 233 unrelated tests passed; only four migration-contract tests failed because `supabase/migrations/202609120005_create_interviewer_configs.sql` was intentionally absent.
+- GREEN: `dce42df18176a00e5c33f910332c276245de5ac5`, CI #362 / `34666866674`. Tenant/job/plan-bound configuration persistence, database bounds, member-read RLS and fixed-role `save_interviewer_config` security-definer mutation landed. Full repository quality gate passed including real local-Supabase migration application, build and Chromium E2E.
+
+### M03.6 interviewer configuration repository
+
+- RED: `db44948825449811a1f45dfb2a6bcdc40be6e7e9`, CI #367 / `34667166600`. Install/lint/typecheck passed; 237 unrelated tests passed; only the four new repository tests failed with `ERR_MODULE_NOT_FOUND` because `src/lib/interviewer/interviewer-configs.ts` was intentionally absent.
+- GREEN candidate: `706822e7103fe16bdbe034bcc27e3dff96130f93`, CI #368 / `34667282268`. All 241 tests passed, including the four new repository tests. This candidate is explicitly **NOT GREEN** because `scripts/verify_autonomous_framework.py` failed after tests: `docs/progress/STATUS.md` lacked `CI status:` and this ledger lacked `## Integration Test Evidence`. No behavioral/code failure was present; exact-head CI after marker repair is required.
+
+## Integration / E2E Evidence
+
+- `e2e/jobs.spec.ts` proves real local-Supabase job tenant and role boundaries.
+- `e2e/competencies.spec.ts` proves competency tenant and fixed-role authority.
+- `e2e/rubrics.spec.ts` proves rubric tenant and mutation authority.
+- `e2e/questions.spec.ts` proves question fixed-role, tenant, job and competency boundaries.
+- `e2e/interview-plans.spec.ts` proves deterministic-plan fixed-role mutation, member read, tenant/job isolation and anonymous denial.
+- Dedicated provider-backed interviewer-configuration role/tenant/job/plan abuse coverage remains required before M03.6 closeout.
 
 ## Integration Test Evidence
-PENDING — milestone has not started. Never fabricate evidence.
 
-## E2E / Visual Verification
-PENDING — define milestone-specific browser/realtime/visual scenarios before closeout where applicable.
+- M03.1–M03.5 retain provider-backed local-Supabase integration/E2E evidence as listed above.
+- M03.6 persistence was applied successfully to real local Supabase at `dce42df18176a00e5c33f910332c276245de5ac5`, CI #362 / `34666866674`.
+- Dedicated M03.6 configuration authorization/isolation E2E remains pending; no provider-backed claim is made for that unfinished behavior.
 
 ## Security Review
-PENDING — cover auth/authz, tenant isolation, untrusted input, secrets, data exposure, injection and milestone-specific threats.
+
+M03.6 configuration rows are organization-owned and constrained to the same job and deterministic plan through composite foreign keys. Authenticated members receive read-only RLS access; direct authenticated mutation is not granted. Draft mutation is exposed only through a fixed-role authenticated security-definer RPC for owner/admin/recruiter/hiring-manager. Organization-authored guidelines remain untrusted and M03.7 must enforce global non-overridable policy. Critical: 0 unresolved. Important: 0 unresolved in the currently reviewed M03.6 validation/persistence/repository scope.
 
 ## Accessibility Review
-PENDING where UI exists — keyboard, focus, semantics, labels, status/error states, responsive and assistive-technology paths.
+
+M03.1–M03.5 authoring surfaces are labelled/component-tested. M03.6 editor does not exist yet, so no M03.6 accessibility/browser claim is made beyond existing regression E2E.
 
 ## Performance Review
-PENDING where relevant — bounded work, pagination, resource limits, retries and hot-path cost.
+
+Current M03 persistence/repository operations remain bounded and indexed without an identified material performance blocker. Milestone-wide performance review remains pending.
 
 ## AI / Eval Review
-Prompt/persona configuration is bounded by platform safety policy. No configuration may enable protected-trait, appearance, emotion, accent, personality, deception, or autonomous hiring judgments.
+
+No model-generated hiring criteria or questions become authoritative. Organization-authored configuration remains untrusted. M03.7 must reject protected-trait, appearance, emotion, accent, deception, medical/family/political/religious and autonomous hire/reject criteria, with platform policy outranking organization text.
 
 ## Code Review Findings
-None yet; milestone has not started.
 
-## Fixes / Re-review
-PENDING when evidence-backed findings exist.
-
-## Fresh Verification Commands
-Run repository-wide verification plus milestone-specific tests. Baseline:
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm e2e
-python3 scripts/verify_autonomous_framework.py
-python3 scripts/verify_prd_coverage.py
-```
+- Resolved prior M03.1 Important finding: requirement ordering uniqueness.
+- M03.5 verified scope has 0 known unresolved Critical and 0 known unresolved Important findings.
+- Current M03.6 validation/persistence/repository inspection has 0 known unresolved Critical and 0 known unresolved Important findings.
+- Do not mark M03.6 verified until route-bound action/editor behavior and provider-backed authorization/isolation are proven.
 
 ## Fresh Verification Results
-PENDING — milestone has not started.
 
-## Commits / Files Changed
-None yet.
+- M03.5 final verified slice: `332caa332b1a6b978860f54f15227ce4d82b385d`, CI #358 / `34665349746` PASS.
+- M03.6 validation GREEN: `7ae46568e458f5efb3447707602ee1c77e750c04`, CI #360 / `34666523775` PASS.
+- M03.6 persistence GREEN: `dce42df18176a00e5c33f910332c276245de5ac5`, CI #362 / `34666866674` PASS across the complete repository quality gate.
+- M03.6 repository candidate `706822e7103fe16bdbe034bcc27e3dff96130f93`, CI #368 / `34667282268`: all tests PASS but overall **NOT GREEN** due only to missing mandatory documentation markers; fresh repaired-head CI is required.
 
 ## Known Limitations
-Milestone is NOT STARTED; implementation-specific limitations are not yet known.
 
-## Documentation Updated
-This living ledger must be reconciled whenever milestone state/evidence changes.
+M03.6 action/editor/provider-backed E2E and M03.7–M03.11 remain incomplete. PR #5 must remain draft/unmerged. Full milestone accessibility/performance/security/AI-safety review and immutable publish/preview closeout remain pending.
 
 ## Durable Recovery Sources
-`AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → relevant PRD → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
+
+Recover actual GitHub state first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md`, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, this ledger, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the active M03 design/plan before writing.
 
 ## Completion Checklist
-- [ ] Requirements and iterations accounted for.
-- [ ] Acceptance criteria verified.
-- [ ] Required TDD/integration/E2E evidence recorded.
-- [ ] Security/accessibility/performance/AI-eval reviews complete where relevant.
-- [ ] 0 Critical / 0 Important findings.
+
+- [ ] Requirements and all M03 iterations accounted for.
+- [ ] Milestone acceptance criteria verified.
+- [ ] Required TDD/integration/E2E evidence complete.
+- [ ] Security/accessibility/performance/AI-safety reviews complete.
+- [ ] 0 Critical / 0 Important findings milestone-wide.
 - [ ] Traceability/feature matrix reconciled.
 - [ ] Exact-final-head CI green.
-- [ ] Durable status/closeout state current.
+- [ ] Durable closeout state current.
+
+## Exact Next Work
+
+Verify the documentation-repaired exact head. Once GREEN, continue M03.6 with a genuine RED for the route-bound interviewer-configuration action. After action GREEN, implement the accessible editor/page wiring and provider-backed role/tenant/job/plan isolation before marking M03.6 verified.
 
 ## Next Milestone
-M04 — Candidates + Invitations.
+M04 — Candidates + Invitations, only after M03 is genuinely complete and merged with post-merge `main` verification.

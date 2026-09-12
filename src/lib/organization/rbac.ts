@@ -33,6 +33,8 @@ export const ORGANIZATION_CAPABILITIES = [
   "team:view",
   "team:invite",
   "team:manage_roles",
+  "jobs:view",
+  "jobs:manage",
 ] as const;
 
 export type OrganizationCapability =
@@ -41,6 +43,12 @@ export type OrganizationCapability =
 const MEMBER_CAPABILITIES = new Set<OrganizationCapability>([
   "organization:view",
   "team:view",
+  "jobs:view",
+]);
+
+const JOB_MANAGER_ROLES = new Set<OrganizationRole>([
+  "recruiter",
+  "hiring_manager",
 ]);
 
 export function hasOrganizationCapability(
@@ -48,6 +56,10 @@ export function hasOrganizationCapability(
   capability: OrganizationCapability,
 ): boolean {
   if (role === "owner" || role === "admin") {
+    return true;
+  }
+
+  if (JOB_MANAGER_ROLES.has(role) && capability === "jobs:manage") {
     return true;
   }
 
