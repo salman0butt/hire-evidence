@@ -33,6 +33,7 @@ export default async function JobPage({ params }: JobPageProps) {
     getInterviewPlan(organizationId, jobId),
   ]);
   const canManage = hasOrganizationCapability(context.role, "jobs:manage");
+  const initialPlanProps = interviewPlan ? { initialPlan: interviewPlan } : {};
 
   return (
     <div className="space-y-10">
@@ -71,7 +72,7 @@ export default async function JobPage({ params }: JobPageProps) {
           questions={questions}
           competencies={competencies}
           maxTotalDurationSeconds={MAX_INTERVIEW_DURATION_SECONDS}
-          initialPlan={interviewPlan ?? undefined}
+          {...initialPlanProps}
           action={saveInterviewPlanAction.bind(null, organizationId, jobId)}
         />
       ) : (
@@ -79,7 +80,7 @@ export default async function JobPage({ params }: JobPageProps) {
           questions={questions}
           competencies={competencies}
           maxTotalDurationSeconds={MAX_INTERVIEW_DURATION_SECONDS}
-          initialPlan={interviewPlan ?? undefined}
+          {...initialPlanProps}
           readOnly
         />
       )}
