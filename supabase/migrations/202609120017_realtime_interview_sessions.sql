@@ -25,6 +25,57 @@ alter table public.interview_attempts enable row level security;
 revoke all on table public.interview_attempts from anon;
 revoke all on table public.interview_attempts from authenticated;
 
+create or replace function public.resolve_realtime_candidate_session(
+  p_token_hash text
+)
+returns table (
+  invitation_id uuid,
+  candidate_id uuid,
+  interviewer_version_id uuid,
+  duration_seconds integer,
+  language text,
+  lifecycle text,
+  has_current_consent boolean
+)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select
+    invitation.id as invitation_id,
+    invitation.candidate_id,
+    invitation.interviewer_version_id,
+    nullif(interviewer_version.snapshot -> 'interviewer_config' ->> 'duration_seconds', '')::integer as duration_seconds,
+    interviewer_version.snapshot -> 'interviewer_config' ->> 'language' as language,
+    invitation.state as lifecycle,
+    exists (
+      select 1
+      from public.candidate_consent_events consent
+      where consent.invitation_id = invitation.id
+        and consent.disclosure_version = 'candidate-interview-v1'
+        and consent.disclosure_categories @> array[
+          'ai_assisted',
+          'transcription',
+          'data_processing',
+          'retention'
+        ]::text[]
+    ) as has_current_consent
+  from public.candidate_invitations invitation
+  join public.interviewer_versions interviewer_version
+    on interviewer_version.id = invitation.interviewer_version_id
+   and interviewer_version.job_id = invitation.job_id
+   and interviewer_version.organization_id = invitation.organization_id
+  where invitation.token_hash = p_token_hash
+    and invitation.expires_at > now()
+    and invitation.revoked_at is null
+    and invitation.state in ('sent', 'opened', 'started')
+  limit 1;
+$$;
+
+revoke all on function public.resolve_realtime_candidate_session(text) from public;
+grant execute on function public.resolve_realtime_candidate_session(text) to anon, authenticated;
+
 create or replace function public.authorize_realtime_interview_session(
   p_token_hash text
 )
