@@ -1,6 +1,6 @@
 # Project Status
 
-Last reconciled: 2026-09-12
+Last reconciled: 2026-09-13
 
 ## Completed Milestones
 
@@ -17,7 +17,9 @@ Realtime AI Interview — **ACTIVE**.
 Active branch: `feat/realtime-ai-interview`
 Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
 Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
-Latest verified behavioral head: `9982d75f02fb6911162d60cec98581441ecf704b`, CI #603 / `34710723994` — full repository gate GREEN.
+Latest verified behavioral head before M05.5: `9982d75f02fb6911162d60cec98581441ecf704b`, CI #603 / `34710723994` — full repository gate GREEN.
+Current branch head before this reconciliation: `c6401b8bb4a14f30b6bc02ac386168fa2d499474`.
+CI status: CI #609 / `34718728708` reached GREEN lint, typecheck, all 409 unit/component tests, and verifier unit tests; it failed only because this status document lacked the framework-required literal `CI status:` field. Full exact-head verification remains pending after this documentation repair.
 
 Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
@@ -28,7 +30,7 @@ Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 - M05.2 Session authorization/provider boundary — **ACTIVE / PARTIALLY VERIFIED**. Invitation/consent/version authorization, one-authoritative-attempt persistence, hashed capability boundaries, and token lifetime enforcement exist. Provider-specific production credential issuance/adapter composition remains intentionally unresolved because no authoritative realtime provider is selected.
 - M05.3 Browser compatibility + microphone diagnostics — **VERIFIED**. Secure-context/media/getUserMedia/AudioContext/AudioWorklet/permission/network diagnostics, explicit acquisition/cleanup, privacy-preserving audio-input enumeration and candidate selection, selected-device checks, usable input-level readiness, accessible status/recovery UI, candidate-page integration, keyboard-focus semantics, and narrow-viewport/no-overflow browser verification are covered.
 - M05.4 Deterministic Web Audio capture — **VERIFIED**. Selected mono input acquisition, AudioWorklet PCM flow, mute, generation-scoped callback rejection, idempotent stop, one-time track/node/context cleanup, and input-level reset are covered.
-- M05.5 Provider-neutral realtime transport — **ACTIVE / NEXT**. Implement normalized app-owned transport + deterministic fake transport. Do not invent a provider adapter.
+- M05.5 Provider-neutral realtime transport — **ACTIVE / GREEN BEHAVIOR, FULL CI PENDING**. App-owned normalized transport lifecycle, open-only audio send, stale callback rejection, idempotent disconnect, normalized technical errors, and a deterministic fake adapter are implemented. Provider-specific adapter work remains blocked pending authoritative provider selection.
 - M05.6–M05.14 — **NOT STARTED**.
 
 ## TDD / Verification Evidence
@@ -41,21 +43,23 @@ Current closeout evidence:
 - M05.4 GREEN: `4b5260bc1dfd4b4e726784d306562e60b12b814c`, CI #601 / `34710176595` — complete repository gate GREEN.
 - M05.4 regression coverage: `3cb6776411e345bb1f7bf8ccc078f23cac6ea389`, CI #602 / `34710451680` — mute, stale callbacks, repeated stop/resource release; complete repository gate GREEN.
 - M05.3 keyboard closeout: `9982d75f02fb6911162d60cec98581441ecf704b`, CI #603 / `34710723994` — technical-check trigger is explicitly focusable; full gate including existing 390px candidate E2E GREEN.
+- M05.5 RED checkpoint: `2e1569cdac314884d5f56af837360dd300e57bd7`, CI #608 / `34711135700` — typecheck failed because the transport contract test intentionally imported the missing `./transport` module.
+- M05.5 implementation checkpoint: `c6401b8bb4a14f30b6bc02ac386168fa2d499474`, CI #609 / `34718728708` — lint/typecheck and all 409 tests passed, including `transport.test.ts`; repository framework verification then exposed stale durable-state formatting (`CI status:` missing), so this is not yet final GREEN evidence.
 
 ## Review State
 
 Critical findings: **0 unresolved** for implemented M05 slices.
 Important findings: **0 unresolved** for implemented M05 slices.
-PR #7 had no unresolved review threads at the latest recovery check.
-Task 4 self-review found no Critical/Important issue in cleanup, stale-generation, mute, security, evidence-integrity, or resource-lifecycle behavior.
+PR #7 has no unresolved review threads at this recovery.
+Transport review: lifecycle gating and stale-generation filtering are app-owned; provider failures emit neutral technical events; no candidate evidence/scoring behavior is introduced; provider payload types remain outside domain modules.
 
 ## Blockers / Constraints
 
 - M05.2 provider-specific production issuance and the provider adapter portion of M05.5 cannot be completed honestly until an authoritative realtime provider choice/configuration exists. Preserve provider-neutral boundaries rather than guessing.
-- This provider decision does not block the app-owned transport interface/fake transport or later provider-neutral domain modules.
+- This provider decision does not block later provider-neutral domain modules.
 
 ## Durable Recovery
 
 Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M05-realtime-ai-interview.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the selected M05 design/plan. Git/code/current exact-SHA CI outrank stale Markdown.
 
-Exact next work: begin M05.5 with strict TDD for lifecycle ordering, send-before-open/send-after-close rejection, stale callbacks, safe/idempotent disconnect, normalized technical errors, and a deterministic fake transport. Provider adapter work stays explicitly blocked pending authoritative provider selection.
+Exact next work: verify the exact documentation-reconciliation head through the complete CI gate; if GREEN, reconcile M05.5 evidence in the milestone/handoff surfaces and begin M05.6 AI audio playback with strict RED-first tests.
