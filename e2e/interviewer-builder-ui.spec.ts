@@ -104,7 +104,7 @@ test.describe("interviewer builder browser closeout", () => {
     await page.getByLabel("Competency name").fill(competency);
     await page.getByLabel("Weight").fill("100");
     await page.getByRole("button", { name: "Add competency" }).click();
-    await expect(page.getByRole("status")).toContainText("Competency created.");
+    await expect(page.getByRole("status")).toContainText("Competency added.");
     await page.reload();
 
     for (const level of [1, 2, 3, 4, 5]) {
