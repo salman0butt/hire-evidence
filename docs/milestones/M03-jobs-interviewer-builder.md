@@ -40,11 +40,11 @@ Organizations + RBAC — **COMPLETE** on `main` at `835d7d571a69cd13e3e802be4872
 
 ## Tasks / Iterations
 
-1. **VERIFIED SLICE** — M03.1 Jobs + Requirements. Tenant CRUD, explicit must-have/nice-to-have requirements, route-bound actions/UI and provider-backed authorization/isolation are present.
-2. **VERIFIED SLICE** — M03.2 Competency Model. Tenant/job-bound persistence, bounded validation, deterministic ordering, fixed-role authority, route-bound UI/actions and provider-backed isolation are present. Exact implementation head `18504de66a11ea6f5944fae4cf2c2522ca5f7c88`, CI #292 / `34647354026`.
-3. **VERIFIED SLICE** — M03.3 Observable 1–5 Rubrics. Complete five-level observable definitions, atomic persistence/editor and provider-backed tenant/role isolation are present. Provider-backed head `b6607a5a9ad72dea585ac2af4cf374e3d319883d`, CI #301 / `34649940346`.
-4. **VERIFIED SLICE** — M03.4 Question Bank. Bounded questions with competency link, difficulty, expected areas, follow-up hints, max duration, required/optional state and deterministic ordering are implemented. Route-bound authoring and reviewer read-only UI are integrated. Exact integrated head `48754524c55c183af5714dee149cd28ead852a5a`, CI #329 / `34657019454`; provider-backed security head `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`, CI #330 / `34657330228`.
-5. **NEXT / NOT STARTED** — M03.5 Deterministic Interview Plan: ordered sections, duration budgets, question ownership and required coverage.
+1. **VERIFIED SLICE** — M03.1 Jobs + Requirements.
+2. **VERIFIED SLICE** — M03.2 Competency Model. Exact implementation head `18504de66a11ea6f5944fae4cf2c2522ca5f7c88`, CI #292 / `34647354026`.
+3. **VERIFIED SLICE** — M03.3 Observable 1–5 Rubrics. Provider-backed head `b6607a5a9ad72dea585ac2af4cf374e3d319883d`, CI #301 / `34649940346`.
+4. **VERIFIED SLICE** — M03.4 Question Bank. Integrated UI head `48754524c55c183af5714dee149cd28ead852a5a`, CI #329 / `34657019454`; provider-backed security head `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`, CI #330 / `34657330228`.
+5. **ACTIVE / PARTIALLY VERIFIED** — M03.5 Deterministic Interview Plan. Deterministic validation, tenant/job-bound plan persistence, ordered sections/links, member-read RLS, fixed-role atomic save RPC, and typed application repository boundary are implemented. Route-bound action/editor and provider-backed plan isolation verification remain unfinished.
 6. **NOT STARTED** — M03.6 Interviewer Configuration.
 7. **NOT STARTED** — M03.7 Guardrail Validation.
 8. **NOT STARTED** — M03.8 Draft / Publish.
@@ -54,61 +54,62 @@ Organizations + RBAC — **COMPLETE** on `main` at `835d7d571a69cd13e3e802be4872
 
 ## TDD Evidence
 
-M03.1 and M03.2 evidence is preserved in earlier branch history and CI. Most recent M03.4 evidence:
+### M03.4 retained evidence
 
-- Route-bound action RED: `7458e880cbd95ea44687b3223acf78c1dbceed21`, CI #322 / `34656371935`. Install/lint/typecheck passed and the five new tests failed only because the action module was absent.
-- Route-bound action GREEN implementation: `9886566c20ff4b7c39a607e4bb770d6efb5fffbc`; subsequent exact integrated heads retain passing action tests.
-- Editor attempt `dbe9d563c553b35d56d83018a768c01e3a7309ed`, CI #324 is **NOT RED** because typecheck failed on an unavailable test dependency before behavior ran.
-- Editor RED: `8ffa9cebf156a0f27341f603863ec442e1beae0d`, CI #325 / `34656625620`. Lint/typecheck passed; only the three new question editor tests failed because the component did not exist.
-- Editor GREEN implementation: `49782ba3ce1c4e9bd07c79857191a95533cb41b2`; subsequent integrated heads retain passing tests.
-- Page-wiring attempt `679c93e24ff476ba91a2216b8dcd5588bbfc27ca`, CI #327 is **NOT RED** because the test fixture failed typecheck first.
-- Page-wiring RED: `07b92bb0fa5dc5036b3700a3ee4cb2fbbe006fca`, CI #328 / `34656918637`. Lint/typecheck passed; 205 unrelated tests passed and only the two new page tests failed because question loading/wiring was absent.
-- Integrated GREEN: `48754524c55c183af5714dee149cd28ead852a5a`, CI #329 / `34657019454`, full quality gate PASS.
-- Provider/security verification: `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`, CI #330 / `34657330228`, full quality gate PASS.
+- Route-bound action RED: `7458e880cbd95ea44687b3223acf78c1dbceed21`, CI #322 / `34656371935`.
+- Editor RED: `8ffa9cebf156a0f27341f603863ec442e1beae0d`, CI #325 / `34656625620`.
+- Page-wiring RED: `07b92bb0fa5dc5036b3700a3ee4cb2fbbe006fca`, CI #328 / `34656918637`.
+- Integrated GREEN: `48754524c55c183af5714dee149cd28ead852a5a`, CI #329 / `34657019454`.
+- Provider/security verification: `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`, CI #330 / `34657330228`.
+
+### M03.5 deterministic plan evidence
+
+- Existing validation tests prove positive bounded duration, deterministic contiguous ordering, total-duration equality, allowed tenant/job question and competency ownership, and required question/competency coverage.
+- Save-authority RED: `a93c5db7c733c6b9082c23e2478eb404a180e3b4`, CI #338 / `34661090957`. Install/lint/typecheck passed; 216 unrelated tests passed; the new save-authority migration assertion alone failed because `save_interview_plan` was absent.
+- Save-boundary GREEN: `166412f5294ff77336dec278648cc7f08e4cdf05`, CI #339 / `34661205052`. Atomic fixed-role security-definer RPC landed and exact-head CI passed.
+- Repository-boundary RED: `ed743bd9f53f778748897b2f264ba2a628769cd3`, CI #340 / `34661710164`. Install/lint/typecheck passed; 217 unrelated tests passed; only the two new repository tests failed because `src/lib/interviewer/interview-plans.ts` was intentionally absent.
+- Repository-boundary GREEN: `c3d5081e22f389e88788c8f302187504b14ad303`, CI #341 / `34661832340`. Minimal typed `saveInterviewPlan` repository landed and the full repository quality gate passed.
 
 ## Integration / E2E Evidence
 
 - `e2e/jobs.spec.ts` proves real local-Supabase job tenant and role boundaries.
 - `e2e/competencies.spec.ts` proves competency tenant and fixed-role authority.
-- `e2e/rubrics.spec.ts` proves rubric tenant and mutation authority; CI #301 passed.
-- `e2e/questions.spec.ts` proves authorized owner/recruiter/hiring-manager question creation; reviewer denial; Org B cross-tenant write/read denial; anonymous read denial; competency/job ownership; and deterministic persisted order. CI #330 passed.
-
-## Integration Test Evidence
-
-M03.1–M03.4 have provider-backed local-Supabase evidence on the active branch. CI #330 / `34657330228` passed frozen install, lint, typecheck, unit/component tests, framework/source verification, real local Supabase startup, production build, Chromium E2E, PRD coverage and teardown at exact head `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`.
+- `e2e/rubrics.spec.ts` proves rubric tenant and mutation authority.
+- `e2e/questions.spec.ts` proves question fixed-role, tenant, job and competency boundaries.
+- M03.5 provider-backed interview-plan authorization/isolation verification is still pending. A direct connector create-file attempt was rejected before reaching GitHub; no repository state changed from that rejected request and lower-level Git writes remain available.
 
 ## Security Review
 
-M03.1–M03.4 persistence remains organization-owned with member-read RLS and narrow authenticated security-definer mutation RPCs for fixed authorized roles. Server actions bind tenant/job identity from routes instead of trusting form-body organization/job values. Questions additionally require the competency to belong to the same organization and job. Provider-backed Org A/Org B/anonymous abuse coverage exists. Critical: 0 unresolved. Important: 0 unresolved in currently reviewed M03.1–M03.4 scope.
+Implemented M03.5 persistence is organization-owned. Plan sections and linked questions/competencies carry organization/job identifiers with composite foreign keys, read access is RLS member-scoped, and mutation is through a fixed-role authenticated security-definer RPC. Required coverage and duration consistency are rechecked transactionally. Critical: 0 unresolved. Important: 0 unresolved in the currently reviewed persistence/repository scope. Provider-backed abuse verification remains required before M03.5 closeout.
 
 ## Accessibility Review
 
-Job, competency, rubric and question authoring surfaces are labelled and component-tested. Question authoring is hidden for read-only users and clearly blocks authoring until a competency exists. Milestone-wide browser/mobile accessibility closeout remains pending for M03.5–M03.11.
+M03.1–M03.4 authoring surfaces are labelled and component-tested. The M03.5 editor does not exist yet, so M03.5 accessibility/browser claims are not made.
 
 ## Performance Review
 
-Current M03 data is bounded and ordered with targeted indexes/constraints. No material blocker found in reviewed M03.1–M03.4 scope. Milestone-wide performance review remains pending.
+Current M03 persistence is bounded and indexed without an identified material performance blocker. Milestone-wide performance review remains pending.
 
 ## AI / Eval Review
 
-No model-generated question suggestions were added in M03.4, so no generated suggestion can silently become authoritative. Organization-authored content remains untrusted. Later guardrail work must reject protected-trait, appearance, emotion, accent, deception, medical/family/political/religious and autonomous hire/reject criteria.
+No model-generated hiring criteria or questions become authoritative. Organization-authored configuration remains untrusted. Later guardrail work must reject protected-trait, appearance, emotion, accent, deception, medical/family/political/religious and autonomous hire/reject criteria.
 
 ## Code Review Findings
 
 - Resolved prior M03.1 Important finding: requirement ordering uniqueness.
-- M03.4 review found no unresolved Critical/Important correctness, tenancy, accessibility or AI-authority issue in the implemented scope.
-- Minor/deferred product capability: question editing/deletion/reordering UI is not introduced by this slice; the current PRD/plan requires a bounded question bank/editor and deterministic persisted position, while broader management can be added only if later acceptance flow requires it. Do not expand speculatively.
+- Current M03.5 persistence/repository inspection has 0 unresolved Critical and 0 unresolved Important findings.
+- Do not mark M03.5 verified until route-bound action/editor behavior and provider-backed authorization/isolation are proven.
 
 ## Fresh Verification Results
 
-- M03.3 provider-backed head `b6607a5a9ad72dea585ac2af4cf374e3d319883d`: CI #301 / `34649940346` PASS.
-- M03.4 integrated UI head `48754524c55c183af5714dee149cd28ead852a5a`: CI #329 / `34657019454` PASS across complete quality gate.
-- M03.4 provider-backed isolation head `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`: CI #330 / `34657330228` PASS across complete quality gate.
-- This durable reconciliation creates a newer documentation-only head and therefore does not replace the implementation evidence above; any subsequent behavioral integration claim requires exact-head verification for its own SHA.
+- M03.4 provider-backed isolation: `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`, CI #330 / `34657330228` PASS.
+- M03.5 save RPC GREEN: `166412f5294ff77336dec278648cc7f08e4cdf05`, CI #339 / `34661205052` PASS.
+- M03.5 repository GREEN: `c3d5081e22f389e88788c8f302187504b14ad303`, CI #341 / `34661832340` PASS across the complete repository quality gate.
+- Documentation reconciliation commits after `c3d5081…` require their own exact-head CI before being called current verified head.
 
 ## Known Limitations
 
-M03.5–M03.11 remain incomplete. PR #5 must remain draft/unmerged. Full milestone accessibility/performance/security/AI-safety review and immutable publish/preview closeout remain pending.
+M03.5 action/editor/provider-backed E2E and M03.6–M03.11 remain incomplete. PR #5 must remain draft/unmerged. Full milestone accessibility/performance/security/AI-safety review and immutable publish/preview closeout remain pending.
 
 ## Durable Recovery Sources
 
@@ -127,7 +128,7 @@ Recover actual GitHub state first, then read `AGENTS.md`, `CODEX-START-HERE.md`,
 
 ## Exact Next Work
 
-Begin M03.5 with genuine RED tests for positive bounded duration, deterministic section ordering, route/tenant/job-bound question ownership, total-duration consistency and required-question/competency coverage. Verify intended behavioral RED before production interview-plan schema/domain/editor code.
+Recover newest branch/CI state after this documentation reconciliation. Then continue M03.5 with a genuine RED for the route-bound interview-plan action/editor, using server-derived questions and competencies as the authoritative allowed/required coverage context. After GREEN, add provider-backed plan role/tenant/job isolation verification and reconcile traceability before marking M03.5 verified.
 
 ## Next Milestone
 M04 — Candidates + Invitations, only after M03 is genuinely complete and merged with post-merge `main` verification.
