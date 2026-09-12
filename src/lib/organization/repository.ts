@@ -18,6 +18,8 @@ export type UpdateOrganizationSettingsInput = Readonly<{
   name: string;
   companySize: string | null;
   hiringUseCase: string | null;
+  candidateSupportEmail: string | null;
+  candidateSupportUrl: string | null;
 }>;
 
 export async function createOrganization(
@@ -89,6 +91,8 @@ export async function updateOrganizationSettings(
       name: input.name,
       company_size: input.companySize,
       hiring_use_case: input.hiringUseCase,
+      candidate_support_email: input.candidateSupportEmail,
+      candidate_support_url: input.candidateSupportUrl,
       updated_at: new Date().toISOString(),
     })
     .eq("id", input.organizationId)
