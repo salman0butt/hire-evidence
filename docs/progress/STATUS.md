@@ -19,46 +19,52 @@ Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
 Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`, CI #517 / `34692492691` GREEN.
 Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
-CI status: M05.2 RED CI #519 / `34693052261` failed as intended because `src/lib/realtime/session-authorization.ts` did not exist; implementation head `6b562a6ef70ef731f68096002edba81b35f9e73a` passed typecheck and all 353 unit/component tests in CI #520 / `34693110559`, but the repository framework verifier rejected this status file because the required `CI status:` marker was missing. This documentation repair creates a newer head that requires fresh exact-head CI.
+CI status: exact implementation head `ac529449ab3a9ad8a87500700995445b66472f98` passed CI #527 / `34693998554` end-to-end: frozen install, lint, typecheck, 95 Vitest files / 358 tests, framework and requirements-source verifiers, autonomous-framework verification, local Supabase migration startup, production build, Chromium E2E, PRD coverage, and cleanup. This status reconciliation creates a newer docs-only head that requires fresh exact-head CI before any integration-readiness claim.
 
 ## Current Task State
 
 - M05.1 Reference characterization — **VERIFIED**. Talk Tutor pinned at `69b6beee90c8dbd186730389f8a1462c2239fe61`; reusable mechanics and hiring-specific non-reuse/safety decisions are durable in the design.
-- M05.2 Session authorization/provider boundary — **ACTIVE**. Initial domain authorization policy has a verified RED and passing focused implementation tests; real server-side invitation/attempt/provider integration remains unfinished.
+- M05.2 Session authorization/provider boundary — **ACTIVE**. Domain authorization is implemented and tested; the authoritative attempt migration/RPC now creates or resumes one invitation-bound attempt, requires active invitation + current disclosure consent + immutable interviewer version, atomically advances the invitation to `started`, stores no raw capability token, exposes no attempt-table grants to browser roles, and returns only the opaque attempt UUID. The API route and short-lived provider-token issuer remain unfinished.
 - M05.3–M05.14 — **NOT STARTED**.
 
 ## M05 Safety / Architecture State
 
-- Invitation capability, current disclosure consent, immutable published interviewer version, and one authoritative attempt must gate realtime authorization.
-- Raw invitation tokens and long-lived provider secrets must not be persisted or logged.
+- Invitation capability, current disclosure consent, immutable published interviewer version, and one authoritative attempt gate realtime authorization.
+- Raw invitation tokens and long-lived provider secrets are not persisted or logged.
 - Candidate speech/transcript is untrusted content and cannot modify system policy, job criteria, plan order, follow-up bounds, or assessment rules.
 - Reconnect resumes the same authoritative attempt and cannot reset the plan.
 - Technical failures, microphone/provider/network problems, timeouts, and reconnects must never become negative candidate evidence.
 - M05 creates no candidate score and no autonomous hire/reject decision.
-- The repository currently has no realtime provider SDK dependency; provider coupling must be justified by authoritative requirements.
+- No realtime provider SDK is present; provider selection/SDK coupling remains intentionally deferred until justified by authoritative requirements.
 
 ## TDD / Verification Evidence
 
 M05.1 is characterization/design and intentionally has no fabricated behavioral RED/GREEN history.
 
-M05.2 RED: `89004863aaa8d5e456d7bed9c9cbd1e1d3f5e0e5`, CI #519 / `34693052261`. Frozen install and lint passed; typecheck failed specifically with TS2307 because `./session-authorization` did not yet exist. The later `supabase stop` failure was secondary because setup was skipped after the intended RED.
+M05.2 authorization-module RED: `89004863aaa8d5e456d7bed9c9cbd1e1d3f5e0e5`, CI #519 / `34693052261`, failed for the intended missing `session-authorization` implementation. Initial implementation later passed focused tests but needed durable-state verifier repair.
 
-M05.2 initial implementation: `6b562a6ef70ef731f68096002edba81b35f9e73a`, CI #520 / `34693110559`. Lint, typecheck, all 94 test files / 353 tests, framework verifier tests, and requirements-source verifier tests passed. The pipeline then failed only because `scripts/verify_autonomous_framework.py` required the literal `CI status:` marker in this file. This commit repairs that durable-state contract; fresh CI is required before treating the implementation checkpoint as fully GREEN.
+M05.2 persistence RED: `02ed8e228cfd67ee24f6deb1badab4169beb1e6e`, CI #524 / `34693510005`. Lint/typecheck passed; unit tests failed exactly because `supabase/migrations/202609120017_realtime_interview_sessions.sql` did not exist.
 
-M04 merge verification: exact `main` SHA `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` passed post-merge CI #517 / `34692492691`, including frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase, production build, Chromium E2E, PRD coverage and cleanup.
+M05.2 persistence implementation: `0239ce3054856012b9630ebdcfb5127f5b5509c2` added authoritative attempt persistence and the token-hash/consent/version-bound RPC.
+
+M05.2 security-review RED: `17de3f6f93c25037dbcb9aaa1395a9c623ea9fe0`, CI #526 / `34693860526`. Install/lint/typecheck passed; 357 tests passed and exactly one new regression failed because the anonymous-capable RPC returned a full `interview_attempts` row instead of only an opaque UUID.
+
+M05.2 security fix GREEN: `ac529449ab3a9ad8a87500700995445b66472f98`, CI #527 / `34693998554` — complete repository gate GREEN including Supabase migration application, build, E2E, and PRD coverage.
+
+M04 merge verification: exact `main` SHA `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` passed post-merge CI #517 / `34692492691`.
 
 ## Review State
 
 Critical findings: **0 unresolved**.
-Important findings: **0 unresolved** so far; M05.2 security/correctness review remains active until lifecycle semantics and the real server/provider boundary are verified.
-The initial authorization module issues credentials only after invitation availability, current consent, immutable version and authoritative attempt readiness; raw invitation tokens are not returned in its result.
+Important findings: **0 unresolved** for the implemented attempt-persistence slice. Security review identified one Important exposure (full attempt-row return from an anonymous-capable RPC); it was fixed by returning only the opaque attempt UUID and verified by CI #527.
+M05.2 overall remains active until the server API/provider-token boundary is implemented and reviewed.
 
 ## Blockers
 
-No external product blocker. The local Codex execution bridge was transiently unavailable earlier in this run; GitHub mutation and CI remain operational, so durable progress continues through the repository. Do not claim local command evidence that did not run.
+No external blocker for provider-neutral server/API work. Provider-specific SDK integration is not yet justified by authoritative requirements and must not be guessed merely to advance the milestone.
 
 ## Durable Recovery
 
 Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M05-realtime-ai-interview.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the selected M05 design/plan.
 
-Exact next work: verify fresh CI after this status repair, inspect invitation lifecycle/consent semantics, add a positive authorization contract, then implement the real server-side session/attempt/provider boundary for M05.2 with strict TDD. Do not advance to M05.3 until M05.2 is genuinely verified.
+Exact next work: continue M05.2 with strict TDD for the public realtime-session API/server repository boundary: prove the route returns a constant-safe unavailable response without raw capability/log leakage and returns only the narrow authorized session projection on success; then implement the minimal provider-neutral route/repository wiring and injected short-lived provider-token issuer. Do not advance to M05.3 until M05.2 is genuinely verified.
