@@ -11,6 +11,7 @@ function capabilities(
 ): Parameters<typeof diagnoseRealtimeBrowser>[0] {
   return {
     isSecureContext: true,
+    isOnline: true,
     hasMediaDevices: true,
     hasGetUserMedia: true,
     hasAudioContext: true,
@@ -29,16 +30,7 @@ describe("diagnoseRealtimeBrowser", () => {
   });
 
   it("fails closed with recoverable guidance when the browser reports the network offline", () => {
-    const offlineCapabilities = {
-      ...capabilities(),
-      isOnline: false,
-    } as Parameters<typeof diagnoseRealtimeBrowser>[0] & { isOnline: boolean };
-
-    expect(
-      diagnoseRealtimeBrowser(
-        offlineCapabilities as Parameters<typeof diagnoseRealtimeBrowser>[0],
-      ),
-    ).toEqual({
+    expect(diagnoseRealtimeBrowser(capabilities({ isOnline: false }))).toEqual({
       status: "blocked",
       reason: "network-offline",
       recoverable: true,
@@ -73,12 +65,13 @@ describe("diagnoseRealtimeBrowser", () => {
 });
 
 describe("collectRealtimeBrowserCapabilities", () => {
-  it("collects browser, permission, audio-worklet and input-device readiness without retaining media", async () => {
+  it("collects browser, network, permission, audio-worklet and input-device readiness without retaining media", async () => {
     const close = vi.fn();
 
     await expect(
       collectRealtimeBrowserCapabilities({
         isSecureContext: true,
+        isOnline: true,
         mediaDevices: {
           getUserMedia: vi.fn(),
           enumerateDevices: vi.fn().mockResolvedValue([
@@ -91,6 +84,7 @@ describe("collectRealtimeBrowserCapabilities", () => {
       }),
     ).resolves.toEqual({
       isSecureContext: true,
+      isOnline: true,
       hasMediaDevices: true,
       hasGetUserMedia: true,
       hasAudioContext: true,
@@ -106,12 +100,14 @@ describe("collectRealtimeBrowserCapabilities", () => {
     await expect(
       collectRealtimeBrowserCapabilities({
         isSecureContext: true,
+        isOnline: true,
         mediaDevices: {
           enumerateDevices: vi.fn().mockRejectedValue(new Error("device enumeration blocked")),
         },
       }),
     ).resolves.toEqual({
       isSecureContext: true,
+      isOnline: true,
       hasMediaDevices: true,
       hasGetUserMedia: false,
       hasAudioContext: false,
