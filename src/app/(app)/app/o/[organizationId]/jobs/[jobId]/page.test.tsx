@@ -154,6 +154,8 @@ const interviewerConfig = {
     maxFollowUpsPerQuestion: 1,
     allowedReasons: ["clarify_ambiguity" as const],
   },
+  status: "draft" as const,
+  publishedAt: null,
 };
 
 async function renderPage() {
