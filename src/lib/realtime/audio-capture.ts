@@ -68,15 +68,12 @@ export function createRealtimeAudioCapture(
   let context: AudioCaptureContext | undefined;
   let source: AudioCaptureSourceNode | undefined;
   let workletNode: AudioCaptureWorkletNode | undefined;
+  let startPromise: Promise<void> | undefined;
   let active = false;
   let muted = false;
   let generation = 0;
 
-  async function start() {
-    if (active) {
-      return;
-    }
-
+  async function startCapture() {
     const currentGeneration = ++generation;
     const constraints: AudioCaptureConstraints = {
       audio: {
@@ -116,6 +113,21 @@ export function createRealtimeAudioCapture(
       await stop();
       throw error;
     }
+  }
+
+  function start() {
+    if (active) {
+      return Promise.resolve();
+    }
+    if (startPromise) {
+      return startPromise;
+    }
+
+    const pendingStart = Promise.resolve().then(startCapture);
+    startPromise = pendingStart.finally(() => {
+      startPromise = undefined;
+    });
+    return startPromise;
   }
 
   function setMuted(nextMuted: boolean) {
