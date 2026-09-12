@@ -134,10 +134,13 @@ export function createRealtimeAudioCapture(
     }
 
     const pendingStart = Promise.resolve().then(startCapture);
-    startPromise = pendingStart.finally(() => {
-      startPromise = undefined;
+    const trackedStart = pendingStart.finally(() => {
+      if (startPromise === trackedStart) {
+        startPromise = undefined;
+      }
     });
-    return startPromise;
+    startPromise = trackedStart;
+    return trackedStart;
   }
 
   function setMuted(nextMuted: boolean) {
@@ -155,6 +158,7 @@ export function createRealtimeAudioCapture(
 
     active = false;
     generation += 1;
+    startPromise = undefined;
 
     const currentStream = stream;
     const currentContext = context;
