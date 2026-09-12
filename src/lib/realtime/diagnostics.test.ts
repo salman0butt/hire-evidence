@@ -28,6 +28,23 @@ describe("diagnoseRealtimeBrowser", () => {
     });
   });
 
+  it("fails closed with recoverable guidance when the browser reports the network offline", () => {
+    const offlineCapabilities = {
+      ...capabilities(),
+      isOnline: false,
+    } as Parameters<typeof diagnoseRealtimeBrowser>[0] & { isOnline: boolean };
+
+    expect(
+      diagnoseRealtimeBrowser(
+        offlineCapabilities as Parameters<typeof diagnoseRealtimeBrowser>[0],
+      ),
+    ).toEqual({
+      status: "blocked",
+      reason: "network-offline",
+      recoverable: true,
+    });
+  });
+
   it.each([
     ["insecure-context", { isSecureContext: false }],
     ["media-devices-unavailable", { hasMediaDevices: false }],
