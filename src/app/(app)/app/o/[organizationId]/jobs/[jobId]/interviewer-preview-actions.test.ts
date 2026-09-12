@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { requireUser } from "@/lib/auth/require-user";
-import { previewInterviewerConfig } from "@/lib/interviewer/interviewer-preview";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
+
+const previewMocks = vi.hoisted(() => ({
+  previewInterviewerConfig: vi.fn(),
+}));
 
 vi.mock("@/lib/auth/require-user", () => ({ requireUser: vi.fn() }));
 vi.mock("@/lib/interviewer/interviewer-preview", () => ({
-  previewInterviewerConfig: vi.fn(),
+  previewInterviewerConfig: previewMocks.previewInterviewerConfig,
 }));
 vi.mock("@/lib/organization/require-membership", () => ({
   requireOrganizationMembership: vi.fn(),
@@ -68,7 +71,7 @@ describe("interviewer preview server action", () => {
       organizationName: "Evidence Co",
       role: "hiring_manager",
     });
-    vi.mocked(previewInterviewerConfig).mockResolvedValue(previewPayload());
+    previewMocks.previewInterviewerConfig.mockResolvedValue(previewPayload());
   });
 
   it("returns a clearly simulated non-billable summary from the route-bound config", async () => {
@@ -95,7 +98,7 @@ describe("interviewer preview server action", () => {
       },
     });
 
-    expect(previewInterviewerConfig).toHaveBeenCalledWith(
+    expect(previewMocks.previewInterviewerConfig).toHaveBeenCalledWith(
       organizationId,
       jobId,
       configId,
@@ -137,12 +140,12 @@ describe("interviewer preview server action", () => {
       message: "You do not have permission to preview interviewer configuration.",
       preview: null,
     });
-    expect(previewInterviewerConfig).not.toHaveBeenCalled();
+    expect(previewMocks.previewInterviewerConfig).not.toHaveBeenCalled();
   });
 
   it("fails closed without leaking provider internals", async () => {
     const { previewInterviewerConfigAction } = await previewActionsModule();
-    vi.mocked(previewInterviewerConfig).mockRejectedValue(
+    previewMocks.previewInterviewerConfig.mockRejectedValue(
       new Error("provider internals"),
     );
 
