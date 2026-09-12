@@ -27,6 +27,22 @@ export type RealtimeBrowserRuntime = Readonly<{
   queryMicrophonePermission?: (() => Promise<MicrophonePermissionState>) | undefined;
 }>;
 
+type RealtimeMicrophoneTrack = Readonly<{
+  readyState?: string | undefined;
+  stop: () => void;
+}>;
+
+type RealtimeMicrophoneStream = Readonly<{
+  getAudioTracks: () => readonly RealtimeMicrophoneTrack[];
+  getTracks: () => readonly RealtimeMicrophoneTrack[];
+}>;
+
+export type RealtimeMicrophoneAccessRuntime = Readonly<{
+  getUserMedia?:
+    | ((constraints: Readonly<{ audio: boolean; video: boolean }>) => Promise<RealtimeMicrophoneStream>)
+    | undefined;
+}>;
+
 export type RealtimeDiagnosticFailureReason =
   | "insecure-context"
   | "media-devices-unavailable"
@@ -169,4 +185,53 @@ export function diagnoseRealtimeBrowser(
   }
 
   return { status: "ready" };
+}
+
+export async function verifyRealtimeMicrophoneAccess(
+  runtime: RealtimeMicrophoneAccessRuntime,
+): Promise<RealtimeDiagnosticResult> {
+  if (!runtime.getUserMedia) {
+    return {
+      status: "blocked",
+      reason: "get-user-media-unavailable",
+      recoverable: false,
+    };
+  }
+
+  let stream: RealtimeMicrophoneStream | undefined;
+
+  try {
+    stream = await runtime.getUserMedia({ audio: true, video: false });
+    const hasLiveAudioTrack = stream
+      .getAudioTracks()
+      .some((track) => track.readyState === undefined || track.readyState === "live");
+
+    if (!hasLiveAudioTrack) {
+      return {
+        status: "blocked",
+        reason: "microphone-input-unavailable",
+        recoverable: true,
+      };
+    }
+
+    return { status: "ready" };
+  } catch (error) {
+    const name = error instanceof Error ? error.name : "";
+
+    if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+      return {
+        status: "blocked",
+        reason: "microphone-permission-denied",
+        recoverable: true,
+      };
+    }
+
+    return {
+      status: "blocked",
+      reason: "microphone-input-unavailable",
+      recoverable: true,
+    };
+  } finally {
+    stream?.getTracks().forEach((track) => track.stop());
+  }
 }
