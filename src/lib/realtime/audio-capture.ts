@@ -175,8 +175,11 @@ export function createRealtimeAudioCapture(
     currentSource?.disconnect();
     currentWorkletNode?.disconnect();
     currentStream?.getTracks().forEach((track) => track.stop());
-    await currentContext?.close();
-    options.onInputLevel?.(0);
+    try {
+      await currentContext?.close();
+    } finally {
+      options.onInputLevel?.(0);
+    }
   }
 
   return { start, setMuted, stop };
