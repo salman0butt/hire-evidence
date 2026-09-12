@@ -50,6 +50,8 @@ async function interviewerConfigsModule() {
       | (InterviewerConfigFixture & {
           id: string;
           planId: string;
+          status: "draft" | "published";
+          publishedAt: string | null;
         })
       | null
     >;
@@ -115,7 +117,8 @@ describe("interviewer configuration repository", () => {
     );
   });
 
-  it("loads the latest tenant/job-bound configuration without widening scope", async () => {
+  it("loads publication state with the latest tenant/job-bound configuration", async () => {
+    const publishedAt = "2026-09-12T04:00:00.000Z";
     const query = readClient({
       data: {
         id: configId,
@@ -131,6 +134,8 @@ describe("interviewer configuration repository", () => {
         candidate_instructions: input.candidateInstructions,
         max_follow_ups_per_question: input.followUpPolicy.maxFollowUpsPerQuestion,
         follow_up_reasons: input.followUpPolicy.allowedReasons,
+        status: "published",
+        published_at: publishedAt,
       },
       error: null,
     });
@@ -139,9 +144,17 @@ describe("interviewer configuration repository", () => {
 
     await expect(
       getLatestInterviewerConfig(organizationId, jobId),
-    ).resolves.toEqual({ id: configId, planId, ...input });
+    ).resolves.toEqual({
+      id: configId,
+      planId,
+      ...input,
+      status: "published",
+      publishedAt,
+    });
 
     expect(query.from).toHaveBeenCalledWith("interviewer_configs");
+    expect(query.select).toHaveBeenCalledWith(expect.stringContaining("status"));
+    expect(query.select).toHaveBeenCalledWith(expect.stringContaining("published_at"));
     expect(query.firstEq).toHaveBeenCalledWith("organization_id", organizationId);
     expect(query.secondEq).toHaveBeenCalledWith("job_id", jobId);
     expect(query.order).toHaveBeenCalledWith("updated_at", { ascending: false });
