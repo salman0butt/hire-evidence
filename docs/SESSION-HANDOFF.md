@@ -9,36 +9,37 @@ This compatibility handoff never outranks actual Git/code/current exact-SHA CI. 
 - Current main SHA: `835d7d571a69cd13e3e802be4872e873ffdd34fe`; post-merge M02 CI #232 / `34624252208` passed.
 - Active branch: `feat/jobs-interviewer-builder`
 - Active PR: #5 — `Build jobs and interviewer configuration` — OPEN / DRAFT / unmerged.
-- Latest fully verified behavioral head before this documentation reconciliation: `dce42df18176a00e5c33f910332c276245de5ac5`.
-- CI #362 / `34666866674` for that head passed frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase migration application, production build, Chromium E2E, PRD coverage and teardown.
-- Documentation reconciliation continues after that SHA and requires fresh exact-head CI before the documentation head itself is called verified.
-- User authorization: milestone PRs may auto-merge only after every explicit merge gate is satisfied. PR #5 remains draft because M03.6–M03.11 remain incomplete.
+- Previous exact implementation head `adfbf30f0f27a3e06c156c3d8a8a16ecf872cef2` passed CI #413 / `34673845119`.
+- Durable-state reconciliation now creates a newer head and therefore requires fresh exact-head CI before any closeout/merge claim.
+- User authorization: milestone PRs may auto-merge only after every explicit merge gate is satisfied. PR #5 remains draft because M03.11 closeout remains incomplete.
 
 ## Current milestone
 
 Jobs + Interviewer Builder is ACTIVE.
 
 - M03.1 Jobs + Requirements — verified slice.
-- M03.2 Competencies — verified slice; `18504de66a11ea6f5944fae4cf2c2522ca5f7c88`, CI #292 / `34647354026`.
-- M03.3 Observable 1–5 Rubrics — verified slice; provider-backed head `b6607a5a9ad72dea585ac2af4cf374e3d319883d`, CI #301 / `34649940346`.
-- M03.4 Question Bank — verified slice; provider-backed head `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`, CI #330 / `34657330228`.
-- M03.5 Deterministic Interview Plan — verified slice; route-bound editor/action and provider-backed role/tenant/job isolation are present. Exact fully verified head `332caa332b1a6b978860f54f15227ce4d82b385d`, CI #358 / `34665349746`.
-- M03.6 Interviewer Configuration — active/partially verified. Bounded validation and tenant/job/plan-bound draft persistence with member-read RLS and fixed-role save authority are GREEN; typed repository/action/editor/provider-backed isolation remain.
+- M03.2 Competencies — verified slice.
+- M03.3 Observable 1–5 Rubrics — verified slice.
+- M03.4 Question Bank — verified slice.
+- M03.5 Deterministic Interview Plan — verified slice.
+- M03.6 Interviewer Configuration — implemented on the current branch with validation, persistence, typed repository, route-bound actions/editor and dedicated provider-backed isolation coverage.
+- M03.7 Non-overridable Guardrails — implemented with pure validation, authoritative database enforcement and provider-backed adversarial coverage.
+- M03.8 Draft / Publish — implemented with publication state and route-bound publish action.
+- M03.9 Immutable Versioning — implemented with immutable interviewer-version persistence/repository/tests.
+- M03.10 Non-billable Preview — implemented with preview migration/domain/action/UI/tests.
+- M03.11 Builder E2E Closeout — ACTIVE.
 
-## M03.6 TDD evidence
+## Recovery evidence
 
-- Validation RED: `2e8a88fc452d80bfa4ea59bbbc1f2cb1eb89829a`, CI #359 / `34666412220`; lint/typecheck passed, 229 unrelated tests passed, and the four new tests failed only because `interviewer-config-validation` was absent.
-- Validation GREEN: `7ae46568e458f5efb3447707602ee1c77e750c04`, CI #360 / `34666523775` PASS across the full repository quality gate.
-- Persistence RED: `73063d7029038924468dc9e27fc994a53abb5fdd`, CI #361 / `34666780326`; lint/typecheck passed, 233 unrelated tests passed, and only the four migration-contract tests failed because `202609120005_create_interviewer_configs.sql` was absent.
-- Persistence GREEN: `dce42df18176a00e5c33f910332c276245de5ac5`, CI #362 / `34666866674` PASS across the full repository quality gate including actual local-Supabase migration application.
+Compared with old M03.6 repository checkpoint `706822e7103fe16bdbe034bcc27e3dff96130f93`, implementation head `adfbf30f0f27a3e06c156c3d8a8a16ecf872cef2` was 45 commits ahead. Those commits add configuration action/editor/E2E, guardrail validator/database enforcement/E2E, publish state/action, immutable versions, and non-billable preview. CI #413 passed on that exact implementation head. Actual Git/code/tests therefore supersede the older durable text that still described M03.6 as partially implemented.
 
 ## Review / blockers
 
-- Latest inspection found no unresolved PR review threads.
-- Implemented M03.6 validation/persistence scope has 0 known unresolved Critical and 0 known unresolved Important findings.
+- Latest GitHub inspection found no unresolved PR review threads.
+- PR #5 is currently mergeable but intentionally remains draft.
 - No current engineering blocker is known.
-- M03 remains incomplete; do not merge PR #5 until all merge gates are genuinely satisfied.
+- Milestone-wide closeout review and final exact-SHA verification remain mandatory before merge.
 
 ## Exact next work
 
-Use `docs/progress/STATUS.md` as canonical state. Recover the newest branch/CI state after this documentation reconciliation. Then write the smallest genuine RED for the typed interviewer-configuration repository boundary. After GREEN, add route-bound action/editor behavior and provider-backed role/tenant/job/plan isolation before marking M03.6 verified.
+Use `docs/progress/STATUS.md` as canonical state. Execute M03.11 closeout against the newest branch head: verify the complete provider-backed builder flow and Org A/Org B/anonymous abuse matrix through configuration, guardrails, publication, immutable version and preview; verify desktop + 390×844 keyboard/focus/overflow behavior; perform skeptical security/accessibility/performance/AI-safety/YAGNI review; fix any Critical/Important findings through TDD; reconcile traceability/feature/ledger/PR docs; then require fresh exact-final-head CI before auto-merge.
