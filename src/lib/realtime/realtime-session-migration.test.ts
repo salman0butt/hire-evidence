@@ -52,4 +52,15 @@ describe("realtime interview session migration", () => {
     expect(migration).toMatch(/update public\.candidate_invitations/i);
     expect(migration).toMatch(/grant execute on function public\.authorize_realtime_interview_session/i);
   });
+
+  it("returns only the opaque attempt identifier and keeps attempt rows off browser table grants", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(
+      /create or replace function public\.authorize_realtime_interview_session\s*\(\s*p_token_hash text\s*\)\s*returns uuid/is,
+    );
+    expect(migration).toMatch(/revoke all on table public\.interview_attempts from anon/i);
+    expect(migration).toMatch(/revoke all on table public\.interview_attempts from authenticated/i);
+    expect(migration).not.toMatch(/grant\s+select\s+on\s+(?:table\s+)?public\.interview_attempts/i);
+  });
 });
