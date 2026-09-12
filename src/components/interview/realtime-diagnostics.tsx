@@ -43,6 +43,8 @@ const FAILURE_MESSAGES: Record<RealtimeDiagnosticFailureReason, string> = {
     "Microphone access is required before the interview can start. Allow access when your browser asks, then retry the microphone check.",
   "microphone-input-unavailable":
     "No microphone input is available. Connect or enable a microphone, then retry the microphone check.",
+  "microphone-input-silent":
+    "The microphone is connected, but no usable input was detected. Speak normally near the microphone, then retry the microphone check.",
 };
 
 function isAcquisitionRecoverablePrerequisite(result: RealtimeDiagnosticResult) {
