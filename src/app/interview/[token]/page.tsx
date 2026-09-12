@@ -1,5 +1,7 @@
+import { CandidateConsentForm } from "@/components/candidates/candidate-consent-form";
 import { resolvePublicInvitation } from "@/lib/candidates/public-invitation";
 import type { PublicInvitationProjection } from "@/lib/candidates/public-invitation";
+import { recordCandidateConsentAction } from "./consent-actions";
 
 type CandidateInterviewPageProps = Readonly<{
   params: Promise<{ token: string }>;
@@ -61,6 +63,7 @@ export default async function CandidateInterviewPage({
   }
 
   const preInterviewItems = buildPreInterviewItems(result.invitation);
+  const consentAction = recordCandidateConsentAction.bind(null, token);
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-12 sm:py-16">
@@ -102,6 +105,10 @@ export default async function CandidateInterviewPage({
           ))}
         </dl>
       </section>
+
+      <div className="mt-10">
+        <CandidateConsentForm action={consentAction} />
+      </div>
     </main>
   );
 }
