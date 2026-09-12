@@ -127,7 +127,7 @@ test.describe("interviewer builder browser closeout", () => {
     await page.getByLabel("Section 1 purpose").fill("Technical evidence");
     await page.getByLabel("Section 1 duration in seconds").fill("1800");
     await page.getByLabel(question).check();
-    await page.getByLabel(competency).check();
+    await page.getByLabel(competency, { exact: true }).check();
     await page.getByRole("button", { name: "Save interview plan" }).click();
     await expect(page.getByRole("status")).toContainText("Interview plan saved.");
     await page.reload();
