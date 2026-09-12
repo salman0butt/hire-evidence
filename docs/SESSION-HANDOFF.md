@@ -13,16 +13,21 @@ This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENT
 - Active draft milestone PR: #7 — `Build realtime AI interview`.
 - Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 - Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
+- Latest verified behavioral head: `9982d75f02fb6911162d60cec98581441ecf704b`, CI #603 / `34710723994` — complete repository gate GREEN.
 
 ## Current milestone state
 
 M05.1 reference characterization is **VERIFIED**.
 
-M05.2 session authorization/provider boundary is **ACTIVE / PARTIALLY VERIFIED**. Implemented work includes invitation/consent/version authorization, one-authoritative-attempt persistence, hashed capability repository behavior, constant-safe handler semantics, narrow attempt projection, and short-lived provider-token lifetime enforcement. Production provider-specific credential issuance/adapter composition remains unresolved because current requirements/source/dependencies do not select a realtime provider. Preserve the provider-neutral boundary rather than guessing a vendor.
+M05.2 session authorization/provider boundary is **ACTIVE / PARTIALLY VERIFIED**. Invitation/consent/version authorization, one-authoritative-attempt persistence, hashed capability repository behavior, constant-safe handler semantics, narrow attempt projection, and short-lived provider-token lifetime enforcement exist. Provider-specific credential issuance/adapter composition remains unresolved because authoritative requirements do not select a realtime provider.
 
-M05.3 browser compatibility + microphone diagnostics is **ACTIVE**. Implemented work includes typed secure-context/media/getUserMedia/AudioContext/AudioWorklet/permission/input-count/network diagnostics, explicit microphone acquisition with immediate track cleanup, accessible status/recovery UI, candidate-page integration, offline fail-closed behavior, and selected-device acquisition support. Remaining acceptance: candidate-facing device enumeration/selection UX after explicit access, usable input-level readiness, and focused keyboard/narrow-viewport browser verification.
+M05.3 browser compatibility + microphone diagnostics is **VERIFIED**. Implemented and verified behavior includes typed browser/network/media diagnostics, explicit microphone acquisition and immediate cleanup, privacy-preserving post-access audio-input enumeration, candidate-selected input checks, usable input-level readiness, accessible status/recovery UI, candidate-page integration, focusable keyboard controls, and existing 390px candidate browser no-overflow coverage. Diagnostic audio stays transient and is not candidate evidence.
 
-M05.4–M05.14 remain **NOT STARTED**.
+M05.4 deterministic Web Audio capture is **VERIFIED**. Selected mono input acquisition, AudioWorklet PCM callbacks, mute, generation-scoped stale callback rejection, idempotent stop, one-time resource cleanup, and visible input-level reset are covered.
+
+M05.5 provider-neutral realtime transport is **ACTIVE / NEXT**. Build the app-owned normalized transport interface and deterministic fake transport under strict TDD. Provider adapter creation remains blocked until authoritative provider selection/configuration exists.
+
+M05.6–M05.14 remain **NOT STARTED**.
 
 ## Safety / architecture state
 
@@ -36,28 +41,26 @@ M05.4–M05.14 remain **NOT STARTED**.
 
 ## Current evidence
 
-- M05.2 authorization RED: `89004863aaa8d5e456d7bed9c9cbd1e1d3f5e0e5`, CI #519 / `34693052261`.
-- M05.2 persistence/security work ultimately passed complete repository gates, including `ac529449ab3a9ad8a87500700995445b66472f98`, CI #527 / `34693998554`, and later provider-neutral work at `c10a4a888454fe9c3612c869d8c6ba7b7b040cd6`, CI #543 / `34696198083`.
-- M05.3 diagnostics RED: `c23a89c66d97c97f8a9be45e135bc8c1d0268950`, CI #544 / `34698263217`.
-- M05.3 diagnostics GREEN: `e821c88beec11e76a990b621b57c833cee455e00`, CI #545 / `34698304817`.
-- M05.3 accessible-UI RED: `100528c0fae1837ee214be8db82c1d6ae4c09cfa`, CI #547 / `34698666201`.
-- Offline integration regression: `5630cb89d69bf379bfc77dd77157c0b32405ef24`, CI #560 / `34700605728` — typecheck caught missing `network-offline` UI copy and missing `isOnline` runtime input.
-- Offline integration fix: `019ac11a6a3575d11af96b579964ec206a6f7da0`, CI #561 / `34700935235` — full repository gate GREEN.
-- Selected-input RED: `1ac380e3b1a32b30cb6623ed13f74297b6865a02`, CI #562 / `34701284392` — intended TS2554 because the access verifier accepted one argument only.
-- Selected-input GREEN: `2708322cd406eb3e2877295bfe25f495cff422c5`, CI #563 / `34701331592` — frozen install, lint, typecheck, unit/component, repository verifiers, local Supabase reset, build, Chromium E2E, PRD coverage and cleanup all GREEN.
-- Documentation reconciliation commits after `2708322…` require fresh exact-head CI before a later readiness claim.
+Earlier M05.2/M05.3 RED/GREEN checkpoints are retained in `docs/milestones/M05-realtime-ai-interview.md`.
+
+Latest checkpoints:
+- M05.4 invalid NOT RED: `cae05ed76eca9547863087aa0ee9e4721c0a59c4`, CI #599 / `34710015886` — test typing failure; not behavioral RED.
+- M05.4 RED: `7b39f6be82982bc6b1e9f677d8b1c640ef06058e`, CI #600 / `34710078998` — intended input-level reset assertion failed after lint/typecheck passed.
+- M05.4 GREEN: `4b5260bc1dfd4b4e726784d306562e60b12b814c`, CI #601 / `34710176595` — full repository gate GREEN.
+- Capture regression coverage: `3cb6776411e345bb1f7bf8ccc078f23cac6ea389`, CI #602 / `34710451680` — mute, stale callback rejection, idempotent resource cleanup; full gate GREEN.
+- M05.3 keyboard closeout: `9982d75f02fb6911162d60cec98581441ecf704b`, CI #603 / `34710723994` — complete repository gate GREEN.
 
 ## Review state
 
 - Critical findings: 0 unresolved for implemented M05 slices.
 - Important findings: 0 unresolved for implemented M05 slices.
-- PR #7 had no submitted reviews or unresolved review threads at last reconciliation.
+- PR #7 had no unresolved review threads at the latest recovery check.
+- Task 4 review found no Critical/Important cleanup, stale-generation, mute, resource-lifecycle, safety, or evidence-integrity issue.
 
 ## Exact next work
 
-1. Recover PR #7 exact head and CI; newer GitHub state wins over this handoff.
-2. Finish M05.3 with strict TDD for privacy-preserving audio-input enumeration and accessible candidate selection after explicit microphone access.
-3. Re-check the selected input without implicit recording/permission requests and keep audio transient.
-4. Add usable input-level readiness without turning signal quality into candidate evidence.
-5. Add focused browser keyboard and narrow-viewport coverage, then perform security/accessibility/performance review and exact-head verification before marking M05.3 verified.
-6. Keep M05.2 provider-specific issuance explicitly unresolved unless authoritative provider requirements appear.
+1. Recover PR #7 exact remote head and exact-SHA CI; newer GitHub state wins over this handoff.
+2. Begin M05.5 with a failing `src/lib/realtime/transport.test.ts` covering lifecycle ordering, send rejection before open and after close, stale-generation callback rejection, normalized technical errors, and idempotent/safe disconnect.
+3. Implement only the app-owned provider-neutral transport boundary plus deterministic fake transport required by later tests.
+4. Do not create or guess a provider adapter while provider selection/configuration is not authoritative.
+5. Review, verify exact-head CI, update durable docs, then continue automatically to the next safe M05 unit.
