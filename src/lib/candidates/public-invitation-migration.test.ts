@@ -25,6 +25,24 @@ describe("public candidate invitation resolution migration", () => {
     expect(migration).toMatch(/candidate_invitations[\s\S]*token_hash\s*=\s*p_token_hash/i);
     expect(migration).toMatch(/organizations[\s\S]*organization_name/i);
     expect(migration).toMatch(/jobs[\s\S]*job_title/i);
+    expect(migration).toMatch(/interviewer_versions/i);
+  });
+
+  it("returns only candidate-safe fields from the immutable published interviewer snapshot", () => {
+    const migration = readMigration();
+    const returnShape =
+      migration.match(/returns table\s*\(([\s\S]*?)\)\s*language/i)?.[1] ?? "";
+
+    expect(returnShape).toMatch(/organization_name\s+text/i);
+    expect(returnShape).toMatch(/job_title\s+text/i);
+    expect(returnShape).toMatch(/duration_seconds\s+integer/i);
+    expect(returnShape).toMatch(/interview_type\s+text/i);
+    expect(returnShape).toMatch(/language\s+text/i);
+    expect(returnShape).toMatch(/candidate_instructions\s+text/i);
+    expect(migration).toMatch(/snapshot[\s\S]*interviewer_config[\s\S]*duration_seconds/i);
+    expect(migration).toMatch(/snapshot[\s\S]*interviewer_config[\s\S]*interview_type/i);
+    expect(migration).toMatch(/snapshot[\s\S]*interviewer_config[\s\S]*language/i);
+    expect(migration).toMatch(/snapshot[\s\S]*interviewer_config[\s\S]*candidate_instructions/i);
   });
 
   it("fails closed for invitations that are not currently usable", () => {
@@ -52,8 +70,6 @@ describe("public candidate invitation resolution migration", () => {
       /grant execute on function public\.resolve_public_candidate_invitation\(text\) to authenticated/i,
     );
     expect(migration).not.toMatch(/grant\s+select\s+on\s+(table\s+)?public\.candidate_invitations\s+to\s+(anon|authenticated)/i);
-    expect(returnShape).toMatch(/organization_name\s+text/i);
-    expect(returnShape).toMatch(/job_title\s+text/i);
     expect(returnShape).not.toMatch(/\bcandidate_id\b/i);
     expect(returnShape).not.toMatch(/\borganization_id\b/i);
     expect(returnShape).not.toMatch(/\binterviewer_version_id\b/i);
