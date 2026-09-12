@@ -25,13 +25,19 @@ export function RealtimeInterview({
   const currentQuestion = sessionSnapshot.currentQuestion;
   const completed = sessionSnapshot.status === "completed";
 
-  return (
-    <section aria-label="Realtime interview" className="space-y-6">
-      {completed ? (
+  if (completed) {
+    return (
+      <section aria-label="Realtime interview" className="space-y-6">
         <p role="status" aria-live="polite">
           Interview complete
         </p>
-      ) : currentQuestion ? (
+      </section>
+    );
+  }
+
+  return (
+    <section aria-label="Realtime interview" className="space-y-6">
+      {currentQuestion ? (
         <article className="space-y-2" aria-labelledby="realtime-section-title">
           <h2 id="realtime-section-title" className="text-xl font-semibold">
             {currentQuestion.sectionTitle}
