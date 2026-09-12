@@ -1,55 +1,56 @@
 # Current Milestone
 
 Milestone:
-Candidates + Invitations
+Realtime AI Interview
 
 Legacy roadmap identifier:
-M04
+M05
 
 Status:
-CLOSEOUT / MERGE GATE
+ACTIVE
 
 Branch:
-`feat/candidates-invitations`
+`feat/realtime-ai-interview`
 
 Base:
-`main` at verified M03 merge SHA `729474ffb03075c93dfa2564f0004f1590533753`
+`main` at verified M04 merge SHA `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`
 
 PR:
-#6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged pending final documentation-head CI.
+Not yet created at activation; create one draft PR after the first coherent durable M05 branch state and reuse it for the milestone.
 
 Canonical compact recovery state:
 `docs/progress/STATUS.md`
 
 ## Iterations
 
-1. M04.1 — Candidate records — **VERIFIED**.
-2. M04.2 — Secure token service + invitation persistence — **VERIFIED**.
-3. M04.3 — Invitation lifecycle — **VERIFIED**.
-4. M04.4 — Public candidate route / invitation resolution — **VERIFIED**.
-5. M04.5 — Pre-interview experience — **VERIFIED**.
-6. M04.6 — Disclosure + consent — **VERIFIED**.
-7. M04.7 — Accommodation/support path — **VERIFIED**.
-8. M04.8 — Security/browser closeout — **VERIFIED** on implementation head `8a6f6cc8adba2d39f2b255a74db166e3285527ba`, CI #507 / `34691558117`.
+1. M05.1 — Reference characterization — **VERIFIED**; Talk Tutor pinned at `69b6beee90c8dbd186730389f8a1462c2239fe61`, reuse/non-reuse decisions recorded in the selected design.
+2. M05.2 — Session authorization/provider boundary — **ACTIVE**.
+3. M05.3 — Browser compatibility + microphone diagnostics — **NOT STARTED**.
+4. M05.4 — Web Audio capture — **NOT STARTED**.
+5. M05.5 — Realtime transport — **NOT STARTED**.
+6. M05.6 — AI audio playback — **NOT STARTED**.
+7. M05.7 — Connection state machine — **NOT STARTED**.
+8. M05.8 — Interview-plan execution — **NOT STARTED**.
+9. M05.9 — Pacing/time budget — **NOT STARTED**.
+10. M05.10 — Bounded follow-ups — **NOT STARTED**.
+11. M05.11 — Barge-in — **NOT STARTED**.
+12. M05.12 — Timeout/error handling — **NOT STARTED**.
+13. M05.13 — Reconnect — **NOT STARTED**.
+14. M05.14 — Full realtime E2E — **NOT STARTED**.
 
 ## Latest Verification
 
-CI #507 passed the complete repository quality gate on `8a6f6cc8adba2d39f2b255a74db166e3285527ba`: frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup, production build, Chromium E2E, PRD coverage, and cleanup.
+M04 PR #6 was squash-merged to `main` as `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`. Post-merge CI #517 / `34692492691` passed the complete repository quality gate on that exact SHA, including build, Chromium E2E and PRD coverage.
 
-The M04.8 browser closeout proves a valid invitation renders the safe public projection on a 390×844 viewport without horizontal overflow; consent is keyboard reachable and recordable; trusted organization support links are exposed; and wrong, expired, revoked, and completed tokens all collapse to the same unavailable browser state.
-
-The immediately preceding CI #505 failure was diagnosed as a stale organization-settings keyboard expectation after two legitimate candidate-support inputs were added. Commit `ac047aff7cffb335226702e24b443cd1706796a9` updated the accessibility test to traverse those fields; exact-head CI #506 / `34691250632` passed the complete gate.
+M05 was then activated from that verified base. Its design is `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`; implementation plan is `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 
 ## Review State
 
-- Unresolved Critical findings: **0**.
-- Unresolved Important findings: **0**.
-- Unresolved GitHub review threads: **0** at latest recovery.
-- Security review confirms raw invitation tokens are hashed server-side and never persisted; RLS/constraints/RPCs remain authoritative; public resolution exposes only a narrow safe projection; invalid/unusable tokens fail closed; consent evidence is append-only from browser roles; interview start requires current disclosure consent; organization support settings remain owner/admin constrained by organization RLS.
-- Accessibility review confirms semantic disclosure/support sections, explicit required consent, keyboard reachability, status/error semantics, and narrow viewport no-overflow coverage.
-- Performance/YAGNI review found no unbounded public read or speculative abstraction; token resolution is a single hash lookup and bounded projection.
-- AI-safety review preserves human hiring decisions and discloses AI/transcription/data-processing/retention before start.
+- Unresolved Critical findings: **0** at activation.
+- Unresolved Important findings: **0** at activation.
+- M05 design preserves invitation/consent/version authorization, server-only long-lived provider secrets, same-attempt reconnect, immutable plan authority, and the rule that technical failures never become negative candidate evidence.
+- No M05 behavioral implementation has yet passed RED/GREEN; never infer or fabricate such evidence from the design commits.
 
 ## Next Action
 
-Reconcile final durable status/traceability/feature-matrix/PR description. Because those documentation commits create a new head, run and verify fresh exact-final-head CI. If it is green and PR/review/concurrency/mergeability gates remain satisfied, mark PR #6 ready if required and squash-merge automatically under the repository owner's standing authorization. Then verify post-merge `main` CI and immediately activate M05 — Realtime AI Interview.
+Execute M05.2 with strict TDD. Define the smallest failing server authorization test proving unusable invitation capabilities, missing current consent, missing immutable published interviewer version, or duplicate-attempt creation cannot mint a provider credential. Verify that exact RED, implement the minimum safe authorization/provider boundary, then verify GREEN and continue to M05.3.
