@@ -24,6 +24,8 @@ type RealtimeReadinessCheckProps = Readonly<{
 const FAILURE_MESSAGES: Record<RealtimeDiagnosticFailureReason, string> = {
   "insecure-context":
     "This interview needs a secure browser connection. Open the interview over HTTPS and try again.",
+  "network-offline":
+    "This device appears to be offline. Restore your network connection, then retry the technical check.",
   "media-devices-unavailable":
     "This browser cannot access media devices. Use a supported modern browser to continue.",
   "get-user-media-unavailable":
@@ -60,6 +62,7 @@ async function runBrowserRealtimeReadinessCheck(): Promise<RealtimeDiagnosticRes
   const mediaDevices = navigator.mediaDevices;
   const capabilities = await collectRealtimeBrowserCapabilities({
     isSecureContext: window.isSecureContext,
+    isOnline: navigator.onLine,
     mediaDevices,
     createAudioContext:
       typeof window.AudioContext === "function"
