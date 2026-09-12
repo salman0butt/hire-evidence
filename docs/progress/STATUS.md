@@ -15,16 +15,16 @@ Candidates + Invitations — **IN PROGRESS** on PR #6 / `feat/candidates-invitat
 
 Active branch: `feat/candidates-invitations`
 Active PR: #6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
-CI status: M04.4 final implementation head `2d5883ce57916b4a48ec338d6ea8816eb3470d80` passed CI #473 / `34684127179` across frozen install, lint, typecheck, all 322 unit/component tests, framework/source verifiers, local Supabase reset, production build, Chromium E2E, PRD coverage, and cleanup.
+CI status: M04.5 implementation head `0e73126561bd940a4e04cc86109996d603e70ab7` passed CI #484 / `34687345100` across frozen install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase startup/reset, production build, Chromium E2E, PRD coverage, and cleanup.
 
 ## Current Task State
 
 - M04.1 Candidate records — **VERIFIED** with tenant/job constraints, normalized candidate identity, role-gated creation, bounded repository behavior, and provider-backed tenant/PII isolation.
 - M04.2 Secure token service + invitation persistence — **VERIFIED**. Tokens use 32 random bytes encoded base64url, only SHA-256 hashes are persisted, hashes are unique, invitation rows bind organization/job/candidate/immutable interviewer version, expiry/revocation metadata is present, RLS is enabled, cross-tenant bindings fail, direct browser mutation is denied, and provider-backed verification passed.
 - M04.3 Invitation lifecycle — **VERIFIED**. PostgreSQL enforces `draft -> sent -> opened -> started -> completed`; transition timestamps are persisted; non-monotonic, cross-tenant, expired, revoked, completed/replayed transitions fail closed; direct authenticated table updates remain revoked.
-- M04.4 Public candidate route — **VERIFIED**. Raw tokens are SHA-256 hashed server-side, a narrow `SECURITY DEFINER` RPC with blank `search_path` resolves only sent/opened/started non-expired non-revoked invitations, only organization/job display fields leave the database boundary, invalid/unusable/provider-error cases collapse to one unavailable shape, and both anonymous and authenticated visitors use function execution without table access.
-- M04.5 Pre-interview experience — **NEXT / NOT STARTED**.
-- M04.6 Disclosure + consent — **NOT STARTED**.
+- M04.4 Public candidate route — **VERIFIED**. Raw tokens are SHA-256 hashed server-side, a narrow `SECURITY DEFINER` RPC with blank `search_path` resolves only sent/opened/started non-expired non-revoked invitations, only organization/job and immutable published-interviewer display fields leave the database boundary, invalid/unusable/provider-error cases collapse to one unavailable shape, and both anonymous and authenticated visitors use function execution without table access.
+- M04.5 Pre-interview experience — **VERIFIED**. The public page renders company and role plus semantic pre-interview sections for duration, format, technical requirements, privacy, and start prerequisites. Duration and interview format are derived from the invitation-bound immutable published interviewer snapshot rather than generic client-authoritative values.
+- M04.6 Disclosure + consent — **NEXT / NOT STARTED**.
 - M04.7 Accommodation/support path — **NOT STARTED**.
 - M04.8 Security E2E closeout — **NOT STARTED**.
 
@@ -43,21 +43,24 @@ CI status: M04.4 final implementation head `2d5883ce57916b4a48ec338d6ea8816eb347
 - M04.4 route RED: `fd759ad8da07ad8dfc29a4b2336ce20625605956`, CI #470 / `34683893563` — existing tests passed; exactly the two route cases failed because the page did not exist.
 - M04.4 security RED: `ff992cf8762dcc59c9d21a70d1a6ad6f5a98c30f`, CI #472 / `34684044217` — route/resolver tests were green; exactly two new authorization assertions failed because draft invitations were still resolvable and authenticated callers lacked the narrow function grant.
 - M04.4 GREEN: `2d5883ce57916b4a48ec338d6ea8816eb3470d80`, CI #473 / `34684127179` — complete repository quality gate passed.
+- M04.5 RED: `2b89fb69f03fb61f9b93a3f5c993094df1a45edf`, CI #483 / `34687250430` — lint/typecheck passed and the unit/component gate failed because the page did not render the immutable published duration/format values required by the new test.
+- M04.5 GREEN: `0e73126561bd940a4e04cc86109996d603e70ab7`, CI #484 / `34687345100` — complete repository quality gate passed, including provider setup/build/Chromium E2E/PRD coverage.
 
 ## Review State
 
-- Critical findings: 0 unresolved for completed M04.1–M04.4 work.
-- Important findings: 0 unresolved for completed M04.1–M04.4 work.
+- Critical findings: 0 unresolved for completed M04.1–M04.5 work.
+- Important findings: 0 unresolved for completed M04.1–M04.5 work.
 - Latest GitHub recovery found no unresolved PR review threads.
 - M04.4 skeptical security review fixed two important edge cases before verification: draft invitations are no longer publicly resolvable, and logged-in visitors can use the same token-bound resolver without receiving broader table or tenant privileges.
+- M04.5 review confirmed the displayed duration/format come from the immutable invitation-bound published interviewer snapshot; React text rendering preserves untrusted-content escaping and no candidate-facing value gains authorization authority.
 - Safety invariants remain intact: RLS/database constraints are authoritative, raw candidate invitation tokens are not persisted or logged, anonymous/authenticated direct table mutation remains denied, immutable interviewer versions are bound to invitations, candidate input remains untrusted, and humans remain hiring decision makers.
 
 ## Blockers
 
-No external blocker. M04 remains incomplete by scope; pre-interview information, disclosure/consent evidence, accommodation support, and final security/browser closeout remain to be built and verified.
+No external blocker. M04 remains incomplete by scope; disclosure/consent evidence, accommodation support, and final security/browser closeout remain to be built and verified.
 
 ## Durable Recovery
 
 Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M04-candidates-invitations.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the active M04 design/plan.
 
-Exact next work: begin M04.5 Pre-interview experience with a genuine RED requiring expected duration and interview format to come from the invitation-bound immutable interviewer-version snapshot, then add semantic/accessibility coverage for company, role, duration, format, technical requirements, privacy summary, and start prerequisites. Verify exact-head CI, reconcile durable evidence, and continue directly to M04.6.
+Exact next work: begin M04.6 Disclosure + consent with a genuine RED requiring append-only consent evidence for AI use, transcription, data/retention disclosure and explicit consent, then enforce that an invitation cannot transition to `started` without current disclosure consent. Verify exact-head CI, reconcile durable evidence, and continue directly to M04.7.
