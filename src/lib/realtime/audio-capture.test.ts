@@ -145,13 +145,13 @@ describe("RealtimeAudioCapture", () => {
   });
 
   it("does not activate capture when stopped while microphone acquisition is pending", async () => {
-    let resolveStream: ((stream: { getTracks: () => { stop: () => void }[] }) => void) | undefined;
     const stopTrack = vi.fn();
     const close = vi.fn().mockResolvedValue(undefined);
     const addModule = vi.fn().mockResolvedValue(undefined);
     const stream = {
       getTracks: () => [{ stop: stopTrack }],
     };
+    let resolveStream: ((stream: typeof stream) => void) | undefined;
     const getUserMedia = vi.fn(
       () =>
         new Promise<typeof stream>((resolve) => {
