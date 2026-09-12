@@ -5,9 +5,11 @@ import { useState } from "react";
 import {
   collectRealtimeBrowserCapabilities,
   diagnoseRealtimeBrowser,
+  listRealtimeAudioInputs,
   verifyRealtimeMicrophoneAccess,
 } from "@/lib/realtime/diagnostics";
 import type {
+  RealtimeAudioInputDevice,
   RealtimeDiagnosticFailureReason,
   RealtimeDiagnosticResult,
 } from "@/lib/realtime/diagnostics";
@@ -18,7 +20,8 @@ type RealtimeDiagnosticsProps = Readonly<{
 }>;
 
 type RealtimeReadinessCheckProps = Readonly<{
-  runCheck?: (() => Promise<RealtimeDiagnosticResult>) | undefined;
+  runCheck?: ((selectedInputDeviceId?: string) => Promise<RealtimeDiagnosticResult>) | undefined;
+  listInputs?: (() => Promise<readonly RealtimeAudioInputDevice[]>) | undefined;
 }>;
 
 const FAILURE_MESSAGES: Record<RealtimeDiagnosticFailureReason, string> = {
@@ -50,7 +53,9 @@ function isAcquisitionRecoverablePrerequisite(result: RealtimeDiagnosticResult) 
   );
 }
 
-async function runBrowserRealtimeReadinessCheck(): Promise<RealtimeDiagnosticResult> {
+async function runBrowserRealtimeReadinessCheck(
+  selectedInputDeviceId?: string,
+): Promise<RealtimeDiagnosticResult> {
   if (typeof window === "undefined" || typeof navigator === "undefined") {
     return {
       status: "blocked",
@@ -78,12 +83,23 @@ async function runBrowserRealtimeReadinessCheck(): Promise<RealtimeDiagnosticRes
     return prerequisiteResult;
   }
 
-  return verifyRealtimeMicrophoneAccess({
-    getUserMedia:
-      typeof mediaDevices?.getUserMedia === "function"
-        ? (constraints) => mediaDevices.getUserMedia(constraints)
-        : undefined,
-  });
+  return verifyRealtimeMicrophoneAccess(
+    {
+      getUserMedia:
+        typeof mediaDevices?.getUserMedia === "function"
+          ? (constraints) => mediaDevices.getUserMedia(constraints)
+          : undefined,
+    },
+    selectedInputDeviceId,
+  );
+}
+
+async function listBrowserRealtimeAudioInputs(): Promise<readonly RealtimeAudioInputDevice[]> {
+  if (typeof navigator === "undefined" || !navigator.mediaDevices) {
+    return [];
+  }
+
+  return listRealtimeAudioInputs(navigator.mediaDevices);
 }
 
 export function RealtimeDiagnostics({ result, onRetry }: RealtimeDiagnosticsProps) {
@@ -119,18 +135,30 @@ export function RealtimeDiagnostics({ result, onRetry }: RealtimeDiagnosticsProp
 
 export function RealtimeReadinessCheck({
   runCheck = runBrowserRealtimeReadinessCheck,
+  listInputs = listBrowserRealtimeAudioInputs,
 }: RealtimeReadinessCheckProps) {
   const [result, setResult] = useState<RealtimeDiagnosticResult | null>(null);
   const [checking, setChecking] = useState(false);
+  const [inputs, setInputs] = useState<readonly RealtimeAudioInputDevice[]>([]);
+  const [selectedInputDeviceId, setSelectedInputDeviceId] = useState("");
 
-  async function handleCheck() {
+  async function handleCheck(inputDeviceId?: string) {
     if (checking) {
       return;
     }
 
     setChecking(true);
     try {
-      setResult(await runCheck());
+      const nextResult = await runCheck(inputDeviceId);
+      setResult(nextResult);
+
+      if (nextResult.status === "ready" && inputs.length === 0) {
+        const nextInputs = await listInputs();
+        setInputs(nextInputs);
+        if (nextInputs.length > 0) {
+          setSelectedInputDeviceId((current) => current || nextInputs[0].deviceId);
+        }
+      }
     } catch {
       setResult({
         status: "blocked",
@@ -158,18 +186,52 @@ export function RealtimeReadinessCheck({
       {result ? (
         <RealtimeDiagnostics
           result={result}
-          onRetry={result.status === "blocked" && result.recoverable ? handleCheck : undefined}
+          onRetry={
+            result.status === "blocked" && result.recoverable
+              ? () => handleCheck(selectedInputDeviceId || undefined)
+              : undefined
+          }
         />
       ) : (
         <button
           type="button"
-          onClick={handleCheck}
+          onClick={() => handleCheck()}
           disabled={checking}
           className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {checking ? "Checking microphone…" : "Run microphone check"}
         </button>
       )}
+
+      {result?.status === "ready" && inputs.length > 0 ? (
+        <div className="space-y-3 rounded-lg border border-slate-200 p-4">
+          <div className="space-y-1">
+            <label htmlFor="realtime-microphone" className="text-sm font-medium text-slate-950">
+              Microphone
+            </label>
+            <select
+              id="realtime-microphone"
+              value={selectedInputDeviceId}
+              onChange={(event) => setSelectedInputDeviceId(event.target.value)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950"
+            >
+              {inputs.map((input) => (
+                <option key={input.deviceId} value={input.deviceId}>
+                  {input.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleCheck(selectedInputDeviceId || undefined)}
+            disabled={checking || !selectedInputDeviceId}
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {checking ? "Checking selected microphone…" : "Check selected microphone"}
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }
