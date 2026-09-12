@@ -10,7 +10,13 @@ describe("RealtimeAudioCapture", () => {
     const connect = vi.fn();
     const disconnect = vi.fn();
     let workletMessage:
-      | ((event: { data: { type: string; pcm?: Float32Array; level?: number } }) => void)
+      | ((event: {
+          data: {
+            type: string;
+            pcm?: Float32Array | undefined;
+            level?: number | undefined;
+          };
+        }) => void)
       | undefined;
 
     const stream = {
