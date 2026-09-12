@@ -13,38 +13,69 @@ function readMigration() {
   return existsSync(migrationPath) ? readFileSync(migrationPath, "utf8") : "";
 }
 
+function functionDefinition(migration: string, qualifiedName: string): string {
+  const marker = `create or replace function ${qualifiedName}`;
+  const start = migration.toLowerCase().indexOf(marker.toLowerCase());
+  expect(start).toBeGreaterThanOrEqual(0);
+  if (start < 0) return "";
+
+  const bodyStart = migration.indexOf("as $$", start);
+  expect(bodyStart).toBeGreaterThanOrEqual(0);
+  if (bodyStart < 0) return "";
+
+  const end = migration.indexOf("$$;", bodyStart);
+  expect(end).toBeGreaterThan(bodyStart);
+  return end > bodyStart ? migration.slice(start, end + 3) : "";
+}
+
 describe("non-billable interviewer preview migration", () => {
   it("exposes an authenticated tenant-bound preview RPC", () => {
     const migration = readMigration();
-
-    expect(migration).toMatch(
-      /create or replace function public\.preview_interviewer_config\s*\(/i,
+    const preview = functionDefinition(
+      migration,
+      "public.preview_interviewer_config",
     );
-    expect(migration).toMatch(/security definer/i);
-    expect(migration).toMatch(/auth\.uid\(\)/i);
-    expect(migration).toMatch(/private\.has_organization_role/i);
-    expect(migration).toMatch(/grant execute on function public\.preview_interviewer_config/i);
+
+    expect(preview).toMatch(/security definer/i);
+    expect(preview).toMatch(/auth\.uid\(\)/i);
+    expect(preview).toMatch(/private\.has_organization_role/i);
+    expect(migration).toMatch(
+      /grant execute on function public\.preview_interviewer_config/i,
+    );
   });
 
   it("uses the same snapshot composition authority as publication", () => {
     const migration = readMigration();
+    const publication = functionDefinition(
+      migration,
+      "public.publish_interviewer_config_guardrail_legacy",
+    );
+    const preview = functionDefinition(
+      migration,
+      "public.preview_interviewer_config",
+    );
 
     expect(migration).toMatch(
       /create or replace function private\.compose_interviewer_snapshot\s*\(/i,
     );
-    expect(migration).toMatch(
-      /create or replace function public\.publish_interviewer_config_guardrail_legacy[\s\S]*private\.compose_interviewer_snapshot/i,
-    );
-    expect(migration).toMatch(
-      /create or replace function public\.preview_interviewer_config[\s\S]*private\.compose_interviewer_snapshot/i,
-    );
+    expect(publication).toMatch(/private\.compose_interviewer_snapshot/i);
+    expect(preview).toMatch(/private\.compose_interviewer_snapshot/i);
   });
 
   it("revalidates safety and never persists preview artifacts", () => {
     const migration = readMigration();
+    const preview = functionDefinition(
+      migration,
+      "public.preview_interviewer_config",
+    );
 
-    expect(migration).toMatch(/private\.assert_interviewer_guardrails/i);
-    expect(migration).not.toMatch(/insert into public\.(?:candidates|interview_attempts|usage_events)/i);
-    expect(migration).not.toMatch(/update public\.interviewer_configs[\s\S]*set status\s*=\s*'published'/i);
+    expect(preview).toMatch(/private\.assert_interviewer_guardrails/i);
+    expect(preview).not.toMatch(
+      /insert into public\.(?:candidates|interview_attempts|usage_events)/i,
+    );
+    expect(preview).not.toMatch(/insert into public\.interviewer_versions/i);
+    expect(preview).not.toMatch(/update public\.interviewer_configs/i);
+    expect(preview).toMatch(/'billable', false/i);
+    expect(preview).toMatch(/'persisted', false/i);
   });
 });
