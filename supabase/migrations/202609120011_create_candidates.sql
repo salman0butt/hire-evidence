@@ -1,7 +1,7 @@
 create table public.candidates (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
-  job_id uuid not null,
+  job_id uuid not null references public.jobs(id) on delete cascade,
   full_name text not null check (
     full_name = btrim(full_name)
     and char_length(full_name) between 1 and 200
