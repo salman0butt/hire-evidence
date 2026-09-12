@@ -10,9 +10,6 @@ alter table public.organizations
       or char_length(candidate_support_url) <= 2048
     );
 
-grant update (candidate_support_email, candidate_support_url)
-  on table public.organizations to authenticated;
-
 -- PostgreSQL does not permit CREATE OR REPLACE to change an existing
 -- function's RETURNS TABLE shape, so drop the old narrow projection first
 -- and recreate it with only the two additional candidate-support fields.
@@ -68,3 +65,8 @@ $$;
 revoke all on function public.resolve_public_candidate_invitation(text) from public;
 grant execute on function public.resolve_public_candidate_invitation(text) to anon;
 grant execute on function public.resolve_public_candidate_invitation(text) to authenticated;
+
+-- The existing organizations_update_admin RLS policy remains authoritative.
+-- Only authenticated owner/admin callers can use these newly granted columns.
+grant update (candidate_support_email, candidate_support_url)
+  on table public.organizations to authenticated;
