@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M04
 
 Current capability:
-M04.1 candidate records and M04.2 secure invitation tokens/persistence are verified. The next unfinished unit is M04.3 invitation lifecycle.
+M04.1 candidate records, M04.2 secure invitation tokens/persistence, and M04.3 authoritative invitation lifecycle are verified. The next unfinished unit is M04.4 public invitation resolution.
 
 Status:
 IN PROGRESS
@@ -28,8 +28,8 @@ Canonical compact recovery state:
 
 1. M04.1 — Candidate records — **VERIFIED**.
 2. M04.2 — Secure token service + invitation persistence — **VERIFIED**.
-3. M04.3 — Invitation lifecycle — **NEXT / NOT STARTED**.
-4. M04.4 — Public candidate route — **NOT STARTED**.
+3. M04.3 — Invitation lifecycle — **VERIFIED**.
+4. M04.4 — Public candidate route / invitation resolution — **NEXT / NOT STARTED**.
 5. M04.5 — Pre-interview experience — **NOT STARTED**.
 6. M04.6 — Disclosure + consent — **NOT STARTED**.
 7. M04.7 — Accommodation/support path — **NOT STARTED**.
@@ -37,16 +37,16 @@ Canonical compact recovery state:
 
 ## Verification state
 
-M04.2 provider verification head `af46174165c6a90f0fb03525afb0ffa0bbfba128` passed CI #451 / `34681517870` across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup, build, Chromium E2E, PRD coverage, and cleanup.
+M04.3 provider-verification head `d8c5317c1d5a28aaec89a826002847db96ed9cdf` passed CI #460 / `34682867624` across frozen install, lint, typecheck, all 312 unit/component tests, framework/source verification, local Supabase reset, build, Chromium E2E, PRD coverage, and cleanup.
 
-Task 2's earlier strict TDD evidence is recorded in `docs/milestones/M04-candidates-invitations.md`, including RED `f447b4d...` / CI #447 for the token module and RED `3df096e...` / CI #449 for invitation persistence, followed by full GREEN runs #448, #450, and provider verification #451.
+Lifecycle TDD evidence: RED `792e56f422e1f77be6967facca73e69388314340` / CI #456 failed only because the lifecycle migration was absent; schema GREEN was established at `9267e97d7467af5049a2c0ac7cf95b4b3e3cb465` / CI #458; provider behavior was then exercised. CI #459 was an invalid NOT GREEN caused by a revoked-row fixture timestamp preceding database `created_at`; the fixture was corrected without weakening the constraint, and CI #460 passed.
 
-Documentation reconciliation creates newer branch heads and therefore does not replace the implementation evidence above; exact-final-head CI will be required again at milestone closeout.
+Documentation reconciliation creates newer branch heads and does not replace the verified implementation evidence above. Exact-final-head CI will be re-established after the next behavioral unit.
 
 ## Review state
 
-For completed M04.1–M04.2, latest review/recovery has 0 unresolved Critical and 0 unresolved Important findings and no unresolved GitHub review threads. Security invariants: raw invitation tokens are not persisted, hashes are unique, invitation bindings are tenant/job/candidate/interviewer-version constrained, authenticated browser mutation is denied, anon has no table privilege, and RLS remains authoritative.
+Latest GitHub recovery found 0 unresolved review threads. For completed M04.1–M04.3 there are 0 unresolved Critical and 0 unresolved Important findings. M04.3 transition authority remains database-enforced, direct authenticated table updates remain revoked, the manager transition RPC is not anonymous, and expired/revoked/completed/replayed transitions fail closed.
 
 ## Next Action
 
-Start M04.3 with strict RED tests for monotonic `draft -> sent -> opened -> started -> completed` transitions and terminal denial after expiry, revocation, or completion. Implement authoritative database transition checks, verify exact-head CI, then continue directly to M04.4 when M04.3 is genuinely complete.
+Start M04.4 with strict RED tests requiring invalid/expired/revoked/completed tokens to return the same safe failure shape, raw tokens to be hashed server-side, exactly one invitation to be resolved, and the result to expose only a safe public projection. Implement the minimal server-only/public-RPC authorization boundary with no service-role browser client, verify provider behavior and exact-head CI, then continue directly to M04.5 when M04.4 is genuinely complete.
