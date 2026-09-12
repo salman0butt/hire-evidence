@@ -3,11 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth/require-user";
+import { validateInterviewerGuardrails } from "@/lib/interviewer/guardrail-validation";
 import { saveInterviewerConfig } from "@/lib/interviewer/interviewer-configs";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/auth/require-user", () => ({ requireUser: vi.fn() }));
+vi.mock("@/lib/interviewer/guardrail-validation", () => ({
+  validateInterviewerGuardrails: vi.fn(),
+}));
 vi.mock("@/lib/interviewer/interviewer-configs", () => ({ saveInterviewerConfig: vi.fn() }));
 vi.mock("@/lib/organization/require-membership", () => ({
   requireOrganizationMembership: vi.fn(),
@@ -61,6 +65,7 @@ describe("interviewer configuration server action", () => {
       organizationName: "Evidence Co",
       role: "hiring_manager",
     });
+    vi.mocked(validateInterviewerGuardrails).mockReturnValue({ safe: true, violations: [] });
     vi.mocked(saveInterviewerConfig).mockResolvedValue(configId);
   });
 
@@ -71,6 +76,11 @@ describe("interviewer configuration server action", () => {
       saveInterviewerConfigAction(organizationId, jobId, idleState, validFormData()),
     ).resolves.toEqual({ status: "success", message: "Interviewer configuration saved." });
 
+    expect(validateInterviewerGuardrails).toHaveBeenCalledWith({
+      jobText: "",
+      guidelines: "Ask for concrete evidence.",
+      candidateInstructions: "Explain your reasoning.",
+    });
     expect(saveInterviewerConfig).toHaveBeenCalledWith(
       organizationId,
       jobId,
@@ -93,6 +103,28 @@ describe("interviewer configuration server action", () => {
       configId,
     );
     expect(revalidatePath).toHaveBeenCalledWith(`/app/o/${organizationId}/jobs/${jobId}`);
+  });
+
+  it("blocks unsafe organization-authored configuration before persistence", async () => {
+    const { saveInterviewerConfigAction } = await interviewerConfigActionsModule();
+    vi.mocked(validateInterviewerGuardrails).mockReturnValue({
+      safe: false,
+      violations: [
+        {
+          code: "autonomous_hiring_decision",
+          message: "The interviewer cannot autonomously make hire or reject decisions.",
+        },
+      ],
+    });
+
+    await expect(
+      saveInterviewerConfigAction(organizationId, jobId, idleState, validFormData()),
+    ).resolves.toEqual({
+      status: "error",
+      message: "Interviewer configuration conflicts with platform hiring-safety rules.",
+    });
+    expect(saveInterviewerConfig).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
   });
 
   it("requires jobs:manage before persistence", async () => {
