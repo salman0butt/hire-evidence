@@ -14,17 +14,18 @@ Last reconciled: 2026-09-12
 
 Realtime AI Interview — **ACTIVE** on `feat/realtime-ai-interview`.
 
+Active branch: `feat/realtime-ai-interview`
 Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
 Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`, CI #517 / `34692492691` GREEN.
 Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
-Latest exact verified branch SHA: `e821c88beec11e76a990b621b57c833cee455e00`, CI #545 / `34698304817` GREEN through frozen install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase migrations, production build, Chromium E2E, PRD coverage, and cleanup.
+CI status: latest fully verified behavioral head before the accessible diagnostics UI is `e821c88beec11e76a990b621b57c833cee455e00`, CI #545 / `34698304817` GREEN. The accessible diagnostics UI implementation at `7aac15fd5da9e42fe4edcad46619004c75601379` passed lint, typecheck, and 100 Vitest files / 380 tests in CI #548, but that run is intentionally not GREEN because this status document temporarily violated the autonomous-framework verifier contract; this reconciliation fixes that documentation regression and requires a fresh exact-head CI run before the UI slice is considered verified.
 
 ## Current Task State
 
 - M05.1 Reference characterization — **VERIFIED**. Talk Tutor is pinned at `69b6beee90c8dbd186730389f8a1462c2239fe61`; reuse/non-reuse and hiring-safety decisions are durable in the selected design.
 - M05.2 Session authorization/provider boundary — **ACTIVE / PARTIALLY VERIFIED**. Invitation/consent/version authorization, one-authoritative-attempt persistence, hashed capability repository boundary, constant-safe handler, and short-lived provider-token lifetime enforcement are implemented. The actual Next.js route/provider adapter remains intentionally uncomposed because no authoritative realtime provider selection/SDK/config exists; do not guess a vendor merely to close the task.
-- M05.3 Browser compatibility + microphone diagnostics — **ACTIVE**. Pure fail-closed capability diagnostics are RED/GREEN verified; client-side acquisition/input-level/network readiness, accessible diagnostics UI, page integration, keyboard and narrow-viewport verification remain.
+- M05.3 Browser compatibility + microphone diagnostics — **ACTIVE**. Pure fail-closed capability diagnostics are RED/GREEN verified. Accessible status/recovery UI has a real RED at `100528c0fae1837ee214be8db82c1d6ae4c09cfa`, CI #547 / `34698666201`, and implementation at `7aac15fd5da9e42fe4edcad46619004c75601379`; exact-final-head verification is pending after this documentation repair. Client-side acquisition/input-level/network readiness, page integration, keyboard and narrow-viewport verification remain.
 - M05.4–M05.14 — **NOT STARTED**.
 
 ## M05 Safety / Architecture State
@@ -46,6 +47,8 @@ Latest exact verified branch SHA: `e821c88beec11e76a990b621b57c833cee455e00`, CI
 - M05.2 later provider-neutral route-handler/token/repository work reached `c10a4a888454fe9c3612c869d8c6ba7b7b040cd6`, CI #543 / `34696198083` GREEN across the full repository gate.
 - M05.3 diagnostics RED: `c23a89c66d97c97f8a9be45e135bc8c1d0268950`, CI #544 / `34698263217`; lint passed and typecheck failed exactly because `./diagnostics` did not yet exist. The later Supabase cleanup error was cascading after setup was skipped and was not the RED cause.
 - M05.3 diagnostics GREEN: `e821c88beec11e76a990b621b57c833cee455e00`, CI #545 / `34698304817` — complete repository gate GREEN.
+- M05.3 accessible UI RED: `100528c0fae1837ee214be8db82c1d6ae4c09cfa`, CI #547 / `34698666201`; lint passed and typecheck failed exactly because `./realtime-diagnostics` did not exist.
+- M05.3 accessible UI implementation: `7aac15fd5da9e42fe4edcad46619004c75601379`; CI #548 proved lint/typecheck and all 380 tests GREEN, then correctly failed the repository framework verifier because the preceding status reconciliation omitted required literal recovery fields. This documentation fix is the root-cause correction; a fresh exact-head run is required.
 
 ## Review State
 
@@ -62,4 +65,4 @@ PR #7 currently has no submitted reviews or unresolved review threads.
 
 Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M05-realtime-ai-interview.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the selected M05 design/plan.
 
-Exact next work: continue M05.3 with strict TDD for accessible candidate-facing diagnostics and browser microphone readiness while keeping M05.2 provider selection explicitly unresolved. Do not mark either iteration verified until its full acceptance boundary is complete.
+Exact next work: verify the repaired exact head across the full repository gate, then continue M05.3 with strict TDD for client-side browser/microphone readiness and page integration while keeping M05.2 provider selection explicitly unresolved. Do not mark either iteration verified until its full acceptance boundary is complete.
