@@ -6,42 +6,46 @@ This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENT
 
 - Repository: `salman0butt/hire-evidence`
 - Default branch: `main`
-- Verified base/main SHA: `729474ffb03075c93dfa2564f0004f1590533753` (M03 PR #5); post-merge CI #432 / `34677775158` passed.
-- Active branch: `feat/candidates-invitations`
-- Active PR: #6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
-- Latest verified implementation head: `8a6f6cc8adba2d39f2b255a74db166e3285527ba`.
-- CI #507 / `34691558117` passed the full repository gate on that implementation head.
-- Durable-document reconciliation creates newer branch heads; fresh exact-final-head CI is mandatory before merge.
+- Verified base/main SHA: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` (M04 PR #6 squash merge).
+- Post-merge main CI: #517 / `34692492691` — GREEN full repository gate.
+- Active branch: `feat/realtime-ai-interview`
+- Active milestone: M05 — Realtime AI Interview.
+- Draft milestone PR: create/reuse the single M05 PR after coherent durable activation state.
+- Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
+- Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 
 ## Current milestone
 
-M04 — Candidates + Invitations is at **CLOSEOUT / MERGE GATE**.
+M05 — Realtime AI Interview is **ACTIVE**.
 
-All iterations M04.1–M04.8 are verified: candidate persistence; secure hash-at-rest opaque invitations; lifecycle/replay controls; public token resolution; pre-interview UI; AI/transcription/data/retention disclosure and append-only consent; trusted accommodation/support path; provider/browser security closeout.
+M05.1 reference characterization is verified. Talk Tutor is pinned at `69b6beee90c8dbd186730389f8a1462c2239fe61`; its ephemeral-token, generation-guard, Web Audio, queued-playback, interruption and teardown mechanics were characterized. The design explicitly rejects copying tutor-controlled prompt/configuration semantics into hiring: invitation capability, current consent, immutable interviewer version, authoritative plan/attempt state and hiring safety boundaries remain application-owned.
 
-## Latest debugging / closeout evidence
+M05.2 session authorization/provider boundary is the exact next behavioral unit.
 
-CI #505 failed only in the older organization settings keyboard E2E after two legitimate candidate-support inputs were added. The UI implementation was correct; the test expected Save immediately after Hiring use case. Commit `ac047aff7cffb335226702e24b443cd1706796a9` updated the focus sequence to include candidate support email/URL. CI #506 / `34691250632` then passed the complete gate.
+## Safety / architecture state
 
-M04.8 added `e2e/candidate-invitation-ui.spec.ts` at `8a6f6cc8adba2d39f2b255a74db166e3285527ba`. CI #507 / `34691558117` passed install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase, build, Chromium E2E, PRD coverage, and cleanup. The browser test verifies the valid mobile invitation and consent flow plus the same unavailable state for wrong, expired, revoked, and completed tokens.
+- Raw invitation tokens are capabilities and are never persisted/logged.
+- Long-lived provider secrets remain server-only; browser credentials are short-lived/minimally scoped.
+- Candidate speech/transcript is untrusted input and cannot change system policy, job criteria, plan order, follow-up limits, or assessment rules.
+- Reconnect resumes the same authoritative attempt and cannot silently restart the plan.
+- Technical/browser/provider/microphone failures never lower candidate evaluation or become negative evidence.
+- M05 introduces no autonomous hire/reject decision, no candidate scoring, and no protected-trait/emotion/personality/deception/appearance/accent-quality inference.
+- The application currently has no realtime provider SDK dependency; do not infer a provider solely because Talk Tutor uses one.
 
-## Review / safety state
+## Current evidence
 
-- Critical findings: 0 unresolved.
-- Important findings: 0 unresolved.
-- GitHub review threads: 0 unresolved at latest recovery.
-- Raw invitation tokens are not persisted/logged; server hashes before the narrow public RPC.
-- Tenant/job/candidate/version constraints and RLS remain authoritative.
-- Consent is versioned and append-only from browser roles; current consent is required before `started`.
-- Candidate support settings remain owner/admin constrained and only safe parsed destinations leave the public boundary.
-- Humans remain hiring decision makers; no autonomous hire/reject or prohibited inference capability was added.
+- M04 merge SHA `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` verified by CI #517 / `34692492691`.
+- M05 design commit: `7dcbaac0fc84e1843e7867feb8f076c43dbebb3f`.
+- M05 implementation-plan commit: `671ee4826df39cc45ed14463b1f8251dd5ce5982`.
+- M05 ledger activation commit: `727779dca4eb579028244faba85f7a6c355ae5eb`.
+- No M05 behavioral RED/GREEN exists yet. Never fabricate one.
 
 ## Exact next work
 
-1. Recover the exact current PR head and ensure no competing autonomous run advanced it.
-2. Finish durable closeout (`STATUS`, `CURRENT`, M04 ledger, handoff, feature matrix, traceability, known issues, PR body).
-3. Verify fresh CI against the exact final documentation head.
-4. Recheck unresolved threads, mergeability, base/head stability and concurrency.
-5. If every authorized gate is green, mark PR #6 ready if required and squash-merge it automatically.
-6. Recover the new `main` SHA and verify post-merge main CI.
-7. Activate M05 — Realtime AI Interview, create/reuse its feature branch and draft PR according to repo conventions, update durable state, and immediately begin the first valid TDD unit.
+1. Recover active branch/PR/exact head and ensure no competing run advanced M05.
+2. If no draft M05 PR exists, create it from `feat/realtime-ai-interview` to `main` and keep it draft.
+3. Begin M05.2 with `src/lib/realtime/session-authorization.test.ts`.
+4. RED must prove at minimum that an unusable invitation, missing current consent, missing immutable published interviewer version, or duplicate-attempt condition cannot mint a provider credential.
+5. Verify the exact RED failure is intended and not lint/type/infrastructure noise.
+6. Implement the minimum safe `authorizeRealtimeSession` + injected provider-token issuer/authoritative attempt boundary.
+7. Verify GREEN on the exact new head, review security/YAGNI/safety, update durable evidence, and continue into M05.3.
