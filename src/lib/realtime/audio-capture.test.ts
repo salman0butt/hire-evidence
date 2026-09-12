@@ -303,4 +303,62 @@ describe("RealtimeAudioCapture", () => {
     await capture.stop();
     expect(secondStopTrack).toHaveBeenCalledTimes(1);
   });
+
+  it("does not tear down a restarted capture when a canceled acquisition rejects later", async () => {
+    type PendingStream = {
+      getTracks: () => { stop: () => void }[];
+    };
+
+    const firstFailure = new Error("first microphone request failed");
+    const secondStopTrack = vi.fn();
+    const secondClose = vi.fn().mockResolvedValue(undefined);
+    const secondStream: PendingStream = {
+      getTracks: () => [{ stop: secondStopTrack }],
+    };
+    let rejectFirstStream: ((error: Error) => void) | undefined;
+    const getUserMedia = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise<PendingStream>((_resolve, reject) => {
+            rejectFirstStream = reject;
+          }),
+      )
+      .mockResolvedValueOnce(secondStream);
+    const createAudioContext = vi.fn(() => ({
+      sampleRate: 48_000,
+      audioWorklet: { addModule: vi.fn().mockResolvedValue(undefined) },
+      createMediaStreamSource: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+      })),
+      destination: {},
+      close: secondClose,
+    }));
+    const capture = createRealtimeAudioCapture({
+      getUserMedia,
+      createAudioContext,
+      createWorkletNode: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        port: { postMessage: vi.fn() },
+      })),
+      onChunk: vi.fn(),
+    });
+
+    const firstStart = capture.start();
+    await Promise.resolve();
+    await capture.stop();
+    await capture.start();
+
+    rejectFirstStream?.(firstFailure);
+    await expect(firstStart).rejects.toThrow("first microphone request failed");
+
+    expect(secondStopTrack).not.toHaveBeenCalled();
+    expect(secondClose).not.toHaveBeenCalled();
+
+    await capture.stop();
+    expect(secondStopTrack).toHaveBeenCalledTimes(1);
+    expect(secondClose).toHaveBeenCalledTimes(1);
+  });
 });
