@@ -44,6 +44,31 @@ export async function saveInterviewPlan(
   return data;
 }
 
+export async function getLatestInterviewPlanId(
+  organizationId: string,
+  jobId: string,
+): Promise<string | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("interview_plans")
+    .select("id")
+    .eq("organization_id", organizationId)
+    .eq("job_id", jobId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error("Unable to load interview plan.");
+  }
+
+  if (!data || typeof data.id !== "string" || !data.id) {
+    return null;
+  }
+
+  return data.id;
+}
+
 export async function getInterviewPlan(
   organizationId: string,
   jobId: string,
