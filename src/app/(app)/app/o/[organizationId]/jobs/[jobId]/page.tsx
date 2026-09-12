@@ -52,6 +52,8 @@ export default async function JobPage({ params }: JobPageProps) {
     getLatestInterviewerConfig(organizationId, jobId),
   ]);
   const canManage = hasOrganizationCapability(context.role, "jobs:manage");
+  const canEditInterviewerConfig =
+    canManage && interviewerConfig?.status !== "published";
   const initialPlanProps = interviewPlan ? { initialPlan: interviewPlan } : {};
   const initialConfigProps = interviewerConfig
     ? { initialConfig: interviewerConfig }
@@ -107,7 +109,7 @@ export default async function JobPage({ params }: JobPageProps) {
         />
       )}
 
-      {canManage ? (
+      {canEditInterviewerConfig ? (
         <InterviewerConfigSection
           planId={interviewPlanId}
           {...initialConfigProps}
