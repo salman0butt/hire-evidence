@@ -39,7 +39,22 @@ async function interviewPlansModule() {
       jobId: string,
       planInput: InterviewPlanFixture,
     ) => Promise<string>;
+    getInterviewPlan: (
+      organizationId: string,
+      jobId: string,
+    ) => Promise<InterviewPlanFixture | null>;
   }>;
+}
+
+function readClient(result: { data: unknown; error: unknown }) {
+  const maybeSingle = vi.fn().mockResolvedValue(result);
+  const limit = vi.fn(() => ({ maybeSingle }));
+  const order = vi.fn(() => ({ limit }));
+  const secondEq = vi.fn(() => ({ order }));
+  const firstEq = vi.fn(() => ({ eq: secondEq }));
+  const select = vi.fn(() => ({ eq: firstEq }));
+  const from = vi.fn(() => ({ select }));
+  return { from, select, firstEq, secondEq, order, limit, maybeSingle };
 }
 
 describe("interview plan repository", () => {
@@ -62,6 +77,63 @@ describe("interview plan repository", () => {
     });
   });
 
+  it("loads the latest tenant- and job-bound plan with ordered links", async () => {
+    const query = readClient({
+      data: {
+        total_duration_seconds: 900,
+        interview_plan_sections: [
+          {
+            purpose: "Technical fundamentals",
+            duration_seconds: 300,
+            position: 0,
+            interview_plan_section_questions: [
+              {
+                question_id: "33333333-3333-4333-8333-333333333333",
+                question_position: 0,
+              },
+            ],
+            interview_plan_section_competencies: [
+              { competency_id: "44444444-4444-4444-8444-444444444444" },
+            ],
+          },
+          {
+            purpose: "Problem solving",
+            duration_seconds: 600,
+            position: 1,
+            interview_plan_section_questions: [
+              {
+                question_id: "66666666-6666-4666-8666-666666666666",
+                question_position: 0,
+              },
+            ],
+            interview_plan_section_competencies: [
+              { competency_id: "77777777-7777-4777-8777-777777777777" },
+            ],
+          },
+        ],
+      },
+      error: null,
+    });
+    mockedCreateClient.mockResolvedValue({ from: query.from } as never);
+    const { getInterviewPlan } = await interviewPlansModule();
+
+    await expect(getInterviewPlan(organizationId, jobId)).resolves.toEqual(input);
+
+    expect(query.from).toHaveBeenCalledWith("interview_plans");
+    expect(query.firstEq).toHaveBeenCalledWith("organization_id", organizationId);
+    expect(query.secondEq).toHaveBeenCalledWith("job_id", jobId);
+    expect(query.order).toHaveBeenCalledWith("updated_at", { ascending: false });
+    expect(query.limit).toHaveBeenCalledWith(1);
+  });
+
+  it("returns null when no plan exists", async () => {
+    const query = readClient({ data: null, error: null });
+    mockedCreateClient.mockResolvedValue({ from: query.from } as never);
+    const { getInterviewPlan } = await interviewPlansModule();
+
+    await expect(getInterviewPlan(organizationId, jobId)).resolves.toBeNull();
+  });
+
   it("fails closed without leaking provider errors", async () => {
     const rpc = vi.fn().mockResolvedValue({
       data: null,
@@ -72,6 +144,13 @@ describe("interview plan repository", () => {
 
     await expect(saveInterviewPlan(organizationId, jobId, input)).rejects.toThrow(
       "Unable to save interview plan.",
+    );
+
+    const query = readClient({ data: null, error: { message: "database internals" } });
+    mockedCreateClient.mockResolvedValue({ from: query.from } as never);
+    const { getInterviewPlan } = await interviewPlansModule();
+    await expect(getInterviewPlan(organizationId, jobId)).rejects.toThrow(
+      "Unable to load interview plan.",
     );
   });
 });
