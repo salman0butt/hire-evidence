@@ -28,7 +28,7 @@ revoke all on table public.interview_attempts from authenticated;
 create or replace function public.authorize_realtime_interview_session(
   p_token_hash text
 )
-returns public.interview_attempts
+returns uuid
 language plpgsql
 security definer
 set search_path = ''
@@ -102,7 +102,7 @@ begin
     raise exception 'invitation unavailable';
   end if;
 
-  return attempt;
+  return attempt.id;
 end;
 $$;
 
