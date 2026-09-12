@@ -1,6 +1,7 @@
 import { CompetencySection } from "@/components/jobs/competency-section";
 import { InterviewPlanSection } from "@/components/jobs/interview-plan-section";
 import { InterviewerConfigSection } from "@/components/jobs/interviewer-config-section";
+import { InterviewerPreviewSection } from "@/components/jobs/interviewer-preview-section";
 import { JobForm } from "@/components/jobs/job-form";
 import { QuestionSection } from "@/components/jobs/question-section";
 import { listCompetencies } from "@/lib/interviewer/competencies";
@@ -21,6 +22,7 @@ import {
 } from "./competency-actions";
 import { saveInterviewPlanAction } from "./interview-plan-actions";
 import { saveInterviewerConfigAction } from "./interviewer-config-actions";
+import { previewInterviewerConfigAction } from "./interviewer-preview-actions";
 import { createQuestionAction } from "./question-actions";
 
 type JobPageProps = Readonly<{
@@ -116,6 +118,17 @@ export default async function JobPage({ params }: JobPageProps) {
           readOnly
         />
       )}
+
+      {canManage && interviewerConfig ? (
+        <InterviewerPreviewSection
+          action={previewInterviewerConfigAction.bind(
+            null,
+            organizationId,
+            jobId,
+            interviewerConfig.id,
+          )}
+        />
+      ) : null}
     </div>
   );
 }
