@@ -123,6 +123,7 @@ test.describe("interviewer builder browser closeout", () => {
     }
     await page.getByRole("button", { name: `Save ${competency} rubric` }).click();
     await expect(page.getByRole("status")).toContainText("Rubric saved.");
+    await page.reload();
 
     await page.getByLabel("Question text").fill(question);
     await page.getByLabel("Expected areas").fill("constraints\ntradeoffs\nverification");
