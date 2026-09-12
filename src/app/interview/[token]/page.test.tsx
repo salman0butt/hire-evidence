@@ -119,6 +119,21 @@ describe("public candidate invitation page", () => {
     ).toHaveAttribute("href", "https://evidence.test/interview-support");
   });
 
+  it("renders an explicit technical readiness check before consent", async () => {
+    mockedResolvePublicInvitation.mockResolvedValue({
+      status: "available",
+      invitation: availableInvitation,
+    });
+    const Page = await loadPage();
+
+    render(await Page({ params: Promise.resolve({ token }) }));
+
+    expect(screen.getByRole("heading", { name: "Technical check" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Run microphone check" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders one generic safe failure state without invitation details", async () => {
     mockedResolvePublicInvitation.mockResolvedValue({ status: "unavailable" });
     const Page = await loadPage();

@@ -4,55 +4,58 @@ Last reconciled: 2026-09-12
 
 ## Completed Milestones
 
-- Product Foundation — **COMPLETE**. PR #2 merged as `64ebeb4f7b2a39fc0557685ef34035650211aad9`; post-merge CI #57 passed.
-- SaaS Shell + Auth — **COMPLETE**. PR #3 squash-merged as `ed10e1b55bb62cf202585c8c50e6487014e83c29`; post-merge CI #157 passed.
-- Organizations + RBAC — **COMPLETE**. PR #4 squash-merged as `835d7d571a69cd13e3e802be4872e873ffdd34fe`; post-merge CI #232 / `34624252208` passed.
-- Jobs + Interviewer Builder — **COMPLETE**. PR #5 squash-merged as `729474ffb03075c93dfa2564f0004f1590533753`; post-merge CI #432 / `34677775158` passed.
+- Product Foundation — **COMPLETE**. PR #2 merged as `64ebeb4f7b2a39fc0557685ef34035650211aad9`.
+- SaaS Shell + Auth — **COMPLETE**. PR #3 merged as `ed10e1b55bb62cf202585c8c50e6487014e83c29`.
+- Organizations + RBAC — **COMPLETE**. PR #4 merged as `835d7d571a69cd13e3e802be4872e873ffdd34fe`.
+- Jobs + Interviewer Builder — **COMPLETE**. PR #5 merged as `729474ffb03075c93dfa2564f0004f1590533753`.
+- Candidates + Invitations — **COMPLETE**. PR #6 merged as `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`; post-merge CI #517 / `34692492691` passed the full repository gate.
 
 ## Current Milestone
 
-Candidates + Invitations — **CLOSEOUT / MERGE GATE** on PR #6 / `feat/candidates-invitations`.
+Realtime AI Interview — **ACTIVE**.
 
-Active branch: `feat/candidates-invitations`
-Active PR: #6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
-Latest verified implementation head: `8a6f6cc8adba2d39f2b255a74db166e3285527ba`.
-CI status: CI #507 / `34691558117` passed the complete repository gate on that exact implementation head. Documentation reconciliation creates a newer head and therefore requires fresh final CI before merge.
+Active branch: `feat/realtime-ai-interview`
+Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
+Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
+Latest verified behavioral head: `9982d75f02fb6911162d60cec98581441ecf704b`, CI #603 / `34710723994` — full repository gate GREEN.
+
+Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
+Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 
 ## Current Task State
 
-- M04.1 Candidate records — **VERIFIED**: tenant/job constraints, normalized identity, role-gated creation, bounded repository behavior, provider-backed tenant/PII isolation.
-- M04.2 Secure invitation tokens/persistence — **VERIFIED**: 32 random bytes, base64url raw tokens, SHA-256 hash-only persistence, uniqueness, expiry/revocation, immutable interviewer-version binding, RLS, browser-write denial.
-- M04.3 Invitation lifecycle — **VERIFIED**: authoritative `draft -> sent -> opened -> started -> completed`, timestamps, cross-tenant/out-of-order/expired/revoked/completed replay denial.
-- M04.4 Public candidate route — **VERIFIED**: server-side token hashing, narrow `SECURITY DEFINER` resolver, safe public projection, constant-shape unavailable result, no public table grant.
-- M04.5 Pre-interview experience — **VERIFIED**: company, role, immutable duration/format, technical requirements, privacy summary, prerequisites, semantic responsive UI.
-- M04.6 Disclosure + consent — **VERIFIED**: AI/transcription/data-processing/retention disclosures; explicit consent; append-only consent evidence; stale disclosure versions rejected; start blocked without current consent.
-- M04.7 Accommodation/support path — **VERIFIED**: trusted owner/admin-configured support email/URL, candidate-facing alternative support path without requiring protected/medical disclosure.
-- M04.8 Security/browser closeout — **VERIFIED** on `8a6f6cc8...` / CI #507: valid mobile browser flow, keyboard consent, support links, no horizontal overflow, and wrong/expired/revoked/completed tokens sharing the same unavailable state.
+- M05.1 Reference characterization — **VERIFIED**.
+- M05.2 Session authorization/provider boundary — **ACTIVE / PARTIALLY VERIFIED**. Invitation/consent/version authorization, one-authoritative-attempt persistence, hashed capability boundaries, and token lifetime enforcement exist. Provider-specific production credential issuance/adapter composition remains intentionally unresolved because no authoritative realtime provider is selected.
+- M05.3 Browser compatibility + microphone diagnostics — **VERIFIED**. Secure-context/media/getUserMedia/AudioContext/AudioWorklet/permission/network diagnostics, explicit acquisition/cleanup, privacy-preserving audio-input enumeration and candidate selection, selected-device checks, usable input-level readiness, accessible status/recovery UI, candidate-page integration, keyboard-focus semantics, and narrow-viewport/no-overflow browser verification are covered.
+- M05.4 Deterministic Web Audio capture — **VERIFIED**. Selected mono input acquisition, AudioWorklet PCM flow, mute, generation-scoped callback rejection, idempotent stop, one-time track/node/context cleanup, and input-level reset are covered.
+- M05.5 Provider-neutral realtime transport — **ACTIVE / NEXT**. Implement normalized app-owned transport + deterministic fake transport. Do not invent a provider adapter.
+- M05.6–M05.14 — **NOT STARTED**.
 
 ## TDD / Verification Evidence
 
-- M04.2 token RED `f447b4d18a08c1063b0b6c58f173f89e561f497a` / CI #447; GREEN `f9240ffb35ce07452d3f5c83bc4254fd8c091156` / CI #448.
-- M04.2 persistence RED `3df096e27eebd6183d3baf679d1ae9e93777c9ad` / CI #449; GREEN `a2b1fb7a686f985c71a1398b3610c499c2d4d63d` / CI #450; provider verification `af46174165c6a90f0fb03525afb0ffa0bbfba128` / CI #451.
-- M04.3 lifecycle RED `792e56f422e1f77be6967facca73e69388314340` / CI #456; schema GREEN `9267e97d7467af5049a2c0ac7cf95b4b3e3cb465` / CI #458; provider GREEN `d8c5317c1d5a28aaec89a826002847db96ed9cdf` / CI #460.
-- M04.4 RED sequence: `2c931522851abbf39513f44f09070c745082069e` / CI #465, `d3f808ea7b7c1acd6d5d7e408fe52bc2ddef7545` / CI #468, `fd759ad8da07ad8dfc29a4b2336ce20625605956` / CI #470, security RED `ff992cf8762dcc59c9d21a70d1a6ad6f5a98c30f` / CI #472; GREEN `2d5883ce57916b4a48ec338d6ea8816eb3470d80` / CI #473.
-- M04.5 RED `2b89fb69f03fb61f9b93a3f5c993094df1a45edf` / CI #483; GREEN `0e73126561bd940a4e04cc86109996d603e70ab7` / CI #484.
-- M04.7 support-path test-first checkpoint `a7a553de51ac28c0eabfe34cae27bd6e96c6fe9e`; implementation `a88cfd44a373decb543d7367372fe9f70484c3ed`. CI #505 exposed only a stale pre-existing keyboard test. Root-cause fix `ac047aff7cffb335226702e24b443cd1706796a9` passed full CI #506 / `34691250632`.
-- M04.8 browser/security closeout `8a6f6cc8adba2d39f2b255a74db166e3285527ba` passed full CI #507 / `34691558117`.
+Earlier M05.2/M05.3 evidence remains in `docs/milestones/M05-realtime-ai-interview.md`.
+
+Current closeout evidence:
+- M05.4 invalid NOT RED: `cae05ed76eca9547863087aa0ee9e4721c0a59c4`, CI #599 / `34710015886` — test harness type mismatch prevented behavioral execution.
+- M05.4 RED: `7b39f6be82982bc6b1e9f677d8b1c640ef06058e`, CI #600 / `34710078998` — lint/typecheck reached GREEN and unit tests failed on the intended input-level reset assertion.
+- M05.4 GREEN: `4b5260bc1dfd4b4e726784d306562e60b12b814c`, CI #601 / `34710176595` — complete repository gate GREEN.
+- M05.4 regression coverage: `3cb6776411e345bb1f7bf8ccc078f23cac6ea389`, CI #602 / `34710451680` — mute, stale callbacks, repeated stop/resource release; complete repository gate GREEN.
+- M05.3 keyboard closeout: `9982d75f02fb6911162d60cec98581441ecf704b`, CI #603 / `34710723994` — technical-check trigger is explicitly focusable; full gate including existing 390px candidate E2E GREEN.
 
 ## Review State
 
-Critical findings: **0 unresolved**.
-Important findings: **0 unresolved**.
-Latest GitHub recovery: **0 unresolved review threads**.
+Critical findings: **0 unresolved** for implemented M05 slices.
+Important findings: **0 unresolved** for implemented M05 slices.
+PR #7 had no unresolved review threads at the latest recovery check.
+Task 4 self-review found no Critical/Important issue in cleanup, stale-generation, mute, security, evidence-integrity, or resource-lifecycle behavior.
 
-Security/privacy review: PostgreSQL constraints/RLS/RPCs remain authoritative; raw tokens are not persisted/logged; public capability is invitation-scoped; support settings remain owner/admin RLS constrained; consent is append-only from browser roles and required before start. Accessibility review: semantic sections, explicit consent, focus order, status semantics and narrow viewport coverage are verified. Performance/YAGNI review found no unbounded public query or speculative architecture. AI-safety boundaries remain intact and humans remain hiring decision makers.
+## Blockers / Constraints
 
-## Blockers
-
-No external blocker. The only remaining M04 merge gate is procedural evidence: final durable-document/PR reconciliation creates a new branch head, so exact-final-head CI must pass and the head/review/concurrency/mergeability state must be rechecked before auto-merge.
+- M05.2 provider-specific production issuance and the provider adapter portion of M05.5 cannot be completed honestly until an authoritative realtime provider choice/configuration exists. Preserve provider-neutral boundaries rather than guessing.
+- This provider decision does not block the app-owned transport interface/fake transport or later provider-neutral domain modules.
 
 ## Durable Recovery
 
-Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M04-candidates-invitations.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the active M04 design/plan.
+Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M05-realtime-ai-interview.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the selected M05 design/plan. Git/code/current exact-SHA CI outrank stale Markdown.
 
-Exact next work: finish durable closeout, verify exact-final-head CI, squash-merge PR #6 if every authorized merge gate remains green, verify post-merge `main`, then activate M05 — Realtime AI Interview and begin its first dependency-valid TDD unit.
+Exact next work: begin M05.5 with strict TDD for lifecycle ordering, send-before-open/send-after-close rejection, stale callbacks, safe/idempotent disconnect, normalized technical errors, and a deterministic fake transport. Provider adapter work stays explicitly blocked pending authoritative provider selection.

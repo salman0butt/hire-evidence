@@ -1,4 +1,5 @@
 import { CandidateConsentForm } from "@/components/candidates/candidate-consent-form";
+import { RealtimeReadinessCheck } from "@/components/interview/realtime-diagnostics";
 import { resolvePublicInvitation } from "@/lib/candidates/public-invitation";
 import type { PublicInvitationProjection } from "@/lib/candidates/public-invitation";
 import { recordCandidateConsentAction } from "./consent-actions";
@@ -145,6 +146,10 @@ export default async function CandidateInterviewPage({
           </div>
         </section>
       ) : null}
+
+      <div className="mt-10">
+        <RealtimeReadinessCheck />
+      </div>
 
       <div className="mt-10">
         <CandidateConsentForm action={consentAction} />
