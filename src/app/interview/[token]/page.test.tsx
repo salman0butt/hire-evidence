@@ -78,6 +78,25 @@ describe("public candidate invitation page", () => {
     expect(screen.getByText("Technical")).toBeInTheDocument();
   });
 
+  it("renders the explicit disclosure consent control for an available invitation", async () => {
+    mockedResolvePublicInvitation.mockResolvedValue({
+      status: "available",
+      invitation: availableInvitation,
+    });
+    const Page = await loadPage();
+
+    render(await Page({ params: Promise.resolve({ token }) }));
+
+    expect(
+      screen.getByRole("heading", { name: "AI and privacy disclosures" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("checkbox", {
+        name: /I have read these disclosures and consent/i,
+      }),
+    ).toBeRequired();
+  });
+
   it("renders one generic safe failure state without invitation details", async () => {
     mockedResolvePublicInvitation.mockResolvedValue({ status: "unavailable" });
     const Page = await loadPage();
