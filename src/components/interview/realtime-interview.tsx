@@ -49,7 +49,7 @@ export function RealtimeInterview({
         muted={muted}
         onMutedChange={onMutedChange}
         onEnd={onEnd}
-        onRetry={onRetry}
+        {...(onRetry ? { onRetry } : {})}
       />
     </section>
   );
