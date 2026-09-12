@@ -1,9 +1,14 @@
 import { CompetencySection } from "@/components/jobs/competency-section";
 import { InterviewPlanSection } from "@/components/jobs/interview-plan-section";
+import { InterviewerConfigSection } from "@/components/jobs/interviewer-config-section";
 import { JobForm } from "@/components/jobs/job-form";
 import { QuestionSection } from "@/components/jobs/question-section";
 import { listCompetencies } from "@/lib/interviewer/competencies";
-import { getInterviewPlan } from "@/lib/interviewer/interview-plans";
+import { getLatestInterviewerConfig } from "@/lib/interviewer/interviewer-configs";
+import {
+  getInterviewPlan,
+  getLatestInterviewPlanId,
+} from "@/lib/interviewer/interview-plans";
 import { listQuestions } from "@/lib/interviewer/questions";
 import { getJob } from "@/lib/jobs/jobs";
 import { hasOrganizationCapability } from "@/lib/organization/rbac";
@@ -15,6 +20,7 @@ import {
   saveCompetencyRubricAction,
 } from "./competency-actions";
 import { saveInterviewPlanAction } from "./interview-plan-actions";
+import { saveInterviewerConfigAction } from "./interviewer-config-actions";
 import { createQuestionAction } from "./question-actions";
 
 type JobPageProps = Readonly<{
@@ -26,14 +32,26 @@ const MAX_INTERVIEW_DURATION_SECONDS = 3600;
 export default async function JobPage({ params }: JobPageProps) {
   const { organizationId, jobId } = await params;
   const context = await requireOrganizationMembership(organizationId);
-  const [job, competencies, questions, interviewPlan] = await Promise.all([
+  const [
+    job,
+    competencies,
+    questions,
+    interviewPlan,
+    interviewPlanId,
+    interviewerConfig,
+  ] = await Promise.all([
     getJob(organizationId, jobId),
     listCompetencies(organizationId, jobId),
     listQuestions(organizationId, jobId),
     getInterviewPlan(organizationId, jobId),
+    getLatestInterviewPlanId(organizationId, jobId),
+    getLatestInterviewerConfig(organizationId, jobId),
   ]);
   const canManage = hasOrganizationCapability(context.role, "jobs:manage");
   const initialPlanProps = interviewPlan ? { initialPlan: interviewPlan } : {};
+  const initialConfigProps = interviewerConfig
+    ? { initialConfig: interviewerConfig }
+    : {};
 
   return (
     <div className="space-y-10">
@@ -81,6 +99,20 @@ export default async function JobPage({ params }: JobPageProps) {
           competencies={competencies}
           maxTotalDurationSeconds={MAX_INTERVIEW_DURATION_SECONDS}
           {...initialPlanProps}
+          readOnly
+        />
+      )}
+
+      {canManage ? (
+        <InterviewerConfigSection
+          planId={interviewPlanId}
+          {...initialConfigProps}
+          action={saveInterviewerConfigAction.bind(null, organizationId, jobId)}
+        />
+      ) : (
+        <InterviewerConfigSection
+          planId={interviewPlanId}
+          {...initialConfigProps}
           readOnly
         />
       )}
