@@ -24,7 +24,7 @@
 
 **Files:**
 - Create: `src/lib/candidates/candidate-migration.test.ts`
-- Create: `supabase/migrations/202609120009_create_candidates.sql`
+- Create: `supabase/migrations/202609120011_create_candidates.sql`
 - Later create: `src/lib/candidates/candidate-validation.ts`, `candidate-validation.test.ts`, `candidates.ts`, `candidates.test.ts`
 
 **Interfaces:**
@@ -42,7 +42,7 @@
 **Files:**
 - Create: `src/lib/candidates/invitation-token.ts`
 - Create: `src/lib/candidates/invitation-token.test.ts`
-- Create: `supabase/migrations/202609120010_create_candidate_invitations.sql`
+- Create: `supabase/migrations/202609120012_create_candidate_invitations.sql`
 
 **Interfaces:**
 - `createInvitationToken(): { token: string; tokenHash: string }`
