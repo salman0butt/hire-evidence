@@ -40,13 +40,11 @@ async function readConfirmationUrl(messageId: string): Promise<string> {
 async function signUpAndCreateOrganization(page: Page, suffix: string) {
   const email = `builder-ui-${suffix}@example.com`;
 
-  await page.goto("/signup");
-  await page.getByLabel("Full name").fill("Builder Owner");
-  await page.getByLabel("Work email").fill(email);
-  await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
-  await page.getByLabel("Confirm password").fill(PASSWORD);
+  await page.goto("/auth/signup");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL(/\/verify-email/);
+  await expect(page.getByRole("status")).toContainText("Check your email");
 
   const messageId = await readLatestMailpitMessageId(email);
   const confirmationUrl = await readConfirmationUrl(messageId);
@@ -54,10 +52,10 @@ async function signUpAndCreateOrganization(page: Page, suffix: string) {
   expect(confirmationResponse.status()).toBeGreaterThanOrEqual(300);
   expect(confirmationResponse.status()).toBeLessThan(400);
 
-  await page.goto("/login");
+  await page.goto("/auth/login");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(PASSWORD);
-  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.getByRole("button", { name: "Log in" }).click();
   await expect(page).toHaveURL(/\/app(?:\/organizations)?$/);
 
   await page.getByRole("link", { name: "Create organization" }).click();
