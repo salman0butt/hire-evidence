@@ -37,6 +37,8 @@ describe("public candidate invitation resolution migration", () => {
 
   it("grants only the resolver capability to anonymous callers", () => {
     const migration = readMigration();
+    const returnShape =
+      migration.match(/returns table\s*\(([\s\S]*?)\)\s*language/i)?.[1] ?? "";
 
     expect(migration).toMatch(
       /revoke all on function public\.resolve_public_candidate_invitation\(text\) from public/i,
@@ -45,8 +47,10 @@ describe("public candidate invitation resolution migration", () => {
       /grant execute on function public\.resolve_public_candidate_invitation\(text\) to anon/i,
     );
     expect(migration).not.toMatch(/grant\s+select\s+on\s+(table\s+)?public\.candidate_invitations\s+to\s+anon/i);
-    expect(migration).not.toMatch(/candidate_id\s+[a-z]/i);
-    expect(migration).not.toMatch(/organization_id\s+[a-z]/i);
-    expect(migration).not.toMatch(/interviewer_version_id\s+[a-z]/i);
+    expect(returnShape).toMatch(/organization_name\s+text/i);
+    expect(returnShape).toMatch(/job_title\s+text/i);
+    expect(returnShape).not.toMatch(/\bcandidate_id\b/i);
+    expect(returnShape).not.toMatch(/\borganization_id\b/i);
+    expect(returnShape).not.toMatch(/\binterviewer_version_id\b/i);
   });
 });
