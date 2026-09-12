@@ -62,9 +62,9 @@ Server-authorized realtime setup; short-lived provider credentials; provider-neu
 ## Tasks / Iterations
 1. **VERIFIED** — M05.1 Reference characterization.
 2. **ACTIVE / PARTIALLY VERIFIED** — M05.2 Session authorization/provider boundary. Authorization, authoritative attempt persistence, narrow repository/handler behavior, and token lifetime rules exist. Provider-specific production issuance remains blocked on authoritative provider selection/configuration.
-3. **ACTIVE** — M05.3 Browser compatibility + microphone diagnostics. Capability/network/permission/input diagnostics, explicit microphone acquisition/cleanup, accessible recovery UI, candidate-page integration, offline handling, and selected-device acquisition exist. Device-selection UX, usable input-level readiness, and focused keyboard/narrow-viewport verification remain.
-4. **NOT STARTED** — M05.4 Deterministic Web Audio capture.
-5. **NOT STARTED** — M05.5 Provider-neutral realtime transport / selected adapter when justified.
+3. **VERIFIED** — M05.3 Browser compatibility + microphone diagnostics. Capability/network/permission/input diagnostics, explicit microphone acquisition/cleanup, privacy-preserving audio-input enumeration/selection, selected-device checks, usable input-level readiness, accessible recovery UI, candidate-page integration, keyboard-focus semantics, and narrow-viewport/no-overflow browser coverage are present.
+4. **VERIFIED** — M05.4 Deterministic Web Audio capture. Selected mono acquisition, AudioWorklet PCM flow, mute, generation-scoped stale callback rejection, idempotent stop, one-time resource cleanup, and input-level reset are covered.
+5. **ACTIVE / NEXT** — M05.5 Provider-neutral realtime transport. Implement the app-owned normalized transport interface and deterministic fake transport. Provider-specific adapter work remains blocked until authoritative provider selection/configuration exists.
 6. **NOT STARTED** — M05.6 AI audio playback.
 7. **NOT STARTED** — M05.7 Explicit connection state machine.
 8. **NOT STARTED** — M05.8 Deterministic interview-plan runner.
@@ -88,34 +88,40 @@ Server-authorized realtime setup; short-lived provider credentials; provider-neu
 - Offline integration GREEN: `019ac11a6a3575d11af96b579964ec206a6f7da0`, CI #561 / `34700935235` — complete repository gate GREEN.
 - Selected-input RED: `1ac380e3b1a32b30cb6623ed13f74297b6865a02`, CI #562 / `34701284392`; intended TS2554 because `verifyRealtimeMicrophoneAccess` accepted only one argument.
 - Selected-input GREEN: `2708322cd406eb3e2877295bfe25f495cff422c5`, CI #563 / `34701331592` — complete repository gate GREEN.
+- M05.4 invalid NOT RED: `cae05ed76eca9547863087aa0ee9e4721c0a59c4`, CI #599 / `34710015886` — a test-harness type mismatch prevented the intended behavioral assertion from running.
+- M05.4 cleanup RED: `7b39f6be82982bc6b1e9f677d8b1c640ef06058e`, CI #600 / `34710078998` — lint/typecheck passed and unit tests failed on the intended input-level reset assertion after `AudioContext.close()` rejection.
+- M05.4 cleanup GREEN: `4b5260bc1dfd4b4e726784d306562e60b12b814c`, CI #601 / `34710176595` — complete repository gate GREEN.
+- M05.4 regression coverage: `3cb6776411e345bb1f7bf8ccc078f23cac6ea389`, CI #602 / `34710451680` — mute, stale callbacks, repeated stop/resource release; complete repository gate GREEN.
+- M05.3 keyboard closeout/current verified behavioral head: `9982d75f02fb6911162d60cec98581441ecf704b`, CI #603 / `34710723994` — complete repository gate GREEN.
 
 ## Integration Test Evidence
-M05 attempt persistence migrations have applied successfully in provider-backed CI. Exact selected-input behavioral head `2708322…` passed local Supabase reset, production build, and existing Chromium E2E in CI #563. Milestone-specific realtime provider and full interview E2E remain pending by design.
+M05 attempt persistence migrations have applied successfully in provider-backed CI. Current verified behavioral head `9982d75…` passed local Supabase reset/migrations, production build, existing Chromium E2E, and PRD coverage in CI #603. Milestone-specific realtime-provider integration and full interview E2E remain pending by design.
 
 ## E2E / Visual Verification
-Existing candidate invitation browser coverage remains green through CI #563. M05.3 still requires focused technical-check keyboard/narrow-viewport coverage. M05.14 will add successful multi-turn completion, microphone denial/recovery, mute/end, barge-in, provider interruption, timeout, bounded reconnect, mobile/no-overflow, status semantics, and unusable invitation safety.
+The existing candidate invitation browser scenario runs at a 390×844 viewport and verifies no horizontal overflow. M05.3 also has focused component coverage proving the explicit technical-check trigger can receive keyboard focus. CI #603 passed the complete Chromium E2E suite. M05.14 will still add successful multi-turn completion, microphone denial/recovery, mute/end, barge-in, provider interruption, timeout, bounded reconnect, realtime status semantics, and unavailable/revoked/completed invitation safety.
 
 ## Security Review
-Implemented M05.2 work gates realtime authorization on invitation capability, current consent, immutable published interviewer version, and one authoritative attempt; raw invitation/provider secrets are not persisted. Earlier full-row anonymous-capable RPC exposure was corrected to return only an opaque attempt UUID. M05.3 keeps diagnostic audio transient and releases acquired tracks immediately. Selected device IDs are browser-local inputs and are not candidate assessment evidence.
+Implemented M05.2 work gates realtime authorization on invitation capability, current consent, immutable published interviewer version, and one authoritative attempt; raw invitation/provider secrets are not persisted. Earlier full-row anonymous-capable RPC exposure was corrected to return only an opaque attempt UUID. M05.3 keeps diagnostic audio transient, releases acquired tracks immediately, and treats selected device IDs only as browser-local technical inputs. M05.4 keeps captured PCM transient at the capture boundary and rejects stale generations from emitting new chunks.
 
 ## Accessibility Review
-M05.3 uses semantic status/alert UI and explicit buttons. Remaining closeout requires accessible device selection plus keyboard and narrow-viewport browser verification. Realtime controls later must retain visible non-audio status, labelled mute/end/retry controls, focus safety, and screen-reader announcements.
+M05.3 uses semantic status/alert UI, labelled microphone selection, explicit controls, live readiness status, and keyboard-focusable actions. Existing narrow-viewport candidate E2E remains green. Later realtime controls must retain visible non-audio status, labelled mute/end/retry controls, pressed/disabled semantics, focus safety, and screen-reader announcements.
 
 ## Performance Review
-Current diagnostics are bounded probes and immediately close AudioContext/MediaStream resources. Later M05 work must preserve bounded queues, retries, follow-ups, event accumulation, and idempotent cleanup; no speculative optimization is currently justified.
+Diagnostics are bounded probes and close AudioContext/MediaStream resources. M05.4 cleanup is idempotent and covered for one-time track/node/context shutdown, preventing duplicate teardown and stale emissions. Later M05 work must preserve bounded playback queues, retries, follow-ups, event accumulation, and cleanup; no speculative optimization is justified yet.
 
 ## AI / Eval Review
-M05 creates no candidate score and no autonomous hire/reject decision. Candidate speech remains untrusted content. Technical failures, network state, microphone quality, silence caused by infrastructure, accent, prosody, emotion, or protected traits cannot become negative candidate evidence. Deterministic plan/follow-up policy and adversarial evals are required in later M05 iterations.
+M05 creates no candidate score and no autonomous hire/reject decision. Candidate speech remains untrusted content. Technical failures, network state, microphone quality, silence caused by infrastructure, accent, prosody, emotion, or protected traits cannot become negative candidate evidence. Deterministic plan/follow-up policy and adversarial evals remain required in later M05 iterations.
 
 ## Code Review Findings
 - Important — **fixed**: anonymous-capable realtime authorization RPC returned a full attempt row; narrowed to opaque UUID only.
 - Important — **fixed**: offline diagnostic domain change was not fully integrated into UI/runtime call; exact typecheck CI exposed and the root cause was fixed at `019ac11…`.
+- Task 4 review found no Critical/Important issue in cleanup, stale-generation, mute, resource-lifecycle, safety, or evidence-integrity behavior.
 - Critical: **0 unresolved** for implemented slices.
 - Important: **0 unresolved** for implemented slices.
-- PR #7 had no submitted reviews or unresolved review threads at the latest reconciliation.
+- PR #7 had no unresolved review threads at the latest recovery check.
 
 ## Fixes / Re-review
-Security and network-integration findings above received regression evidence and complete GREEN CI. Selected-device access support also passed a complete exact-head gate at `2708322…`. M05.2 and M05.3 remain ACTIVE because their acceptance boundaries are not yet complete.
+Security and network-integration findings above received regression evidence and complete GREEN CI. Diagnostics/device-selection/input-level/keyboard acceptance and deterministic capture are now verified through exact behavioral head `9982d75…`, CI #603. M05.2 remains partially active only for provider-specific issuance; M05.5 is the next safe provider-neutral unit.
 
 ## Fresh Verification Commands
 
@@ -136,16 +142,16 @@ python3 scripts/verify_prd_coverage.py
 plus focused realtime/provider/browser/security tests required by the active unit.
 
 ## Fresh Verification Results
-Exact behavioral SHA `2708322cd406eb3e2877295bfe25f495cff422c5` passed CI #563 / `34701331592`, including frozen dependencies, lint, typecheck, unit/component tests, framework/source verification, local Supabase reset/migrations, build, Chromium E2E, PRD coverage, and cleanup. Documentation reconciliation commits after that SHA require a fresh exact-head run before any later integration-readiness claim.
+Exact behavioral SHA `9982d75f02fb6911162d60cec98581441ecf704b` passed CI #603 / `34710723994`, including frozen dependencies, lint, typecheck, unit/component tests, framework/source verification, local Supabase reset/migrations, production build, Chromium E2E, PRD coverage, and cleanup. Documentation reconciliation commits after that behavioral SHA require their own exact-head CI before any later milestone-readiness claim.
 
 ## Commits / Files Changed
-The active PR contains the M05 design/plan, realtime authorization/persistence/provider-token boundaries, browser diagnostics, candidate technical-check UI/page integration, and associated tests/docs. Recent diagnostic checkpoints are recorded in TDD Evidence above; recover the current PR head from GitHub rather than trusting a stale commit list here.
+The active PR contains the M05 design/plan, realtime authorization/persistence/provider-token boundaries, browser diagnostics, candidate technical-check UI/page integration, deterministic audio capture/worklet lifecycle, and associated tests/docs. Recover the current PR head from GitHub rather than trusting a stale commit list here.
 
 ## Known Limitations
-No authoritative realtime provider SDK/configuration exists yet, so provider-specific production token issuance/adapter composition remains unresolved. M05.3 still lacks candidate device enumeration/selection UX, usable input-level readiness, and focused browser technical-check accessibility closeout.
+No authoritative realtime provider SDK/configuration exists yet, so provider-specific production token issuance and the selected-provider adapter portion of M05.5 remain unresolved. This does not block the provider-neutral transport contract/fake transport or later provider-neutral domain work.
 
 ## Documentation Updated
-`docs/progress/STATUS.md`, `docs/milestones/CURRENT.md`, this ledger, `docs/progress/KNOWN-ISSUES.md`, `docs/SESSION-HANDOFF.md`, and requirements traceability are the durable recovery surfaces and must be kept synchronized with Git/code/current exact-SHA CI.
+`docs/progress/STATUS.md`, `docs/milestones/CURRENT.md`, this ledger, `docs/SESSION-HANDOFF.md`, and requirements/traceability surfaces are durable recovery sources and must remain synchronized with Git/code/current exact-SHA CI.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `CODEX-START-HERE.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → live Git/PR/review/exact-head CI → `docs/progress/STATUS.md` → `docs/progress/KNOWN-ISSUES.md` → `docs/milestones/CURRENT.md` → this ledger → requirements/traceability → selected design/plan → source/tests.
@@ -155,13 +161,13 @@ No authoritative realtime provider SDK/configuration exists yet, so provider-spe
 - [ ] Stable multi-turn candidate interview acceptance criterion verified.
 - [ ] Required TDD/integration/provider/browser/E2E evidence recorded.
 - [ ] Security/accessibility/performance/AI-safety reviews complete.
-- [ ] 0 Critical / 0 Important findings.
+- [ ] 0 Critical / 0 Important findings at milestone closeout.
 - [ ] Traceability/feature matrix/status/handoff reconciled.
 - [ ] Exact-final-head CI green.
 - [ ] Final PR head/review/concurrency/mergeability gates green before authorized merge.
 
 ## Next Action
-Complete M05.3 with strict TDD for privacy-preserving candidate audio-input enumeration/selection after explicit microphone access, re-check the chosen input, add usable input-level readiness, then close keyboard/narrow-viewport browser verification before marking M05.3 verified.
+Begin M05.5 with strict TDD for the provider-neutral transport lifecycle: normalized events/technical errors, send-before-open and send-after-close rejection, stale callback rejection, safe/idempotent disconnect, and a deterministic fake transport for later orchestration tests. Do not create a provider adapter until authoritative provider selection/configuration exists.
 
 ## Next Milestone
 M06 — Transcript + Durable Session, only after M05 is genuinely complete, merged, and post-merge `main` is verified.
