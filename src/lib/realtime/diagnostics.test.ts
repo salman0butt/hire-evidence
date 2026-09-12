@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   collectRealtimeBrowserCapabilities,
   diagnoseRealtimeBrowser,
+  listRealtimeAudioInputs,
   verifyRealtimeMicrophoneAccess,
 } from "./diagnostics";
 
@@ -115,6 +116,32 @@ describe("collectRealtimeBrowserCapabilities", () => {
       microphonePermission: "prompt",
       inputDeviceCount: 0,
     });
+  });
+});
+
+describe("listRealtimeAudioInputs", () => {
+  it("returns only addressable audio inputs with privacy-safe fallback labels", async () => {
+    const enumerateDevices = vi.fn().mockResolvedValue([
+      { kind: "audioinput", deviceId: "mic-1", label: "Built-in microphone" },
+      { kind: "videoinput", deviceId: "camera-1", label: "Camera" },
+      { kind: "audioinput", deviceId: "mic-2", label: "" },
+      { kind: "audioinput", deviceId: "", label: "Hidden until permission" },
+    ]);
+
+    await expect(listRealtimeAudioInputs({ enumerateDevices })).resolves.toEqual([
+      { deviceId: "mic-1", label: "Built-in microphone" },
+      { deviceId: "mic-2", label: "Microphone 2" },
+    ]);
+    expect(enumerateDevices).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns an empty list when device enumeration is unavailable or rejected", async () => {
+    await expect(listRealtimeAudioInputs({})).resolves.toEqual([]);
+    await expect(
+      listRealtimeAudioInputs({
+        enumerateDevices: vi.fn().mockRejectedValue(new Error("enumeration blocked")),
+      }),
+    ).resolves.toEqual([]);
   });
 });
 
