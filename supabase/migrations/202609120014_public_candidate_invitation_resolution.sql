@@ -22,9 +22,10 @@ as $$
   where invitation.token_hash = p_token_hash
     and invitation.expires_at > now()
     and invitation.revoked_at is null
-    and invitation.state <> 'completed'
+    and invitation.state in ('sent', 'opened', 'started')
   limit 1;
 $$;
 
 revoke all on function public.resolve_public_candidate_invitation(text) from public;
 grant execute on function public.resolve_public_candidate_invitation(text) to anon;
+grant execute on function public.resolve_public_candidate_invitation(text) to authenticated;
