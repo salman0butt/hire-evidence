@@ -27,15 +27,17 @@ describe("public candidate invitation resolution migration", () => {
     expect(migration).toMatch(/jobs[\s\S]*job_title/i);
   });
 
-  it("fails closed for expired, revoked, or completed invitations", () => {
+  it("fails closed for invitations that are not currently usable", () => {
     const migration = readMigration();
 
     expect(migration).toMatch(/expires_at\s*>\s*now\(\)/i);
     expect(migration).toMatch(/revoked_at\s+is null/i);
-    expect(migration).toMatch(/state\s*<>\s*'completed'/i);
+    expect(migration).toMatch(
+      /state\s+in\s*\(\s*'sent'\s*,\s*'opened'\s*,\s*'started'\s*\)/i,
+    );
   });
 
-  it("grants only the resolver capability to anonymous callers", () => {
+  it("grants only the resolver capability to public caller roles", () => {
     const migration = readMigration();
     const returnShape =
       migration.match(/returns table\s*\(([\s\S]*?)\)\s*language/i)?.[1] ?? "";
@@ -46,7 +48,10 @@ describe("public candidate invitation resolution migration", () => {
     expect(migration).toMatch(
       /grant execute on function public\.resolve_public_candidate_invitation\(text\) to anon/i,
     );
-    expect(migration).not.toMatch(/grant\s+select\s+on\s+(table\s+)?public\.candidate_invitations\s+to\s+anon/i);
+    expect(migration).toMatch(
+      /grant execute on function public\.resolve_public_candidate_invitation\(text\) to authenticated/i,
+    );
+    expect(migration).not.toMatch(/grant\s+select\s+on\s+(table\s+)?public\.candidate_invitations\s+to\s+(anon|authenticated)/i);
     expect(returnShape).toMatch(/organization_name\s+text/i);
     expect(returnShape).toMatch(/job_title\s+text/i);
     expect(returnShape).not.toMatch(/\bcandidate_id\b/i);
