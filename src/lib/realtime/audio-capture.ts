@@ -120,7 +120,9 @@ export function createRealtimeAudioCapture(
 
       active = true;
     } catch (error) {
-      await stop();
+      if (currentGeneration === generation) {
+        await stop();
+      }
       throw error;
     }
   }
