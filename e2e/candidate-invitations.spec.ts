@@ -329,12 +329,18 @@ test.describe("provider-backed candidate invitation persistence", () => {
         interviewer_version_id: versionA,
         token_hash: tokenHash(),
         expires_at: expiresAt,
-        revoked_at: new Date().toISOString(),
       })
       .select("id")
       .single();
     expect(revokedInvitation.error).toBeNull();
     if (!revokedInvitation.data?.id) throw new Error("Missing revoked invitation id.");
+    const revoked = await admin
+      .from("candidate_invitations")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("id", revokedInvitation.data.id)
+      .select("id")
+      .single();
+    expect(revoked.error).toBeNull();
     const revokedTransition = await ownerA.rpc("transition_candidate_invitation", {
       invitation_id: revokedInvitation.data.id,
       target_state: "sent",
