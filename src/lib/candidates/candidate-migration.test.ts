@@ -43,6 +43,18 @@ describe("candidate tenancy migration", () => {
     expect(migration).toMatch(/references public\.jobs\s*\(id,\s*organization_id\)/i);
   });
 
+  it("limits candidate reads to job-management roles", () => {
+    const migration = readMigration();
+    const selectPolicy =
+      migration.match(/create policy candidates_select_member[\s\S]*?;/i)?.[0] ?? "";
+
+    expect(selectPolicy).toMatch(/private\.has_organization_role/i);
+    expect(selectPolicy).toMatch(
+      /array\['owner',\s*'admin',\s*'recruiter',\s*'hiring_manager'\]::public\.organization_role\[\]/i,
+    );
+    expect(selectPolicy).not.toMatch(/private\.is_organization_member/i);
+  });
+
   it("uses role-gated RPCs for candidate creation instead of direct mutation grants", () => {
     const migration = readMigration();
 
