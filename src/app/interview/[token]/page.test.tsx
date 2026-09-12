@@ -1,0 +1,55 @@
+import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { resolvePublicInvitation } from "@/lib/candidates/public-invitation";
+
+vi.mock("@/lib/candidates/public-invitation", () => ({
+  resolvePublicInvitation: vi.fn(),
+}));
+
+const mockedResolvePublicInvitation = vi.mocked(resolvePublicInvitation);
+const token = "candidate-route-token";
+
+async function loadPage() {
+  const modulePath = "./page";
+  return (await import(modulePath)).default as (props: {
+    params: Promise<{ token: string }>;
+  }) => Promise<React.ReactNode>;
+}
+
+describe("public candidate invitation page", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("renders only the safe invitation projection for an available token", async () => {
+    mockedResolvePublicInvitation.mockResolvedValue({
+      status: "available",
+      invitation: {
+        organizationName: "Evidence Labs",
+        jobTitle: "Senior Engineer",
+      },
+    });
+    const Page = await loadPage();
+
+    render(await Page({ params: Promise.resolve({ token }) }));
+
+    expect(mockedResolvePublicInvitation).toHaveBeenCalledWith(token);
+    expect(
+      screen.getByRole("heading", { name: "Senior Engineer interview" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Evidence Labs")).toBeInTheDocument();
+  });
+
+  it("renders one generic safe failure state without invitation details", async () => {
+    mockedResolvePublicInvitation.mockResolvedValue({ status: "unavailable" });
+    const Page = await loadPage();
+
+    render(await Page({ params: Promise.resolve({ token }) }));
+
+    expect(
+      screen.getByRole("heading", { name: "Invitation unavailable" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Evidence Labs")).not.toBeInTheDocument();
+  });
+});
