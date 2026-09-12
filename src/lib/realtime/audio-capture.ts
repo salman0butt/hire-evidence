@@ -88,29 +88,34 @@ export function createRealtimeAudioCapture(
       video: false,
     };
 
-    stream = await options.getUserMedia(constraints);
-    context = options.createAudioContext();
-    await context.audioWorklet.addModule(WORKLET_URL);
-    source = context.createMediaStreamSource(stream);
-    workletNode = options.createWorkletNode(context);
+    try {
+      stream = await options.getUserMedia(constraints);
+      context = options.createAudioContext();
+      await context.audioWorklet.addModule(WORKLET_URL);
+      source = context.createMediaStreamSource(stream);
+      workletNode = options.createWorkletNode(context);
 
-    source.connect(workletNode);
-    workletNode.connect(context.destination);
-    workletNode.port.onmessage = (event) => {
-      if (!active || currentGeneration !== generation) {
-        return;
-      }
+      source.connect(workletNode);
+      workletNode.connect(context.destination);
+      workletNode.port.onmessage = (event) => {
+        if (!active || currentGeneration !== generation) {
+          return;
+        }
 
-      const message = event.data;
-      if (message.type === "pcm" && message.pcm && !muted) {
-        options.onChunk(message.pcm, context?.sampleRate ?? 0);
-      }
-      if (message.type === "level" && typeof message.level === "number") {
-        options.onInputLevel?.(muted ? 0 : message.level);
-      }
-    };
+        const message = event.data;
+        if (message.type === "pcm" && message.pcm && !muted) {
+          options.onChunk(message.pcm, context?.sampleRate ?? 0);
+        }
+        if (message.type === "level" && typeof message.level === "number") {
+          options.onInputLevel?.(muted ? 0 : message.level);
+        }
+      };
 
-    active = true;
+      active = true;
+    } catch (error) {
+      await stop();
+      throw error;
+    }
   }
 
   function setMuted(nextMuted: boolean) {
