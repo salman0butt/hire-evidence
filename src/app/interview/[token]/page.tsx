@@ -1,36 +1,43 @@
 import { resolvePublicInvitation } from "@/lib/candidates/public-invitation";
+import type { PublicInvitationProjection } from "@/lib/candidates/public-invitation";
 
 type CandidateInterviewPageProps = Readonly<{
   params: Promise<{ token: string }>;
 }>;
 
-const preInterviewItems = [
-  {
-    title: "Approximate duration",
-    description:
-      "Plan for 15–60 minutes. The published interview plan determines the final duration.",
-  },
-  {
-    title: "Interview format",
-    description:
-      "You will complete a structured, AI-guided interview with role-relevant questions.",
-  },
-  {
-    title: "Technical requirements",
-    description:
-      "Use a modern browser, a stable internet connection, and a working microphone. You will be able to complete a technical check before the interview timer starts.",
-  },
-  {
-    title: "Privacy",
-    description:
-      "Before starting, you will review the AI, transcription, data-processing, and retention disclosures and provide explicit consent.",
-  },
-  {
-    title: "Start prerequisites",
-    description:
-      "The invitation must remain valid, you must confirm the disclosures and consent, and the required technical checks must pass before an interview attempt starts.",
-  },
-] as const;
+function formatInterviewType(interviewType: string) {
+  return interviewType
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function buildPreInterviewItems(invitation: PublicInvitationProjection) {
+  return [
+    {
+      title: "Approximate duration",
+      description: `${Math.ceil(invitation.durationSeconds / 60)} minutes`,
+    },
+    {
+      title: "Interview format",
+      description: formatInterviewType(invitation.interviewType),
+    },
+    {
+      title: "Technical requirements",
+      description:
+        "Use a modern browser, a stable internet connection, and a working microphone. You will be able to complete a technical check before the interview timer starts.",
+    },
+    {
+      title: "Privacy",
+      description:
+        "Before starting, you will review the AI, transcription, data-processing, and retention disclosures and provide explicit consent.",
+    },
+    {
+      title: "Start prerequisites",
+      description:
+        "The invitation must remain valid, you must confirm the disclosures and consent, and the required technical checks must pass before an interview attempt starts.",
+    },
+  ] as const;
+}
 
 export default async function CandidateInterviewPage({
   params,
@@ -52,6 +59,8 @@ export default async function CandidateInterviewPage({
       </main>
     );
   }
+
+  const preInterviewItems = buildPreInterviewItems(result.invitation);
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-12 sm:py-16">
