@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { createRealtimeSessionHandler } from "./route";
+import { createRealtimeSessionHandler } from "@/lib/realtime/realtime-session-handler";
 
 function request() {
   return new Request("https://hire-evidence.example/api/interview/capability-secret/realtime-session", {
