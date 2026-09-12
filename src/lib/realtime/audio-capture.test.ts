@@ -74,4 +74,40 @@ describe("RealtimeAudioCapture", () => {
     expect(onChunk).toHaveBeenCalledTimes(1);
     expect(onChunk).toHaveBeenCalledWith(pcm, 48_000);
   });
+
+  it("releases the microphone and audio context when startup fails", async () => {
+    const workletFailure = new Error("worklet failed");
+    const stopTrack = vi.fn();
+    const close = vi.fn().mockResolvedValue(undefined);
+    const stream = {
+      getTracks: () => [{ stop: stopTrack }],
+    };
+    const source = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+    };
+    const audioContext = {
+      sampleRate: 48_000,
+      audioWorklet: { addModule: vi.fn().mockRejectedValue(workletFailure) },
+      createMediaStreamSource: vi.fn(() => source),
+      destination: {},
+      close,
+    };
+
+    const capture = createRealtimeAudioCapture({
+      getUserMedia: vi.fn().mockResolvedValue(stream),
+      createAudioContext: vi.fn(() => audioContext),
+      createWorkletNode: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        port: { postMessage: vi.fn() },
+      })),
+      onChunk: vi.fn(),
+    });
+
+    await expect(capture.start()).rejects.toThrow("worklet failed");
+
+    expect(stopTrack).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+  });
 });
