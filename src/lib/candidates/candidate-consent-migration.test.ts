@@ -45,4 +45,17 @@ describe("candidate invitation consent migration", () => {
     expect(migration).toMatch(/state\s+in\s*\(\s*'sent'\s*,\s*'opened'\s*\)/i);
     expect(migration).toMatch(/grant execute on function public\.record_candidate_invitation_consent/i);
   });
+
+  it("accepts only the current disclosure version and blocks start until it was consented", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(/candidate-interview-v1/i);
+    expect(migration).toMatch(/p_disclosure_version\s*<>\s*'candidate-interview-v1'/i);
+    expect(migration).toMatch(/create or replace function public\.transition_candidate_invitation/i);
+    expect(migration).toMatch(/target_state\s*=\s*'started'/i);
+    expect(migration).toMatch(/from public\.candidate_consent_events/i);
+    expect(migration).toMatch(/consent\.invitation_id\s*=\s*invitation\.id/i);
+    expect(migration).toMatch(/consent\.disclosure_version\s*=\s*'candidate-interview-v1'/i);
+    expect(migration).toMatch(/current disclosure consent required/i);
+  });
 });
