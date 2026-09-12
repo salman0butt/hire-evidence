@@ -6,25 +6,30 @@ This compatibility handoff never outranks actual Git/code/current exact-SHA CI. 
 
 - Repository: `salman0butt/hire-evidence`
 - Default branch: `main`
-- Current main SHA before M03 merge: `835d7d571a69cd13e3e802be4872e873ffdd34fe`; post-merge M02 CI #232 passed.
-- Active branch: `feat/jobs-interviewer-builder`
-- Active PR: #5 — `Build jobs and interviewer configuration` — OPEN / DRAFT / unmerged.
-- Implementation head `6b3526aacfe8d5f0df33b699012bd11e521228bc` passed CI #430 / `34677201542` across the complete repository quality gate.
-- Closeout documentation now creates a newer head; fresh exact-final-head CI is mandatory before merge.
+- Current verified main SHA: `729474ffb03075c93dfa2564f0004f1590533753`; M03 PR #5 squash-merged and post-merge CI #432 / `34677775158` passed.
+- Active branch: `feat/candidates-invitations`
+- Active PR: #6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
+- M04.2 provider-verification head `af46174165c6a90f0fb03525afb0ffa0bbfba128` passed CI #451 / `34681517870` across the complete repository quality gate.
+- Durable documentation reconciliation creates newer heads; recover current exact branch/CI before writing.
 
 ## Current milestone
 
-Jobs + Interviewer Builder is in final closeout.
+M04 — Candidates + Invitations is IN PROGRESS.
 
-M03.1–M03.10 are verified. M03.11's complete builder browser journey, direct provider authorization/tenant abuse coverage, desktop + 390×844 overflow checks, keyboard focus check, skeptical security/accessibility/performance/AI-safety/YAGNI review, and durable reconciliation are complete. Closeout evidence lives at `docs/superpowers/evidence/2026-09-12-m03-jobs-interviewer-builder-closeout.md`.
+- M04.1 Candidate records — VERIFIED.
+- M04.2 Secure token service + invitation persistence — VERIFIED with strict RED/GREEN evidence and provider-backed uniqueness/tenant/browser-boundary checks.
+- M04.3 Invitation lifecycle — NEXT.
+- M04.4–M04.8 — NOT STARTED.
+
+Key M04.2 evidence is recorded in `docs/milestones/M04-candidates-invitations.md`. Raw invitation tokens are generated from 32 random bytes and never persisted; SHA-256 hashes are stored, invitation rows are tenant/job/candidate/immutable-version bound, RLS is enabled, anon has no table access, and authenticated browser mutation is denied.
 
 ## Review / blockers
 
-- Critical findings: 0 unresolved.
-- Important findings: 0 unresolved.
-- Latest GitHub inspection: no unresolved review threads.
-- Only blocker: fresh exact-final-head CI for this documentation-reconciled head, followed by final concurrency/head/review verification.
+- Critical findings: 0 unresolved for completed M04.1–M04.2 work.
+- Important findings: 0 unresolved for completed M04.1–M04.2 work.
+- Latest GitHub recovery found no unresolved review threads.
+- No external blocker. M04 remains incomplete by scope.
 
 ## Exact next work
 
-Verify the exact current PR head CI. If green and unchanged, mark PR #5 ready if required and squash-merge under the standing user authorization, verify post-merge `main` CI, then recover the roadmap/PRD and activate M04 — Candidates + Invitations immediately.
+Recover the exact current PR head and CI. Then start M04.3 with strict TDD: write the smallest meaningful failing test for monotonic `draft -> sent -> opened -> started -> completed` invitation transitions and terminal denial after expiry/revocation/completion; verify real RED; implement authoritative database transition enforcement; verify full GREEN; review security/replay behavior; update durable evidence; then continue directly to M04.4.
