@@ -28,6 +28,22 @@ describe("realtime interview session migration", () => {
     expect(migration).toMatch(/enable row level security/i);
   });
 
+  it("resolves only a capability-bound realtime session projection for server authorization", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(/create or replace function public\.resolve_realtime_candidate_session/i);
+    expect(migration).toMatch(/p_token_hash text/i);
+    expect(migration).toMatch(/returns table\s*\([\s\S]*invitation_id uuid[\s\S]*candidate_id uuid[\s\S]*interviewer_version_id uuid[\s\S]*duration_seconds integer[\s\S]*language text[\s\S]*lifecycle text[\s\S]*has_current_consent boolean/i);
+    expect(migration).toMatch(/security definer/i);
+    expect(migration).toMatch(/set search_path\s*=\s*''/i);
+    expect(migration).toMatch(/token_hash\s*=\s*p_token_hash/i);
+    expect(migration).toMatch(/expires_at\s*>\s*now\(\)/i);
+    expect(migration).toMatch(/revoked_at is null/i);
+    expect(migration).toMatch(/candidate_consent_events/i);
+    expect(migration).toMatch(/candidate-interview-v1/i);
+    expect(migration).toMatch(/grant execute on function public\.resolve_realtime_candidate_session/i);
+  });
+
   it("authorizes start through a token-hash-bound security-definer RPC with current consent", () => {
     const migration = readMigration();
 
