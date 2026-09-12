@@ -190,7 +190,7 @@ function tokenHash() {
 test.describe("provider-backed candidate invitation persistence", () => {
   test.describe.configure({ mode: "serial" });
 
-  test("enforces token uniqueness, tenant binding, RLS, and browser write denial", async () => {
+  test("enforces token uniqueness, tenant binding, RLS, lifecycle authority, and browser write denial", async () => {
     test.setTimeout(120_000);
     const { supabaseUrl, publishableKey, serviceRoleKey } = environment();
     const admin = client(supabaseUrl, serviceRoleKey);
@@ -234,7 +234,8 @@ test.describe("provider-backed candidate invitation persistence", () => {
       .select("id")
       .single();
     expect(inserted.error).toBeNull();
-    expect(inserted.data?.id).toBeTruthy();
+    if (!inserted.data?.id) throw new Error("Missing invitation id.");
+    const invitationId = inserted.data.id;
 
     const duplicateHash = await admin.from("candidate_invitations").insert({
       organization_id: orgB,
@@ -280,6 +281,86 @@ test.describe("provider-backed candidate invitation persistence", () => {
       .eq("organization_id", orgA);
     expect(ownerBCrossRead.error).toBeNull();
     expect(ownerBCrossRead.data).toEqual([]);
+
+    const crossTenantTransition = await ownerB.rpc("transition_candidate_invitation", {
+      invitation_id: invitationId,
+      target_state: "sent",
+    });
+    expect(crossTenantTransition.error).not.toBeNull();
+
+    const outOfOrder = await ownerA.rpc("transition_candidate_invitation", {
+      invitation_id: invitationId,
+      target_state: "opened",
+    });
+    expect(outOfOrder.error).not.toBeNull();
+
+    for (const targetState of ["sent", "opened", "started", "completed"] as const) {
+      const transition = await ownerA.rpc("transition_candidate_invitation", {
+        invitation_id: invitationId,
+        target_state: targetState,
+      });
+      expect(transition.error).toBeNull();
+    }
+
+    const replayCompleted = await ownerA.rpc("transition_candidate_invitation", {
+      invitation_id: invitationId,
+      target_state: "started",
+    });
+    expect(replayCompleted.error).not.toBeNull();
+
+    const completed = await ownerA
+      .from("candidate_invitations")
+      .select("state,sent_at,opened_at,started_at,completed_at")
+      .eq("id", invitationId)
+      .single();
+    expect(completed.error).toBeNull();
+    expect(completed.data?.state).toBe("completed");
+    expect(completed.data?.sent_at).toBeTruthy();
+    expect(completed.data?.opened_at).toBeTruthy();
+    expect(completed.data?.started_at).toBeTruthy();
+    expect(completed.data?.completed_at).toBeTruthy();
+
+    const revokedInvitation = await admin
+      .from("candidate_invitations")
+      .insert({
+        organization_id: orgA,
+        job_id: jobA,
+        candidate_id: candidateA,
+        interviewer_version_id: versionA,
+        token_hash: tokenHash(),
+        expires_at: expiresAt,
+        revoked_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+    expect(revokedInvitation.error).toBeNull();
+    if (!revokedInvitation.data?.id) throw new Error("Missing revoked invitation id.");
+    const revokedTransition = await ownerA.rpc("transition_candidate_invitation", {
+      invitation_id: revokedInvitation.data.id,
+      target_state: "sent",
+    });
+    expect(revokedTransition.error).not.toBeNull();
+
+    const expiredInvitation = await admin
+      .from("candidate_invitations")
+      .insert({
+        organization_id: orgA,
+        job_id: jobA,
+        candidate_id: candidateA,
+        interviewer_version_id: versionA,
+        token_hash: tokenHash(),
+        created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        expires_at: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+      })
+      .select("id")
+      .single();
+    expect(expiredInvitation.error).toBeNull();
+    if (!expiredInvitation.data?.id) throw new Error("Missing expired invitation id.");
+    const expiredTransition = await ownerA.rpc("transition_candidate_invitation", {
+      invitation_id: expiredInvitation.data.id,
+      target_state: "sent",
+    });
+    expect(expiredTransition.error).not.toBeNull();
 
     const directBrowserWrite = await ownerA.from("candidate_invitations").insert({
       organization_id: orgA,
