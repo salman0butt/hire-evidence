@@ -110,4 +110,37 @@ describe("RealtimeAudioCapture", () => {
     expect(stopTrack).toHaveBeenCalledTimes(1);
     expect(close).toHaveBeenCalledTimes(1);
   });
+
+  it("coalesces concurrent start requests into one microphone acquisition", async () => {
+    const stream = {
+      getTracks: () => [{ stop: vi.fn() }],
+    };
+    const source = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+    };
+    const workletNode = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      port: { postMessage: vi.fn() },
+    };
+    const audioContext = {
+      sampleRate: 48_000,
+      audioWorklet: { addModule: vi.fn().mockResolvedValue(undefined) },
+      createMediaStreamSource: vi.fn(() => source),
+      destination: {},
+      close: vi.fn().mockResolvedValue(undefined),
+    };
+    const getUserMedia = vi.fn().mockResolvedValue(stream);
+    const capture = createRealtimeAudioCapture({
+      getUserMedia,
+      createAudioContext: vi.fn(() => audioContext),
+      createWorkletNode: vi.fn(() => workletNode),
+      onChunk: vi.fn(),
+    });
+
+    await Promise.all([capture.start(), capture.start()]);
+
+    expect(getUserMedia).toHaveBeenCalledTimes(1);
+  });
 });
