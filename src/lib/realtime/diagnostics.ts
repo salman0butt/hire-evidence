@@ -2,6 +2,7 @@ export type MicrophonePermissionState = "granted" | "prompt" | "denied";
 
 export type RealtimeBrowserCapabilities = Readonly<{
   isSecureContext: boolean;
+  isOnline: boolean;
   hasMediaDevices: boolean;
   hasGetUserMedia: boolean;
   hasAudioContext: boolean;
@@ -22,6 +23,7 @@ type RealtimeAudioContextProbe = Readonly<{
 
 export type RealtimeBrowserRuntime = Readonly<{
   isSecureContext: boolean;
+  isOnline: boolean;
   mediaDevices?: RealtimeMediaDevicesProbe | undefined;
   createAudioContext?: (() => RealtimeAudioContextProbe) | undefined;
   queryMicrophonePermission?: (() => Promise<MicrophonePermissionState>) | undefined;
@@ -45,6 +47,7 @@ export type RealtimeMicrophoneAccessRuntime = Readonly<{
 
 export type RealtimeDiagnosticFailureReason =
   | "insecure-context"
+  | "network-offline"
   | "media-devices-unavailable"
   | "get-user-media-unavailable"
   | "audio-context-unavailable"
@@ -112,6 +115,7 @@ export async function collectRealtimeBrowserCapabilities(
 
   return {
     isSecureContext: runtime.isSecureContext,
+    isOnline: runtime.isOnline,
     hasMediaDevices,
     hasGetUserMedia,
     hasAudioContext,
@@ -126,6 +130,10 @@ export function diagnoseRealtimeBrowser(
 ): RealtimeDiagnosticResult {
   if (!capabilities.isSecureContext) {
     return { status: "blocked", reason: "insecure-context", recoverable: false };
+  }
+
+  if (!capabilities.isOnline) {
+    return { status: "blocked", reason: "network-offline", recoverable: true };
   }
 
   if (!capabilities.hasMediaDevices) {
