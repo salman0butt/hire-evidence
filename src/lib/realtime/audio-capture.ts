@@ -95,6 +95,10 @@ export function createRealtimeAudioCapture(
       stream = acquiredStream;
       context = options.createAudioContext();
       await context.audioWorklet.addModule(WORKLET_URL);
+      if (currentGeneration !== generation) {
+        return;
+      }
+
       source = context.createMediaStreamSource(stream);
       workletNode = options.createWorkletNode(context);
 
