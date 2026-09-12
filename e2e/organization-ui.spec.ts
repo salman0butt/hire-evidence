@@ -114,12 +114,18 @@ test.describe("organization tenant UI accessibility and responsiveness", () => {
     const name = page.getByLabel("Organization name");
     const companySize = page.getByLabel("Company size");
     const hiringUseCase = page.getByLabel("Hiring use case");
+    const candidateSupportEmail = page.getByLabel("Candidate support email");
+    const candidateSupportUrl = page.getByLabel("Candidate support URL");
     const save = page.getByRole("button", { name: "Save settings" });
     await name.focus();
     await page.keyboard.press("Tab");
     await expect(companySize).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(hiringUseCase).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(candidateSupportEmail).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(candidateSupportUrl).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(save).toBeFocused();
 
