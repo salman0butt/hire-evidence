@@ -1,37 +1,47 @@
 # Session Handoff
 
-This compatibility handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENTS.md` and `docs/AUTONOMOUS-DEVELOPMENT.md`, then actual GitHub state before trusting this file.
+This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, and live GitHub state first.
 
-## Current repository state
+## Repository state
 
 - Repository: `salman0butt/hire-evidence`
 - Default branch: `main`
-- Current verified main SHA: `729474ffb03075c93dfa2564f0004f1590533753`; M03 PR #5 squash-merged and post-merge CI #432 / `34677775158` passed.
+- Verified base/main SHA: `729474ffb03075c93dfa2564f0004f1590533753` (M03 PR #5); post-merge CI #432 / `34677775158` passed.
 - Active branch: `feat/candidates-invitations`
 - Active PR: #6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
-- M04.3 lifecycle provider-verification head `d8c5317c1d5a28aaec89a826002847db96ed9cdf` passed CI #460 / `34682867624` across the complete repository quality gate.
-- Durable documentation reconciliation creates newer heads; recover current exact branch/CI before writing.
+- Latest verified implementation head: `8a6f6cc8adba2d39f2b255a74db166e3285527ba`.
+- CI #507 / `34691558117` passed the full repository gate on that implementation head.
+- Durable-document reconciliation creates newer branch heads; fresh exact-final-head CI is mandatory before merge.
 
 ## Current milestone
 
-M04 — Candidates + Invitations is IN PROGRESS.
+M04 — Candidates + Invitations is at **CLOSEOUT / MERGE GATE**.
 
-- M04.1 Candidate records — VERIFIED.
-- M04.2 Secure token service + invitation persistence — VERIFIED with strict RED/GREEN evidence and provider-backed uniqueness/tenant/browser-boundary checks.
-- M04.3 Invitation lifecycle — VERIFIED with database-authoritative monotonic transitions, transition timestamps, cross-tenant denial, and expired/revoked/completed replay denial.
-- M04.4 Public invitation resolution — NEXT.
-- M04.5–M04.8 — NOT STARTED.
+All iterations M04.1–M04.8 are verified: candidate persistence; secure hash-at-rest opaque invitations; lifecycle/replay controls; public token resolution; pre-interview UI; AI/transcription/data/retention disclosure and append-only consent; trusted accommodation/support path; provider/browser security closeout.
 
-Lifecycle evidence: RED `792e56f422e1f77be6967facca73e69388314340` / CI #456 failed exactly because the lifecycle migration was absent. Schema GREEN was established at `9267e97d7467af5049a2c0ac7cf95b4b3e3cb465` / CI #458. Provider checkpoint `9d97ec54c1fd2872fca62b9abe1e7290427d4264` / CI #459 was NOT GREEN because the revoked-row test fixture set `revoked_at` before the database default `created_at`; the fixture was corrected without weakening the production constraint. Exact provider GREEN is `d8c5317c1d5a28aaec89a826002847db96ed9cdf` / CI #460.
+## Latest debugging / closeout evidence
 
-## Review / blockers
+CI #505 failed only in the older organization settings keyboard E2E after two legitimate candidate-support inputs were added. The UI implementation was correct; the test expected Save immediately after Hiring use case. Commit `ac047aff7cffb335226702e24b443cd1706796a9` updated the focus sequence to include candidate support email/URL. CI #506 / `34691250632` then passed the complete gate.
 
-- Critical findings: 0 unresolved for completed M04.1–M04.3 work.
-- Important findings: 0 unresolved for completed M04.1–M04.3 work.
-- Latest GitHub recovery found no unresolved review threads.
-- M04.3 manager lifecycle authority is not exposed anonymously. M04.4 must introduce a separate narrowly scoped token-resolution boundary rather than broadening table/RPC privileges.
-- No external blocker. M04 remains incomplete by scope.
+M04.8 added `e2e/candidate-invitation-ui.spec.ts` at `8a6f6cc8adba2d39f2b255a74db166e3285527ba`. CI #507 / `34691558117` passed install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase, build, Chromium E2E, PRD coverage, and cleanup. The browser test verifies the valid mobile invitation and consent flow plus the same unavailable state for wrong, expired, revoked, and completed tokens.
+
+## Review / safety state
+
+- Critical findings: 0 unresolved.
+- Important findings: 0 unresolved.
+- GitHub review threads: 0 unresolved at latest recovery.
+- Raw invitation tokens are not persisted/logged; server hashes before the narrow public RPC.
+- Tenant/job/candidate/version constraints and RLS remain authoritative.
+- Consent is versioned and append-only from browser roles; current consent is required before `started`.
+- Candidate support settings remain owner/admin constrained and only safe parsed destinations leave the public boundary.
+- Humans remain hiring decision makers; no autonomous hire/reject or prohibited inference capability was added.
 
 ## Exact next work
 
-Recover the exact current PR head and CI. Then start M04.4 with strict TDD: require invalid, expired, revoked and completed raw tokens to return the same safe failure shape; require raw-token hashing server-side; resolve at most one invitation; expose only the safe public projection; and avoid any service-role browser client or public table grant. Verify real RED, implement the minimal server-only/public-RPC boundary, verify full GREEN/provider behavior, reconcile evidence, then continue directly to M04.5.
+1. Recover the exact current PR head and ensure no competing autonomous run advanced it.
+2. Finish durable closeout (`STATUS`, `CURRENT`, M04 ledger, handoff, feature matrix, traceability, known issues, PR body).
+3. Verify fresh CI against the exact final documentation head.
+4. Recheck unresolved threads, mergeability, base/head stability and concurrency.
+5. If every authorized gate is green, mark PR #6 ready if required and squash-merge it automatically.
+6. Recover the new `main` SHA and verify post-merge main CI.
+7. Activate M05 — Realtime AI Interview, create/reuse its feature branch and draft PR according to repo conventions, update durable state, and immediately begin the first valid TDD unit.
