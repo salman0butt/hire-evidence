@@ -4,26 +4,26 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 
 | Capability | PRD ownership | Milestone | Status | Evidence / note |
 |---|---|---|---|---|
-| Repository/application foundation | Foundation | Product Foundation | VERIFIED | PR #2 integrated to `main`; CI #57. |
+| Repository/application foundation | Foundation | Product Foundation | VERIFIED | PR #2 integrated; CI #57. |
 | Durable autonomous-development control plane | Owner framework + PRD autonomy | Product Foundation | VERIFIED | Framework/source/PRD gates enforced in CI. |
 | Complete PRD/requirements corpus in Git | PRD 1–242 | Product Foundation | VERIFIED | Durable source + manifest + coverage verifier. |
 | Reproducible dependency graph | Product Foundation | Product Foundation | VERIFIED | `pnpm-lock.yaml` + frozen CI installs. |
 | SaaS shell + auth/profile foundation | PRD 15–17, 196 | SaaS Shell + Auth | VERIFIED | PR #3 integrated; post-merge CI #157. |
 | Organizations + RBAC / tenant isolation | PRD 8–14, 18–19, 197 | Organizations + RBAC | VERIFIED | PR #4 integrated; post-merge CI #232. |
-| Tenant-scoped jobs + requirements | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Normalized persistence, validation, role/RLS boundaries, UI and provider-backed E2E. |
-| Competencies + deterministic weighting/order | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Provider-backed role/tenant/job coverage. |
-| Observable 1–5 rubrics | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Complete score-level persistence/editor and provider-backed isolation. |
-| Question bank | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Job/competency-bound deterministic questions with fixed-role authorization. |
-| Deterministic interview plans | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Ordered sections/questions/competencies, duration consistency, tenant isolation. |
-| Interviewer configuration | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Bounded config, route-bound UI/actions, fixed-role persistence, provider-backed abuse matrix. |
-| Non-overridable hiring guardrails | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Application validator plus authoritative DB save/publish enforcement and adversarial E2E. |
-| Draft/publish interviewer state | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Role-gated atomic publish with completeness/duration checks and idempotent repeat behavior. |
-| Immutable interviewer versions | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Snapshot/version provenance, member-only RLS, update/delete denial. |
-| Non-billable interviewer preview | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | `billable=false`, `persisted=false`, tenant/authz denial, no extra version created. |
-| M03 responsive/keyboard/provider closeout | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | `interviewer-builder-ui.spec.ts` + provider abuse E2E; implementation head CI #430 passed. |
-| Jobs + Interviewer Builder milestone | PRD 20–41, 198 | Jobs + Interviewer Builder | ACTIVE | Engineering/review complete; final documentation-head CI and merge/post-merge verification pending. |
-| Candidates and invitations | PRD roadmap | Candidates + Invitations | PLANNED | Narrow invitation-scoped authorization. |
-| Realtime AI interview | PRD roadmap | Realtime AI Interview | PLANNED | Realtime failure/continuity scenarios required. |
+| Jobs + requirements / competencies / rubrics / question bank | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | PR #5; provider-backed role/tenant coverage. |
+| Deterministic interview plan + interviewer configuration | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | Ordered bounded plan/config with UI/provider tests. |
+| Non-overridable hiring guardrails + immutable published versions | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | DB + application enforcement, version provenance, adversarial E2E. |
+| Non-billable interviewer preview + accessible builder closeout | PRD 20–41, 198 | Jobs + Interviewer Builder | VERIFIED | PR #5 integrated; post-merge CI #432. |
+| Candidate records | PRD 42–57, 199 | Candidates + Invitations | VERIFIED | Tenant/job-bound normalized candidate persistence and provider isolation. |
+| Opaque expiring/revocable invitation tokens | PRD 42–57, 199 | Candidates + Invitations | VERIFIED | 32 random bytes, base64url, SHA-256 hash-only storage, RLS and binding constraints. |
+| Invitation lifecycle and replay protection | PRD 42–57, 199 | Candidates + Invitations | VERIFIED | Authoritative monotonic RPC, timestamps, terminal fail-closed behavior. |
+| Narrow public candidate invitation access | PRD 42–57, 199 | Candidates + Invitations | VERIFIED | Server-side token hashing + bounded safe public projection. |
+| Candidate pre-interview experience | PRD 42–57, 199 | Candidates + Invitations | VERIFIED | Company/role/duration/format/technical/privacy/prerequisite UI. |
+| AI/privacy disclosure + explicit consent evidence | PRD 42–57, 199 | Candidates + Invitations | VERIFIED | Versioned append-only consent for AI/transcription/data/retention; start gated. |
+| Accommodation/support path | PRD 42–57, 199 | Candidates + Invitations | VERIFIED | Owner/admin-configured support contacts exposed safely to candidate. |
+| Candidate security/accessibility/browser closeout | PRD 42–57, 199 | Candidates + Invitations | VERIFIED | `candidate-invitation-ui.spec.ts`; implementation head CI #507 / `34691558117`. |
+| Candidates + Invitations milestone | PRD 42–57, 199 | Candidates + Invitations | ACTIVE | Implementation/review complete; final documentation-head CI + merge/post-merge verification pending. |
+| Realtime AI interview | PRD roadmap | Realtime AI Interview | PLANNED | Next milestone after M04 integration; realtime failure/continuity scenarios required. |
 | Durable transcript/session continuity | PRD roadmap | Transcript + Durable Session | PLANNED | Finalized immutable chronological turns. |
 | Evidence-grounded assessment | PRD roadmap | Evidence-Based Assessment | PLANNED | Runtime schema/evidence validation + provenance. |
 | Hiring-team review | PRD roadmap | Hiring Team Review | PLANNED | Humans remain decision makers. |

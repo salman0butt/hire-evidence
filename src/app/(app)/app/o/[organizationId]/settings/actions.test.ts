@@ -43,11 +43,13 @@ describe("organization settings action", () => {
     mockedUpdateSettings.mockResolvedValue(undefined);
   });
 
-  it("updates only validated business fields in the route-bound organization", async () => {
+  it("updates only validated business and candidate support fields in the route-bound organization", async () => {
     const formData = form({
       name: "  Acme Labs  ",
       company_size: "  51-200  ",
       hiring_use_case: "  Structured technical hiring  ",
+      candidate_support_email: "  candidates@acme.test  ",
+      candidate_support_url: "  https://acme.test/interview-support  ",
       organization_id: "attacker-selected-organization",
       created_by: "attacker-selected-user",
     });
@@ -65,6 +67,8 @@ describe("organization settings action", () => {
       name: "Acme Labs",
       companySize: "51-200",
       hiringUseCase: "Structured technical hiring",
+      candidateSupportEmail: "candidates@acme.test",
+      candidateSupportUrl: "https://acme.test/interview-support",
     });
     expect(mockedRevalidatePath).toHaveBeenCalledWith(`/app/o/${organizationId}`);
     expect(mockedRevalidatePath).toHaveBeenCalledWith(`/app/o/${organizationId}/settings`);
@@ -103,6 +107,48 @@ describe("organization settings action", () => {
     );
 
     expect(result).toEqual({ status: "error", message: "Organization name is required." });
+    expect(mockedUpdateSettings).not.toHaveBeenCalled();
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid candidate support email before persistence", async () => {
+    const result = await updateOrganizationSettingsAction(
+      organizationId,
+      idleOrganizationActionState,
+      form({
+        name: "Acme",
+        company_size: "",
+        hiring_use_case: "",
+        candidate_support_email: "not-an-email",
+        candidate_support_url: "",
+      }),
+    );
+
+    expect(result).toEqual({
+      status: "error",
+      message: "Candidate support email must be valid.",
+    });
+    expect(mockedUpdateSettings).not.toHaveBeenCalled();
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
+  });
+
+  it("rejects unsafe candidate support URLs before persistence", async () => {
+    const result = await updateOrganizationSettingsAction(
+      organizationId,
+      idleOrganizationActionState,
+      form({
+        name: "Acme",
+        company_size: "",
+        hiring_use_case: "",
+        candidate_support_email: "candidates@acme.test",
+        candidate_support_url: "javascript:alert(1)",
+      }),
+    );
+
+    expect(result).toEqual({
+      status: "error",
+      message: "Candidate support URL must use http or https.",
+    });
     expect(mockedUpdateSettings).not.toHaveBeenCalled();
     expect(mockedRevalidatePath).not.toHaveBeenCalled();
   });

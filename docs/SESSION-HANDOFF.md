@@ -1,30 +1,47 @@
 # Session Handoff
 
-This compatibility handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENTS.md` and `docs/AUTONOMOUS-DEVELOPMENT.md`, then actual GitHub state before trusting this file.
+This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, and live GitHub state first.
 
-## Current repository state
+## Repository state
 
 - Repository: `salman0butt/hire-evidence`
 - Default branch: `main`
-- Current main SHA before M03 merge: `835d7d571a69cd13e3e802be4872e873ffdd34fe`; post-merge M02 CI #232 passed.
-- Active branch: `feat/jobs-interviewer-builder`
-- Active PR: #5 — `Build jobs and interviewer configuration` — OPEN / DRAFT / unmerged.
-- Implementation head `6b3526aacfe8d5f0df33b699012bd11e521228bc` passed CI #430 / `34677201542` across the complete repository quality gate.
-- Closeout documentation now creates a newer head; fresh exact-final-head CI is mandatory before merge.
+- Verified base/main SHA: `729474ffb03075c93dfa2564f0004f1590533753` (M03 PR #5); post-merge CI #432 / `34677775158` passed.
+- Active branch: `feat/candidates-invitations`
+- Active PR: #6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
+- Latest verified implementation head: `8a6f6cc8adba2d39f2b255a74db166e3285527ba`.
+- CI #507 / `34691558117` passed the full repository gate on that implementation head.
+- Durable-document reconciliation creates newer branch heads; fresh exact-final-head CI is mandatory before merge.
 
 ## Current milestone
 
-Jobs + Interviewer Builder is in final closeout.
+M04 — Candidates + Invitations is at **CLOSEOUT / MERGE GATE**.
 
-M03.1–M03.10 are verified. M03.11's complete builder browser journey, direct provider authorization/tenant abuse coverage, desktop + 390×844 overflow checks, keyboard focus check, skeptical security/accessibility/performance/AI-safety/YAGNI review, and durable reconciliation are complete. Closeout evidence lives at `docs/superpowers/evidence/2026-09-12-m03-jobs-interviewer-builder-closeout.md`.
+All iterations M04.1–M04.8 are verified: candidate persistence; secure hash-at-rest opaque invitations; lifecycle/replay controls; public token resolution; pre-interview UI; AI/transcription/data/retention disclosure and append-only consent; trusted accommodation/support path; provider/browser security closeout.
 
-## Review / blockers
+## Latest debugging / closeout evidence
+
+CI #505 failed only in the older organization settings keyboard E2E after two legitimate candidate-support inputs were added. The UI implementation was correct; the test expected Save immediately after Hiring use case. Commit `ac047aff7cffb335226702e24b443cd1706796a9` updated the focus sequence to include candidate support email/URL. CI #506 / `34691250632` then passed the complete gate.
+
+M04.8 added `e2e/candidate-invitation-ui.spec.ts` at `8a6f6cc8adba2d39f2b255a74db166e3285527ba`. CI #507 / `34691558117` passed install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase, build, Chromium E2E, PRD coverage, and cleanup. The browser test verifies the valid mobile invitation and consent flow plus the same unavailable state for wrong, expired, revoked, and completed tokens.
+
+## Review / safety state
 
 - Critical findings: 0 unresolved.
 - Important findings: 0 unresolved.
-- Latest GitHub inspection: no unresolved review threads.
-- Only blocker: fresh exact-final-head CI for this documentation-reconciled head, followed by final concurrency/head/review verification.
+- GitHub review threads: 0 unresolved at latest recovery.
+- Raw invitation tokens are not persisted/logged; server hashes before the narrow public RPC.
+- Tenant/job/candidate/version constraints and RLS remain authoritative.
+- Consent is versioned and append-only from browser roles; current consent is required before `started`.
+- Candidate support settings remain owner/admin constrained and only safe parsed destinations leave the public boundary.
+- Humans remain hiring decision makers; no autonomous hire/reject or prohibited inference capability was added.
 
 ## Exact next work
 
-Verify the exact current PR head CI. If green and unchanged, mark PR #5 ready if required and squash-merge under the standing user authorization, verify post-merge `main` CI, then recover the roadmap/PRD and activate M04 — Candidates + Invitations immediately.
+1. Recover the exact current PR head and ensure no competing autonomous run advanced it.
+2. Finish durable closeout (`STATUS`, `CURRENT`, M04 ledger, handoff, feature matrix, traceability, known issues, PR body).
+3. Verify fresh CI against the exact final documentation head.
+4. Recheck unresolved threads, mergeability, base/head stability and concurrency.
+5. If every authorized gate is green, mark PR #6 ready if required and squash-merge it automatically.
+6. Recover the new `main` SHA and verify post-merge main CI.
+7. Activate M05 — Realtime AI Interview, create/reuse its feature branch and draft PR according to repo conventions, update durable state, and immediately begin the first valid TDD unit.
