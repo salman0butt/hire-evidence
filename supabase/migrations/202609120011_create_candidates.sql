@@ -7,6 +7,7 @@ create table public.candidates (
   ),
   email text not null check (email = lower(btrim(email))
     and char_length(email) between 3 and 320
+    and email ~ '^[^[:space:]@]+@[^[:space:]@]+[.][^[:space:]@]+$'
   ),
   created_by uuid not null references auth.users(id) on delete restrict,
   created_at timestamptz not null default now(),
@@ -66,8 +67,9 @@ begin
 
   if normalized_email is null
      or char_length(normalized_email) < 3
-     or char_length(normalized_email) > 320 then
-    raise exception 'Candidate email must be between 3 and 320 characters.' using errcode = '22023';
+     or char_length(normalized_email) > 320
+     or normalized_email !~ '^[^[:space:]@]+@[^[:space:]@]+[.][^[:space:]@]+$' then
+    raise exception 'Candidate email must be a valid normalized email address.' using errcode = '22023';
   end if;
 
   if not exists (
