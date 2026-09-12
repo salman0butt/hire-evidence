@@ -14,7 +14,7 @@ Jobs + Interviewer Builder — **ACTIVE** on draft PR #5 / `feat/jobs-interviewe
 
 Active branch: `feat/jobs-interviewer-builder`
 Active PR: #5 — `Build jobs and interviewer configuration` — OPEN / DRAFT / unmerged.
-Latest fully verified behavioral head before this documentation reconciliation: `c3d5081e22f389e88788c8f302187504b14ad303`, CI #341 / `34661832340` — PASS across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase, production build, Chromium E2E, PRD coverage and teardown.
+CI status: latest fully verified behavioral head `c3d5081e22f389e88788c8f302187504b14ad303`, CI #341 / `34661832340` — PASS across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase, production build, Chromium E2E, PRD coverage and teardown. Documentation-only CI #345 failed because two mandatory recovery markers were omitted; this commit restores them and requires fresh exact-head CI.
 
 ## Current Task State
 
