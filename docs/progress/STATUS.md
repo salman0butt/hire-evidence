@@ -17,8 +17,8 @@ Realtime AI Interview — **ACTIVE**.
 Active branch: `feat/realtime-ai-interview`
 Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
 Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
-Latest verified behavioral head: `a184da9ec54aa317fa42c600591be422676797d1`.
-CI status: CI #623 / `34722042401` passed the complete repository gate on `a184da9ec54aa317fa42c600591be422676797d1`: frozen install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase, production build, Chromium E2E, PRD coverage, and cleanup.
+Latest verified behavioral head: `db5d814321d869f53b57af3238941cc19cda0afe`.
+CI status: CI #640 / `34724476662` passed the complete repository gate on `db5d814321d869f53b57af3238941cc19cda0afe`: frozen install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase, production build, Chromium E2E, PRD coverage, and cleanup.
 
 Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
@@ -33,41 +33,43 @@ Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 - M05.6 AI audio playback — **VERIFIED**. Serialized PCM playback, per-source cleanup, output-level reset, interruption epoch/queue invalidation, stale ended-callback rejection, copied PCM ownership, and idempotent one-time teardown are implemented and exact-head verified.
 - M05.7 Explicit connection state machine — **VERIFIED**. Application-owned lifecycle, generation-scoped stale-event rejection, bounded recovery entry/retry semantics, terminal authorization handling, subordinate listening/thinking/speaking state, and accessible mute/end/retry controls are implemented and exact-head verified.
 - M05.8 Deterministic interview-plan runner — **VERIFIED**. Runtime snapshots the immutable published plan, advances only in exact section/question order, rejects replay/out-of-order progression, bounds follow-up consumption, and authorizes only the current published question rather than future or model-invented questions.
-- M05.9 Pacing/time budget — **NEXT**.
-- M05.10–M05.14 — **NOT STARTED**.
+- M05.9 Pacing/time budget — **VERIFIED**. Monotonic active-time accounting, backwards-clock resistance, infrastructure-downtime separation, optional-follow-up suppression near deadline, and graceful completion are implemented and exact-head verified.
+- M05.10 Bounded follow-ups — **VERIFIED**. Only neutral job-related clarification/example/missing-dimension categories are allowed, configured limits are capped by an absolute ceiling, invalid/prohibited categories are denied, and candidate text cannot widen policy.
+- M05.11 Realtime interview orchestration — **ACTIVE / PARTIALLY VERIFIED**. Provider-neutral deterministic multi-turn progression, app-owned turn completion, playback/barge-in routing, generation-scoped stale callback rejection, candidate-safe snapshot projection, and candidate-facing current-question/completion presentation are implemented. Production page/transport composition remains dependent on the provider-specific authorization/adapter blocker.
+- M05.12–M05.14 — **NOT STARTED**.
 
 ## TDD / Verification Evidence
 
-Earlier M05.2–M05.4 evidence remains in `docs/milestones/M05-realtime-ai-interview.md`.
+Earlier M05.2–M05.8 evidence remains in `docs/milestones/M05-realtime-ai-interview.md`.
 
-- M05.5 RED: `2e1569cdac314884d5f56af837360dd300e57bd7`, CI #608 / `34711135700` — typecheck failed because the transport contract test imported the intentionally missing `./transport` module.
-- M05.5 exact verified head: `fb960c72136246fb2ba1a236971db948fb7ee95e`, CI #610 / `34718812471` — complete repository gate GREEN.
-- M05.6 RED: `0bd355a996f1d2ceec18b985bd1b533ff1a992c9`, CI #612 / `34719132103` — typecheck failed because the playback contract imported the intentionally missing `./audio-playback` module.
-- M05.6 invalid NOT GREEN: `6c97808ae14fd6e69a951617ef22dfc0fa3fcf27`, CI #613 / `34719250355` — test-harness typing failed before behavioral verification.
-- M05.6 GREEN: `d3e4edf01001f893f3f913f45011233096744a67`, CI #614 / `34719329747` — complete repository gate GREEN.
-- M05.7 state-machine RED: `15f887e62d628965a01b7f58363fb63d50b339e0`, CI #616 / `34719618954` — required connection-machine behavior was absent. Implementation `ef4718a28d0a88dcdcdb59098c3630a3a028df3e` started CI #617 / `34719712700`, which was cancelled by the next head and is not final GREEN evidence.
-- M05.7 accessible-controls RED: `2faa12fca7d0f39a5b411259286f54a11176d5d1`, CI #618 / `34719805392` — typecheck failed on the intentionally missing realtime-controls component.
-- M05.7 GREEN: `6a440ccd0233b2083c47f3ec9991b897487dbad6`, CI #619 / `34720013611` — complete repository gate GREEN.
-- M05.8 initial RED: `1ef658fabd7ca8b8c29921661c9e2f42001a0c16`, CI #620 / `34721584894` — typecheck failed on the intentionally missing deterministic plan-runner module.
-- M05.8 initial GREEN: `0fab34a4a61dd4d8c91c1ca80e1055905bf2e6f9`, CI #621 / `34721656385` — complete repository gate GREEN.
-- M05.8 review RED: `a3224b943c5b4613c58b54e0ca3953d97285975f`, CI #622 / `34721926133` — unit tests proved the initial question-authority helper incorrectly allowed future planned questions.
-- M05.8 reviewed GREEN: `a184da9ec54aa317fa42c600591be422676797d1`, CI #623 / `34722042401` — current-question-only authority fix passed the complete repository gate.
+- M05.9 RED: `26d81a7377050dd1f2d37b211c3712c583c987c1`, CI #629 / `34722836765` — pacing contract tests failed before the pacing module existed.
+- M05.9 GREEN: `b0449897d484e7fe0b7a3a463d956d8c6ab1aeed`, CI #630 / `34722921808` — complete repository gate GREEN.
+- M05.10 RED: `e7bff68b96bd493a2e93f5be32b74c000ea7aa49`, CI #631 / `34723178316` — bounded follow-up contract failed before policy implementation.
+- M05.10 GREEN: `3dc9844f812db0b830f0e86d522eb7825e26779c`, CI #632 / `34723229777` — complete repository gate GREEN.
+- M05.11 orchestration RED: `a49e2bc113f70caca58d5c44ddeaed66c2e67ad6`, CI #633 / `34723516805`.
+- M05.11 orchestration GREEN: `b5364a9e72175e80a75bc63e200b8a38ccfdd7f2`, CI #634 / `34723587460`.
+- M05.11 stale-completion RED: `9bf0423351dec74d8a4ffb32397116647b0c5809`, CI #635 / `34723861306`.
+- M05.11 stale-completion GREEN: `d50275653d3e64532bdda22aafddfcd02db53504`, CI #636 / `34723913764`.
+- M05.11 presentation RED: `ba1378e27954ca25c5d3895955d8128284d02d14`, CI #637 / `34724213415` — typecheck failed on the intentionally missing realtime interview presentation component.
+- M05.11 invalid NOT GREEN: `2f32c3e53efa1748493129694b11e8b0c0e67c28`, CI #638 / `34724353167` — exact optional prop typing failed before behavioral verification.
+- M05.11 invalid NOT GREEN: `c86300d4b13fed47d4cbd21d8f99950eab543600`, CI #639 / `34724392853` — unit verification exposed competing completion/end live-status announcements.
+- M05.11 reviewed GREEN: `db5d814321d869f53b57af3238941cc19cda0afe`, CI #640 / `34724476662` — full repository gate GREEN after terminal completion was reduced to one authoritative announcement and obsolete controls were removed.
 
 ## Review State
 
 Critical findings: **0 unresolved** for implemented M05 slices.
-Important findings: **0 unresolved** for implemented M05 slices.
+Important findings: **0 unresolved** for implemented provider-neutral M05 slices.
 PR #7 has no unresolved review threads at the latest recovery.
 
-M05.8 review found one Important issue: authorizing any question present anywhere in the plan could allow a future question out of order. The regression test at `a3224b9…` proved the issue; `a184da9…` restricts authorization to the current deterministic cursor and passed the full gate. The runner copies published plan data, ignores untrusted extra event fields, never derives candidate quality, and cannot mutate hiring evidence.
+M05.11 review caught a candidate-facing accessibility ambiguity: completion rendered two competing live status regions. The exact CI failure on `c86300d…` reproduced it, and `db5d814…` fixes the root cause by rendering a single terminal completion status with no obsolete controls.
 
 ## Blockers / Constraints
 
-- Provider-specific production issuance and provider adapter composition remain blocked until an authoritative realtime provider is selected/configured.
-- This does not block later provider-neutral M05 domain work.
+- Provider-specific production credential issuance, provider adapter composition, and final live page wiring remain blocked until an authoritative realtime provider is selected/configured.
+- This does not block provider-neutral timeout/error recovery, reconnect policy, or deterministic E2E scaffolding.
 
 ## Durable Recovery
 
 Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M05-realtime-ai-interview.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the selected M05 design/plan. Git/code/current exact-SHA CI outrank stale Markdown.
 
-Exact next work: begin M05.9 with strict RED-first tests for pure pacing/time-budget behavior: monotonic elapsed-time handling, resistance to backwards/discontinuous wall-clock input, suppression of optional follow-ups near the deadline, graceful completion, and explicit separation of infrastructure downtime from candidate speaking time where authoritative state permits.
+Exact next work: continue the largest safe provider-neutral M05 unit. M05.11 production composition is provider-blocked, so begin M05.12 with strict RED-first tests for typed timeout/error recovery, bounded retry classification, terminal authorization failures, and the invariant that technical failures never mutate candidate evaluation.
