@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   collectRealtimeBrowserCapabilities,
   diagnoseRealtimeBrowser,
+  verifyRealtimeMicrophoneAccess,
 } from "./diagnostics";
 
 function capabilities(
@@ -101,5 +102,50 @@ describe("collectRealtimeBrowserCapabilities", () => {
       microphonePermission: "prompt",
       inputDeviceCount: 0,
     });
+  });
+});
+
+describe("verifyRealtimeMicrophoneAccess", () => {
+  it("requests audio only on explicit readiness check and stops every acquired track immediately", async () => {
+    const stop = vi.fn();
+    const getUserMedia = vi.fn().mockResolvedValue({
+      getAudioTracks: () => [{ readyState: "live", stop }],
+      getTracks: () => [{ stop }],
+    });
+
+    await expect(verifyRealtimeMicrophoneAccess({ getUserMedia })).resolves.toEqual({
+      status: "ready",
+    });
+
+    expect(getUserMedia).toHaveBeenCalledWith({ audio: true, video: false });
+    expect(stop).toHaveBeenCalledTimes(1);
+  });
+
+  it("fails closed with recoverable permission guidance when acquisition is denied", async () => {
+    const getUserMedia = vi.fn().mockRejectedValue(
+      Object.assign(new Error("blocked"), { name: "NotAllowedError" }),
+    );
+
+    await expect(verifyRealtimeMicrophoneAccess({ getUserMedia })).resolves.toEqual({
+      status: "blocked",
+      reason: "microphone-permission-denied",
+      recoverable: true,
+    });
+  });
+
+  it("fails closed when acquisition succeeds without a live audio track", async () => {
+    const stop = vi.fn();
+    const getUserMedia = vi.fn().mockResolvedValue({
+      getAudioTracks: () => [],
+      getTracks: () => [{ stop }],
+    });
+
+    await expect(verifyRealtimeMicrophoneAccess({ getUserMedia })).resolves.toEqual({
+      status: "blocked",
+      reason: "microphone-input-unavailable",
+      recoverable: true,
+    });
+
+    expect(stop).toHaveBeenCalledTimes(1);
   });
 });
