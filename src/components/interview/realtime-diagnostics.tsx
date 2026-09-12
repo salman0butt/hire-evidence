@@ -155,8 +155,9 @@ export function RealtimeReadinessCheck({
       if (nextResult.status === "ready" && inputs.length === 0) {
         const nextInputs = await listInputs();
         setInputs(nextInputs);
-        if (nextInputs.length > 0) {
-          setSelectedInputDeviceId((current) => current || nextInputs[0].deviceId);
+        const firstInput = nextInputs[0];
+        if (firstInput) {
+          setSelectedInputDeviceId((current) => current || firstInput.deviceId);
         }
       }
     } catch {
