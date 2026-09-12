@@ -95,6 +95,7 @@ test.describe("interviewer builder browser closeout", () => {
 
     await page.goto(`/app/o/${organizationId}/jobs`);
     await page.getByRole("link", { name: `Edit ${title}` }).click();
+    await expect(page).toHaveURL(/\/jobs\/[^/?#]+$/);
     const jobUrl = page.url();
     const jobId = jobUrl.match(/\/jobs\/([^/?#]+)$/)?.[1];
     expect(jobId).toBeTruthy();
