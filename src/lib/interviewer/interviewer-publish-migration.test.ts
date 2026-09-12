@@ -44,7 +44,9 @@ describe("interviewer draft/publish state migration", () => {
     expect(migration).toMatch(/interview_plan_sections/i);
     expect(migration).toMatch(/interview_plan_section_questions/i);
     expect(migration).toMatch(/interview_plan_section_competencies/i);
-    expect(migration).toMatch(/total_duration_seconds[\s\S]*duration_seconds/i);
+    expect(migration).toMatch(/config\.duration_seconds/i);
+    expect(migration).toMatch(/plan\.total_duration_seconds/i);
+    expect(migration).toMatch(/v_config_duration\s*<>\s*v_plan_duration/i);
     expect(migration).toMatch(/cannot be published/i);
   });
 
