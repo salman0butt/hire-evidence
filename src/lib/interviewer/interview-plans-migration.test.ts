@@ -68,4 +68,19 @@ describe("deterministic interview plan tenancy migration", () => {
 
     expect(migration).toMatch(/private\.is_organization_member\(organization_id\)/i);
   });
+
+  it("saves plans only through a fixed-role security-definer boundary", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(/create or replace function public\.save_interview_plan\s*\(/i);
+    expect(migration).toMatch(/security definer/i);
+    expect(migration).toMatch(/set search_path = ''/i);
+    expect(migration).toMatch(/auth\.uid\(\)/i);
+    expect(migration).toMatch(/private\.has_organization_role\([\s\S]*'owner'[\s\S]*'admin'[\s\S]*'recruiter'[\s\S]*'hiring_manager'/i);
+    expect(migration).toMatch(/Interview plan duration must equal the sum of section durations\./i);
+    expect(migration).toMatch(/Interview plan must cover every required question\./i);
+    expect(migration).toMatch(/Interview plan must cover every required competency\./i);
+    expect(migration).toMatch(/revoke all on function public\.save_interview_plan/i);
+    expect(migration).toMatch(/grant execute on function public\.save_interview_plan[\s\S]*to authenticated/i);
+  });
 });
