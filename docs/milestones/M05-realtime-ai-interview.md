@@ -59,7 +59,7 @@ Server-authorized realtime session setup with browser diagnostics, deterministic
 
 ## Tasks / Iterations
 1. **VERIFIED** — M05.1 — Reference characterization: Talk Tutor server token, state, Web Audio capture/playback, interruption and teardown patterns characterized; reuse/non-reuse and hiring safety boundaries recorded in the selected design.
-2. **ACTIVE** — M05.2 — Session authorization/provider boundary: server-authorized realtime session setup.
+2. **ACTIVE** — M05.2 — Session authorization/provider boundary: domain authorization plus authoritative invitation-bound attempt persistence/RPC are implemented and verified; public API wiring and short-lived provider-token issuer remain.
 3. **NOT STARTED** — M05.3 — Browser compatibility + microphone diagnostics: feature detection, permission/input/level/network readiness.
 4. **NOT STARTED** — M05.4 — Web Audio capture: deterministic audio capture lifecycle.
 5. **NOT STARTED** — M05.5 — Realtime transport: provider connect/send/receive lifecycle.
@@ -74,31 +74,43 @@ Server-authorized realtime session setup with browser diagnostics, deterministic
 14. **NOT STARTED** — M05.14 — Full realtime E2E: stable multi-turn voice interview across failure scenarios.
 
 ## TDD Evidence
-M05.1 is characterization/design work and has no fabricated RED/GREEN evidence. M05.2 behavioral RED is the next required checkpoint.
+M05.1 is characterization/design work and has no fabricated behavioral RED/GREEN evidence.
+
+M05.2 authorization-module RED: `89004863aaa8d5e456d7bed9c9cbd1e1d3f5e0e5`, CI #519 / `34693052261`, failed for the intended missing `session-authorization` implementation.
+
+M05.2 persistence RED: `02ed8e228cfd67ee24f6deb1badab4169beb1e6e`, CI #524 / `34693510005`, failed exactly because `202609120017_realtime_interview_sessions.sql` did not exist.
+
+M05.2 persistence implementation: `0239ce3054856012b9630ebdcfb5127f5b5509c2` created one invitation-bound authoritative attempt with token-hash, consent, immutable-version and lifecycle gating.
+
+M05.2 security-review RED: `17de3f6f93c25037dbcb9aaa1395a9c623ea9fe0`, CI #526 / `34693860526`, had 357 passing tests and one intended failure proving the anonymous-capable authorization RPC returned too much data (`public.interview_attempts`) instead of only an opaque UUID.
+
+M05.2 security GREEN: `ac529449ab3a9ad8a87500700995445b66472f98`, CI #527 / `34693998554`, passed the complete repository gate after narrowing the RPC result to `uuid`.
 
 ## Integration Test Evidence
-PENDING — M05.2 will establish the first server authorization integration boundary.
+CI #527 successfully started local Supabase with the new migration, proving the attempt schema/function applies against the repository migration chain; production build and Chromium E2E also passed.
 
 ## E2E / Visual Verification
-PENDING — milestone plan requires successful multi-turn completion plus microphone denial/recovery, barge-in, timeout, provider interruption, bounded reconnect, mobile/no-overflow and keyboard/status coverage.
+Current repository E2E is GREEN at the M05.2 persistence checkpoint. Milestone-specific realtime E2E remains pending for M05.14: successful multi-turn completion plus microphone denial/recovery, barge-in, timeout, provider interruption, bounded reconnect, mobile/no-overflow and keyboard/status coverage.
 
 ## Security Review
-Initial design review requires invitation capability + current consent + immutable interviewer version + authoritative attempt before provider credential issuance; raw invitation/provider secrets are not persisted or logged; reconnect resumes the same attempt; candidate speech cannot alter policy/plan.
+The implemented authorization slice requires invitation capability + current consent + immutable interviewer version + one authoritative attempt. Raw invitation/provider secrets are not persisted. `interview_attempts` has RLS and no browser table grants. A review-found Important issue—returning the complete attempt row through an anon-capable security-definer RPC—was fixed so only the opaque attempt UUID is returned. No unresolved Critical/Important findings remain for this slice.
 
 ## Accessibility Review
-Initial design requires semantic status/error states, keyboard-accessible mute/end/retry/device controls, visible non-audio connection state, and narrow viewport coverage.
+No new candidate UI was introduced in this slice. The selected design still requires semantic status/error states, keyboard-accessible mute/end/retry/device controls, visible non-audio connection state, and narrow viewport coverage in later tasks.
 
 ## Performance Review
-Initial design requires bounded output queues, follow-ups, retries and event accumulation with idempotent audio/resource cleanup.
+Attempt authorization uses a unique invitation constraint and one create/resume operation; no unbounded collection/queue is introduced. Later realtime work must preserve bounded queues, follow-ups, retries and event accumulation.
 
 ## AI / Eval Review
 Technical failures must never lower candidate scores. Interview behavior must remain job-related, bounded by the immutable plan and guardrails, and robust to candidate prompt injection. M05 introduces no autonomous hire/reject decision or candidate score.
 
 ## Code Review Findings
-None yet for behavioral implementation; M05.1 design self-review found no Critical/Important blocker.
+- Important — fixed: anonymous-capable realtime authorization RPC originally returned the complete `interview_attempts` row. Regression RED `17de3f6…`; fix GREEN `ac529449…` returns only the opaque attempt UUID while preserving no direct browser table grants.
+- Critical: 0 unresolved.
+- Important: 0 unresolved for the implemented slice.
 
 ## Fixes / Re-review
-PENDING when evidence-backed findings exist.
+The security regression and complete CI #527 confirm the narrowed result contract and migration validity. M05.2 remains ACTIVE because API/provider-token integration is not yet complete.
 
 ## Fresh Verification Commands
 Run repository-wide verification plus milestone-specific tests. Baseline:
@@ -114,17 +126,20 @@ python3 scripts/verify_prd_coverage.py
 ```
 
 ## Fresh Verification Results
-M04 post-merge base `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` passed CI #517 / `34692492691`. M05 branch verification is required on each behavioral checkpoint and final head.
+Exact implementation SHA `ac529449ab3a9ad8a87500700995445b66472f98` passed CI #527 / `34693998554`, including install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup/migrations, build, Chromium E2E, PRD coverage and cleanup. Subsequent durable documentation commits require fresh exact-head CI.
 
 ## Commits / Files Changed
 - `7dcbaac0fc84e1843e7867feb8f076c43dbebb3f` — realtime interview design/reference characterization.
 - `671ee4826df39cc45ed14463b1f8251dd5ce5982` — executable M05 implementation plan.
+- `0239ce3054856012b9630ebdcfb5127f5b5509c2` — authoritative realtime attempt persistence/RPC.
+- `17de3f6f93c25037dbcb9aaa1395a9c623ea9fe0` — security regression RED for narrow RPC output.
+- `ac529449ab3a9ad8a87500700995445b66472f98` — narrow RPC result GREEN.
 
 ## Known Limitations
-No realtime provider SDK is currently present in the application dependency set. Provider selection/SDK coupling must be justified by authoritative requirements rather than inferred from the Talk Tutor reference.
+No realtime provider SDK is currently present in the application dependency set. Provider selection/SDK coupling must be justified by authoritative requirements rather than inferred from the Talk Tutor reference. Public realtime-session route and short-lived provider credential issuance are still unfinished M05.2 work.
 
 ## Documentation Updated
-M05 design and implementation plan are durable. Project CURRENT/STATUS/HANDOFF are being reconciled to the activated milestone.
+Design, implementation plan, milestone ledger, project status and session handoff carry the M05 recovery/evidence state.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → relevant PRD → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
@@ -140,7 +155,7 @@ M05 design and implementation plan are durable. Project CURRENT/STATUS/HANDOFF a
 - [ ] Durable status/closeout state current.
 
 ## Next Action
-Execute M05.2 with strict TDD: first define a failing server realtime-session authorization contract proving unusable invitations, missing current consent, missing immutable published interviewer version and duplicate-attempt creation cannot mint provider credentials. Verify the RED is genuine before minimal implementation.
+Continue M05.2 with strict TDD for the public realtime-session API/server repository boundary. Prove constant-safe unavailable responses, no raw capability/log leakage, and a narrow successful session projection; then implement provider-neutral server wiring and the injected short-lived provider-token issuer without choosing a provider absent authoritative justification.
 
 ## Next Milestone
 M06 — Transcript + Durable Session.
