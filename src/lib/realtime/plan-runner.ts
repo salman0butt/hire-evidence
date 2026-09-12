@@ -177,9 +177,7 @@ export function isInterviewQuestionAllowed(
   state: InterviewPlanRunnerState,
   questionId: string,
 ): boolean {
-  return state.plan.sections.some((section) =>
-    section.questions.some((question) => question.id === questionId),
-  );
+  return getCurrentInterviewQuestion(state)?.questionId === questionId;
 }
 
 export function applyInterviewPlanEvent(
