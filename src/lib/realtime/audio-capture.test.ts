@@ -143,4 +143,49 @@ describe("RealtimeAudioCapture", () => {
 
     expect(getUserMedia).toHaveBeenCalledTimes(1);
   });
+
+  it("does not activate capture when stopped while microphone acquisition is pending", async () => {
+    let resolveStream: ((stream: { getTracks: () => { stop: () => void }[] }) => void) | undefined;
+    const stopTrack = vi.fn();
+    const close = vi.fn().mockResolvedValue(undefined);
+    const addModule = vi.fn().mockResolvedValue(undefined);
+    const stream = {
+      getTracks: () => [{ stop: stopTrack }],
+    };
+    const getUserMedia = vi.fn(
+      () =>
+        new Promise<typeof stream>((resolve) => {
+          resolveStream = resolve;
+        }),
+    );
+    const capture = createRealtimeAudioCapture({
+      getUserMedia,
+      createAudioContext: vi.fn(() => ({
+        sampleRate: 48_000,
+        audioWorklet: { addModule },
+        createMediaStreamSource: vi.fn(() => ({
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        })),
+        destination: {},
+        close,
+      })),
+      createWorkletNode: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        port: { postMessage: vi.fn() },
+      })),
+      onChunk: vi.fn(),
+    });
+
+    const startPromise = capture.start();
+    await Promise.resolve();
+    await capture.stop();
+    resolveStream?.(stream);
+    await startPromise;
+
+    expect(stopTrack).toHaveBeenCalledTimes(1);
+    expect(addModule).not.toHaveBeenCalled();
+    expect(close).not.toHaveBeenCalled();
+  });
 });
