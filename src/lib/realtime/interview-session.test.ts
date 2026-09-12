@@ -88,6 +88,7 @@ describe("realtime interview session orchestration", () => {
       firstGeneration,
     );
     session.handleTransportEvent({ type: "candidateSpeechStart" }, firstGeneration);
+    session.completeCurrentQuestion("stale-turn", firstGeneration);
 
     expect(playback.enqueue).not.toHaveBeenCalled();
     expect(playback.interrupt).not.toHaveBeenCalled();
