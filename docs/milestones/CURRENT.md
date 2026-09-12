@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M03
 
 Current capability:
-Tenant-scoped Jobs + Requirements, Competencies, Observable 1–5 Rubrics, Question Bank, and Deterministic Interview Plan are verified slices on draft PR #5. M03.6 Interviewer Configuration is ACTIVE: bounded configuration validation plus tenant/job/plan-bound draft persistence, member-read RLS, and a fixed-role save RPC are implemented and fully verified. Route-bound application repository/action/editor/provider-backed isolation work remains.
+M03.1–M03.5 remain verified slices. Actual branch code/tests now also contain M03.6 interviewer configuration, M03.7 non-overridable guardrails, M03.8 draft/publish, M03.9 immutable versioning, and M03.10 non-billable preview. M03.11 milestone-wide builder closeout is ACTIVE.
 
 Status:
 ACTIVE
@@ -40,31 +40,31 @@ Detailed known issues:
 - Persistence remains organization-owned with PostgreSQL RLS/RPC authority.
 - Route-bound organization/job identifiers are authoritative over form-body values.
 - Organization-authored configuration is untrusted and cannot override platform safety/fairness policy.
-- Published interviewer versions must be immutable and reproducible.
+- Published interviewer versions are immutable/reproducible artifacts.
 - Humans remain hiring decision makers.
 
 ## Iterations
 
 1. M03.1 — Jobs + requirements — **VERIFIED SLICE**.
-2. M03.2 — Competency model — **VERIFIED SLICE**. Exact implementation head `18504de66a11ea6f5944fae4cf2c2522ca5f7c88`, CI #292 / `34647354026`.
-3. M03.3 — Observable 1–5 rubrics — **VERIFIED SLICE**. Provider-backed head `b6607a5a9ad72dea585ac2af4cf374e3d319883d`, CI #301 / `34649940346`.
-4. M03.4 — Question bank — **VERIFIED SLICE**. Provider-backed isolation head `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`, CI #330 / `34657330228`.
-5. M03.5 — Deterministic interview plan — **VERIFIED SLICE**. Route-bound action/editor and provider-backed tenant/role/job isolation are present; exact fully verified head `332caa332b1a6b978860f54f15227ce4d82b385d`, CI #358 / `34665349746`.
-6. M03.6 — Interviewer configuration — **ACTIVE / PARTIALLY VERIFIED**. Validation RED `2e8a88fc452d80bfa4ea59bbbc1f2cb1eb89829a`, CI #359 / `34666412220` → validation GREEN `7ae46568e458f5efb3447707602ee1c77e750c04`, CI #360 / `34666523775`. Persistence RED `73063d7029038924468dc9e27fc994a53abb5fdd`, CI #361 / `34666780326` → persistence GREEN `dce42df18176a00e5c33f910332c276245de5ac5`, CI #362 / `34666866674`.
-7. M03.7 — Non-overridable guardrail validation — NOT STARTED.
-8. M03.8 — Draft/publish state machine — NOT STARTED.
-9. M03.9 — Immutable versioning — NOT STARTED.
-10. M03.10 — Non-billable preview — NOT STARTED.
-11. M03.11 — Builder E2E closeout — NOT STARTED.
+2. M03.2 — Competency model — **VERIFIED SLICE**.
+3. M03.3 — Observable 1–5 rubrics — **VERIFIED SLICE**.
+4. M03.4 — Question bank — **VERIFIED SLICE**.
+5. M03.5 — Deterministic interview plan — **VERIFIED SLICE**.
+6. M03.6 — Interviewer configuration — **IMPLEMENTED / EXACT-HEAD GREEN**. Validation, tenant/job/plan-bound persistence, typed repository, route-bound actions/editor/page wiring and dedicated provider-backed isolation E2E are present.
+7. M03.7 — Non-overridable guardrail validation — **IMPLEMENTED / EXACT-HEAD GREEN**. Pure validator plus authoritative database enforcement and provider-backed adversarial coverage are present.
+8. M03.8 — Draft/publish state machine — **IMPLEMENTED / EXACT-HEAD GREEN**. Publish-state migration and route-bound publication action are present.
+9. M03.9 — Immutable versioning — **IMPLEMENTED / EXACT-HEAD GREEN**. Published interviewer-version migration/repository/tests are present.
+10. M03.10 — Non-billable preview — **IMPLEMENTED / EXACT-HEAD GREEN**. Preview migration/domain/action/UI/tests are present.
+11. M03.11 — Builder E2E closeout — **ACTIVE**. Complete builder journey, abuse matrix, desktop/mobile accessibility, skeptical milestone-wide review, traceability/doc reconciliation and final exact-SHA CI are the remaining closeout work.
 
 ## Verification state
 
-Exact behavioral head `dce42df18176a00e5c33f910332c276245de5ac5` passed CI #362 / `34666866674` across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase migration application, production build, Chromium E2E, PRD coverage and teardown. This proves current M03.6 validation and persistence; repository/action/editor/provider-backed configuration isolation still remain.
+The previous code head `adfbf30f0f27a3e06c156c3d8a8a16ecf872cef2` passed CI #413 / `34673845119`. That head was 45 commits ahead of the old M03.6 repository checkpoint `706822e7103fe16bdbe034bcc27e3dff96130f93` and contained the M03.6–M03.10 implementation/test expansion described above. Documentation reconciliation now produces a newer head, so fresh exact-head CI is required before closeout or merge.
 
 ## Review state
 
-No unresolved Critical or Important finding is known in the implemented M03.6 validation/persistence scope. PR #5 remains draft because M03.6 application behavior plus M03.7–M03.11 are incomplete.
+Latest GitHub inspection found no unresolved review threads. No merge is authorized until M03.11 proves all milestone acceptance, security/accessibility/performance/AI-safety, documentation, concurrency and exact-final-head CI gates.
 
 ## Next Action
 
-Continue M03.6 with the smallest genuine RED for the typed interviewer-configuration application repository boundary. Then add route-bound action/editor behavior and provider-backed role/tenant/job/plan isolation before marking M03.6 verified.
+Execute M03.11 closeout: verify the full provider-backed builder flow and Org A/Org B/anonymous abuse matrix through configuration → guardrails → publish → immutable version → preview; verify desktop and 390×844 keyboard/focus/overflow behavior; perform skeptical milestone-wide review; fix every Critical/Important finding; reconcile milestone/traceability/feature/PR documentation; then require fresh exact-final-head CI before auto-merge.
