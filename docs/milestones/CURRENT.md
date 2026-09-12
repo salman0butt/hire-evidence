@@ -6,11 +6,8 @@ Candidates + Invitations
 Legacy roadmap identifier:
 M04
 
-Current capability:
-M04.1 candidate records, M04.2 secure invitation tokens/persistence, M04.3 authoritative invitation lifecycle, and M04.4 public invitation resolution are verified. The next unfinished unit is M04.5 pre-interview experience.
-
 Status:
-IN PROGRESS
+CLOSEOUT / MERGE GATE
 
 Branch:
 `feat/candidates-invitations`
@@ -19,7 +16,7 @@ Base:
 `main` at verified M03 merge SHA `729474ffb03075c93dfa2564f0004f1590533753`
 
 PR:
-#6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
+#6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged pending final documentation-head CI.
 
 Canonical compact recovery state:
 `docs/progress/STATUS.md`
@@ -30,23 +27,29 @@ Canonical compact recovery state:
 2. M04.2 — Secure token service + invitation persistence — **VERIFIED**.
 3. M04.3 — Invitation lifecycle — **VERIFIED**.
 4. M04.4 — Public candidate route / invitation resolution — **VERIFIED**.
-5. M04.5 — Pre-interview experience — **NEXT / NOT STARTED**.
-6. M04.6 — Disclosure + consent — **NOT STARTED**.
-7. M04.7 — Accommodation/support path — **NOT STARTED**.
-8. M04.8 — Security E2E closeout — **NOT STARTED**.
+5. M04.5 — Pre-interview experience — **VERIFIED**.
+6. M04.6 — Disclosure + consent — **VERIFIED**.
+7. M04.7 — Accommodation/support path — **VERIFIED**.
+8. M04.8 — Security/browser closeout — **VERIFIED** on implementation head `8a6f6cc8adba2d39f2b255a74db166e3285527ba`, CI #507 / `34691558117`.
 
-## Verification state
+## Latest Verification
 
-M04.4 final implementation head `2d5883ce57916b4a48ec338d6ea8816eb3470d80` passed CI #473 / `34684127179` across frozen install, lint, typecheck, all 322 unit/component tests, framework/source verification, local Supabase reset, production build, Chromium E2E, PRD coverage, and cleanup.
+CI #507 passed the complete repository quality gate on `8a6f6cc8adba2d39f2b255a74db166e3285527ba`: frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup, production build, Chromium E2E, PRD coverage, and cleanup.
 
-M04.4 TDD evidence: SQL-boundary RED `2c931522851abbf39513f44f09070c745082069e` / CI #465 failed only because the public invitation migration did not exist; server-resolver RED `d3f808ea7b7c1acd6d5d7e408fe52bc2ddef7545` / CI #468 failed only because `public-invitation.ts` did not exist; route RED `fd759ad8da07ad8dfc29a4b2336ce20625605956` / CI #470 failed only because the public page did not exist. Security RED `ff992cf8762dcc59c9d21a70d1a6ad6f5a98c30f` / CI #472 then proved draft invitations were still publicly resolvable and authenticated visitors lacked the same narrow RPC capability. The final hardening restricts public resolution to sent/opened/started invitations and grants only function execution to anon/authenticated roles.
+The M04.8 browser closeout proves a valid invitation renders the safe public projection on a 390×844 viewport without horizontal overflow; consent is keyboard reachable and recordable; trusted organization support links are exposed; and wrong, expired, revoked, and completed tokens all collapse to the same unavailable browser state.
 
-Documentation reconciliation creates newer branch heads and does not replace the verified implementation evidence above. Exact-final-head CI will be re-established after the next behavioral unit.
+The immediately preceding CI #505 failure was diagnosed as a stale organization-settings keyboard expectation after two legitimate candidate-support inputs were added. Commit `ac047aff7cffb335226702e24b443cd1706796a9` updated the accessibility test to traverse those fields; exact-head CI #506 / `34691250632` passed the complete gate.
 
-## Review state
+## Review State
 
-Latest GitHub recovery found 0 unresolved review threads. For completed M04.1–M04.4 there are 0 unresolved Critical and 0 unresolved Important findings. M04.4 hashes raw tokens server-side, returns only organization/job display fields, uses a `SECURITY DEFINER` RPC with blank `search_path`, exposes no invitation table grant, fails closed for draft/expired/revoked/completed invitations, and supports both anonymous and authenticated visitors without broadening tenant access.
+- Unresolved Critical findings: **0**.
+- Unresolved Important findings: **0**.
+- Unresolved GitHub review threads: **0** at latest recovery.
+- Security review confirms raw invitation tokens are hashed server-side and never persisted; RLS/constraints/RPCs remain authoritative; public resolution exposes only a narrow safe projection; invalid/unusable tokens fail closed; consent evidence is append-only from browser roles; interview start requires current disclosure consent; organization support settings remain owner/admin constrained by organization RLS.
+- Accessibility review confirms semantic disclosure/support sections, explicit required consent, keyboard reachability, status/error semantics, and narrow viewport no-overflow coverage.
+- Performance/YAGNI review found no unbounded public read or speculative abstraction; token resolution is a single hash lookup and bounded projection.
+- AI-safety review preserves human hiring decisions and discloses AI/transcription/data-processing/retention before start.
 
 ## Next Action
 
-Start M04.5 with strict RED tests requiring the safe public projection to derive expected duration and interview format from the invitation-bound immutable interviewer-version snapshot. Then add the focused pre-interview experience covering company, role, expected duration, format, technical requirements, privacy summary, and start prerequisites with semantic/accessibility tests. Verify exact-head CI and continue directly to M04.6 when M04.5 is genuinely complete.
+Reconcile final durable status/traceability/feature-matrix/PR description. Because those documentation commits create a new head, run and verify fresh exact-final-head CI. If it is green and PR/review/concurrency/mergeability gates remain satisfied, mark PR #6 ready if required and squash-merge automatically under the repository owner's standing authorization. Then verify post-merge `main` CI and immediately activate M05 — Realtime AI Interview.
