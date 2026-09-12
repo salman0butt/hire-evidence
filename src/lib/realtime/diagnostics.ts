@@ -39,9 +39,15 @@ type RealtimeMicrophoneStream = Readonly<{
   getTracks: () => readonly RealtimeMicrophoneTrack[];
 }>;
 
+type RealtimeAudioConstraint =
+  | boolean
+  | Readonly<{
+      deviceId: Readonly<{ exact: string }>;
+    }>;
+
 export type RealtimeMicrophoneAccessRuntime = Readonly<{
   getUserMedia?:
-    | ((constraints: Readonly<{ audio: boolean; video: boolean }>) => Promise<RealtimeMicrophoneStream>)
+    | ((constraints: Readonly<{ audio: RealtimeAudioConstraint; video: boolean }>) => Promise<RealtimeMicrophoneStream>)
     | undefined;
 }>;
 
@@ -197,6 +203,7 @@ export function diagnoseRealtimeBrowser(
 
 export async function verifyRealtimeMicrophoneAccess(
   runtime: RealtimeMicrophoneAccessRuntime,
+  selectedInputDeviceId?: string,
 ): Promise<RealtimeDiagnosticResult> {
   if (!runtime.getUserMedia) {
     return {
@@ -209,7 +216,11 @@ export async function verifyRealtimeMicrophoneAccess(
   let stream: RealtimeMicrophoneStream | undefined;
 
   try {
-    stream = await runtime.getUserMedia({ audio: true, video: false });
+    const audio: RealtimeAudioConstraint = selectedInputDeviceId
+      ? { deviceId: { exact: selectedInputDeviceId } }
+      : true;
+
+    stream = await runtime.getUserMedia({ audio, video: false });
     const hasLiveAudioTrack = stream
       .getAudioTracks()
       .some((track) => track.readyState === undefined || track.readyState === "live");
