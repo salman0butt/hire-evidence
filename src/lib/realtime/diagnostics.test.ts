@@ -1,0 +1,52 @@
+import { describe, expect, it } from "vitest";
+
+import { diagnoseRealtimeBrowser } from "./diagnostics";
+
+function capabilities(
+  overrides: Partial<Parameters<typeof diagnoseRealtimeBrowser>[0]> = {},
+): Parameters<typeof diagnoseRealtimeBrowser>[0] {
+  return {
+    isSecureContext: true,
+    hasMediaDevices: true,
+    hasGetUserMedia: true,
+    hasAudioContext: true,
+    hasAudioWorklet: true,
+    microphonePermission: "granted",
+    inputDeviceCount: 1,
+    ...overrides,
+  };
+}
+
+describe("diagnoseRealtimeBrowser", () => {
+  it("reports ready only when the browser and microphone prerequisites are available", () => {
+    expect(diagnoseRealtimeBrowser(capabilities())).toEqual({
+      status: "ready",
+    });
+  });
+
+  it.each([
+    ["insecure-context", { isSecureContext: false }],
+    ["media-devices-unavailable", { hasMediaDevices: false }],
+    ["get-user-media-unavailable", { hasGetUserMedia: false }],
+    ["audio-context-unavailable", { hasAudioContext: false }],
+    ["audio-worklet-unavailable", { hasAudioWorklet: false }],
+  ] as const)("fails closed for %s", (reason, override) => {
+    expect(diagnoseRealtimeBrowser(capabilities(override))).toEqual({
+      status: "blocked",
+      reason,
+      recoverable: false,
+    });
+  });
+
+  it.each([
+    ["microphone-permission-denied", { microphonePermission: "denied" as const }],
+    ["microphone-permission-required", { microphonePermission: "prompt" as const }],
+    ["microphone-input-unavailable", { inputDeviceCount: 0 }],
+  ] as const)("reports recoverable microphone readiness for %s", (reason, override) => {
+    expect(diagnoseRealtimeBrowser(capabilities(override))).toEqual({
+      status: "blocked",
+      reason,
+      recoverable: true,
+    });
+  });
+});
