@@ -240,4 +240,67 @@ describe("RealtimeAudioCapture", () => {
     expect(sourceConnect).not.toHaveBeenCalled();
     expect(createWorkletNode).not.toHaveBeenCalled();
   });
+
+  it("can restart immediately after canceling a pending microphone acquisition", async () => {
+    type PendingStream = {
+      getTracks: () => { stop: () => void }[];
+    };
+
+    const firstStopTrack = vi.fn();
+    const secondStopTrack = vi.fn();
+    const firstStream: PendingStream = {
+      getTracks: () => [{ stop: firstStopTrack }],
+    };
+    const secondStream: PendingStream = {
+      getTracks: () => [{ stop: secondStopTrack }],
+    };
+    let resolveFirstStream: ((stream: PendingStream) => void) | undefined;
+    const getUserMedia = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise<PendingStream>((resolve) => {
+            resolveFirstStream = resolve;
+          }),
+      )
+      .mockResolvedValueOnce(secondStream);
+    const createAudioContext = vi.fn(() => ({
+      sampleRate: 48_000,
+      audioWorklet: { addModule: vi.fn().mockResolvedValue(undefined) },
+      createMediaStreamSource: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+      })),
+      destination: {},
+      close: vi.fn().mockResolvedValue(undefined),
+    }));
+    const capture = createRealtimeAudioCapture({
+      getUserMedia,
+      createAudioContext,
+      createWorkletNode: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        port: { postMessage: vi.fn() },
+      })),
+      onChunk: vi.fn(),
+    });
+
+    const firstStart = capture.start();
+    await Promise.resolve();
+    await capture.stop();
+
+    const secondStart = capture.start();
+    await Promise.resolve();
+
+    expect(getUserMedia).toHaveBeenCalledTimes(2);
+
+    resolveFirstStream?.(firstStream);
+    await Promise.all([firstStart, secondStart]);
+
+    expect(firstStopTrack).toHaveBeenCalledTimes(1);
+    expect(secondStopTrack).not.toHaveBeenCalled();
+
+    await capture.stop();
+    expect(secondStopTrack).toHaveBeenCalledTimes(1);
+  });
 });
