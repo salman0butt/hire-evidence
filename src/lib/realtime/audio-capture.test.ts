@@ -192,4 +192,52 @@ describe("RealtimeAudioCapture", () => {
     expect(addModule).not.toHaveBeenCalled();
     expect(close).not.toHaveBeenCalled();
   });
+
+  it("does not activate capture when stopped while the worklet module is loading", async () => {
+    const stopTrack = vi.fn();
+    const close = vi.fn().mockResolvedValue(undefined);
+    const sourceConnect = vi.fn();
+    const createWorkletNode = vi.fn(() => ({
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      port: { postMessage: vi.fn() },
+    }));
+    let resolveModule: (() => void) | undefined;
+    const addModule = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveModule = resolve;
+        }),
+    );
+    const stream = {
+      getTracks: () => [{ stop: stopTrack }],
+    };
+    const capture = createRealtimeAudioCapture({
+      getUserMedia: vi.fn().mockResolvedValue(stream),
+      createAudioContext: vi.fn(() => ({
+        sampleRate: 48_000,
+        audioWorklet: { addModule },
+        createMediaStreamSource: vi.fn(() => ({
+          connect: sourceConnect,
+          disconnect: vi.fn(),
+        })),
+        destination: {},
+        close,
+      })),
+      createWorkletNode,
+      onChunk: vi.fn(),
+    });
+
+    const startPromise = capture.start();
+    await Promise.resolve();
+    await Promise.resolve();
+    await capture.stop();
+    resolveModule?.();
+    await startPromise;
+
+    expect(stopTrack).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(sourceConnect).not.toHaveBeenCalled();
+    expect(createWorkletNode).not.toHaveBeenCalled();
+  });
 });
