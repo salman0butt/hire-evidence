@@ -7,6 +7,7 @@ import {
   diagnoseRealtimeBrowser,
   listRealtimeAudioInputs,
   verifyRealtimeMicrophoneAccess,
+  verifyRealtimeMicrophoneInputLevel,
 } from "@/lib/realtime/diagnostics";
 import type {
   RealtimeAudioInputDevice,
@@ -22,6 +23,9 @@ type RealtimeDiagnosticsProps = Readonly<{
 type RealtimeReadinessCheckProps = Readonly<{
   runCheck?: ((selectedInputDeviceId?: string) => Promise<RealtimeDiagnosticResult>) | undefined;
   listInputs?: (() => Promise<readonly RealtimeAudioInputDevice[]>) | undefined;
+  runInputLevelCheck?:
+    | ((selectedInputDeviceId?: string) => Promise<RealtimeDiagnosticResult>)
+    | undefined;
 }>;
 
 const FAILURE_MESSAGES: Record<RealtimeDiagnosticFailureReason, string> = {
@@ -104,6 +108,63 @@ async function listBrowserRealtimeAudioInputs(): Promise<readonly RealtimeAudioI
   return listRealtimeAudioInputs(navigator.mediaDevices);
 }
 
+async function measureBrowserRealtimeInputLevel(stream: MediaStream): Promise<number> {
+  const context = new window.AudioContext();
+  const source = context.createMediaStreamSource(stream);
+  const analyser = context.createAnalyser();
+  analyser.fftSize = 256;
+  source.connect(analyser);
+
+  const samples = new Uint8Array(analyser.fftSize);
+  let peak = 0;
+
+  try {
+    if (context.state === "suspended") {
+      await context.resume();
+    }
+
+    for (let index = 0; index < 6; index += 1) {
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 50));
+      analyser.getByteTimeDomainData(samples);
+      for (const sample of samples) {
+        peak = Math.max(peak, Math.abs(sample - 128) / 128);
+      }
+    }
+
+    return peak;
+  } finally {
+    source.disconnect();
+    analyser.disconnect();
+    await context.close();
+  }
+}
+
+async function runBrowserRealtimeInputLevelCheck(
+  selectedInputDeviceId?: string,
+): Promise<RealtimeDiagnosticResult> {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return {
+      status: "blocked",
+      reason: "media-devices-unavailable",
+      recoverable: false,
+    };
+  }
+
+  const mediaDevices = navigator.mediaDevices;
+
+  return verifyRealtimeMicrophoneInputLevel(
+    {
+      getUserMedia:
+        typeof mediaDevices?.getUserMedia === "function"
+          ? (constraints) => mediaDevices.getUserMedia(constraints)
+          : undefined,
+      measureInputLevel: (stream) =>
+        measureBrowserRealtimeInputLevel(stream as unknown as MediaStream),
+    },
+    selectedInputDeviceId,
+  );
+}
+
 export function RealtimeDiagnostics({ result, onRetry }: RealtimeDiagnosticsProps) {
   if (result.status === "ready") {
     return (
@@ -138,11 +199,14 @@ export function RealtimeDiagnostics({ result, onRetry }: RealtimeDiagnosticsProp
 export function RealtimeReadinessCheck({
   runCheck = runBrowserRealtimeReadinessCheck,
   listInputs = listBrowserRealtimeAudioInputs,
+  runInputLevelCheck = runBrowserRealtimeInputLevelCheck,
 }: RealtimeReadinessCheckProps) {
   const [result, setResult] = useState<RealtimeDiagnosticResult | null>(null);
   const [checking, setChecking] = useState(false);
   const [inputs, setInputs] = useState<readonly RealtimeAudioInputDevice[]>([]);
   const [selectedInputDeviceId, setSelectedInputDeviceId] = useState("");
+  const [inputLevelResult, setInputLevelResult] = useState<RealtimeDiagnosticResult | null>(null);
+  const [inputLevelChecking, setInputLevelChecking] = useState(false);
 
   async function handleCheck(inputDeviceId?: string) {
     if (checking) {
@@ -150,6 +214,7 @@ export function RealtimeReadinessCheck({
     }
 
     setChecking(true);
+    setInputLevelResult(null);
     try {
       const nextResult = await runCheck(inputDeviceId);
       setResult(nextResult);
@@ -170,6 +235,25 @@ export function RealtimeReadinessCheck({
       });
     } finally {
       setChecking(false);
+    }
+  }
+
+  async function handleInputLevelCheck() {
+    if (inputLevelChecking || !selectedInputDeviceId) {
+      return;
+    }
+
+    setInputLevelChecking(true);
+    try {
+      setInputLevelResult(await runInputLevelCheck(selectedInputDeviceId));
+    } catch {
+      setInputLevelResult({
+        status: "blocked",
+        reason: "microphone-input-unavailable",
+        recoverable: true,
+      });
+    } finally {
+      setInputLevelChecking(false);
     }
   }
 
@@ -215,7 +299,10 @@ export function RealtimeReadinessCheck({
             <select
               id="realtime-microphone"
               value={selectedInputDeviceId}
-              onChange={(event) => setSelectedInputDeviceId(event.target.value)}
+              onChange={(event) => {
+                setSelectedInputDeviceId(event.target.value);
+                setInputLevelResult(null);
+              }}
               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950"
             >
               {inputs.map((input) => (
@@ -225,14 +312,33 @@ export function RealtimeReadinessCheck({
               ))}
             </select>
           </div>
+          <p className="text-sm leading-6 text-slate-600">
+            Speak normally while checking. Audio is sampled only for technical readiness and is
+            not saved or used as candidate evidence.
+          </p>
           <button
             type="button"
-            onClick={() => handleCheck(selectedInputDeviceId || undefined)}
-            disabled={checking || !selectedInputDeviceId}
+            onClick={handleInputLevelCheck}
+            disabled={inputLevelChecking || !selectedInputDeviceId}
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {checking ? "Checking selected microphone…" : "Check selected microphone"}
+            {inputLevelChecking ? "Checking selected microphone…" : "Check selected microphone"}
           </button>
+          {inputLevelResult?.status === "ready" ? (
+            <div
+              role="status"
+              aria-label="Microphone input"
+              aria-live="polite"
+              className="rounded-lg border border-slate-200 p-3 text-sm text-slate-700"
+            >
+              Microphone input detected. This signal was used only for technical readiness.
+            </div>
+          ) : inputLevelResult ? (
+            <RealtimeDiagnostics
+              result={inputLevelResult}
+              onRetry={inputLevelResult.recoverable ? handleInputLevelCheck : undefined}
+            />
+          ) : null}
         </div>
       ) : null}
     </section>
