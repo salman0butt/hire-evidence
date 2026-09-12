@@ -133,7 +133,7 @@ test.describe("interviewer builder browser closeout", () => {
     await page.reload();
 
     await page.getByLabel("Internal interviewer name").fill(`Technical interviewer ${suffix}`);
-    await page.getByLabel("Duration in seconds").fill("1800");
+    await page.getByLabel("Duration in seconds", { exact: true }).fill("1800");
     await page.getByLabel("Interview guidelines").fill("Ask neutral job-related questions and request concrete evidence.");
     await page.getByLabel("Candidate instructions").fill("Explain your reasoning with concrete examples.");
     await page.getByLabel("Clarify ambiguity").check();
