@@ -78,6 +78,10 @@ Organizations + RBAC — **COMPLETE** on `main` at `835d7d571a69cd13e3e802be4872
 - `e2e/questions.spec.ts` proves question fixed-role, tenant, job and competency boundaries.
 - M03.5 provider-backed interview-plan authorization/isolation verification is still pending. A direct connector create-file attempt was rejected before reaching GitHub; no repository state changed from that rejected request and lower-level Git writes remain available.
 
+## Integration Test Evidence
+
+M03.1–M03.4 retain provider-backed local-Supabase evidence. M03.5 currently has migration contract coverage plus exact-head full-suite verification at `c3d5081e22f389e88788c8f302187504b14ad303`, CI #341 / `34661832340`; dedicated provider-backed interview-plan role/tenant/job abuse coverage is still required before M03.5 closeout.
+
 ## Security Review
 
 Implemented M03.5 persistence is organization-owned. Plan sections and linked questions/competencies carry organization/job identifiers with composite foreign keys, read access is RLS member-scoped, and mutation is through a fixed-role authenticated security-definer RPC. Required coverage and duration consistency are rechecked transactionally. Critical: 0 unresolved. Important: 0 unresolved in the currently reviewed persistence/repository scope. Provider-backed abuse verification remains required before M03.5 closeout.
