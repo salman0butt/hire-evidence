@@ -25,6 +25,7 @@ export type RealtimeSessionAuthorizationDeps = Readonly<{
     rawToken: string,
   ) => Promise<CandidateRealtimeSession>;
   getOrCreateAttempt: (input: {
+    rawToken: string;
     invitationId: string;
     candidateId: string;
     interviewerVersionId: string;
@@ -76,6 +77,7 @@ export async function authorizeRealtimeSession(
   }
 
   const attempt = await deps.getOrCreateAttempt({
+    rawToken,
     invitationId: candidateSession.invitationId,
     candidateId: candidateSession.candidateId,
     interviewerVersionId: candidateSession.interviewerVersionId,
