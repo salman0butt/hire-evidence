@@ -36,6 +36,8 @@ describe("candidate tenancy migration", () => {
 
     expect(migration).toMatch(/check\s*\(full_name\s*=\s*btrim\(full_name\)/i);
     expect(migration).toMatch(/check\s*\(email\s*=\s*lower\(btrim\(email\)\)/i);
+    expect(migration).toMatch(/email\s*~\s*'\^\[\^\[:space:\]@\]\+@/i);
+    expect(migration).toMatch(/normalized_email\s*!~\s*'\^\[\^\[:space:\]@\]\+@/i);
     expect(migration).toMatch(/unique\s*\(organization_id,\s*job_id,\s*email\)/i);
     expect(migration).toMatch(/foreign key\s*\(job_id,\s*organization_id\)/i);
     expect(migration).toMatch(/references public\.jobs\s*\(id,\s*organization_id\)/i);
