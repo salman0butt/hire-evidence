@@ -1,58 +1,63 @@
 # Session Handoff
 
-This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, and live GitHub state first.
+This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, and live GitHub state first.
 
 ## Repository state
 
 - Repository: `salman0butt/hire-evidence`
 - Default branch: `main`
 - Verified base/main SHA: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` (Candidates + Invitations PR #6 squash merge).
-- Post-merge main CI: #517 / `34692492691` — GREEN full repository gate.
+- Base post-merge main CI: #517 / `34692492691` — GREEN full repository gate.
 - Active branch: `feat/realtime-ai-interview`
 - Active milestone: M05 — Realtime AI Interview.
 - Active draft milestone PR: #7 — `Build realtime AI interview`.
 - Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 - Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 
-## Current milestone
+## Current milestone state
 
-M05 — Realtime AI Interview is **ACTIVE**.
+M05.1 reference characterization is **VERIFIED**.
 
-M05.1 reference characterization is **VERIFIED**. Talk Tutor is pinned at `69b6beee90c8dbd186730389f8a1462c2239fe61`; reusable ephemeral-token, generation-guard, Web Audio, queued-playback, interruption and teardown mechanics plus hiring-specific non-reuse rules are durable in the selected design.
+M05.2 session authorization/provider boundary is **ACTIVE / PARTIALLY VERIFIED**. Implemented work includes invitation/consent/version authorization, one-authoritative-attempt persistence, hashed capability repository behavior, constant-safe handler semantics, narrow attempt projection, and short-lived provider-token lifetime enforcement. Production provider-specific credential issuance/adapter composition remains unresolved because current requirements/source/dependencies do not select a realtime provider. Preserve the provider-neutral boundary rather than guessing a vendor.
 
-M05.2 session authorization/provider boundary is **ACTIVE**. The domain authorization module and authoritative attempt persistence/RPC are implemented. The persistence layer creates/resumes one invitation-bound attempt, checks usable invitation state, current `candidate-interview-v1` consent and immutable interviewer version, atomically advances the invitation to `started`, stores no raw capability token, leaves the attempt table inaccessible to browser roles, and returns only the opaque attempt UUID. The public API route and short-lived provider-token issuer remain unfinished.
+M05.3 browser compatibility + microphone diagnostics is **ACTIVE**. Implemented work includes typed secure-context/media/getUserMedia/AudioContext/AudioWorklet/permission/input-count/network diagnostics, explicit microphone acquisition with immediate track cleanup, accessible status/recovery UI, candidate-page integration, offline fail-closed behavior, and selected-device acquisition support. Remaining acceptance: candidate-facing device enumeration/selection UX after explicit access, usable input-level readiness, and focused keyboard/narrow-viewport browser verification.
 
-M05.3–M05.14 have not started.
+M05.4–M05.14 remain **NOT STARTED**.
 
 ## Safety / architecture state
 
 - Raw invitation tokens are capabilities and are never persisted/logged.
 - Long-lived provider secrets remain server-only; browser credentials must be short-lived/minimally scoped.
 - Candidate speech/transcript is untrusted input and cannot change system policy, job criteria, plan order, follow-up limits, or assessment rules.
-- Reconnect resumes the same authoritative attempt and cannot silently restart the plan.
+- Reconnect must resume the same authoritative attempt and cannot silently restart the plan.
 - Technical/browser/provider/microphone failures never lower candidate evaluation or become negative evidence.
-- M05 introduces no autonomous hire/reject decision, candidate score, or protected-trait/emotion/personality/deception/appearance/accent-quality inference.
-- No realtime provider SDK is currently present. Do not select/couple a provider merely because the Talk Tutor reference uses one; preserve the provider-neutral boundary until authoritative requirements justify selection.
+- M05 introduces no autonomous hire/reject decision, candidate score, protected-trait/emotion/personality/deception/appearance/accent-quality inference.
+- No realtime provider SDK is authoritative yet; do not couple a provider merely because a reference project uses one.
 
 ## Current evidence
 
-- M04 merge SHA `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` verified by CI #517 / `34692492691`.
-- M05 design commit: `7dcbaac0fc84e1843e7867feb8f076c43dbebb3f`.
-- M05 implementation-plan commit: `671ee4826df39cc45ed14463b1f8251dd5ce5982`.
 - M05.2 authorization RED: `89004863aaa8d5e456d7bed9c9cbd1e1d3f5e0e5`, CI #519 / `34693052261`.
-- M05.2 persistence RED: `02ed8e228cfd67ee24f6deb1badab4169beb1e6e`, CI #524 / `34693510005` — intended missing migration failure.
-- M05.2 persistence implementation: `0239ce3054856012b9630ebdcfb5127f5b5509c2`.
-- M05.2 security-review RED: `17de3f6f93c25037dbcb9aaa1395a9c623ea9fe0`, CI #526 / `34693860526` — exactly one new test failed because the RPC returned the full attempt row.
-- M05.2 security GREEN: `ac529449ab3a9ad8a87500700995445b66472f98`, CI #527 / `34693998554` — complete repository gate GREEN, including local Supabase migrations, build, Chromium E2E and PRD coverage.
-- Security re-review: 0 unresolved Critical / 0 unresolved Important findings for the implemented persistence slice.
-- Documentation commits after `ac529449…` create a newer head and therefore require fresh exact-head CI before any readiness claim.
+- M05.2 persistence/security work ultimately passed complete repository gates, including `ac529449ab3a9ad8a87500700995445b66472f98`, CI #527 / `34693998554`, and later provider-neutral work at `c10a4a888454fe9c3612c869d8c6ba7b7b040cd6`, CI #543 / `34696198083`.
+- M05.3 diagnostics RED: `c23a89c66d97c97f8a9be45e135bc8c1d0268950`, CI #544 / `34698263217`.
+- M05.3 diagnostics GREEN: `e821c88beec11e76a990b621b57c833cee455e00`, CI #545 / `34698304817`.
+- M05.3 accessible-UI RED: `100528c0fae1837ee214be8db82c1d6ae4c09cfa`, CI #547 / `34698666201`.
+- Offline integration regression: `5630cb89d69bf379bfc77dd77157c0b32405ef24`, CI #560 / `34700605728` — typecheck caught missing `network-offline` UI copy and missing `isOnline` runtime input.
+- Offline integration fix: `019ac11a6a3575d11af96b579964ec206a6f7da0`, CI #561 / `34700935235` — full repository gate GREEN.
+- Selected-input RED: `1ac380e3b1a32b30cb6623ed13f74297b6865a02`, CI #562 / `34701284392` — intended TS2554 because the access verifier accepted one argument only.
+- Selected-input GREEN: `2708322cd406eb3e2877295bfe25f495cff422c5`, CI #563 / `34701331592` — frozen install, lint, typecheck, unit/component, repository verifiers, local Supabase reset, build, Chromium E2E, PRD coverage and cleanup all GREEN.
+- Documentation reconciliation commits after `2708322…` require fresh exact-head CI before a later readiness claim.
+
+## Review state
+
+- Critical findings: 0 unresolved for implemented M05 slices.
+- Important findings: 0 unresolved for implemented M05 slices.
+- PR #7 had no submitted reviews or unresolved review threads at last reconciliation.
 
 ## Exact next work
 
-1. Recover PR #7 exact head and CI; do not trust this handoff if GitHub has advanced.
-2. Continue M05.2, not M05.3.
-3. With strict TDD, add the public `POST /api/interview/[token]/realtime-session` contract: constant-safe unavailable/error response, no raw capability echo/logging, and a narrow successful session projection only.
-4. Implement the provider-neutral server repository/authorization wiring needed by that route without exposing attempt rows or internal assessment data.
-5. Add the injected short-lived provider-token issuer boundary. Do not choose a provider SDK absent authoritative justification; if provider-specific issuance cannot yet be implemented, keep that dependency explicit and M05.2 ACTIVE rather than fabricating a provider.
-6. Run focused tests/typecheck/security review and exact-head CI; update durable evidence.
-7. Only mark M05.2 verified and advance to browser diagnostics after the real server/API/provider credential boundary is complete and green.
+1. Recover PR #7 exact head and CI; newer GitHub state wins over this handoff.
+2. Finish M05.3 with strict TDD for privacy-preserving audio-input enumeration and accessible candidate selection after explicit microphone access.
+3. Re-check the selected input without implicit recording/permission requests and keep audio transient.
+4. Add usable input-level readiness without turning signal quality into candidate evidence.
+5. Add focused browser keyboard and narrow-viewport coverage, then perform security/accessibility/performance review and exact-head verification before marking M05.3 verified.
+6. Keep M05.2 provider-specific issuance explicitly unresolved unless authoritative provider requirements appear.
