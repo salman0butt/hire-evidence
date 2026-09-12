@@ -119,8 +119,8 @@ set search_path = ''
 as $$
 declare
   actor_id uuid := auth.uid();
-  plan_id uuid;
-  section_id uuid;
+  v_plan_id uuid;
+  v_section_id uuid;
   section_value jsonb;
   section_ordinality bigint;
   section_purpose text;
@@ -170,7 +170,7 @@ begin
     p_job_id,
     p_total_duration_seconds
   )
-  returning id into plan_id;
+  returning id into v_plan_id;
 
   for section_value, section_ordinality in
     select value, ordinality
@@ -217,12 +217,12 @@ begin
     values (
       p_organization_id,
       p_job_id,
-      plan_id,
+      v_plan_id,
       section_purpose,
       section_duration,
       section_ordinality - 1
     )
-    returning id into section_id;
+    returning id into v_section_id;
 
     for question_value, question_ordinality in
       select value, ordinality
@@ -241,8 +241,8 @@ begin
       values (
         p_organization_id,
         p_job_id,
-        plan_id,
-        section_id,
+        v_plan_id,
+        v_section_id,
         question_value::uuid,
         question_ordinality - 1
       );
@@ -264,8 +264,8 @@ begin
       values (
         p_organization_id,
         p_job_id,
-        plan_id,
-        section_id,
+        v_plan_id,
+        v_section_id,
         competency_value::uuid
       );
     end loop;
@@ -284,7 +284,7 @@ begin
       and not exists (
         select 1
         from public.interview_plan_section_questions planned_question
-        where planned_question.plan_id = plan_id
+        where planned_question.plan_id = v_plan_id
           and planned_question.question_id = q.id
       )
   ) then
@@ -299,14 +299,14 @@ begin
       and not exists (
         select 1
         from public.interview_plan_section_competencies planned_competency
-        where planned_competency.plan_id = plan_id
+        where planned_competency.plan_id = v_plan_id
           and planned_competency.competency_id = competency.id
       )
   ) then
     raise exception 'Interview plan must cover every required competency.' using errcode = '22023';
   end if;
 
-  return plan_id;
+  return v_plan_id;
 end;
 $$;
 
