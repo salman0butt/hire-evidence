@@ -55,6 +55,25 @@ export async function saveInterviewerConfig(
   return data;
 }
 
+export async function publishInterviewerConfig(
+  organizationId: string,
+  jobId: string,
+  configId: string,
+): Promise<string> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("publish_interviewer_config", {
+    p_organization_id: organizationId,
+    p_job_id: jobId,
+    p_config_id: configId,
+  });
+
+  if (error || typeof data !== "string") {
+    throw new Error("Unable to publish interviewer configuration.");
+  }
+
+  return data;
+}
+
 export async function getLatestInterviewerConfig(
   organizationId: string,
   jobId: string,
