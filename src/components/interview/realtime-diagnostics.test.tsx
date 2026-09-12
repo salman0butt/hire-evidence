@@ -1,7 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { RealtimeDiagnostics } from "./realtime-diagnostics";
+import {
+  RealtimeDiagnostics,
+  RealtimeReadinessCheck,
+} from "./realtime-diagnostics";
 
 describe("RealtimeDiagnostics", () => {
   it("announces when the browser is ready without exposing a retry action", () => {
@@ -45,5 +48,39 @@ describe("RealtimeDiagnostics", () => {
 
     expect(screen.getByRole("alert")).toHaveTextContent(/supported modern browser/i);
     expect(screen.queryByRole("button", { name: /retry/i })).not.toBeInTheDocument();
+  });
+});
+
+describe("RealtimeReadinessCheck", () => {
+  it("does not request microphone access until the candidate explicitly starts the check", async () => {
+    const runCheck = vi.fn().mockResolvedValue({ status: "ready" as const });
+
+    render(<RealtimeReadinessCheck runCheck={runCheck} />);
+
+    expect(runCheck).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: /run microphone check/i }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(/ready for the microphone check/i);
+    expect(runCheck).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a recoverable failure retryable without starting an interview", async () => {
+    const runCheck = vi
+      .fn()
+      .mockResolvedValueOnce({
+        status: "blocked" as const,
+        reason: "microphone-permission-denied" as const,
+        recoverable: true,
+      })
+      .mockResolvedValueOnce({ status: "ready" as const });
+
+    render(<RealtimeReadinessCheck runCheck={runCheck} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /run microphone check/i }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(/microphone access is blocked/i);
+
+    fireEvent.click(screen.getByRole("button", { name: /retry microphone check/i }));
+    expect(await screen.findByRole("status")).toHaveTextContent(/ready for the microphone check/i);
+    expect(runCheck).toHaveBeenCalledTimes(2);
   });
 });
