@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 export type InterviewerConfig = ValidatedInterviewerConfigInput & {
   id: string;
   planId: string;
+  status: "draft" | "published";
+  publishedAt: string | null;
 };
 
 type InterviewerConfigRow = Readonly<{
@@ -20,6 +22,8 @@ type InterviewerConfigRow = Readonly<{
   candidate_instructions: string;
   max_follow_ups_per_question: number;
   follow_up_reasons: ValidatedInterviewerConfigInput["followUpPolicy"]["allowedReasons"];
+  status: "draft" | "published";
+  published_at: string | null;
 }>;
 
 export async function saveInterviewerConfig(
@@ -82,7 +86,7 @@ export async function getLatestInterviewerConfig(
   const { data, error } = await supabase
     .from("interviewer_configs")
     .select(
-      "id, plan_id, name, interview_type, persona, language, duration_seconds, difficulty, question_mode, guidelines, candidate_instructions, max_follow_ups_per_question, follow_up_reasons",
+      "id, plan_id, name, interview_type, persona, language, duration_seconds, difficulty, question_mode, guidelines, candidate_instructions, max_follow_ups_per_question, follow_up_reasons, status, published_at",
     )
     .eq("organization_id", organizationId)
     .eq("job_id", jobId)
@@ -113,5 +117,7 @@ export async function getLatestInterviewerConfig(
       maxFollowUpsPerQuestion: row.max_follow_ups_per_question,
       allowedReasons: row.follow_up_reasons,
     },
+    status: row.status,
+    publishedAt: row.published_at,
   };
 }
