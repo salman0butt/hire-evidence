@@ -22,7 +22,7 @@ export type RealtimeInterviewSessionSnapshot = Readonly<{
 export type RealtimeInterviewSession = Readonly<{
   getSnapshot(): RealtimeInterviewSessionSnapshot;
   handleTransportEvent(event: RealtimeTransportEvent, generation?: number): void;
-  completeCurrentQuestion(eventId: string): void;
+  completeCurrentQuestion(eventId: string, generation?: number): void;
   advanceGeneration(): number;
 }>;
 
@@ -79,7 +79,11 @@ export function createRealtimeInterviewSession(input: Readonly<{
     }
   }
 
-  function completeCurrentQuestion(eventId: string) {
+  function completeCurrentQuestion(eventId: string, eventGeneration = generation) {
+    if (eventGeneration !== generation) {
+      return;
+    }
+
     const current = getCurrentInterviewQuestion(planState);
     if (!current || !eventId) {
       return;
