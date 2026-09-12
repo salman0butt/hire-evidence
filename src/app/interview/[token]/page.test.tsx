@@ -16,6 +16,8 @@ const availableInvitation = {
   interviewType: "technical",
   language: "English",
   candidateInstructions: "Use a quiet room.",
+  candidateSupportEmail: "candidates@evidence.test",
+  candidateSupportUrl: "https://evidence.test/interview-support",
 } as const;
 
 async function loadPage() {
@@ -95,6 +97,26 @@ describe("public candidate invitation page", () => {
         name: /I have read these disclosures and consent/i,
       }),
     ).toBeRequired();
+  });
+
+  it("shows a trusted accommodation and interview-support contact path", async () => {
+    mockedResolvePublicInvitation.mockResolvedValue({
+      status: "available",
+      invitation: availableInvitation,
+    });
+    const Page = await loadPage();
+
+    render(await Page({ params: Promise.resolve({ token }) }));
+
+    expect(
+      screen.getByRole("heading", { name: /accommodation or interview support/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /email interview support/i }),
+    ).toHaveAttribute("href", "mailto:candidates@evidence.test");
+    expect(
+      screen.getByRole("link", { name: /visit interview support/i }),
+    ).toHaveAttribute("href", "https://evidence.test/interview-support");
   });
 
   it("renders one generic safe failure state without invitation details", async () => {

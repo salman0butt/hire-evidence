@@ -21,6 +21,8 @@ async function loadResolver() {
             interviewType: string;
             language: string;
             candidateInstructions: string;
+            candidateSupportEmail: string | null;
+            candidateSupportUrl: string | null;
           };
         }
       | { status: "unavailable" }
@@ -41,6 +43,8 @@ const validRow = {
   interview_type: "technical",
   language: "English",
   candidate_instructions: "Use a quiet room.",
+  candidate_support_email: "candidates@evidence.test",
+  candidate_support_url: "https://evidence.test/interview-support",
 };
 
 describe("public invitation resolver", () => {
@@ -61,11 +65,26 @@ describe("public invitation resolver", () => {
         interviewType: "technical",
         language: "English",
         candidateInstructions: "Use a quiet room.",
+        candidateSupportEmail: "candidates@evidence.test",
+        candidateSupportUrl: "https://evidence.test/interview-support",
       },
     });
 
     expect(rpc).toHaveBeenCalledWith("resolve_public_candidate_invitation", {
       p_token_hash: hashInvitationToken(rawToken),
+    });
+  });
+
+  it("drops unsafe optional candidate support URLs without making the invitation unusable", async () => {
+    rpcClient({
+      data: [{ ...validRow, candidate_support_url: "javascript:alert(1)" }],
+      error: null,
+    });
+    const { resolvePublicInvitation } = await loadResolver();
+
+    await expect(resolvePublicInvitation(rawToken)).resolves.toMatchObject({
+      status: "available",
+      invitation: { candidateSupportUrl: null },
     });
   });
 

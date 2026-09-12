@@ -111,6 +111,27 @@ describe("organization settings action", () => {
     expect(mockedRevalidatePath).not.toHaveBeenCalled();
   });
 
+  it("rejects invalid candidate support email before persistence", async () => {
+    const result = await updateOrganizationSettingsAction(
+      organizationId,
+      idleOrganizationActionState,
+      form({
+        name: "Acme",
+        company_size: "",
+        hiring_use_case: "",
+        candidate_support_email: "not-an-email",
+        candidate_support_url: "",
+      }),
+    );
+
+    expect(result).toEqual({
+      status: "error",
+      message: "Candidate support email must be valid.",
+    });
+    expect(mockedUpdateSettings).not.toHaveBeenCalled();
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
+  });
+
   it("rejects unsafe candidate support URLs before persistence", async () => {
     const result = await updateOrganizationSettingsAction(
       organizationId,
