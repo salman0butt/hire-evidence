@@ -9,7 +9,7 @@ This compatibility handoff never outranks actual Git/code/current exact-SHA CI. 
 - Current verified main SHA: `729474ffb03075c93dfa2564f0004f1590533753`; M03 PR #5 squash-merged and post-merge CI #432 / `34677775158` passed.
 - Active branch: `feat/candidates-invitations`
 - Active PR: #6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
-- M04.2 provider-verification head `af46174165c6a90f0fb03525afb0ffa0bbfba128` passed CI #451 / `34681517870` across the complete repository quality gate.
+- M04.3 lifecycle provider-verification head `d8c5317c1d5a28aaec89a826002847db96ed9cdf` passed CI #460 / `34682867624` across the complete repository quality gate.
 - Durable documentation reconciliation creates newer heads; recover current exact branch/CI before writing.
 
 ## Current milestone
@@ -18,18 +18,20 @@ M04 — Candidates + Invitations is IN PROGRESS.
 
 - M04.1 Candidate records — VERIFIED.
 - M04.2 Secure token service + invitation persistence — VERIFIED with strict RED/GREEN evidence and provider-backed uniqueness/tenant/browser-boundary checks.
-- M04.3 Invitation lifecycle — NEXT.
-- M04.4–M04.8 — NOT STARTED.
+- M04.3 Invitation lifecycle — VERIFIED with database-authoritative monotonic transitions, transition timestamps, cross-tenant denial, and expired/revoked/completed replay denial.
+- M04.4 Public invitation resolution — NEXT.
+- M04.5–M04.8 — NOT STARTED.
 
-Key M04.2 evidence is recorded in `docs/milestones/M04-candidates-invitations.md`. Raw invitation tokens are generated from 32 random bytes and never persisted; SHA-256 hashes are stored, invitation rows are tenant/job/candidate/immutable-version bound, RLS is enabled, anon has no table access, and authenticated browser mutation is denied.
+Lifecycle evidence: RED `792e56f422e1f77be6967facca73e69388314340` / CI #456 failed exactly because the lifecycle migration was absent. Schema GREEN was established at `9267e97d7467af5049a2c0ac7cf95b4b3e3cb465` / CI #458. Provider checkpoint `9d97ec54c1fd2872fca62b9abe1e7290427d4264` / CI #459 was NOT GREEN because the revoked-row test fixture set `revoked_at` before the database default `created_at`; the fixture was corrected without weakening the production constraint. Exact provider GREEN is `d8c5317c1d5a28aaec89a826002847db96ed9cdf` / CI #460.
 
 ## Review / blockers
 
-- Critical findings: 0 unresolved for completed M04.1–M04.2 work.
-- Important findings: 0 unresolved for completed M04.1–M04.2 work.
+- Critical findings: 0 unresolved for completed M04.1–M04.3 work.
+- Important findings: 0 unresolved for completed M04.1–M04.3 work.
 - Latest GitHub recovery found no unresolved review threads.
+- M04.3 manager lifecycle authority is not exposed anonymously. M04.4 must introduce a separate narrowly scoped token-resolution boundary rather than broadening table/RPC privileges.
 - No external blocker. M04 remains incomplete by scope.
 
 ## Exact next work
 
-Recover the exact current PR head and CI. Then start M04.3 with strict TDD: write the smallest meaningful failing test for monotonic `draft -> sent -> opened -> started -> completed` invitation transitions and terminal denial after expiry/revocation/completion; verify real RED; implement authoritative database transition enforcement; verify full GREEN; review security/replay behavior; update durable evidence; then continue directly to M04.4.
+Recover the exact current PR head and CI. Then start M04.4 with strict TDD: require invalid, expired, revoked and completed raw tokens to return the same safe failure shape; require raw-token hashing server-side; resolve at most one invitation; expose only the safe public projection; and avoid any service-role browser client or public table grant. Verify real RED, implement the minimal server-only/public-RPC boundary, verify full GREEN/provider behavior, reconcile evidence, then continue directly to M04.5.
