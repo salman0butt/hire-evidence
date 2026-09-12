@@ -136,11 +136,21 @@ describe("deterministic interview plan runner", () => {
     expect(getCurrentInterviewQuestion(afterExhausted)?.remainingFollowUps).toBe(0);
   });
 
-  it("never authorizes a model-requested question outside the immutable published plan", () => {
-    const state = createInterviewPlanState(sourcePlan);
+  it("authorizes only the current published question, never future or invented model questions", () => {
+    let state = createInterviewPlanState(sourcePlan);
 
     expect(isInterviewQuestionAllowed(state, "q1")).toBe(true);
-    expect(isInterviewQuestionAllowed(state, "q2")).toBe(true);
+    expect(isInterviewQuestionAllowed(state, "q2")).toBe(false);
     expect(isInterviewQuestionAllowed(state, "invented-by-model")).toBe(false);
+
+    state = applyInterviewPlanEvent(state, {
+      type: "questionCompleted",
+      eventId: "advance-to-q2",
+      questionId: "q1",
+    });
+
+    expect(isInterviewQuestionAllowed(state, "q1")).toBe(false);
+    expect(isInterviewQuestionAllowed(state, "q2")).toBe(true);
+    expect(isInterviewQuestionAllowed(state, "q3")).toBe(false);
   });
 });
