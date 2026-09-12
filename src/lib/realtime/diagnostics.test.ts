@@ -5,6 +5,7 @@ import {
   diagnoseRealtimeBrowser,
   listRealtimeAudioInputs,
   verifyRealtimeMicrophoneAccess,
+  verifyRealtimeMicrophoneInputLevel,
 } from "./diagnostics";
 
 function capabilities(
@@ -201,6 +202,48 @@ describe("verifyRealtimeMicrophoneAccess", () => {
     await expect(verifyRealtimeMicrophoneAccess({ getUserMedia })).resolves.toEqual({
       status: "blocked",
       reason: "microphone-input-unavailable",
+      recoverable: true,
+    });
+
+    expect(stop).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("verifyRealtimeMicrophoneInputLevel", () => {
+  it("requires a usable transient input signal from the explicitly selected microphone and releases media", async () => {
+    const stop = vi.fn();
+    const stream = {
+      getAudioTracks: () => [{ readyState: "live", stop }],
+      getTracks: () => [{ stop }],
+    };
+    const getUserMedia = vi.fn().mockResolvedValue(stream);
+    const measureInputLevel = vi.fn().mockResolvedValue(0.18);
+
+    await expect(
+      verifyRealtimeMicrophoneInputLevel({ getUserMedia, measureInputLevel }, "microphone-2"),
+    ).resolves.toEqual({ status: "ready" });
+
+    expect(getUserMedia).toHaveBeenCalledWith({
+      audio: { deviceId: { exact: "microphone-2" } },
+      video: false,
+    });
+    expect(measureInputLevel).toHaveBeenCalledWith(stream);
+    expect(stop).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports a recoverable silent-input diagnostic without treating silence as candidate evidence", async () => {
+    const stop = vi.fn();
+    const getUserMedia = vi.fn().mockResolvedValue({
+      getAudioTracks: () => [{ readyState: "live", stop }],
+      getTracks: () => [{ stop }],
+    });
+    const measureInputLevel = vi.fn().mockResolvedValue(0);
+
+    await expect(
+      verifyRealtimeMicrophoneInputLevel({ getUserMedia, measureInputLevel }),
+    ).resolves.toEqual({
+      status: "blocked",
+      reason: "microphone-input-silent",
       recoverable: true,
     });
 
