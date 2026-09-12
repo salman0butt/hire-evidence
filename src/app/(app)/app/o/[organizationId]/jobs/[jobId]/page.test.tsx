@@ -193,6 +193,20 @@ describe("job detail page", () => {
     expect(screen.getByRole("button", { name: "Publish interviewer configuration" })).toBeInTheDocument();
   });
 
+  it("renders a published interviewer configuration read-only for a manager", async () => {
+    mockedRequireMembership.mockResolvedValue({ organizationId, organizationName: "Evidence Co", role: "hiring_manager" });
+    mockedGetLatestInterviewerConfig.mockResolvedValue({
+      ...interviewerConfig,
+      status: "published",
+      publishedAt: "2026-09-12T05:00:00.000Z",
+    });
+
+    await renderPage();
+
+    expect(screen.getByText(/Interviewer config: Technical interviewer — plan 55555555-5555-4555-8555-555555555555 — read only — config save disconnected/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Publish interviewer configuration" })).not.toBeInTheDocument();
+  });
+
   it("renders the same tenant builder data read-only for a reviewer", async () => {
     mockedRequireMembership.mockResolvedValue({ organizationId, organizationName: "Evidence Co", role: "reviewer" });
 
