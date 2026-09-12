@@ -130,6 +130,7 @@ describe("authorizeRealtimeSession", () => {
     });
 
     expect(getOrCreateAttempt).toHaveBeenCalledWith({
+      rawToken: "candidate-token",
       invitationId: "invitation-1",
       candidateId: "candidate-1",
       interviewerVersionId: "version-1",
