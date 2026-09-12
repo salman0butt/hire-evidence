@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth/require-user";
+import { validateInterviewerGuardrails } from "@/lib/interviewer/guardrail-validation";
 import {
   type InterviewerConfigInput,
   validateInterviewerConfigInput,
@@ -89,6 +90,15 @@ export async function saveInterviewerConfigAction(
   const organization = await requireOrganizationMembership(organizationId);
   if (!hasOrganizationCapability(organization.role, "jobs:manage")) {
     return errorState("You do not have permission to manage interviewer configuration.");
+  }
+
+  const guardrailValidation = validateInterviewerGuardrails({
+    jobText: "",
+    guidelines: validation.value.guidelines,
+    candidateInstructions: validation.value.candidateInstructions,
+  });
+  if (!guardrailValidation.safe) {
+    return errorState("Interviewer configuration conflicts with platform hiring-safety rules.");
   }
 
   try {
