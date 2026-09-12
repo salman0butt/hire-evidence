@@ -1,18 +1,20 @@
 import { describe, expect, it } from "vitest";
 
+type SectionInput = {
+  purpose: string;
+  durationSeconds: number;
+  position: number;
+  questionIds: string[];
+  competencyIds: string[];
+};
+
 async function validationModule() {
   const modulePath = "./interview-plan-validation";
   return import(/* @vite-ignore */ modulePath) as Promise<{
     validateInterviewPlanInput: (
       input: {
         totalDurationSeconds: number;
-        sections: Array<{
-          purpose: string;
-          durationSeconds: number;
-          position: number;
-          questionIds: string[];
-          competencyIds: string[];
-        }>;
+        sections: SectionInput[];
       },
       context: {
         maxTotalDurationSeconds: number;
@@ -33,24 +35,25 @@ const context = {
   requiredCompetencyIds: ["c-1", "c-2"],
 } as const;
 
+const firstSection: SectionInput = {
+  purpose: "  Technical fundamentals  ",
+  durationSeconds: 300,
+  position: 0,
+  questionIds: ["q-1"],
+  competencyIds: ["c-1"],
+};
+
+const secondSection: SectionInput = {
+  purpose: "Problem solving",
+  durationSeconds: 600,
+  position: 1,
+  questionIds: ["q-2", "q-3"],
+  competencyIds: ["c-2"],
+};
+
 const validPlan = {
   totalDurationSeconds: 900,
-  sections: [
-    {
-      purpose: "  Technical fundamentals  ",
-      durationSeconds: 300,
-      position: 0,
-      questionIds: ["q-1"],
-      competencyIds: ["c-1"],
-    },
-    {
-      purpose: "Problem solving",
-      durationSeconds: 600,
-      position: 1,
-      questionIds: ["q-2", "q-3"],
-      competencyIds: ["c-2"],
-    },
-  ],
+  sections: [firstSection, secondSection],
 };
 
 describe("validateInterviewPlanInput", () => {
@@ -89,12 +92,7 @@ describe("validateInterviewPlanInput", () => {
         validateInterviewPlanInput(
           {
             totalDurationSeconds: durationSeconds,
-            sections: [
-              {
-                ...validPlan.sections[0],
-                durationSeconds,
-              },
-            ],
+            sections: [{ ...firstSection, durationSeconds }],
           },
           context,
         ),
@@ -113,10 +111,7 @@ describe("validateInterviewPlanInput", () => {
       validateInterviewPlanInput(
         {
           ...validPlan,
-          sections: [
-            validPlan.sections[0],
-            { ...validPlan.sections[1], position: 2 },
-          ],
+          sections: [firstSection, { ...secondSection, position: 2 }],
         },
         context,
       ),
@@ -148,8 +143,8 @@ describe("validateInterviewPlanInput", () => {
         {
           ...validPlan,
           sections: [
-            { ...validPlan.sections[0], questionIds: ["q-other-job"] },
-            validPlan.sections[1],
+            { ...firstSection, questionIds: ["q-other-job"] },
+            secondSection,
           ],
         },
         context,
@@ -164,8 +159,8 @@ describe("validateInterviewPlanInput", () => {
         {
           ...validPlan,
           sections: [
-            { ...validPlan.sections[0], competencyIds: ["c-other-job"] },
-            validPlan.sections[1],
+            { ...firstSection, competencyIds: ["c-other-job"] },
+            secondSection,
           ],
         },
         context,
@@ -183,10 +178,7 @@ describe("validateInterviewPlanInput", () => {
       validateInterviewPlanInput(
         {
           ...validPlan,
-          sections: [
-            validPlan.sections[0],
-            { ...validPlan.sections[1], questionIds: ["q-3"] },
-          ],
+          sections: [firstSection, { ...secondSection, questionIds: ["q-3"] }],
         },
         context,
       ),
@@ -200,8 +192,8 @@ describe("validateInterviewPlanInput", () => {
         {
           ...validPlan,
           sections: [
-            validPlan.sections[0],
-            { ...validPlan.sections[1], competencyIds: ["c-1"] },
+            firstSection,
+            { ...secondSection, competencyIds: ["c-1"] },
           ],
         },
         context,
