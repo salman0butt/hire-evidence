@@ -2,6 +2,7 @@ import { CompetencySection } from "@/components/jobs/competency-section";
 import { InterviewPlanSection } from "@/components/jobs/interview-plan-section";
 import { InterviewerConfigSection } from "@/components/jobs/interviewer-config-section";
 import { InterviewerPreviewSection } from "@/components/jobs/interviewer-preview-section";
+import { InterviewerPublicationSection } from "@/components/jobs/interviewer-publication-section";
 import { JobForm } from "@/components/jobs/job-form";
 import { QuestionSection } from "@/components/jobs/question-section";
 import { listCompetencies } from "@/lib/interviewer/competencies";
@@ -23,6 +24,7 @@ import {
 import { saveInterviewPlanAction } from "./interview-plan-actions";
 import { saveInterviewerConfigAction } from "./interviewer-config-actions";
 import { previewInterviewerConfigAction } from "./interviewer-preview-actions";
+import { publishInterviewerConfigAction } from "./interviewer-publish-actions";
 import { createQuestionAction } from "./question-actions";
 
 type JobPageProps = Readonly<{
@@ -118,6 +120,24 @@ export default async function JobPage({ params }: JobPageProps) {
           readOnly
         />
       )}
+
+      {interviewerConfig ? (
+        <InterviewerPublicationSection
+          status={interviewerConfig.status}
+          publishedAt={interviewerConfig.publishedAt}
+          readOnly={!canManage}
+          {...(canManage
+            ? {
+                action: publishInterviewerConfigAction.bind(
+                  null,
+                  organizationId,
+                  jobId,
+                  interviewerConfig.id,
+                ),
+              }
+            : {})}
+        />
+      ) : null}
 
       {canManage && interviewerConfig ? (
         <InterviewerPreviewSection
