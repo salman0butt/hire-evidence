@@ -2,42 +2,44 @@ import { expect, test, type Page } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
 const PASSWORD = "BuilderBrowserTest-1234";
+const PROVIDER_TIMEOUT_MS = 30_000;
 
 function localEnvironment() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!supabaseUrl || !publishableKey) {
-    throw new Error("Builder browser E2E requires local Supabase URL and publishable key.");
+  const mailpitUrl = process.env.SUPABASE_MAILPIT_URL;
+  if (!supabaseUrl || !publishableKey || !mailpitUrl) {
+    throw new Error(
+      "Builder browser E2E requires local Supabase URL, publishable key, and Mailpit URL.",
+    );
   }
-  return { supabaseUrl, publishableKey };
+  return { supabaseUrl, publishableKey, mailpitUrl };
 }
 
-async function readLatestMailpitMessageId(recipient: string): Promise<string> {
-  const response = await fetch("http://127.0.0.1:54324/api/v1/messages");
-  expect(response.ok).toBe(true);
-  const payload = (await response.json()) as {
-    messages: Array<{ ID: string; To: Array<{ Address: string }> }>;
-  };
-  const message = payload.messages.find((item) =>
-    item.To.some((to) => to.Address === recipient),
-  );
-  expect(message).toBeTruthy();
-  if (!message) throw new Error("Missing confirmation email.");
-  return message.ID;
+function decodeHtmlHref(value: string): string {
+  return value.replaceAll("&amp;", "&").replaceAll("&#x2F;", "/");
 }
 
-async function readConfirmationUrl(messageId: string): Promise<string> {
-  const response = await fetch(`http://127.0.0.1:54324/api/v1/message/${messageId}`);
-  expect(response.ok).toBe(true);
-  const payload = (await response.json()) as { Text: string; HTML: string };
-  const body = `${payload.Text}\n${payload.HTML}`;
-  const match = body.match(/https?:\/\/[^\s"'<>]+\/auth\/v1\/verify[^\s"'<>]+/);
-  expect(match?.[0]).toBeTruthy();
-  if (!match?.[0]) throw new Error("Missing confirmation URL.");
-  return match[0].replaceAll("&amp;", "&");
+async function waitForConfirmationLink(mailpitUrl: string, email: string) {
+  const deadline = Date.now() + PROVIDER_TIMEOUT_MS;
+  const query = encodeURIComponent(`to:${email}`);
+  const linkPattern = /href=["']([^"']*\/auth\/confirm\?[^"']*type=email[^"']*)["']/i;
+
+  while (Date.now() < deadline) {
+    const response = await fetch(`${mailpitUrl}/view/latest.html?query=${query}`);
+    if (response.ok) {
+      const html = await response.text();
+      const match = linkPattern.exec(html);
+      if (match?.[1]) return decodeHtmlHref(match[1]);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  throw new Error(`Timed out waiting for confirmation email for ${email}.`);
 }
 
 async function signUpAndCreateOrganization(page: Page, suffix: string) {
+  const { mailpitUrl } = localEnvironment();
   const email = `builder-ui-${suffix}@example.com`;
 
   await page.goto("/auth/signup");
@@ -45,18 +47,8 @@ async function signUpAndCreateOrganization(page: Page, suffix: string) {
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page.getByRole("status")).toContainText("Check your email");
-
-  const messageId = await readLatestMailpitMessageId(email);
-  const confirmationUrl = await readConfirmationUrl(messageId);
-  const confirmationResponse = await page.request.get(confirmationUrl, { maxRedirects: 0 });
-  expect(confirmationResponse.status()).toBeGreaterThanOrEqual(300);
-  expect(confirmationResponse.status()).toBeLessThan(400);
-
-  await page.goto("/auth/login");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(PASSWORD);
-  await page.getByRole("button", { name: "Log in" }).click();
-  await expect(page).toHaveURL(/\/app(?:\/organizations)?$/);
+  await page.goto(await waitForConfirmationLink(mailpitUrl, email));
+  await expect(page).toHaveURL(/\/app$/);
 
   await page.getByRole("link", { name: "Create organization" }).click();
   await page.getByLabel("Organization name").fill(`Builder Org ${suffix}`);
