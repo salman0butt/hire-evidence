@@ -58,7 +58,10 @@ describe("RealtimeReadinessCheck", () => {
     render(<RealtimeReadinessCheck runCheck={runCheck} />);
 
     expect(runCheck).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: /run microphone check/i }));
+    const runButton = screen.getByRole("button", { name: /run microphone check/i });
+    runButton.focus();
+    expect(runButton).toHaveFocus();
+    fireEvent.click(runButton);
 
     expect(await screen.findByRole("status")).toHaveTextContent(/ready for the microphone check/i);
     expect(runCheck).toHaveBeenCalledTimes(1);
