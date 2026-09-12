@@ -9,6 +9,14 @@ vi.mock("@/lib/candidates/public-invitation", () => ({
 
 const mockedResolvePublicInvitation = vi.mocked(resolvePublicInvitation);
 const token = "candidate-route-token";
+const availableInvitation = {
+  organizationName: "Evidence Labs",
+  jobTitle: "Senior Engineer",
+  durationSeconds: 2700,
+  interviewType: "technical",
+  language: "English",
+  candidateInstructions: "Use a quiet room.",
+} as const;
 
 async function loadPage() {
   const modulePath = "./page";
@@ -25,10 +33,7 @@ describe("public candidate invitation page", () => {
   it("renders only the safe invitation projection for an available token", async () => {
     mockedResolvePublicInvitation.mockResolvedValue({
       status: "available",
-      invitation: {
-        organizationName: "Evidence Labs",
-        jobTitle: "Senior Engineer",
-      },
+      invitation: availableInvitation,
     });
     const Page = await loadPage();
 
@@ -44,10 +49,7 @@ describe("public candidate invitation page", () => {
   it("shows the required pre-interview information before the candidate can start", async () => {
     mockedResolvePublicInvitation.mockResolvedValue({
       status: "available",
-      invitation: {
-        organizationName: "Evidence Labs",
-        jobTitle: "Senior Engineer",
-      },
+      invitation: availableInvitation,
     });
     const Page = await loadPage();
 
