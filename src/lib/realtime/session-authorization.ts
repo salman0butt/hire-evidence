@@ -53,7 +53,9 @@ const unavailable: RealtimeSessionAuthorization = { status: "unavailable" };
 function isEligibleLifecycle(
   lifecycle: "sent" | "opened" | "started" | "completed",
 ): boolean {
-  return lifecycle === "opened" || lifecycle === "started";
+  return (
+    lifecycle === "sent" || lifecycle === "opened" || lifecycle === "started"
+  );
 }
 
 export async function authorizeRealtimeSession(
