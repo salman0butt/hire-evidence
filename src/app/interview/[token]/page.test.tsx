@@ -41,6 +41,28 @@ describe("public candidate invitation page", () => {
     expect(screen.getByText("Evidence Labs")).toBeInTheDocument();
   });
 
+  it("shows the required pre-interview information before the candidate can start", async () => {
+    mockedResolvePublicInvitation.mockResolvedValue({
+      status: "available",
+      invitation: {
+        organizationName: "Evidence Labs",
+        jobTitle: "Senior Engineer",
+      },
+    });
+    const Page = await loadPage();
+
+    render(await Page({ params: Promise.resolve({ token }) }));
+
+    expect(
+      screen.getByRole("heading", { name: "Before you start" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Approximate duration")).toBeInTheDocument();
+    expect(screen.getByText("Interview format")).toBeInTheDocument();
+    expect(screen.getByText("Technical requirements")).toBeInTheDocument();
+    expect(screen.getByText("Privacy")).toBeInTheDocument();
+    expect(screen.getByText("Start prerequisites")).toBeInTheDocument();
+  });
+
   it("renders one generic safe failure state without invitation details", async () => {
     mockedResolvePublicInvitation.mockResolvedValue({ status: "unavailable" });
     const Page = await loadPage();
