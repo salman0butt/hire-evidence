@@ -11,9 +11,20 @@ export type RealtimeBrowserCapabilities = Readonly<{
   inputDeviceCount: number;
 }>;
 
+type RealtimeMediaDeviceInfo = Readonly<{
+  kind: string;
+  deviceId?: string | undefined;
+  label?: string | undefined;
+}>;
+
 type RealtimeMediaDevicesProbe = Readonly<{
   getUserMedia?: unknown;
-  enumerateDevices?: (() => Promise<readonly { kind: string }[]>) | undefined;
+  enumerateDevices?: (() => Promise<readonly RealtimeMediaDeviceInfo[]>) | undefined;
+}>;
+
+export type RealtimeAudioInputDevice = Readonly<{
+  deviceId: string;
+  label: string;
 }>;
 
 type RealtimeAudioContextProbe = Readonly<{
@@ -129,6 +140,29 @@ export async function collectRealtimeBrowserCapabilities(
     microphonePermission,
     inputDeviceCount,
   };
+}
+
+export async function listRealtimeAudioInputs(
+  mediaDevices: Pick<RealtimeMediaDevicesProbe, "enumerateDevices">,
+): Promise<readonly RealtimeAudioInputDevice[]> {
+  if (!mediaDevices.enumerateDevices) {
+    return [];
+  }
+
+  try {
+    const devices = await mediaDevices.enumerateDevices();
+    return devices
+      .filter(
+        (device): device is RealtimeMediaDeviceInfo & { deviceId: string } =>
+          device.kind === "audioinput" && Boolean(device.deviceId),
+      )
+      .map((device, index) => ({
+        deviceId: device.deviceId,
+        label: device.label?.trim() || `Microphone ${index + 1}`,
+      }));
+  } catch {
+    return [];
+  }
 }
 
 export function diagnoseRealtimeBrowser(
