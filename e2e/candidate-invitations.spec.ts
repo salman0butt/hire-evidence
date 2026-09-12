@@ -190,7 +190,7 @@ function tokenHash() {
 test.describe("provider-backed candidate invitation persistence", () => {
   test.describe.configure({ mode: "serial" });
 
-  test("enforces token uniqueness, tenant binding, RLS, lifecycle authority, and browser write denial", async () => {
+  test("enforces token uniqueness, tenant binding, consent, lifecycle authority, and browser write denial", async () => {
     test.setTimeout(120_000);
     const { supabaseUrl, publishableKey, serviceRoleKey } = environment();
     const admin = client(supabaseUrl, serviceRoleKey);
@@ -294,7 +294,57 @@ test.describe("provider-backed candidate invitation persistence", () => {
     });
     expect(outOfOrder.error).not.toBeNull();
 
-    for (const targetState of ["sent", "opened", "started", "completed"] as const) {
+    for (const targetState of ["sent", "opened"] as const) {
+      const transition = await ownerA.rpc("transition_candidate_invitation", {
+        invitation_id: invitationId,
+        target_state: targetState,
+      });
+      expect(transition.error).toBeNull();
+    }
+
+    const startWithoutConsent = await ownerA.rpc("transition_candidate_invitation", {
+      invitation_id: invitationId,
+      target_state: "started",
+    });
+    expect(startWithoutConsent.error).not.toBeNull();
+
+    const staleDisclosureConsent = await anon.rpc("record_candidate_invitation_consent", {
+      p_token_hash: hash,
+      p_disclosure_version: "candidate-interview-v0",
+    });
+    expect(staleDisclosureConsent.error).not.toBeNull();
+
+    const currentConsent = await anon.rpc("record_candidate_invitation_consent", {
+      p_token_hash: hash,
+      p_disclosure_version: "candidate-interview-v1",
+    });
+    expect(currentConsent.error).toBeNull();
+    expect(currentConsent.data).toBe(true);
+
+    const storedConsent = await admin
+      .from("candidate_consent_events")
+      .select("disclosure_version,disclosure_categories,consented_at")
+      .eq("invitation_id", invitationId)
+      .single();
+    expect(storedConsent.error).toBeNull();
+    expect(storedConsent.data?.disclosure_version).toBe("candidate-interview-v1");
+    expect(storedConsent.data?.disclosure_categories).toEqual(
+      expect.arrayContaining([
+        "ai_assisted",
+        "transcription",
+        "data_processing",
+        "retention",
+      ]),
+    );
+    expect(storedConsent.data?.consented_at).toBeTruthy();
+
+    const directConsentRewrite = await anon
+      .from("candidate_consent_events")
+      .update({ disclosure_version: "candidate-interview-v0" })
+      .eq("invitation_id", invitationId);
+    expect(directConsentRewrite.error).not.toBeNull();
+
+    for (const targetState of ["started", "completed"] as const) {
       const transition = await ownerA.rpc("transition_candidate_invitation", {
         invitation_id: invitationId,
         target_state: targetState,
