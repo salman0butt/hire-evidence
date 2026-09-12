@@ -78,7 +78,7 @@ const RULES: readonly Rule[] = [
     code: "personality_proxy",
     message: "Personality labels cannot be used as a proxy for job-related evidence.",
     patterns: [
-      /\b(?:introvert|extrovert|personality type|personality test|personality fit)\b/i,
+      /\b(?:introvert|introverts|extrovert|extroverts|personality|personality type|personality test|personality fit)\b/i,
     ],
   },
   {
