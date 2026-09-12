@@ -1,17 +1,17 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, type Mock } from "vitest";
 
 import { createRealtimeAudioPlayback, type RealtimePlaybackAudioContext } from "./audio-playback";
 
 type SourceHarness = {
-  start: ReturnType<typeof vi.fn>;
-  stop: ReturnType<typeof vi.fn>;
-  disconnect: ReturnType<typeof vi.fn>;
+  start: Mock<() => void>;
+  stop: Mock<() => void>;
+  disconnect: Mock<() => void>;
   end(): void;
 };
 
 function createAudioHarness() {
   const sources: SourceHarness[] = [];
-  const close = vi.fn().mockResolvedValue(undefined);
+  const close = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
   const context: RealtimePlaybackAudioContext = {
     destination: {},
     createBuffer: vi.fn((_channels, length, sampleRate) => {
@@ -37,10 +37,10 @@ function createAudioHarness() {
         set onended(value) {
           onended = value;
         },
-        connect: vi.fn(),
-        start: vi.fn(),
-        stop: vi.fn(),
-        disconnect: vi.fn(),
+        connect: vi.fn<(destination: unknown) => void>(),
+        start: vi.fn<() => void>(),
+        stop: vi.fn<() => void>(),
+        disconnect: vi.fn<() => void>(),
         end() {
           onended?.();
         },
