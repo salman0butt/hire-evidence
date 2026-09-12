@@ -45,7 +45,7 @@ Organizations + RBAC — **COMPLETE** on `main` at `835d7d571a69cd13e3e802be4872
 3. **VERIFIED SLICE** — M03.3 Observable 1–5 Rubrics. Provider-backed head `b6607a5a9ad72dea585ac2af4cf374e3d319883d`, CI #301 / `34649940346`.
 4. **VERIFIED SLICE** — M03.4 Question Bank. Provider-backed security head `c5a8688f62eb74bfe5964a203e92e520bc0a01d9`, CI #330 / `34657330228`.
 5. **VERIFIED SLICE** — M03.5 Deterministic Interview Plan. Validation, tenant/job-bound persistence, atomic fixed-role save authority, typed repository, route-bound action/editor, and provider-backed role/tenant/job isolation are present. Exact fully verified head `332caa332b1a6b978860f54f15227ce4d82b385d`, CI #358 / `34665349746`.
-6. **ACTIVE / PARTIALLY VERIFIED** — M03.6 Interviewer Configuration. Bounded configuration validation plus tenant/job/plan-bound draft persistence, member-read RLS, and fixed-role save authority are implemented. Typed repository/action/editor/provider-backed isolation remain.
+6. **ACTIVE / PARTIALLY VERIFIED** — M03.6 Interviewer Configuration. Bounded configuration validation, tenant/job/plan-bound draft persistence, member-read RLS, fixed-role save authority, and the typed repository implementation are present. Route-bound action/editor/provider-backed isolation remain. Repository GREEN candidate `706822e7103fe16bdbe034bcc27e3dff96130f93`, CI #368 / `34667282268`, passed all 241 tests but is **NOT GREEN** because durable-document framework markers were missing; this reconciliation repairs them and requires fresh exact-head CI.
 7. **NOT STARTED** — M03.7 Guardrail Validation.
 8. **NOT STARTED** — M03.8 Draft / Publish.
 9. **NOT STARTED** — M03.9 Immutable Versioning.
@@ -69,6 +69,11 @@ Organizations + RBAC — **COMPLETE** on `main` at `835d7d571a69cd13e3e802be4872
 - RED: `73063d7029038924468dc9e27fc994a53abb5fdd`, CI #361 / `34666780326`. Install/lint/typecheck passed; 233 unrelated tests passed; only four migration-contract tests failed because `supabase/migrations/202609120005_create_interviewer_configs.sql` was intentionally absent.
 - GREEN: `dce42df18176a00e5c33f910332c276245de5ac5`, CI #362 / `34666866674`. Tenant/job/plan-bound configuration persistence, database bounds, member-read RLS and fixed-role `save_interviewer_config` security-definer mutation landed. Full repository quality gate passed including real local-Supabase migration application, build and Chromium E2E.
 
+### M03.6 interviewer configuration repository
+
+- RED: `db44948825449811a1f45dfb2a6bcdc40be6e7e9`, CI #367 / `34667166600`. Install/lint/typecheck passed; 237 unrelated tests passed; only the four new repository tests failed with `ERR_MODULE_NOT_FOUND` because `src/lib/interviewer/interviewer-configs.ts` was intentionally absent.
+- GREEN candidate: `706822e7103fe16bdbe034bcc27e3dff96130f93`, CI #368 / `34667282268`. All 241 tests passed, including the four new repository tests. This candidate is explicitly **NOT GREEN** because `scripts/verify_autonomous_framework.py` failed after tests: `docs/progress/STATUS.md` lacked `CI status:` and this ledger lacked `## Integration Test Evidence`. No behavioral/code failure was present; exact-head CI after marker repair is required.
+
 ## Integration / E2E Evidence
 
 - `e2e/jobs.spec.ts` proves real local-Supabase job tenant and role boundaries.
@@ -78,9 +83,15 @@ Organizations + RBAC — **COMPLETE** on `main` at `835d7d571a69cd13e3e802be4872
 - `e2e/interview-plans.spec.ts` proves deterministic-plan fixed-role mutation, member read, tenant/job isolation and anonymous denial.
 - Dedicated provider-backed interviewer-configuration role/tenant/job/plan abuse coverage remains required before M03.6 closeout.
 
+## Integration Test Evidence
+
+- M03.1–M03.5 retain provider-backed local-Supabase integration/E2E evidence as listed above.
+- M03.6 persistence was applied successfully to real local Supabase at `dce42df18176a00e5c33f910332c276245de5ac5`, CI #362 / `34666866674`.
+- Dedicated M03.6 configuration authorization/isolation E2E remains pending; no provider-backed claim is made for that unfinished behavior.
+
 ## Security Review
 
-M03.6 configuration rows are organization-owned and constrained to the same job and deterministic plan through composite foreign keys. Authenticated members receive read-only RLS access; direct authenticated mutation is not granted. Draft mutation is exposed only through a fixed-role authenticated security-definer RPC for owner/admin/recruiter/hiring-manager. Organization-authored guidelines remain untrusted and M03.7 must enforce global non-overridable policy. Critical: 0 unresolved. Important: 0 unresolved in the currently reviewed M03.6 validation/persistence scope.
+M03.6 configuration rows are organization-owned and constrained to the same job and deterministic plan through composite foreign keys. Authenticated members receive read-only RLS access; direct authenticated mutation is not granted. Draft mutation is exposed only through a fixed-role authenticated security-definer RPC for owner/admin/recruiter/hiring-manager. Organization-authored guidelines remain untrusted and M03.7 must enforce global non-overridable policy. Critical: 0 unresolved. Important: 0 unresolved in the currently reviewed M03.6 validation/persistence/repository scope.
 
 ## Accessibility Review
 
@@ -88,7 +99,7 @@ M03.1–M03.5 authoring surfaces are labelled/component-tested. M03.6 editor doe
 
 ## Performance Review
 
-Current M03 persistence remains bounded and indexed without an identified material performance blocker. Milestone-wide performance review remains pending.
+Current M03 persistence/repository operations remain bounded and indexed without an identified material performance blocker. Milestone-wide performance review remains pending.
 
 ## AI / Eval Review
 
@@ -98,19 +109,19 @@ No model-generated hiring criteria or questions become authoritative. Organizati
 
 - Resolved prior M03.1 Important finding: requirement ordering uniqueness.
 - M03.5 verified scope has 0 known unresolved Critical and 0 known unresolved Important findings.
-- Current M03.6 validation/persistence inspection has 0 known unresolved Critical and 0 known unresolved Important findings.
-- Do not mark M03.6 verified until typed application repository/action/editor behavior and provider-backed authorization/isolation are proven.
+- Current M03.6 validation/persistence/repository inspection has 0 known unresolved Critical and 0 known unresolved Important findings.
+- Do not mark M03.6 verified until route-bound action/editor behavior and provider-backed authorization/isolation are proven.
 
 ## Fresh Verification Results
 
 - M03.5 final verified slice: `332caa332b1a6b978860f54f15227ce4d82b385d`, CI #358 / `34665349746` PASS.
 - M03.6 validation GREEN: `7ae46568e458f5efb3447707602ee1c77e750c04`, CI #360 / `34666523775` PASS.
 - M03.6 persistence GREEN: `dce42df18176a00e5c33f910332c276245de5ac5`, CI #362 / `34666866674` PASS across the complete repository quality gate.
-- Documentation reconciliation commits after `dce42df…` require fresh exact-head CI before the documentation head itself is called verified.
+- M03.6 repository candidate `706822e7103fe16bdbe034bcc27e3dff96130f93`, CI #368 / `34667282268`: all tests PASS but overall **NOT GREEN** due only to missing mandatory documentation markers; fresh repaired-head CI is required.
 
 ## Known Limitations
 
-M03.6 typed repository/action/editor/provider-backed E2E and M03.7–M03.11 remain incomplete. PR #5 must remain draft/unmerged. Full milestone accessibility/performance/security/AI-safety review and immutable publish/preview closeout remain pending.
+M03.6 action/editor/provider-backed E2E and M03.7–M03.11 remain incomplete. PR #5 must remain draft/unmerged. Full milestone accessibility/performance/security/AI-safety review and immutable publish/preview closeout remain pending.
 
 ## Durable Recovery Sources
 
@@ -129,7 +140,7 @@ Recover actual GitHub state first, then read `AGENTS.md`, `CODEX-START-HERE.md`,
 
 ## Exact Next Work
 
-Recover newest branch/CI state after this documentation reconciliation. Then continue M03.6 with a genuine RED for the typed interviewer-configuration application repository boundary. After GREEN, implement route-bound action/editor behavior and provider-backed role/tenant/job/plan isolation before marking M03.6 verified.
+Verify the documentation-repaired exact head. Once GREEN, continue M03.6 with a genuine RED for the route-bound interviewer-configuration action. After action GREEN, implement the accessible editor/page wiring and provider-backed role/tenant/job/plan isolation before marking M03.6 verified.
 
 ## Next Milestone
 M04 — Candidates + Invitations, only after M03 is genuinely complete and merged with post-merge `main` verification.
