@@ -1,53 +1,52 @@
 # Current Milestone
 
 Milestone:
-Jobs + Interviewer Builder
+Candidates + Invitations
 
 Legacy roadmap identifier:
-M03
+M04
 
 Current capability:
-M03.1–M03.10 are verified. M03.11 engineering/review closeout is complete; only fresh exact-final-head CI for the documentation-reconciled head and the final concurrency/review re-check remain before the authorized merge gate.
+M04.1 candidate records and M04.2 secure invitation tokens/persistence are verified. The next unfinished unit is M04.3 invitation lifecycle.
 
 Status:
-CLOSEOUT / FINAL-CI PENDING
+IN PROGRESS
 
 Branch:
-`feat/jobs-interviewer-builder`
+`feat/candidates-invitations`
 
 Base:
-`main` at verified M02 merge SHA `835d7d571a69cd13e3e802be4872e873ffdd34fe`
+`main` at verified M03 merge SHA `729474ffb03075c93dfa2564f0004f1590533753`
 
 PR:
-#5 — `Build jobs and interviewer configuration` — OPEN / DRAFT / unmerged.
+#6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
 
 Canonical compact recovery state:
 `docs/progress/STATUS.md`
 
 ## Iterations
 
-1. M03.1 — Jobs + requirements — **VERIFIED**.
-2. M03.2 — Competency model — **VERIFIED**.
-3. M03.3 — Observable 1–5 rubrics — **VERIFIED**.
-4. M03.4 — Question bank — **VERIFIED**.
-5. M03.5 — Deterministic interview plan — **VERIFIED**.
-6. M03.6 — Interviewer configuration — **VERIFIED**.
-7. M03.7 — Non-overridable guardrail validation — **VERIFIED**.
-8. M03.8 — Draft/publish state machine — **VERIFIED**.
-9. M03.9 — Immutable versioning — **VERIFIED**.
-10. M03.10 — Non-billable preview — **VERIFIED**.
-11. M03.11 — Builder E2E closeout — **ENGINEERING COMPLETE / FINAL DOC-HEAD CI PENDING**.
+1. M04.1 — Candidate records — **VERIFIED**.
+2. M04.2 — Secure token service + invitation persistence — **VERIFIED**.
+3. M04.3 — Invitation lifecycle — **NEXT / NOT STARTED**.
+4. M04.4 — Public candidate route — **NOT STARTED**.
+5. M04.5 — Pre-interview experience — **NOT STARTED**.
+6. M04.6 — Disclosure + consent — **NOT STARTED**.
+7. M04.7 — Accommodation/support path — **NOT STARTED**.
+8. M04.8 — Security E2E closeout — **NOT STARTED**.
 
 ## Verification state
 
-Implementation head `6b3526aacfe8d5f0df33b699012bd11e521228bc` passed CI #430 / `34677201542` across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase, build, Chromium E2E, and PRD coverage. The complete provider-backed builder journey and direct authorization/tenant abuse tests pass.
+M04.2 provider verification head `af46174165c6a90f0fb03525afb0ffa0bbfba128` passed CI #451 / `34681517870` across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup, build, Chromium E2E, PRD coverage, and cleanup.
 
-Closeout evidence is recorded in `docs/superpowers/evidence/2026-09-12-m03-jobs-interviewer-builder-closeout.md`. This documentation reconciliation creates a newer head, so one fresh exact-final-head CI run is mandatory before merge.
+Task 2's earlier strict TDD evidence is recorded in `docs/milestones/M04-candidates-invitations.md`, including RED `f447b4d...` / CI #447 for the token module and RED `3df096e...` / CI #449 for invitation persistence, followed by full GREEN runs #448, #450, and provider verification #451.
+
+Documentation reconciliation creates newer branch heads and therefore does not replace the implementation evidence above; exact-final-head CI will be required again at milestone closeout.
 
 ## Review state
 
-Skeptical correctness/security/accessibility/performance/AI-safety/YAGNI review is complete with 0 unresolved Critical and 0 unresolved Important findings. Latest GitHub inspection found no unresolved review threads. Organization text remains untrusted; platform guardrails are authoritative; published versions are immutable; humans remain hiring decision makers.
+For completed M04.1–M04.2, latest review/recovery has 0 unresolved Critical and 0 unresolved Important findings and no unresolved GitHub review threads. Security invariants: raw invitation tokens are not persisted, hashes are unique, invitation bindings are tenant/job/candidate/interviewer-version constrained, authenticated browser mutation is denied, anon has no table privilege, and RLS remains authoritative.
 
 ## Next Action
 
-Verify exact-final-head CI for this reconciliation. If green and no newer conflicting work/reviews exist, mark PR #5 ready if required, auto-merge under the user-authorized gates, verify post-merge `main`, then activate M04 — Candidates + Invitations.
+Start M04.3 with strict RED tests for monotonic `draft -> sent -> opened -> started -> completed` transitions and terminal denial after expiry, revocation, or completion. Implement authoritative database transition checks, verify exact-head CI, then continue directly to M04.4 when M04.3 is genuinely complete.
