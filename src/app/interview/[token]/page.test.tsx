@@ -65,6 +65,19 @@ describe("public candidate invitation page", () => {
     expect(screen.getByText("Start prerequisites")).toBeInTheDocument();
   });
 
+  it("shows duration and format from the published invitation snapshot", async () => {
+    mockedResolvePublicInvitation.mockResolvedValue({
+      status: "available",
+      invitation: availableInvitation,
+    });
+    const Page = await loadPage();
+
+    render(await Page({ params: Promise.resolve({ token }) }));
+
+    expect(screen.getByText("45 minutes")).toBeInTheDocument();
+    expect(screen.getByText("Technical")).toBeInTheDocument();
+  });
+
   it("renders one generic safe failure state without invitation details", async () => {
     mockedResolvePublicInvitation.mockResolvedValue({ status: "unavailable" });
     const Page = await loadPage();
