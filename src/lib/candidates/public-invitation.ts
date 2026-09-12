@@ -4,6 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 export type PublicInvitationProjection = Readonly<{
   organizationName: string;
   jobTitle: string;
+  durationSeconds: number;
+  interviewType: string;
+  language: string;
+  candidateInstructions: string;
 }>;
 
 export type PublicInvitationResolution =
@@ -16,16 +20,28 @@ export type PublicInvitationResolution =
 type PublicInvitationRow = Readonly<{
   organization_name?: unknown;
   job_title?: unknown;
+  duration_seconds?: unknown;
+  interview_type?: unknown;
+  language?: unknown;
+  candidate_instructions?: unknown;
 }>;
 
 const unavailable: PublicInvitationResolution = { status: "unavailable" };
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && Boolean(value.trim());
+}
+
 function parseProjection(row: PublicInvitationRow): PublicInvitationProjection | null {
   if (
-    typeof row.organization_name !== "string" ||
-    !row.organization_name.trim() ||
-    typeof row.job_title !== "string" ||
-    !row.job_title.trim()
+    !isNonEmptyString(row.organization_name) ||
+    !isNonEmptyString(row.job_title) ||
+    !Number.isInteger(row.duration_seconds) ||
+    (row.duration_seconds as number) < 900 ||
+    (row.duration_seconds as number) > 3600 ||
+    !isNonEmptyString(row.interview_type) ||
+    !isNonEmptyString(row.language) ||
+    typeof row.candidate_instructions !== "string"
   ) {
     return null;
   }
@@ -33,6 +49,10 @@ function parseProjection(row: PublicInvitationRow): PublicInvitationProjection |
   return {
     organizationName: row.organization_name,
     jobTitle: row.job_title,
+    durationSeconds: row.duration_seconds as number,
+    interviewType: row.interview_type,
+    language: row.language,
+    candidateInstructions: row.candidate_instructions,
   };
 }
 
