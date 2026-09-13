@@ -6,6 +6,10 @@ create table public.interview_attempts (
   candidate_id uuid not null references public.candidates(id) on delete restrict,
   interviewer_version_id uuid not null references public.interviewer_versions(id) on delete restrict,
   state text not null default 'active' check (state in ('active', 'completed', 'aborted')),
+  resume_section_index integer not null default 0 check (resume_section_index >= 0),
+  resume_question_index integer not null default 0 check (resume_question_index >= 0),
+  resume_follow_ups_used jsonb not null default '{}'::jsonb check (jsonb_typeof(resume_follow_ups_used) = 'object'),
+  processed_event_ids jsonb not null default '[]'::jsonb check (jsonb_typeof(processed_event_ids) = 'array'),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (invitation_id),
@@ -79,7 +83,14 @@ grant execute on function public.resolve_realtime_candidate_session(text) to ano
 create or replace function public.authorize_realtime_interview_session(
   p_token_hash text
 )
-returns uuid
+returns table (
+  attempt_id uuid,
+  interviewer_version_id uuid,
+  resume_section_index integer,
+  resume_question_index integer,
+  resume_follow_ups_used jsonb,
+  processed_event_ids jsonb
+)
 language plpgsql
 security definer
 set search_path = ''
@@ -153,7 +164,14 @@ begin
     raise exception 'invitation unavailable';
   end if;
 
-  return attempt.id;
+  return query
+  select
+    attempt.id,
+    attempt.interviewer_version_id,
+    attempt.resume_section_index,
+    attempt.resume_question_index,
+    attempt.resume_follow_ups_used,
+    attempt.processed_event_ids;
 end;
 $$;
 
