@@ -8,13 +8,15 @@ Only unresolved or materially relevant issues belong here. Actual Git/code/curre
 
 Classification: **External product/integration dependency / not a correctness defect**.
 
-M05.2 has provider-neutral authorization, authoritative attempt persistence, constant-safe route-handler behavior, and short-lived provider-token lifetime enforcement, but the repository currently contains no authoritative realtime provider selection, provider SDK/configuration, or production credential-minting contract. Do not invent a vendor merely to mark M05.2 complete. This blocks provider-specific production issuance/adapter composition but does not block independent browser diagnostics or provider-neutral realtime domain work explicitly permitted by the M05 plan.
+Provider-neutral session authorization, authoritative attempt persistence, diagnostics, capture/playback, transport interfaces, deterministic orchestration, pacing, follow-up policy, recovery, and same-attempt reconnect state are implemented and verified. The repository still contains no authoritative realtime provider selection, provider SDK/configuration, or production credential-minting contract. Do not invent a vendor merely to mark M05 complete.
 
-### M05.3 diagnostics acceptance still incomplete
+This blocks provider-specific production credential issuance, provider adapter composition, live interview-page wiring, provider-backed reconnect/integration tests, and the M05 live stable multi-turn browser exit criterion. It does not block deterministic provider-neutral verification or documentation/traceability work.
 
-Classification: **Active milestone work**.
+### M05 full live realtime E2E closeout
 
-Browser/network/capability diagnostics, explicit microphone acquisition/cleanup, accessible recovery UI, candidate-page integration, offline fail-closed behavior, and selected-device acquisition support are implemented. Candidate-facing microphone enumeration/selection UX, usable input-level readiness, and browser keyboard/narrow-viewport closeout remain before M05.3 can be verified.
+Classification: **Blocked milestone acceptance work**.
+
+M05.14 requires a candidate to complete a stable multi-turn live voice interview and requires browser scenarios around provider interruption/recovery. Existing repository E2E remains green, but the live realtime flow cannot be honestly wired or verified until the provider dependency above is resolved. PR #7 must remain draft/unmerged while this exit criterion is open.
 
 ### External CI maintenance notices
 
@@ -24,15 +26,15 @@ GitHub-hosted CI reports Node runtime deprecation notices from third-party actio
 
 ## Recently resolved M05 issues
 
-- `5630cb89d69bf379bfc77dd77157c0b32405ef24` / CI #560 (`34700605728`) failed typecheck because the newly added offline diagnostic reason had not been integrated into candidate UI copy and `collectRealtimeBrowserCapabilities` was called without `isOnline`. Root cause was stale UI integration, not test infrastructure.
-- `019ac11a6a3575d11af96b579964ec206a6f7da0` / CI #561 (`34700935235`) added actionable offline copy plus `navigator.onLine`; the complete repository gate passed.
-- `1ac380e3b1a32b30cb6623ed13f74297b6865a02` / CI #562 (`34701284392`) is a valid selected-device RED: typecheck failed exactly because `verifyRealtimeMicrophoneAccess` accepted only one argument.
-- `2708322cd406eb3e2877295bfe25f495cff422c5` / CI #563 (`34701331592`) added the minimal selected-device constraint and passed the complete repository gate.
+- Browser compatibility/microphone diagnostics are now verified, including offline behavior, selected-device handling, usable input readiness, accessibility, and candidate-page integration. The older M05.3 incomplete-diagnostics entry was stale and has been removed.
+- Progress checkpoint authority now comes from the persisted attempt rather than caller-supplied interviewer-version input. Reviewed GREEN: `576d5dbad4138b85876eeac22ddfe8e7247381ce`, CI #669 / `34732650018`.
+- Runtime question progression now waits for authoritative persistence and consumes the returned checkpoint. RED: `f3b01a0e1f3f9ca17cf5058aea73816f6e639d49`, CI #671 / `34732962547`.
+- Malformed authoritative checkpoints now fail closed without rejecting the session or advancing local plan state. Review RED: `a0fcda2590020b4bd574dcd342a3aec308e34300`, CI #673 / `34733342412`; reviewed GREEN: `5e9328d2f945cd10eaecea312896f29fbc93b10e`, CI #674 / `34733465242`.
 
 ## Review blockers
 
-No unresolved Critical or Important review finding is currently known for the implemented M05 slices. PR #7 had no submitted reviews or unresolved review threads at the last reconciliation.
+No unresolved Critical or Important review finding is currently known for the implemented provider-neutral M05 slices through `5e9328d2…`. PR #7 had no unresolved review threads at the latest recovery.
 
 ## Merge gate
 
-PR #7 remains OPEN / DRAFT because M05 is far from milestone-complete. Do not merge until all M05 acceptance criteria, tasks, required tests/E2E, reviews, durable traceability, exact-final-head CI, concurrency checks, and repository protection requirements satisfy the owner's authorized auto-merge gates.
+PR #7 remains OPEN / DRAFT and must not merge while the authoritative provider dependency and live stable multi-turn M05 exit criterion remain unresolved. Merge only after all M05 acceptance criteria, tests/E2E, reviews, durable traceability, exact-final-head CI, concurrency checks, and repository protection requirements satisfy the owner's authorized auto-merge gates.
