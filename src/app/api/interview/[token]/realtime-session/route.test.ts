@@ -33,6 +33,13 @@ describe("POST /api/interview/[token]/realtime-session", () => {
   });
 
   it("returns only the narrow candidate session projection on success", async () => {
+    const resumeCheckpoint = {
+      interviewerVersionId: "internal-version-1",
+      sectionIndex: 1,
+      questionIndex: 0,
+      followUpsUsed: { "question-1": 1 },
+      processedEventIds: ["event-1"],
+    } as const;
     const authorize = vi.fn().mockResolvedValue({
       status: "authorized",
       attemptId: "attempt-1",
@@ -43,6 +50,7 @@ describe("POST /api/interview/[token]/realtime-session", () => {
         credential: "short-lived-provider-token",
         expiresAt: "2026-09-12T13:00:00.000Z",
       },
+      resumeCheckpoint,
     });
 
     const response = await createRealtimeSessionHandler(authorize)(request(), context);
@@ -57,6 +65,7 @@ describe("POST /api/interview/[token]/realtime-session", () => {
         credential: "short-lived-provider-token",
         expiresAt: "2026-09-12T13:00:00.000Z",
       },
+      resumeCheckpoint,
     });
   });
 
