@@ -1,5 +1,6 @@
 import { hashInvitationToken } from "@/lib/candidates/invitation-token";
 
+import type { RealtimeResumeCheckpoint } from "./reconnect";
 import type {
   CandidateRealtimeSession,
   RealtimeAttemptResult,
@@ -26,8 +27,37 @@ type CandidateSessionRow = Readonly<{
   has_current_consent: boolean;
 }>;
 
+type RealtimeAttemptRow = Readonly<{
+  attempt_id: string;
+  interviewer_version_id: string;
+  resume_section_index: number;
+  resume_question_index: number;
+  resume_follow_ups_used: Readonly<Record<string, number>>;
+  processed_event_ids: readonly string[];
+}>;
+
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
+}
+
+function isFollowUpsUsed(value: unknown): value is Readonly<Record<string, number>> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+
+  return Object.entries(value).every(
+    ([questionId, used]) => isNonEmptyString(questionId) && isNonNegativeInteger(used),
+  );
+}
+
+function isProcessedEventIds(value: unknown): value is readonly string[] {
+  return (
+    Array.isArray(value) &&
+    value.every(isNonEmptyString) &&
+    new Set(value).size === value.length
+  );
 }
 
 function isCandidateSessionRow(value: unknown): value is CandidateSessionRow {
@@ -47,6 +77,30 @@ function isCandidateSessionRow(value: unknown): value is CandidateSessionRow {
       row.lifecycle === "started") &&
     typeof row.has_current_consent === "boolean"
   );
+}
+
+function isRealtimeAttemptRow(value: unknown): value is RealtimeAttemptRow {
+  if (!value || typeof value !== "object") return false;
+
+  const row = value as Record<string, unknown>;
+  return (
+    isNonEmptyString(row.attempt_id) &&
+    isNonEmptyString(row.interviewer_version_id) &&
+    isNonNegativeInteger(row.resume_section_index) &&
+    isNonNegativeInteger(row.resume_question_index) &&
+    isFollowUpsUsed(row.resume_follow_ups_used) &&
+    isProcessedEventIds(row.processed_event_ids)
+  );
+}
+
+function toResumeCheckpoint(row: RealtimeAttemptRow): RealtimeResumeCheckpoint {
+  return Object.freeze({
+    interviewerVersionId: row.interviewer_version_id,
+    sectionIndex: row.resume_section_index,
+    questionIndex: row.resume_question_index,
+    followUpsUsed: Object.freeze({ ...row.resume_follow_ups_used }),
+    processedEventIds: Object.freeze([...row.processed_event_ids]),
+  });
 }
 
 export function createRealtimeSessionRepository(rpc: Rpc): Pick<
@@ -87,9 +141,22 @@ export function createRealtimeSessionRepository(rpc: Rpc): Pick<
         p_token_hash: hashInvitationToken(input.rawToken),
       });
 
-      if (error || !isNonEmptyString(data)) return { status: "conflict" };
+      if (error) return { status: "conflict" };
 
-      return { status: "ready", attemptId: data };
+      if (isNonEmptyString(data)) {
+        return { status: "ready", attemptId: data };
+      }
+
+      if (!Array.isArray(data) || data.length !== 1 || !isRealtimeAttemptRow(data[0])) {
+        return { status: "conflict" };
+      }
+
+      const row = data[0];
+      return {
+        status: "ready",
+        attemptId: row.attempt_id,
+        resumeCheckpoint: toResumeCheckpoint(row),
+      };
     },
   };
 }
