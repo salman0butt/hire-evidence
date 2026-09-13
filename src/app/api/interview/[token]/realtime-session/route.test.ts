@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { createRealtimeSessionHandler } from "@/lib/realtime/realtime-session-handler";
+import { POST } from "./route";
 
 function request() {
   return new Request("https://hire-evidence.example/api/interview/capability-secret/realtime-session", {
@@ -13,6 +14,15 @@ const context = {
 };
 
 describe("POST /api/interview/[token]/realtime-session", () => {
+  it("fails closed at the production route while no realtime provider is configured", async () => {
+    const response = await POST(request(), context);
+    const body = await response.text();
+
+    expect(response.status).toBe(503);
+    expect(JSON.parse(body)).toEqual({ status: "unavailable" });
+    expect(body).not.toContain("capability-secret");
+  });
+
   it("returns one constant-safe unavailable response without echoing or logging the capability", async () => {
     const authorize = vi.fn().mockResolvedValue({ status: "unavailable" });
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
