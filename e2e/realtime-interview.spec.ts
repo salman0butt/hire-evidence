@@ -251,7 +251,10 @@ test.describe("realtime interview browser readiness", () => {
     await expect(runCheck).toBeFocused();
     await runCheck.click();
 
-    await expect(page.getByRole("alert")).toContainText("Microphone access is blocked");
+    const microphoneAlert = page
+      .getByRole("alert")
+      .filter({ hasText: "Technical check needs attention" });
+    await expect(microphoneAlert).toContainText("Microphone access is blocked");
     const retry = page.getByRole("button", { name: "Retry microphone check" });
     await expect(retry).toBeVisible();
 
