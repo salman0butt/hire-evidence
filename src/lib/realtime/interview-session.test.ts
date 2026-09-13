@@ -102,4 +102,57 @@ describe("realtime interview session orchestration", () => {
     expect(serialized).toContain("question-1");
     expect(serialized).not.toMatch(/credential|secret|api.?key|score|rubric/i);
   });
+
+  it("applies bounded technical recovery without resetting the interview plan", () => {
+    const playback = createPlayback();
+    const session = createRealtimeInterviewSession({ plan, playback });
+    const firstGeneration = session.getSnapshot().generation;
+
+    const decision = session.handleTechnicalFailure(
+      { kind: "provider-error", detail: "provider-internal payload" },
+      0,
+      2,
+      firstGeneration,
+    );
+
+    expect(decision).toEqual({
+      action: "retry",
+      reason: "The interview connection was interrupted. We will try to reconnect.",
+      affectsEvaluation: false,
+    });
+    expect(session.getSnapshot()).toMatchObject({
+      status: "active",
+      generation: firstGeneration + 1,
+      currentQuestion: { questionId: "question-1" },
+    });
+
+    session.handleTransportEvent(
+      { type: "audio", pcm: new Float32Array([0.5]), sampleRate: 24_000 },
+      firstGeneration,
+    );
+    expect(playback.enqueue).not.toHaveBeenCalled();
+  });
+
+  it("ends safely on terminal technical failures without converting them into candidate evaluation", () => {
+    const playback = createPlayback();
+    const session = createRealtimeInterviewSession({ plan, playback });
+
+    const decision = session.handleTechnicalFailure(
+      { kind: "authorization-denied", detail: "sensitive server detail" },
+      0,
+      2,
+    );
+
+    expect(decision.action).toBe("end-safe");
+    expect(decision.affectsEvaluation).toBe(false);
+    expect(decision.reason).not.toContain("sensitive server detail");
+    expect(session.getSnapshot()).toMatchObject({
+      status: "ended",
+      currentQuestion: { questionId: "question-1" },
+    });
+
+    session.completeCurrentQuestion("must-not-progress");
+    expect(session.getSnapshot().currentQuestion?.questionId).toBe("question-1");
+    expect(playback.stop).toHaveBeenCalledTimes(1);
+  });
 });
