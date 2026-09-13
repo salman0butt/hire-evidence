@@ -29,6 +29,9 @@ export function createRealtimeSessionHandler(
         durationSeconds: authorization.durationSeconds,
         language: authorization.language,
         providerCredential: authorization.providerCredential,
+        ...(authorization.resumeCheckpoint
+          ? { resumeCheckpoint: authorization.resumeCheckpoint }
+          : {}),
       });
     } catch {
       return Response.json({ status: "unavailable" }, { status: 503 });
