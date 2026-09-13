@@ -28,6 +28,19 @@ describe("realtime interview session migration", () => {
     expect(migration).toMatch(/enable row level security/i);
   });
 
+  it("stores a bounded authoritative reconnect checkpoint on the attempt", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(/resume_section_index integer not null default 0/i);
+    expect(migration).toMatch(/resume_question_index integer not null default 0/i);
+    expect(migration).toMatch(/resume_follow_ups_used jsonb not null default '\{\}'::jsonb/i);
+    expect(migration).toMatch(/processed_event_ids jsonb not null default '\[\]'::jsonb/i);
+    expect(migration).toMatch(/check\s*\(resume_section_index >= 0\)/i);
+    expect(migration).toMatch(/check\s*\(resume_question_index >= 0\)/i);
+    expect(migration).toMatch(/jsonb_typeof\(resume_follow_ups_used\) = 'object'/i);
+    expect(migration).toMatch(/jsonb_typeof\(processed_event_ids\) = 'array'/i);
+  });
+
   it("resolves only a capability-bound realtime session projection for server authorization", () => {
     const migration = readMigration();
 
@@ -69,12 +82,13 @@ describe("realtime interview session migration", () => {
     expect(migration).toMatch(/grant execute on function public\.authorize_realtime_interview_session/i);
   });
 
-  it("returns only the opaque attempt identifier and keeps attempt rows off browser table grants", () => {
+  it("returns only the opaque attempt identity and authoritative resume state while keeping attempt rows off browser table grants", () => {
     const migration = readMigration();
 
     expect(migration).toMatch(
-      /create or replace function public\.authorize_realtime_interview_session\s*\(\s*p_token_hash text\s*\)\s*returns uuid/is,
+      /create or replace function public\.authorize_realtime_interview_session\s*\(\s*p_token_hash text\s*\)\s*returns table\s*\([\s\S]*attempt_id uuid[\s\S]*interviewer_version_id uuid[\s\S]*resume_section_index integer[\s\S]*resume_question_index integer[\s\S]*resume_follow_ups_used jsonb[\s\S]*processed_event_ids jsonb/is,
     );
+    expect(migration).toMatch(/return query\s+select\s+[\s\S]*attempt\.id[\s\S]*attempt\.interviewer_version_id[\s\S]*attempt\.resume_section_index[\s\S]*attempt\.resume_question_index[\s\S]*attempt\.resume_follow_ups_used[\s\S]*attempt\.processed_event_ids/is);
     expect(migration).toMatch(/revoke all on table public\.interview_attempts from anon/i);
     expect(migration).toMatch(/revoke all on table public\.interview_attempts from authenticated/i);
     expect(migration).not.toMatch(/grant\s+select\s+on\s+(?:table\s+)?public\.interview_attempts/i);
