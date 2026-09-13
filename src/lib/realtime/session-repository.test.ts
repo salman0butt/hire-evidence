@@ -73,10 +73,48 @@ describe("realtime session repository", () => {
     });
   });
 
+  it("returns the server-authoritative resume checkpoint for the same attempt", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: [
+        {
+          attempt_id: "attempt-1",
+          interviewer_version_id: "version-1",
+          resume_section_index: 1,
+          resume_question_index: 0,
+          resume_follow_ups_used: { "question-1": 1 },
+          processed_event_ids: ["event-1"],
+        },
+      ],
+      error: null,
+    });
+    const repository = createRealtimeSessionRepository(rpc);
+
+    await expect(
+      repository.getOrCreateAttempt({
+        rawToken: "capability-secret",
+        invitationId: "invitation-1",
+        candidateId: "candidate-1",
+        interviewerVersionId: "version-1",
+      }),
+    ).resolves.toEqual({
+      status: "ready",
+      attemptId: "attempt-1",
+      resumeCheckpoint: {
+        interviewerVersionId: "version-1",
+        sectionIndex: 1,
+        questionIndex: 0,
+        followUpsUsed: { "question-1": 1 },
+        processedEventIds: ["event-1"],
+      },
+    });
+  });
+
   it("fails closed when the authoritative attempt RPC fails or returns no opaque id", async () => {
     for (const response of [
       { data: null, error: null },
       { data: "", error: null },
+      { data: [], error: null },
+      { data: [{ attempt_id: "attempt-1" }], error: null },
       { data: null, error: { message: "database failure" } },
     ]) {
       const repository = createRealtimeSessionRepository(
