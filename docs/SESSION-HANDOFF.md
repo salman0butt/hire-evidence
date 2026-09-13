@@ -13,8 +13,8 @@ This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENT
 - Active draft milestone PR: #7 — `Build realtime AI interview`.
 - Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 - Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
-- Latest verified behavioral head: `5e9328d2f945cd10eaecea312896f29fbc93b10e`, CI #674 / `34733465242` — complete repository gate GREEN.
-- Documentation reconciliation commits after that behavioral head must receive fresh exact-head CI before being treated as final branch verification.
+- Latest verified behavioral/browser head: `1c4635618aa1d3471284ca30cfb8658981afdd94`, CI #682 / `34734661625` — complete repository gate GREEN with 25 Chromium E2E tests.
+- Durable documentation commits after that head require fresh exact-head CI before being treated as final branch verification.
 
 ## Current milestone state
 
@@ -42,11 +42,15 @@ M05.11 realtime orchestration — **ACTIVE / PARTIALLY VERIFIED**. Provider-neut
 
 M05.12 timeout/error recovery — **VERIFIED (provider-neutral scope)**.
 
-M05.13 same-attempt reconnect — **VERIFIED (provider-neutral scope)**. Server-authoritative resume checkpoints and progress RPCs are implemented. Runtime question completion now waits for authoritative persistence, consumes the server checkpoint, rejects stale-generation results, and fails closed on conflicts, persistence rejection, or malformed checkpoints. Provider-backed reconnect integration remains blocked until provider selection.
+M05.13 same-attempt reconnect — **VERIFIED (provider-neutral scope)**. Server-authoritative resume checkpoints and progress RPCs are implemented. Runtime question completion waits for authoritative persistence, consumes the server checkpoint, rejects stale-generation results, and fails closed on conflicts, persistence rejection, or malformed checkpoints. Provider-backed reconnect integration remains blocked until provider selection.
 
-M05.14 full realtime E2E / closeout — **NOT STARTED / LIVE-PROVIDER BLOCKED**. Deterministic provider-neutral browser coverage can continue; the PRD exit criterion requiring a stable live multi-turn voice interview cannot be honestly closed without a selected/configured provider.
+M05.14 full realtime E2E / closeout — **ACTIVE / PARTIALLY VERIFIED**. A real candidate-page Playwright scenario now verifies mobile layout, keyboard focus, microphone denial, explicit retry recovery, enumerated microphone selection, and that readiness checks do not start recording. Stable provider-backed multi-turn voice completion remains unresolved.
 
 ## Current evidence
+
+M05.14 browser checkpoints:
+- `829d9d92c3f9b92d32944b54622436b1a54b63a5`, CI #681 / `34734365068` — **NOT GREEN**. The intended denial UI rendered and 24 existing E2E tests passed, but a generic `role=alert` locator also matched Next.js's route announcer.
+- `1c4635618aa1d3471284ca30cfb8658981afdd94`, CI #682 / `34734661625` — GREEN after the locator was scoped to the technical-check alert; full repository gate passed, including 480 unit/component tests and 25 Chromium E2E tests.
 
 Recent M05.13 checkpoints:
 - runtime persistence RED: `f3b01a0e1f3f9ca17cf5058aea73816f6e639d49`, CI #671 / `34732962547` — missing orchestration persistence boundary.
@@ -57,9 +61,9 @@ Recent M05.13 checkpoints:
 ## Review state
 
 - Critical findings: 0 unresolved for implemented M05 slices.
-- Important findings: 0 unresolved for verified provider-neutral slices through `5e9328d2…`.
+- Important findings: 0 unresolved for verified provider-neutral slices through the latest M05.14 browser slice.
 - PR #7 had no unresolved review threads at the latest recovery check.
-- Latest Important finding (invalid persisted checkpoint throwing) is fixed and regression-tested.
+- The CI #681 browser failure was a test-locator defect, not a production defect; systematic debugging identified and corrected it.
 
 ## Safety / architecture state
 
@@ -74,6 +78,6 @@ Recent M05.13 checkpoints:
 ## Exact next work
 
 1. Recover PR #7 exact remote head and exact-head CI; newer GitHub state wins over this handoff.
-2. Finish durable M05 reconciliation (`docs/milestones/M05-realtime-ai-interview.md`, known issues/traceability if needed) without losing historical evidence.
-3. Continue M05.14 with deterministic browser/E2E scenarios that do not require provider coupling.
+2. Verify the latest documentation head with the complete CI gate.
+3. Continue M05.14 with the next real deterministic browser/E2E scenario that does not require fabricated provider coupling.
 4. Keep PR #7 draft/unmerged while provider-specific authorization/adapter/live page/reconnect and the stable live multi-turn exit criterion remain blocked by the missing authoritative provider decision/configuration.
