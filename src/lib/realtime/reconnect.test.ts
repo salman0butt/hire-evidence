@@ -88,6 +88,16 @@ describe("authoritative realtime reconnect checkpoints", () => {
         processedEventIds: [],
       },
     },
+    {
+      name: "follow-up state for a future question beyond the authoritative cursor",
+      checkpoint: {
+        interviewerVersionId: "version-1",
+        sectionIndex: 0,
+        questionIndex: 0,
+        followUpsUsed: { "question-2": 1 },
+        processedEventIds: [],
+      },
+    },
   ])("fails closed for $name instead of silently resetting progress", ({ checkpoint }) => {
     expect(() => restoreInterviewPlanState(plan, checkpoint)).toThrow(
       "Invalid realtime resume checkpoint.",
