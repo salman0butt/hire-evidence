@@ -190,7 +190,7 @@ async function createInvitation(actor: TestClient, admin: TestClient, suffix: st
 test.describe("realtime interview browser readiness", () => {
   test.describe.configure({ mode: "serial" });
 
-  test("recovers from denied microphone access without starting recording", async ({ page }) => {
+  test("recovers from denied microphone access without starting recording", async ({ page, request }) => {
     test.setTimeout(120_000);
     const { supabaseUrl, publishableKey, serviceRoleKey } = environment();
     const admin = client(supabaseUrl, serviceRoleKey);
@@ -266,6 +266,13 @@ test.describe("realtime interview browser readiness", () => {
     await expect(page.getByRole("status")).toContainText("Ready for the microphone check.");
     await expect(page.getByLabel("Microphone")).toHaveValue("mic-1");
     await expect(page.getByText("No recording has started.")).toBeVisible();
+
+    const realtimeResponse = await request.post(`/api/interview/${token}/realtime-session`);
+    const realtimeBody = await realtimeResponse.text();
+    expect(realtimeResponse.status()).toBe(503);
+    expect(JSON.parse(realtimeBody)).toEqual({ status: "unavailable" });
+    expect(realtimeBody).not.toContain(token);
+    expect(realtimeBody).not.toContain("credential");
 
     const dimensions = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
