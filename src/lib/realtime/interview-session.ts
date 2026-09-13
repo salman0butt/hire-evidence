@@ -62,11 +62,22 @@ function toSnapshot(
   });
 }
 
+function toResumeCheckpoint(state: InterviewPlanRunnerState): RealtimeResumeCheckpoint {
+  return Object.freeze({
+    interviewerVersionId: state.plan.versionId,
+    sectionIndex: state.sectionIndex,
+    questionIndex: state.questionIndex,
+    followUpsUsed: Object.freeze({ ...state.followUpsUsed }),
+    processedEventIds: Object.freeze([...state.processedEventIds]),
+  });
+}
+
 export function createRealtimeInterviewSession(input: Readonly<{
   plan: InterviewPlanInput;
   playback: RealtimeAudioPlayback;
   resumeCheckpoint?: RealtimeResumeCheckpoint | undefined;
   onSnapshot?: ((snapshot: RealtimeInterviewSessionSnapshot) => void) | undefined;
+  onResumeCheckpoint?: ((checkpoint: RealtimeResumeCheckpoint) => void) | undefined;
 }>): RealtimeInterviewSession {
   let planState = input.resumeCheckpoint
     ? restoreInterviewPlanState(input.plan, input.resumeCheckpoint)
@@ -120,6 +131,9 @@ export function createRealtimeInterviewSession(input: Readonly<{
     }
 
     planState = next;
+    if (planState.status === "active") {
+      input.onResumeCheckpoint?.(toResumeCheckpoint(planState));
+    }
     publishSnapshot();
   }
 
