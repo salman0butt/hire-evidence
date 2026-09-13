@@ -6,10 +6,15 @@ import {
   type InterviewPlanInput,
   type InterviewPlanRunnerState,
 } from "./plan-runner";
+import {
+  decideRealtimeRecovery,
+  type RealtimeRecoveryDecision,
+  type RealtimeTechnicalFailure,
+} from "./recovery";
 import type { RealtimeTransportEvent } from "./transport";
 
 export type RealtimeInterviewSessionSnapshot = Readonly<{
-  status: "active" | "completed";
+  status: "active" | "completed" | "ended";
   generation: number;
   currentQuestion: Readonly<{
     sectionId: string;
@@ -23,17 +28,24 @@ export type RealtimeInterviewSession = Readonly<{
   getSnapshot(): RealtimeInterviewSessionSnapshot;
   handleTransportEvent(event: RealtimeTransportEvent, generation?: number): void;
   completeCurrentQuestion(eventId: string, generation?: number): void;
+  handleTechnicalFailure(
+    failure: RealtimeTechnicalFailure,
+    retryCount: number,
+    maxRetries: number,
+    generation?: number,
+  ): RealtimeRecoveryDecision | null;
   advanceGeneration(): number;
 }>;
 
 function toSnapshot(
   state: InterviewPlanRunnerState,
   generation: number,
+  ended: boolean,
 ): RealtimeInterviewSessionSnapshot {
   const current = getCurrentInterviewQuestion(state);
 
   return Object.freeze({
-    status: state.status,
+    status: ended ? "ended" : state.status,
     generation,
     currentQuestion: current
       ? Object.freeze({
@@ -53,9 +65,10 @@ export function createRealtimeInterviewSession(input: Readonly<{
 }>): RealtimeInterviewSession {
   let planState = createInterviewPlanState(input.plan);
   let generation = 1;
+  let ended = false;
 
   function getSnapshot() {
-    return toSnapshot(planState, generation);
+    return toSnapshot(planState, generation, ended);
   }
 
   function publishSnapshot() {
@@ -63,7 +76,7 @@ export function createRealtimeInterviewSession(input: Readonly<{
   }
 
   function handleTransportEvent(event: RealtimeTransportEvent, eventGeneration = generation) {
-    if (eventGeneration !== generation || planState.status !== "active") {
+    if (eventGeneration !== generation || planState.status !== "active" || ended) {
       return;
     }
 
@@ -80,7 +93,7 @@ export function createRealtimeInterviewSession(input: Readonly<{
   }
 
   function completeCurrentQuestion(eventId: string, eventGeneration = generation) {
-    if (eventGeneration !== generation) {
+    if (eventGeneration !== generation || ended) {
       return;
     }
 
@@ -103,7 +116,40 @@ export function createRealtimeInterviewSession(input: Readonly<{
     publishSnapshot();
   }
 
+  function handleTechnicalFailure(
+    failure: RealtimeTechnicalFailure,
+    retryCount: number,
+    maxRetries: number,
+    eventGeneration = generation,
+  ): RealtimeRecoveryDecision | null {
+    if (eventGeneration !== generation || planState.status !== "active" || ended) {
+      return null;
+    }
+
+    const decision = decideRealtimeRecovery({
+      failure,
+      retryCount,
+      maxRetries,
+      attemptStatus: "active",
+    });
+
+    if (decision.action === "end-safe") {
+      ended = true;
+      void input.playback.stop();
+      publishSnapshot();
+      return decision;
+    }
+
+    generation += 1;
+    publishSnapshot();
+    return decision;
+  }
+
   function advanceGeneration() {
+    if (ended) {
+      return generation;
+    }
+
     generation += 1;
     publishSnapshot();
     return generation;
@@ -113,6 +159,7 @@ export function createRealtimeInterviewSession(input: Readonly<{
     getSnapshot,
     handleTransportEvent,
     completeCurrentQuestion,
+    handleTechnicalFailure,
     advanceGeneration,
   });
 }
