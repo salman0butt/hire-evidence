@@ -17,8 +17,8 @@ Realtime AI Interview — **ACTIVE**.
 Active branch: `feat/realtime-ai-interview`
 Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
 Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
-Latest verified behavioral head: `5e9328d2f945cd10eaecea312896f29fbc93b10e`.
-CI status: CI #674 / `34733465242` passed the complete repository gate on `5e9328d2f945cd10eaecea312896f29fbc93b10e`: frozen install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase startup/migrations, production build, Chromium E2E, PRD coverage, and cleanup.
+Latest verified browser head: `1c4635618aa1d3471284ca30cfb8658981afdd94`.
+CI status: CI #682 / `34734661625` passed the complete repository gate on `1c4635618aa1d3471284ca30cfb8658981afdd94`: frozen install, lint, typecheck, 480 unit/component tests, framework/source verifiers, local Supabase startup/migrations, production build, 25 Chromium E2E tests, PRD coverage, and cleanup.
 
 Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
@@ -37,12 +37,16 @@ Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 - M05.10 Bounded follow-ups — **VERIFIED**.
 - M05.11 Realtime interview orchestration — **ACTIVE / PARTIALLY VERIFIED**. Deterministic multi-turn progression, barge-in routing, generation-scoped stale callback rejection, safe candidate projection, and presentation are verified. Production page/transport composition remains dependent on provider selection.
 - M05.12 Timeout/error recovery — **VERIFIED (provider-neutral scope)**.
-- M05.13 Same-attempt reconnect — **VERIFIED (provider-neutral scope)**. Server-authoritative attempt checkpoints, idempotent processed event IDs, capability-bound progress RPCs, immutable-plan restoration, stale-generation rejection, and runtime persistence gating are implemented. Local progression now waits for authoritative persistence, consumes the returned server checkpoint, fails closed on conflicts/rejections/malformed checkpoints, and does not fabricate candidate evidence. Provider-backed reconnect integration remains blocked by provider selection.
-- M05.14 Full realtime E2E / milestone closeout — **NOT STARTED / BLOCKED FOR LIVE-PROVIDER PATH**. Deterministic provider-neutral coverage can continue, but the required stable live multi-turn browser exit cannot be completed until an authoritative realtime provider is selected/configured.
+- M05.13 Same-attempt reconnect — **VERIFIED (provider-neutral scope)**. Server-authoritative attempt checkpoints, idempotent processed event IDs, capability-bound progress RPCs, immutable-plan restoration, stale-generation rejection, and runtime persistence gating are implemented. Local progression waits for authoritative persistence, consumes the returned server checkpoint, fails closed on conflicts/rejections/malformed checkpoints, and does not fabricate candidate evidence. Provider-backed reconnect integration remains blocked by provider selection.
+- M05.14 Full realtime E2E / milestone closeout — **ACTIVE / PARTIALLY VERIFIED**. `e2e/realtime-interview.spec.ts` now exercises the real candidate invitation page on a mobile viewport and proves keyboard focus, microphone denial, explicit retry recovery, input enumeration/selection, no horizontal overflow, and that readiness checks do not start recording. Stable provider-backed multi-turn voice completion remains blocked until an authoritative realtime provider is selected/configured.
 
 ## TDD / Verification Evidence
 
 Earlier M05 evidence remains preserved in `docs/milestones/M05-realtime-ai-interview.md` and Git history.
+
+M05.14 browser checkpoints:
+- `829d9d92c3f9b92d32944b54622436b1a54b63a5`, CI #681 / `34734365068` — **NOT GREEN**. New realtime browser scenario reached E2E; 24 existing browser tests passed, but the assertion used an ambiguous `role=alert` locator that also matched Next.js's route announcer.
+- `1c4635618aa1d3471284ca30cfb8658981afdd94`, CI #682 / `34734661625` — reviewed browser GREEN. Locator is scoped to the technical-check alert; full repository gate passed with 25 Chromium E2E tests.
 
 Recent M05.13 checkpoints:
 - authoritative progress repository RED: `87406dc5d0186d5f28f3b8d5cdd5f19c9f50b2b1`, CI #665 / `34732181229` — progress persistence repository boundary absent.
@@ -57,10 +61,10 @@ Recent M05.13 checkpoints:
 ## Review State
 
 Critical findings: **0 unresolved** for implemented M05 slices.
-Important findings: **0 unresolved** for verified provider-neutral slices through `5e9328d2…`.
+Important findings: **0 unresolved** for verified provider-neutral slices through the latest M05.14 browser slice.
 PR #7 had no unresolved review threads at the latest recovery.
 
-Latest Important finding resolved: an invalid server-authoritative resume checkpoint could escape as an exception during runtime progression. RED `a0fcda25…` reproduced the defect; GREEN `5e9328d2…` now leaves local plan state unchanged and fails closed.
+The M05.14 CI #681 failure was a test-locator defect rather than a product defect. Systematic debugging identified the Next.js route announcer as the second `role=alert`; the minimal scoped-locator fix is exact-head verified by CI #682.
 
 ## Blockers / Constraints
 
@@ -72,4 +76,4 @@ Latest Important finding resolved: an invalid server-authoritative resume checkp
 
 Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M05-realtime-ai-interview.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the selected M05 design/plan. Git/code/current exact-SHA CI outrank stale Markdown.
 
-Exact next work: reconcile M05 durable docs to the verified `5e9328d2…` runtime-persistence state, then add the largest remaining deterministic M05.14 browser/E2E coverage that does not require inventing a realtime provider. Do not merge PR #7 while the stable live multi-turn provider path remains unresolved.
+Exact next work: continue M05.14 with the next largest deterministic browser/E2E slice that exercises real candidate-facing behavior without fabricating provider coupling. Do not merge PR #7 while the stable live multi-turn provider path remains unresolved.
