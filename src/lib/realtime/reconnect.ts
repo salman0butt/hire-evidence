@@ -43,21 +43,38 @@ export function restoreInterviewPlanState(
     return failInvalidCheckpoint();
   }
 
-  const questionLimits = new Map<string, number>();
-  for (const planSection of initialState.plan.sections) {
-    for (const question of planSection.questions) {
-      questionLimits.set(question.id, question.followUpLimit);
-    }
-  }
+  const questionLimits = new Map<
+    string,
+    Readonly<{ limit: number; sectionIndex: number; questionIndex: number }>
+  >();
+  initialState.plan.sections.forEach((planSection, sectionIndex) => {
+    planSection.questions.forEach((question, questionIndex) => {
+      questionLimits.set(
+        question.id,
+        Object.freeze({
+          limit: question.followUpLimit,
+          sectionIndex,
+          questionIndex,
+        }),
+      );
+    });
+  });
 
   const followUpsUsed: Record<string, number> = {};
   for (const [questionId, used] of Object.entries(checkpoint.followUpsUsed)) {
-    const limit = questionLimits.get(questionId);
+    const questionPosition = questionLimits.get(questionId);
+    const isFutureQuestion =
+      questionPosition !== undefined &&
+      (questionPosition.sectionIndex > checkpoint.sectionIndex ||
+        (questionPosition.sectionIndex === checkpoint.sectionIndex &&
+          questionPosition.questionIndex > checkpoint.questionIndex));
+
     if (
-      limit === undefined ||
+      questionPosition === undefined ||
+      isFutureQuestion ||
       !Number.isInteger(used) ||
       used < 0 ||
-      used > limit
+      used > questionPosition.limit
     ) {
       return failInvalidCheckpoint();
     }
