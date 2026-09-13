@@ -64,6 +64,27 @@ describe("realtime interview session orchestration", () => {
     expect(snapshots.at(-1)?.status).toBe("completed");
   });
 
+  it("emits an authoritative resume checkpoint after accepted plan progression", () => {
+    const checkpoints: unknown[] = [];
+    const session = createRealtimeInterviewSession({
+      plan,
+      playback: createPlayback(),
+      onResumeCheckpoint: (checkpoint) => checkpoints.push(checkpoint),
+    });
+
+    session.completeCurrentQuestion("turn-1");
+
+    expect(checkpoints).toEqual([
+      {
+        interviewerVersionId: "version-1",
+        sectionIndex: 0,
+        questionIndex: 1,
+        followUpsUsed: {},
+        processedEventIds: ["turn-1"],
+      },
+    ]);
+  });
+
   it("routes provider audio to playback and barge-in only interrupts playback", () => {
     const playback = createPlayback();
     const session = createRealtimeInterviewSession({ plan, playback });
