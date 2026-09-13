@@ -109,6 +109,48 @@ describe("realtime session repository", () => {
     });
   });
 
+  it("persists question progression through the authoritative attempt RPC", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: [
+        {
+          attempt_state: "active",
+          resume_section_index: 0,
+          resume_question_index: 1,
+          resume_follow_ups_used: { "question-1": 1 },
+          processed_event_ids: ["event-1"],
+        },
+      ],
+      error: null,
+    });
+    const repository = createRealtimeSessionRepository(rpc);
+
+    await expect(
+      repository.advanceAttemptProgress({
+        rawToken: "capability-secret",
+        attemptId: "attempt-1",
+        eventId: "event-1",
+        questionId: "question-1",
+        interviewerVersionId: "version-1",
+      }),
+    ).resolves.toEqual({
+      status: "active",
+      checkpoint: {
+        interviewerVersionId: "version-1",
+        sectionIndex: 0,
+        questionIndex: 1,
+        followUpsUsed: { "question-1": 1 },
+        processedEventIds: ["event-1"],
+      },
+    });
+
+    expect(rpc).toHaveBeenCalledWith("advance_realtime_interview_session", {
+      p_token_hash: hashInvitationToken("capability-secret"),
+      p_attempt_id: "attempt-1",
+      p_event_id: "event-1",
+      p_question_id: "question-1",
+    });
+  });
+
   it("fails closed when the authoritative attempt RPC fails or returns no opaque id", async () => {
     for (const response of [
       { data: null, error: null },
