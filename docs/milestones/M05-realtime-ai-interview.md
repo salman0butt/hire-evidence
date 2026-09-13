@@ -74,7 +74,7 @@ Server-authorized realtime setup; short-lived provider credentials; provider-neu
 11. **ACTIVE / PARTIALLY VERIFIED** — M05.11 Realtime interview orchestrator/barge-in integration. Provider-neutral controller/presentation behavior is verified; production provider/page composition remains blocked.
 12. **VERIFIED (provider-neutral scope)** — M05.12 Timeout/error recovery.
 13. **VERIFIED (provider-neutral scope)** — M05.13 Same-authoritative-attempt reconnect. Server-authoritative checkpoints, capability-bound progress persistence, immutable-plan restoration, stale-generation handling, and runtime persistence gating are implemented and exact-head verified. Provider-backed reconnect remains blocked by provider selection.
-14. **NOT STARTED / LIVE-PROVIDER BLOCKED** — M05.14 Full realtime E2E and closeout. Continue deterministic coverage that does not depend on provider coupling; do not claim the stable live multi-turn exit until the provider path exists.
+14. **ACTIVE / PARTIALLY VERIFIED** — M05.14 Full realtime E2E and closeout. Deterministic browser coverage now proves candidate-page microphone denial → explicit retry recovery, keyboard focus, input enumeration/selection, mobile no-overflow, and that the readiness check does not start recording. Continue deterministic coverage that does not depend on provider coupling; do not claim the stable live multi-turn exit until the provider path exists.
 
 ## TDD Evidence
 
@@ -89,9 +89,16 @@ Earlier M05.2–M05.12 checkpoints remain historically preserved in Git and prio
 - fail-closed review RED: `a0fcda2590020b4bd574dcd342a3aec308e34300`, CI #673 / `34733342412` — malformed authoritative checkpoint rejected the session promise instead of failing closed.
 - reviewed GREEN: `5e9328d2f945cd10eaecea312896f29fbc93b10e`, CI #674 / `34733465242` — invalid/conflicting/rejected persistence leaves local progress unchanged; complete repository gate GREEN.
 
+M05.14 browser evidence:
+
+- browser scenario checkpoint: `829d9d92c3f9b92d32944b54622436b1a54b63a5`, CI #681 / `34734365068` — **NOT GREEN**. The scenario reached the intended microphone-denial state and all 24 pre-existing browser tests passed, but Playwright strict mode found both the technical-check alert and Next.js route announcer for a generic `role=alert` locator. This is test-locator evidence, not a product behavior RED.
+- reviewed browser GREEN: `1c4635618aa1d3471284ca30cfb8658981afdd94`, CI #682 / `34734661625` — locator narrowed to the technical-check alert; full repository gate GREEN with 25 Chromium E2E tests.
+
 ## Integration Test Evidence
 
-CI #674 / `34733465242` on `5e9328d2f945cd10eaecea312896f29fbc93b10e` passed frozen dependency installation, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase startup/migrations, production build, Chromium E2E, PRD coverage, and cleanup. Full stable multi-turn live-provider browser E2E remains an M05.14 closeout requirement and is not yet satisfied.
+CI #682 / `34734661625` on `1c4635618aa1d3471284ca30cfb8658981afdd94` passed frozen dependency installation, lint, typecheck, 480 unit/component tests, framework/source verifiers, local Supabase startup/migrations, production build, 25 Chromium E2E tests, PRD coverage, and cleanup. The new deterministic browser scenario exercises the real candidate invitation page on a 390×844 viewport and proves microphone denial/retry recovery, accessible keyboard focus, enumerated microphone selection, no horizontal overflow, and no recording during readiness checks.
+
+Full stable multi-turn live-provider browser E2E remains an M05.14 closeout requirement and is not yet satisfied.
 
 ## Security Review
 
@@ -99,13 +106,15 @@ Implemented M05 work does not create candidate scores or autonomous hire/reject 
 
 Invitation capability and current consent remain server authorization requirements. Raw capability tokens and long-lived provider secrets are not persisted/logged. Progress persistence is capability-bound and database-authoritative; browser/session values cannot replace the persisted interviewer-version authority. Invalid, conflicting, or malformed persisted progress fails closed without advancing local plan state.
 
+The M05.14 browser fixture creates only ephemeral local-CI candidate/invitation data and does not weaken production authorization or persist raw invitation tokens outside the test process.
+
 ## Accessibility Review
 
-M05.3 diagnostic UI and M05.7 realtime controls provide semantic status/alert information, keyboard-operable controls, labelled mute/end/retry actions, pressed/disabled state, and live status text. Candidate-facing current-question/completion presentation is covered by component tests. Full realtime browser accessibility coverage remains part of M05.14.
+M05.3 diagnostic UI and M05.7 realtime controls provide semantic status/alert information, keyboard-operable controls, labelled mute/end/retry actions, pressed/disabled state, and live status text. Candidate-facing current-question/completion presentation is covered by component tests. M05.14 browser coverage now verifies keyboard focus on the microphone-check action, semantic recovery presentation, microphone selection, and mobile no-overflow on the real candidate invitation page. Full live realtime browser accessibility coverage remains part of M05.14.
 
 ## Performance Review
 
-Capture/playback/transport lifecycles use bounded cleanup and stale-generation rejection. Plan, pacing, follow-up, recovery, reconnect, and persistence bookkeeping are bounded by published plan/event sizes. Runtime progression performs at most the explicitly injected authoritative persistence operation per accepted completion and does not buffer unbounded media or duplicate model calls.
+Capture/playback/transport lifecycles use bounded cleanup and stale-generation rejection. Plan, pacing, follow-up, recovery, reconnect, and persistence bookkeeping are bounded by published plan/event sizes. Runtime progression performs at most the explicitly injected authoritative persistence operation per accepted completion and does not buffer unbounded media or duplicate model calls. The new browser fixture adds one isolated invitation flow and bounded mocked media calls only in test execution.
 
 ## Code Review Findings
 
@@ -114,21 +123,22 @@ Capture/playback/transport lifecycles use bounded cleanup and stale-generation r
 - Important — **fixed**: M05.8 initially authorized future planned questions; current-question-only authority is regression-tested.
 - Important — **fixed**: progress checkpoint authority initially depended on caller input; persisted attempt version now wins.
 - Important — **fixed**: malformed authoritative progress checkpoint could throw from runtime orchestration; regression RED `a0fcda25…` proved it and GREEN `5e9328d2…` now fails closed with unchanged local state.
+- Test quality — **fixed**: first M05.14 browser assertion used an ambiguous `role=alert` locator also matching Next.js route announcer; CI #681 reproduced it and CI #682 verifies the scoped locator.
 - Critical: **0 unresolved** for implemented slices.
-- Important: **0 unresolved** for verified provider-neutral slices through `5e9328d2…`.
+- Important: **0 unresolved** for verified provider-neutral slices through the current browser coverage.
 - PR #7 had no unresolved review threads at the latest recovery check.
 
 ## Known Limitations
 
 No authoritative realtime provider SDK/configuration exists yet. Therefore provider-specific production credential issuance, provider adapter composition, final live page wiring, provider-backed reconnect, and the live stable multi-turn browser exit criterion remain unresolved. Do not invent a provider merely to close M05.
 
-M05.14 remains required before milestone completion. PR #7 must stay draft and unmerged until all acceptance, exact-final-head CI, review, traceability, and live-provider gates are genuinely satisfied.
+M05.14 remains incomplete. PR #7 must stay draft and unmerged until all acceptance, exact-final-head CI, review, traceability, and live-provider gates are genuinely satisfied.
 
 ## Fresh Verification Results
 
-Latest verified behavioral SHA `5e9328d2f945cd10eaecea312896f29fbc93b10e` passed CI #674 / `34733465242`, including frozen dependency install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup/migrations, production build, Chromium E2E, PRD coverage, and cleanup.
+Latest verified behavioral/browser SHA `1c4635618aa1d3471284ca30cfb8658981afdd94` passed CI #682 / `34734661625`, including frozen dependency install, lint, typecheck, 480 unit/component tests, framework/source verification, local Supabase startup/migrations, production build, 25 Chromium E2E tests, PRD coverage, and cleanup.
 
-Durable documentation commits after `5e9328d2…` require their own exact-head CI before they can become final branch verification evidence.
+Durable documentation commits after `1c463561…` require their own exact-head CI before they can become final branch verification evidence.
 
 ## Fresh Verification Commands
 
@@ -163,7 +173,7 @@ Recover actual Git/GitHub first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `
 - [ ] Final PR head/review/concurrency/mergeability gates green before authorized merge.
 
 ## Next Action
-Continue M05.14 with deterministic browser/E2E scenarios that can be proven without provider coupling. If all such work is exhausted, persist the provider-selection blocker exactly and keep PR #7 draft/unmerged rather than inventing a provider or weakening the exit criterion.
+Continue M05.14 with the next largest deterministic browser/E2E scenario that exercises real candidate-facing behavior without provider coupling. If all such work is exhausted, persist the provider-selection blocker exactly and keep PR #7 draft/unmerged rather than inventing a provider or weakening the exit criterion.
 
 ## Next Milestone
 M06 — Transcript + Durable Session, only after M05 is genuinely complete, merged, and post-merge `main` is verified.
