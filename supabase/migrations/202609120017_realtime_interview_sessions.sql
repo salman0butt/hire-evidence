@@ -177,3 +177,156 @@ $$;
 
 revoke all on function public.authorize_realtime_interview_session(text) from public;
 grant execute on function public.authorize_realtime_interview_session(text) to anon, authenticated;
+
+create or replace function public.advance_realtime_interview_session(
+  p_token_hash text,
+  p_attempt_id uuid,
+  p_event_id text,
+  p_question_id uuid
+)
+returns table (
+  attempt_state text,
+  resume_section_index integer,
+  resume_question_index integer,
+  resume_follow_ups_used jsonb,
+  processed_event_ids jsonb
+)
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  attempt public.interview_attempts;
+  interviewer_version public.interviewer_versions;
+  sections jsonb;
+  current_questions jsonb;
+  next_questions jsonb;
+  current_question_id uuid;
+  next_section_index integer;
+begin
+  if p_token_hash is null
+     or btrim(p_token_hash) = ''
+     or p_attempt_id is null
+     or p_event_id is null
+     or btrim(p_event_id) = ''
+     or p_question_id is null then
+    raise exception 'realtime progress unavailable';
+  end if;
+
+  select interview_attempt.*
+    into attempt
+  from public.interview_attempts interview_attempt
+  join public.candidate_invitations candidate_invitation
+    on candidate_invitation.id = interview_attempt.invitation_id
+   and candidate_invitation.candidate_id = interview_attempt.candidate_id
+   and candidate_invitation.job_id = interview_attempt.job_id
+   and candidate_invitation.organization_id = interview_attempt.organization_id
+   and candidate_invitation.interviewer_version_id = interview_attempt.interviewer_version_id
+  where interview_attempt.id = p_attempt_id
+    and candidate_invitation.token_hash = p_token_hash
+    and candidate_invitation.expires_at > now()
+    and candidate_invitation.revoked_at is null
+    and candidate_invitation.state = 'started'
+  for update of interview_attempt;
+
+  if attempt.id is null or not (attempt.state = 'active') then
+    raise exception 'realtime progress unavailable';
+  end if;
+
+  if attempt.processed_event_ids ? p_event_id then
+    return query
+    select
+      attempt.state,
+      attempt.resume_section_index,
+      attempt.resume_question_index,
+      attempt.resume_follow_ups_used,
+      attempt.processed_event_ids;
+    return;
+  end if;
+
+  select version.*
+    into interviewer_version
+  from public.interviewer_versions version
+  where version.id = attempt.interviewer_version_id
+    and version.job_id = attempt.job_id
+    and version.organization_id = attempt.organization_id;
+
+  if interviewer_version.id is null then
+    raise exception 'realtime progress unavailable';
+  end if;
+
+  sections := interviewer_version.snapshot -> 'interview_plan' -> 'sections';
+  if sections is null
+     or jsonb_typeof(sections) <> 'array'
+     or attempt.resume_section_index >= jsonb_array_length(sections) then
+    raise exception 'realtime progress unavailable';
+  end if;
+
+  current_questions := sections -> attempt.resume_section_index -> 'question_ids';
+  if current_questions is null
+     or jsonb_typeof(current_questions) <> 'array'
+     or attempt.resume_question_index >= jsonb_array_length(current_questions) then
+    raise exception 'realtime progress unavailable';
+  end if;
+
+  begin
+    current_question_id := (current_questions ->> attempt.resume_question_index)::uuid;
+  exception when invalid_text_representation then
+    raise exception 'realtime progress unavailable';
+  end;
+
+  if current_question_id is null or current_question_id <> p_question_id then
+    raise exception 'realtime progress unavailable';
+  end if;
+
+  if attempt.resume_question_index + 1 < jsonb_array_length(current_questions) then
+    update public.interview_attempts
+    set resume_question_index = attempt.resume_question_index + 1,
+        processed_event_ids = attempt.processed_event_ids || jsonb_build_array(p_event_id),
+        updated_at = now()
+    where id = attempt.id
+    returning * into attempt;
+  else
+    next_section_index := attempt.resume_section_index + 1;
+
+    while next_section_index < jsonb_array_length(sections) loop
+      next_questions := sections -> next_section_index -> 'question_ids';
+
+      if next_questions is not null
+         and jsonb_typeof(next_questions) = 'array'
+         and jsonb_array_length(next_questions) > 0 then
+        update public.interview_attempts
+        set resume_section_index = next_section_index,
+            resume_question_index = 0,
+            processed_event_ids = attempt.processed_event_ids || jsonb_build_array(p_event_id),
+            updated_at = now()
+        where id = attempt.id
+        returning * into attempt;
+        exit;
+      end if;
+
+      next_section_index := next_section_index + 1;
+    end loop;
+
+    if next_section_index >= jsonb_array_length(sections) then
+      update public.interview_attempts
+      set state = 'completed',
+          processed_event_ids = attempt.processed_event_ids || jsonb_build_array(p_event_id),
+          updated_at = now()
+      where id = attempt.id
+      returning * into attempt;
+    end if;
+  end if;
+
+  return query
+  select
+    attempt.state,
+    attempt.resume_section_index,
+    attempt.resume_question_index,
+    attempt.resume_follow_ups_used,
+    attempt.processed_event_ids;
+end;
+$$;
+
+revoke all on function public.advance_realtime_interview_session(text, uuid, text, uuid) from public;
+grant execute on function public.advance_realtime_interview_session(text, uuid, text, uuid) to anon, authenticated;
