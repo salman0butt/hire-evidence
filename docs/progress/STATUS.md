@@ -17,8 +17,8 @@ Realtime AI Interview — **ACTIVE**.
 Active branch: `feat/realtime-ai-interview`
 Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
 Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
-Latest verified behavioral/browser head: `db86e81fa19af2daf2c830c0b5cb0082fd118fd9`.
-CI status: CI #689 / `34765662964` passed the complete repository gate on `db86e81fa19af2daf2c830c0b5cb0082fd118fd9`: frozen install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase startup/migrations, production build, Chromium E2E, PRD coverage, and cleanup.
+Latest verified behavioral/browser head: `db86e81fa19af2daf2c830c0b5cb0082fd118fd9`, CI #689 / `34765662964` — complete repository gate GREEN.
+Latest verified documentation-reconciliation checkpoint: `f62363e1fa226dba3635551a73075b173c1f957f`, CI #696 / `34766225999` — complete repository gate GREEN after restoring the mandatory milestone recovery index.
 
 Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
@@ -38,14 +38,16 @@ Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 - M05.11 Realtime interview orchestration — **ACTIVE / PARTIALLY VERIFIED**. Deterministic multi-turn progression, barge-in routing, stale-callback rejection, safe candidate projection, and presentation are verified. Production provider/transport composition remains blocked.
 - M05.12 Timeout/error recovery — **VERIFIED (provider-neutral scope)**.
 - M05.13 Same-attempt reconnect — **VERIFIED (provider-neutral scope)**. Server-authoritative checkpoints, idempotent processed event IDs, capability-bound progress RPCs, immutable-plan restoration, stale-generation rejection, and persistence gating are verified. Provider-backed reconnect remains blocked.
-- M05.14 Full realtime E2E / milestone closeout — **ACTIVE / PARTIALLY VERIFIED**. Real candidate-page E2E proves keyboard focus, microphone denial/retry recovery, input enumeration/selection, mobile no-overflow, no recording during readiness checks, and now verifies the real production realtime-session endpoint fails closed without leaking the raw capability or any credential while provider configuration is absent. Stable provider-backed multi-turn voice completion remains blocked.
+- M05.14 Full realtime E2E / milestone closeout — **ACTIVE / PARTIALLY VERIFIED**. Real candidate-page E2E proves keyboard focus, microphone denial/retry recovery, input enumeration/selection, mobile no-overflow, no recording during readiness checks, and verifies the real production realtime-session endpoint fails closed without leaking the raw capability or any credential while provider configuration is absent. Stable provider-backed multi-turn voice completion remains blocked.
 
 ## Latest TDD / Verification Evidence
 
 - Production-route RED: `e5a38034fbb35203e47a97fa2491cca5142b116b`, CI #687 / `34765320016` — intended typecheck failure: `Cannot find module './route'`; the production realtime-session route was absent.
 - Production-route GREEN: `cf37ffadcea1bab410e32d89060df22138af4324`, CI #688 / `34765378818` — minimal fail-closed route added; complete repository gate GREEN.
 - Browser/API integration GREEN: `db86e81fa19af2daf2c830c0b5cb0082fd118fd9`, CI #689 / `34765662964` — real candidate invitation flow plus production endpoint verified constant-safe `503`, no capability leakage, and no credential exposure; complete repository gate GREEN.
-- Earlier M05.14 browser GREEN: `1c4635618aa1d3471284ca30cfb8658981afdd94`, CI #682 / `34734661625` — microphone denial/recovery, keyboard focus, input selection, mobile no-overflow, and no recording during readiness checks.
+- Documentation checkpoint `93895ca943c88b51436621b5823673026ff95ad2`, CI #695 / `34766106531` — **INVALID / NOT GREEN**. Lint, typecheck, 481 unit/component tests, and verifier unit tests passed, but `scripts/verify_autonomous_framework.py` correctly rejected the rewritten M05 ledger because mandatory heading `## Durable Recovery Sources` had been omitted. Subsequent build/E2E were skipped; this checkpoint is not completion evidence.
+- Framework-recovery GREEN: `f62363e1fa226dba3635551a73075b173c1f957f`, CI #696 / `34766225999` — restored the required recovery index; complete repository gate GREEN including autonomous/requirements verifiers, local Supabase, build, Chromium E2E, PRD coverage, and cleanup.
+- Earlier M05.14 browser GREEN: `1c4635618aa1d3471284ca30cfb8658981afdd94`, CI #682 / `34734661625`.
 - Earlier authoritative persistence reviewed GREEN: `5e9328d2f945cd10eaecea312896f29fbc93b10e`, CI #674 / `34733465242`.
 
 Detailed historical RED/GREEN evidence remains in `docs/milestones/M05-realtime-ai-interview.md` and Git history.
