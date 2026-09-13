@@ -98,6 +98,32 @@ describe("authorizeRealtimeSession", () => {
     expect(issueProviderCredential).not.toHaveBeenCalled();
   });
 
+  it("returns the authoritative checkpoint when resuming the same attempt", async () => {
+    const resumeCheckpoint = {
+      interviewerVersionId: "version-1",
+      sectionIndex: 1,
+      questionIndex: 0,
+      followUpsUsed: { "question-1": 1 },
+      processedEventIds: ["event-1"],
+    } as const;
+    const dependencies = deps({
+      getOrCreateAttempt: vi.fn().mockResolvedValue({
+        status: "ready",
+        attemptId: "attempt-1",
+        resumeCheckpoint,
+      }),
+    });
+
+    await expect(
+      authorizeRealtimeSession("candidate-token", dependencies),
+    ).resolves.toMatchObject({
+      status: "authorized",
+      attemptId: "attempt-1",
+      interviewerVersionId: "version-1",
+      resumeCheckpoint,
+    });
+  });
+
   it("authorizes a consented sent invitation before the server-owned start transition", async () => {
     const getOrCreateAttempt = vi.fn().mockResolvedValue({
       status: "ready",
