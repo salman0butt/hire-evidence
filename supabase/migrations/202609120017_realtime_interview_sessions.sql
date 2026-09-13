@@ -186,6 +186,7 @@ create or replace function public.advance_realtime_interview_session(
 )
 returns table (
   attempt_state text,
+  interviewer_version_id uuid,
   resume_section_index integer,
   resume_question_index integer,
   resume_follow_ups_used jsonb,
@@ -237,6 +238,7 @@ begin
     return query
     select
       attempt.state,
+      attempt.interviewer_version_id,
       attempt.resume_section_index,
       attempt.resume_question_index,
       attempt.resume_follow_ups_used,
@@ -321,6 +323,7 @@ begin
   return query
   select
     attempt.state,
+    attempt.interviewer_version_id,
     attempt.resume_section_index,
     attempt.resume_question_index,
     attempt.resume_follow_ups_used,
