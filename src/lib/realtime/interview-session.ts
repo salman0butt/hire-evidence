@@ -11,6 +11,10 @@ import {
   type RealtimeRecoveryDecision,
   type RealtimeTechnicalFailure,
 } from "./recovery";
+import {
+  restoreInterviewPlanState,
+  type RealtimeResumeCheckpoint,
+} from "./reconnect";
 import type { RealtimeTransportEvent } from "./transport";
 
 export type RealtimeInterviewSessionSnapshot = Readonly<{
@@ -61,9 +65,12 @@ function toSnapshot(
 export function createRealtimeInterviewSession(input: Readonly<{
   plan: InterviewPlanInput;
   playback: RealtimeAudioPlayback;
+  resumeCheckpoint?: RealtimeResumeCheckpoint | undefined;
   onSnapshot?: ((snapshot: RealtimeInterviewSessionSnapshot) => void) | undefined;
 }>): RealtimeInterviewSession {
-  let planState = createInterviewPlanState(input.plan);
+  let planState = input.resumeCheckpoint
+    ? restoreInterviewPlanState(input.plan, input.resumeCheckpoint)
+    : createInterviewPlanState(input.plan);
   let generation = 1;
   let ended = false;
 
