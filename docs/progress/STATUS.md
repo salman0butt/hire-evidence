@@ -1,6 +1,6 @@
 # Project Status
 
-Last reconciled: 2026-09-13
+Last reconciled: 2026-09-14
 
 ## Completed Milestones
 
@@ -18,8 +18,8 @@ Active branch: `feat/realtime-ai-interview`
 Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
 Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
 Latest verified behavioral/browser head: `db86e81fa19af2daf2c830c0b5cb0082fd118fd9`, CI #689 / `34765662964` — complete repository gate GREEN.
-Latest verified documentation-reconciliation checkpoint: `f62363e1fa226dba3635551a73075b173c1f957f`, CI #696 / `34766225999` — complete repository gate GREEN after restoring the mandatory milestone recovery index.
-CI status: exact head `ac1e1f3801356d9ac82dd6a46ebfbfd4f6f09f04`, CI #697 / `34766532207` — INVALID / NOT GREEN because `scripts/verify_autonomous_framework.py` rejected this file after the required `CI status:` marker was removed; lint, typecheck, 481 unit/component tests, and verifier unit tests had passed before the framework verification stop. This commit repairs that durable-state invariant and requires fresh exact-head CI.
+Latest verified documentation-reconciliation checkpoint: `d3964af513a5450aade2b7070e326a9d32133531`, CI #698 / `34767200086` — complete repository gate GREEN after restoring the mandatory `CI status:` recovery marker.
+CI status: exact verified head before this documentation-only reconciliation is `d3964af513a5450aade2b7070e326a9d32133531`, CI #698 / `34767200086` — GREEN. This status-only commit requires fresh exact-head CI before becoming the new verified documentation checkpoint.
 
 Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
@@ -48,7 +48,8 @@ Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 - Browser/API integration GREEN: `db86e81fa19af2daf2c830c0b5cb0082fd118fd9`, CI #689 / `34765662964` — real candidate invitation flow plus production endpoint verified constant-safe `503`, no capability leakage, and no credential exposure; complete repository gate GREEN.
 - Documentation checkpoint `93895ca943c88b51436621b5823673026ff95ad2`, CI #695 / `34766106531` — **INVALID / NOT GREEN**. Lint, typecheck, 481 unit/component tests, and verifier unit tests passed, but `scripts/verify_autonomous_framework.py` correctly rejected the rewritten M05 ledger because mandatory heading `## Durable Recovery Sources` had been omitted. Subsequent build/E2E were skipped; this checkpoint is not completion evidence.
 - Framework-recovery GREEN: `f62363e1fa226dba3635551a73075b173c1f957f`, CI #696 / `34766225999` — restored the required recovery index; complete repository gate GREEN including autonomous/requirements verifiers, local Supabase, build, Chromium E2E, PRD coverage, and cleanup.
-- Exact-head documentation regression `ac1e1f3801356d9ac82dd6a46ebfbfd4f6f09f04`, CI #697 / `34766532207` — **INVALID / NOT GREEN** because the required `CI status:` recovery marker was accidentally removed; no product-code test failed before the framework verifier stopped the run.
+- Documentation regression `ac1e1f3801356d9ac82dd6a46ebfbfd4f6f09f04`, CI #697 / `34766532207` — **INVALID / NOT GREEN** because the required `CI status:` recovery marker was accidentally removed; no product-code test failed before the framework verifier stopped the run.
+- Repaired exact-head GREEN: `d3964af513a5450aade2b7070e326a9d32133531`, CI #698 / `34767200086` — restored the mandatory status invariant; complete repository gate GREEN.
 - Earlier M05.14 browser GREEN: `1c4635618aa1d3471284ca30cfb8658981afdd94`, CI #682 / `34734661625`.
 - Earlier authoritative persistence reviewed GREEN: `5e9328d2f945cd10eaecea312896f29fbc93b10e`, CI #674 / `34733465242`.
 
