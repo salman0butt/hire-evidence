@@ -93,4 +93,26 @@ describe("realtime interview session migration", () => {
     expect(migration).toMatch(/revoke all on table public\.interview_attempts from authenticated/i);
     expect(migration).not.toMatch(/grant\s+select\s+on\s+(?:table\s+)?public\.interview_attempts/i);
   });
+
+  it("advances only the current authoritative question through a capability-bound progress RPC", () => {
+    const migration = readMigration();
+
+    expect(migration).toMatch(/create or replace function public\.advance_realtime_interview_session/i);
+    expect(migration).toMatch(/p_token_hash text/i);
+    expect(migration).toMatch(/p_attempt_id uuid/i);
+    expect(migration).toMatch(/p_event_id text/i);
+    expect(migration).toMatch(/p_question_id uuid/i);
+    expect(migration).toMatch(/security definer/i);
+    expect(migration).toMatch(/set search_path\s*=\s*''/i);
+    expect(migration).toMatch(/candidate_invitation\.token_hash\s*=\s*p_token_hash/i);
+    expect(migration).toMatch(/candidate_invitation\.expires_at\s*>\s*now\(\)/i);
+    expect(migration).toMatch(/candidate_invitation\.revoked_at is null/i);
+    expect(migration).toMatch(/attempt\.state\s*=\s*'active'/i);
+    expect(migration).toMatch(/interviewer_version\.snapshot\s*->\s*'interview_plan'\s*->\s*'sections'/i);
+    expect(migration).toMatch(/current_question_id\s*<>\s*p_question_id/i);
+    expect(migration).toMatch(/processed_event_ids\s*=\s*attempt\.processed_event_ids\s*\|\|\s*jsonb_build_array\(p_event_id\)/i);
+    expect(migration).toMatch(/resume_question_index\s*=\s*attempt\.resume_question_index\s*\+\s*1/i);
+    expect(migration).toMatch(/state\s*=\s*'completed'/i);
+    expect(migration).toMatch(/grant execute on function public\.advance_realtime_interview_session/i);
+  });
 });
