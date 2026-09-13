@@ -143,6 +143,10 @@ describe("realtime interview session orchestration", () => {
       2,
     );
 
+    if (!decision) {
+      throw new Error("Expected an active-session recovery decision.");
+    }
+
     expect(decision.action).toBe("end-safe");
     expect(decision.affectsEvaluation).toBe(false);
     expect(decision.reason).not.toContain("sensitive server detail");
