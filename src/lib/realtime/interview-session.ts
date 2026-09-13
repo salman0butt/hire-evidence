@@ -158,7 +158,14 @@ export function createRealtimeInterviewSession(input: Readonly<{
       }
 
       if (persisted.status === "active") {
-        planState = restoreInterviewPlanState(input.plan, persisted.checkpoint);
+        let restoredState: InterviewPlanRunnerState;
+        try {
+          restoredState = restoreInterviewPlanState(input.plan, persisted.checkpoint);
+        } catch {
+          return;
+        }
+
+        planState = restoredState;
         input.onResumeCheckpoint?.(persisted.checkpoint);
       } else {
         if (next.status !== "completed") {
