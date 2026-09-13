@@ -1,3 +1,5 @@
+import type { RealtimeResumeCheckpoint } from "./reconnect";
+
 export type CandidateRealtimeSession =
   | Readonly<{ status: "unavailable" }>
   | Readonly<{
@@ -12,7 +14,11 @@ export type CandidateRealtimeSession =
     }>;
 
 export type RealtimeAttemptResult =
-  | Readonly<{ status: "ready"; attemptId: string }>
+  | Readonly<{
+      status: "ready";
+      attemptId: string;
+      resumeCheckpoint?: RealtimeResumeCheckpoint | undefined;
+    }>
   | Readonly<{ status: "conflict" }>;
 
 export type ProviderCredential = Readonly<{
@@ -47,6 +53,7 @@ export type RealtimeSessionAuthorization =
       durationSeconds: number;
       language: string;
       providerCredential: ProviderCredential;
+      resumeCheckpoint?: RealtimeResumeCheckpoint | undefined;
     }>;
 
 const unavailable: RealtimeSessionAuthorization = { status: "unavailable" };
@@ -99,5 +106,8 @@ export async function authorizeRealtimeSession(
     durationSeconds: candidateSession.durationSeconds,
     language: candidateSession.language,
     providerCredential,
+    ...(attempt.resumeCheckpoint
+      ? { resumeCheckpoint: attempt.resumeCheckpoint }
+      : {}),
   };
 }
