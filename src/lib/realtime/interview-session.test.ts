@@ -85,6 +85,82 @@ describe("realtime interview session orchestration", () => {
     ]);
   });
 
+  it("waits for authoritative persistence before committing local question progression", async () => {
+    let resolveProgress:
+      | ((value: {
+          status: "active";
+          checkpoint: {
+            interviewerVersionId: string;
+            sectionIndex: number;
+            questionIndex: number;
+            followUpsUsed: Record<string, number>;
+            processedEventIds: string[];
+          };
+        }) => void)
+      | undefined;
+    const persistProgress = vi.fn(
+      () =>
+        new Promise<{
+          status: "active";
+          checkpoint: {
+            interviewerVersionId: string;
+            sectionIndex: number;
+            questionIndex: number;
+            followUpsUsed: Record<string, number>;
+            processedEventIds: string[];
+          };
+        }>((resolve) => {
+          resolveProgress = resolve;
+        }),
+    );
+    const session = createRealtimeInterviewSession({
+      plan,
+      playback: createPlayback(),
+      persistProgress,
+    });
+
+    const completion = session.completeCurrentQuestion("turn-1");
+
+    expect(persistProgress).toHaveBeenCalledWith({
+      eventId: "turn-1",
+      questionId: "question-1",
+    });
+    expect(session.getSnapshot().currentQuestion?.questionId).toBe("question-1");
+
+    resolveProgress?.({
+      status: "active",
+      checkpoint: {
+        interviewerVersionId: "version-1",
+        sectionIndex: 0,
+        questionIndex: 1,
+        followUpsUsed: {},
+        processedEventIds: ["turn-1"],
+      },
+    });
+    await completion;
+
+    expect(session.getSnapshot().currentQuestion?.questionId).toBe("question-2");
+  });
+
+  it("fails closed without advancing local plan state when authoritative persistence conflicts", async () => {
+    const persistProgress = vi.fn().mockResolvedValue({ status: "conflict" as const });
+    const snapshots: RealtimeInterviewSessionSnapshot[] = [];
+    const session = createRealtimeInterviewSession({
+      plan,
+      playback: createPlayback(),
+      persistProgress,
+      onSnapshot: (snapshot) => snapshots.push(snapshot),
+    });
+
+    await session.completeCurrentQuestion("turn-1");
+
+    expect(session.getSnapshot()).toMatchObject({
+      status: "active",
+      currentQuestion: { questionId: "question-1" },
+    });
+    expect(snapshots).toEqual([]);
+  });
+
   it("routes provider audio to playback and barge-in only interrupts playback", () => {
     const playback = createPlayback();
     const session = createRealtimeInterviewSession({ plan, playback });
