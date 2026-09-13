@@ -165,6 +165,10 @@ python3 scripts/verify_prd_coverage.py
 
 plus focused realtime/provider/browser/security tests required by the active unit.
 
+## Durable Recovery Sources
+
+Recover actual Git/GitHub first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md`, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, this milestone ledger, `docs/SESSION-HANDOFF.md`, `docs/requirements/TRACEABILITY.md`, the authoritative requirements/PRD source, and the selected M05 design/plan. Actual Git graph, source/tests, and exact-SHA CI outrank stale Markdown or prior chat/task summaries.
+
 ## Completion Checklist
 - [ ] Requirements and all M05 iterations accounted for.
 - [ ] Stable multi-turn candidate interview acceptance criterion verified.
