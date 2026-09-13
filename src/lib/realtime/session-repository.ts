@@ -38,6 +38,7 @@ type RealtimeAttemptRow = Readonly<{
 
 type RealtimeProgressRow = Readonly<{
   attempt_state: "active" | "completed";
+  interviewer_version_id: string;
   resume_section_index: number;
   resume_question_index: number;
   resume_follow_ups_used: Readonly<Record<string, number>>;
@@ -129,6 +130,7 @@ function isRealtimeProgressRow(value: unknown): value is RealtimeProgressRow {
   const row = value as Record<string, unknown>;
   return (
     (row.attempt_state === "active" || row.attempt_state === "completed") &&
+    isNonEmptyString(row.interviewer_version_id) &&
     isNonNegativeInteger(row.resume_section_index) &&
     isNonNegativeInteger(row.resume_question_index) &&
     isFollowUpsUsed(row.resume_follow_ups_used) &&
@@ -229,7 +231,7 @@ export function createRealtimeSessionRepository(rpc: Rpc): RealtimeSessionReposi
       return {
         status: "active",
         checkpoint: Object.freeze({
-          interviewerVersionId: input.interviewerVersionId,
+          interviewerVersionId: row.interviewer_version_id,
           sectionIndex: row.resume_section_index,
           questionIndex: row.resume_question_index,
           followUpsUsed: Object.freeze({ ...row.resume_follow_ups_used }),
