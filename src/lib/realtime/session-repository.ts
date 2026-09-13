@@ -36,6 +36,36 @@ type RealtimeAttemptRow = Readonly<{
   processed_event_ids: readonly string[];
 }>;
 
+type RealtimeProgressRow = Readonly<{
+  attempt_state: "active" | "completed";
+  resume_section_index: number;
+  resume_question_index: number;
+  resume_follow_ups_used: Readonly<Record<string, number>>;
+  processed_event_ids: readonly string[];
+}>;
+
+export type RealtimeAttemptProgressResult =
+  | Readonly<{
+      status: "active";
+      checkpoint: RealtimeResumeCheckpoint;
+    }>
+  | Readonly<{ status: "completed" }>
+  | Readonly<{ status: "conflict" }>;
+
+export type RealtimeSessionRepository = Pick<
+  RealtimeSessionAuthorizationDeps,
+  "resolveCandidateSession" | "getOrCreateAttempt"
+> &
+  Readonly<{
+    advanceAttemptProgress(input: Readonly<{
+      rawToken: string;
+      attemptId: string;
+      eventId: string;
+      questionId: string;
+      interviewerVersionId: string;
+    }>): Promise<RealtimeAttemptProgressResult>;
+  }>;
+
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
@@ -93,6 +123,19 @@ function isRealtimeAttemptRow(value: unknown): value is RealtimeAttemptRow {
   );
 }
 
+function isRealtimeProgressRow(value: unknown): value is RealtimeProgressRow {
+  if (!value || typeof value !== "object") return false;
+
+  const row = value as Record<string, unknown>;
+  return (
+    (row.attempt_state === "active" || row.attempt_state === "completed") &&
+    isNonNegativeInteger(row.resume_section_index) &&
+    isNonNegativeInteger(row.resume_question_index) &&
+    isFollowUpsUsed(row.resume_follow_ups_used) &&
+    isProcessedEventIds(row.processed_event_ids)
+  );
+}
+
 function toResumeCheckpoint(row: RealtimeAttemptRow): RealtimeResumeCheckpoint {
   return Object.freeze({
     interviewerVersionId: row.interviewer_version_id,
@@ -103,10 +146,7 @@ function toResumeCheckpoint(row: RealtimeAttemptRow): RealtimeResumeCheckpoint {
   });
 }
 
-export function createRealtimeSessionRepository(rpc: Rpc): Pick<
-  RealtimeSessionAuthorizationDeps,
-  "resolveCandidateSession" | "getOrCreateAttempt"
-> {
+export function createRealtimeSessionRepository(rpc: Rpc): RealtimeSessionRepository {
   return {
     async resolveCandidateSession(rawToken): Promise<CandidateRealtimeSession> {
       if (!rawToken) return { status: "unavailable" };
@@ -156,6 +196,45 @@ export function createRealtimeSessionRepository(rpc: Rpc): Pick<
         status: "ready",
         attemptId: row.attempt_id,
         resumeCheckpoint: toResumeCheckpoint(row),
+      };
+    },
+
+    async advanceAttemptProgress(input): Promise<RealtimeAttemptProgressResult> {
+      if (
+        !input.rawToken ||
+        !input.attemptId ||
+        !input.eventId ||
+        !input.questionId ||
+        !input.interviewerVersionId
+      ) {
+        return { status: "conflict" };
+      }
+
+      const { data, error } = await rpc("advance_realtime_interview_session", {
+        p_token_hash: hashInvitationToken(input.rawToken),
+        p_attempt_id: input.attemptId,
+        p_event_id: input.eventId,
+        p_question_id: input.questionId,
+      });
+
+      if (error || !Array.isArray(data) || data.length !== 1 || !isRealtimeProgressRow(data[0])) {
+        return { status: "conflict" };
+      }
+
+      const row = data[0];
+      if (row.attempt_state === "completed") {
+        return { status: "completed" };
+      }
+
+      return {
+        status: "active",
+        checkpoint: Object.freeze({
+          interviewerVersionId: input.interviewerVersionId,
+          sectionIndex: row.resume_section_index,
+          questionIndex: row.resume_question_index,
+          followUpsUsed: Object.freeze({ ...row.resume_follow_ups_used }),
+          processedEventIds: Object.freeze([...row.processed_event_ids]),
+        }),
       };
     },
   };
