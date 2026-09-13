@@ -95,6 +95,28 @@ describe("realtime interview session orchestration", () => {
     expect(session.getSnapshot().currentQuestion?.questionId).toBe("question-1");
   });
 
+  it("starts a reauthorized browser session from the server-authoritative checkpoint", () => {
+    const session = createRealtimeInterviewSession({
+      plan,
+      playback: createPlayback(),
+      resumeCheckpoint: {
+        interviewerVersionId: "version-1",
+        sectionIndex: 0,
+        questionIndex: 1,
+        followUpsUsed: { "question-1": 1 },
+        processedEventIds: ["question-1-complete"],
+      },
+    });
+
+    expect(session.getSnapshot()).toMatchObject({
+      status: "active",
+      currentQuestion: {
+        questionId: "question-2",
+        prompt: "What trade-off did you make?",
+      },
+    });
+  });
+
   it("exposes only candidate-safe plan state and no secret or scoring configuration", () => {
     const session = createRealtimeInterviewSession({ plan, playback: createPlayback() });
     const serialized = JSON.stringify(session.getSnapshot());
