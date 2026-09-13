@@ -15,6 +15,7 @@ import {
   restoreInterviewPlanState,
   type RealtimeResumeCheckpoint,
 } from "./reconnect";
+import type { RealtimeAttemptProgressResult } from "./session-repository";
 import type { RealtimeTransportEvent } from "./transport";
 
 export type RealtimeInterviewSessionSnapshot = Readonly<{
@@ -31,7 +32,7 @@ export type RealtimeInterviewSessionSnapshot = Readonly<{
 export type RealtimeInterviewSession = Readonly<{
   getSnapshot(): RealtimeInterviewSessionSnapshot;
   handleTransportEvent(event: RealtimeTransportEvent, generation?: number): void;
-  completeCurrentQuestion(eventId: string, generation?: number): void;
+  completeCurrentQuestion(eventId: string, generation?: number): Promise<void>;
   handleTechnicalFailure(
     failure: RealtimeTechnicalFailure,
     retryCount: number,
@@ -76,6 +77,9 @@ export function createRealtimeInterviewSession(input: Readonly<{
   plan: InterviewPlanInput;
   playback: RealtimeAudioPlayback;
   resumeCheckpoint?: RealtimeResumeCheckpoint | undefined;
+  persistProgress?:
+    | ((input: Readonly<{ eventId: string; questionId: string }>) => Promise<RealtimeAttemptProgressResult>)
+    | undefined;
   onSnapshot?: ((snapshot: RealtimeInterviewSessionSnapshot) => void) | undefined;
   onResumeCheckpoint?: ((checkpoint: RealtimeResumeCheckpoint) => void) | undefined;
 }>): RealtimeInterviewSession {
@@ -110,7 +114,7 @@ export function createRealtimeInterviewSession(input: Readonly<{
     }
   }
 
-  function completeCurrentQuestion(eventId: string, eventGeneration = generation) {
+  async function completeCurrentQuestion(eventId: string, eventGeneration = generation) {
     if (eventGeneration !== generation || ended) {
       return;
     }
@@ -127,6 +131,43 @@ export function createRealtimeInterviewSession(input: Readonly<{
     });
 
     if (next === planState) {
+      return;
+    }
+
+    if (input.persistProgress) {
+      let persisted: RealtimeAttemptProgressResult;
+      try {
+        persisted = await input.persistProgress({
+          eventId,
+          questionId: current.questionId,
+        });
+      } catch {
+        return;
+      }
+
+      if (
+        eventGeneration !== generation ||
+        ended ||
+        getCurrentInterviewQuestion(planState)?.questionId !== current.questionId
+      ) {
+        return;
+      }
+
+      if (persisted.status === "conflict") {
+        return;
+      }
+
+      if (persisted.status === "active") {
+        planState = restoreInterviewPlanState(input.plan, persisted.checkpoint);
+        input.onResumeCheckpoint?.(persisted.checkpoint);
+      } else {
+        if (next.status !== "completed") {
+          return;
+        }
+        planState = next;
+      }
+
+      publishSnapshot();
       return;
     }
 
