@@ -107,6 +107,7 @@ export function createRealtimeInterviewSession(input: Readonly<{
         input.playback.enqueue(event.pcm, event.sampleRate);
         return;
       case "candidateSpeechStart":
+      case "interrupted":
         input.playback.interrupt();
         return;
       default:
