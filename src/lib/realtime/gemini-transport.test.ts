@@ -67,6 +67,8 @@ describe("Gemini Live realtime transport adapter", () => {
         generationConfig: {
           responseModalities: ["AUDIO"],
         },
+        inputAudioTranscription: {},
+        outputAudioTranscription: {},
         sessionResumption: {},
       },
     });
