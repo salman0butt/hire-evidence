@@ -8,6 +8,8 @@ import type { RealtimeInterviewSessionSnapshot } from "@/lib/realtime/interview-
 import type { RealtimeInterviewRuntime } from "@/lib/realtime/realtime-interview-runtime";
 import type { RealtimeTechnicalFailure } from "@/lib/realtime/recovery";
 import type { RealtimeSessionAuthorization } from "@/lib/realtime/session-authorization";
+import { createRealtimeTechnicalEventClient } from "@/lib/realtime/technical-event-client";
+import type { TechnicalEventCategory } from "@/lib/realtime/technical-event-repository";
 
 import { RealtimeInterview } from "./realtime-interview";
 
@@ -36,6 +38,24 @@ type LauncherState =
   | "error";
 
 const MAX_RECOVERY_ATTEMPTS = 2;
+
+function technicalEventCategoryForFailure(
+  failure: RealtimeTechnicalFailure,
+): TechnicalEventCategory {
+  if (failure.kind === "microphone-lost") return "microphone_failure";
+  if (failure.kind === "browser-unsupported") return "browser_disconnect";
+  if (
+    failure.kind === "provider-closed" ||
+    failure.kind === "provider-error" ||
+    failure.kind === "credential-expired" ||
+    failure.kind === "send-failed" ||
+    failure.kind === "decode-failed"
+  ) {
+    return "provider_disconnect";
+  }
+
+  return "reconnect_failure";
+}
 
 function isAuthorizedRealtimeSession(value: unknown): value is AuthorizedRealtimeSession {
   if (!value || typeof value !== "object") return false;
@@ -126,6 +146,10 @@ export function RealtimeInterviewLauncher({
       return;
     }
 
+    const recordTechnicalEvent = createRealtimeTechnicalEventClient({
+      rawToken: token,
+      attemptId: result.attemptId,
+    });
     const runtime = createRuntime(
       result,
       (snapshot) => {
@@ -134,8 +158,12 @@ export function RealtimeInterviewLauncher({
         }
       },
       token,
-      () => {
+      (failure) => {
         if (runtimeRef.current === runtime) {
+          void recordTechnicalEvent({
+            category: technicalEventCategoryForFailure(failure),
+            occurredAt: new Date().toISOString(),
+          }).catch(() => undefined);
           void recoverRuntime(runtime, recoveryAttempt);
         }
       },
