@@ -1,3 +1,4 @@
+import type { InterviewPlanInput } from "./plan-runner";
 import type { RealtimeResumeCheckpoint } from "./reconnect";
 
 export type CandidateRealtimeSession =
@@ -11,6 +12,7 @@ export type CandidateRealtimeSession =
       language: string;
       hasCurrentConsent: boolean;
       lifecycle: "sent" | "opened" | "started" | "completed";
+      interviewPlan: InterviewPlanInput;
     }>;
 
 export type RealtimeAttemptResult =
@@ -52,6 +54,7 @@ export type RealtimeSessionAuthorization =
       interviewerVersionId: string;
       durationSeconds: number;
       language: string;
+      interviewPlan: InterviewPlanInput;
       providerCredential: ProviderCredential;
       resumeCheckpoint?: RealtimeResumeCheckpoint | undefined;
     }>;
@@ -78,6 +81,7 @@ export async function authorizeRealtimeSession(
   if (
     !candidateSession.hasCurrentConsent ||
     !candidateSession.interviewerVersionId ||
+    candidateSession.interviewPlan.versionId !== candidateSession.interviewerVersionId ||
     !isEligibleLifecycle(candidateSession.lifecycle)
   ) {
     return unavailable;
@@ -105,6 +109,7 @@ export async function authorizeRealtimeSession(
     interviewerVersionId: candidateSession.interviewerVersionId,
     durationSeconds: candidateSession.durationSeconds,
     language: candidateSession.language,
+    interviewPlan: candidateSession.interviewPlan,
     providerCredential,
     ...(attempt.resumeCheckpoint
       ? { resumeCheckpoint: attempt.resumeCheckpoint }
