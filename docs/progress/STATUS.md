@@ -18,7 +18,7 @@ Active branch: `feat/realtime-ai-interview`
 Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT / unmerged.
 Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
 Latest verified behavioral head before this documentation reconciliation: `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN, including lint, typecheck, unit/component tests, framework/source verifiers, build, Chromium E2E, and PRD coverage.
-This documentation reconciliation creates a newer branch head and therefore requires fresh exact-head CI before it can serve as a final branch verification checkpoint.
+CI status: behavioral head `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — GREEN. Documentation head `3914a347a47090f666a5458014196d9ca9d4a338`, CI #778 / `34859783065` — NOT GREEN because `scripts/verify_autonomous_framework.py` required this literal `CI status:` field; lint, typecheck, 125 test files / 506 tests, and verifier unit tests passed before that contract failure. This correction requires fresh exact-head CI.
 
 Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
@@ -47,6 +47,7 @@ Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
 - Production browser runtime composition E2E covers default launcher/runtime wiring and same-attempt reconnect after a synthetic disconnect while preventing the short-lived credential from rendering in candidate UI.
 - Provider-interruption barge-in RED: `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772 / `34857082289` — intentionally FAILED because provider `interrupted` did not stop obsolete playback.
 - Provider-interruption GREEN: `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN after routing provider `interrupted` through playback interruption.
+- Documentation checkpoint `3914a347a47090f666a5458014196d9ca9d4a338`, CI #778 / `34859783065` — **NOT GREEN**. Lint, typecheck, 125 test files / 506 tests, framework-verifier tests, and requirements-source-verifier tests passed; the autonomous framework verifier correctly rejected the missing literal `CI status:` durable-status contract. The downstream `supabase: command not found` cleanup message followed skipped Supabase setup and was not the root cause.
 
 Detailed historical RED/GREEN evidence remains in `docs/milestones/M05-realtime-ai-interview.md` and Git history.
 
@@ -69,4 +70,4 @@ Production browser composition and deterministic reconnect/barge-in coverage are
 
 Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M05-realtime-ai-interview.md`, `docs/SESSION-HANDOFF.md`, requirements/traceability, and the selected M05 design/plan. Git/code/current exact-SHA CI outrank stale Markdown.
 
-Exact next work: verify this documentation reconciliation head with the complete CI gate, then execute live Gemini-backed multi-turn browser acceptance when server `GEMINI_API_KEY` is available. Verify live interruption/barge-in, timeout/error recovery, bounded same-attempt reconnect, mute/end controls, accessibility/mobile behavior, and invitation safety; reconcile M05 ledger/traceability/known issues/handoff; perform skeptical closeout review; run the complete quality gate; and keep PR #7 draft until every milestone merge gate is satisfied.
+Exact next work: verify this corrected documentation reconciliation head with the complete CI gate, then execute live Gemini-backed multi-turn browser acceptance when server `GEMINI_API_KEY` is available. Verify live interruption/barge-in, timeout/error recovery, bounded same-attempt reconnect, mute/end controls, accessibility/mobile behavior, and invitation safety; reconcile M05 ledger/traceability/known issues/handoff; perform skeptical closeout review; run the complete quality gate; and keep PR #7 draft until every milestone merge gate is satisfied.
