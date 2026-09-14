@@ -25,7 +25,13 @@ function createPlaybackContext(): RealtimePlaybackAudioContext {
   return {
     destination: context.destination,
     createBuffer(numberOfChannels, length, sampleRate) {
-      return context.createBuffer(numberOfChannels, length, sampleRate);
+      const buffer = context.createBuffer(numberOfChannels, length, sampleRate);
+      return {
+        sampleRate: buffer.sampleRate,
+        copyToChannel(data, channelNumber = 0) {
+          buffer.copyToChannel(new Float32Array(data), channelNumber);
+        },
+      };
     },
     createBufferSource() {
       const source = context.createBufferSource();
