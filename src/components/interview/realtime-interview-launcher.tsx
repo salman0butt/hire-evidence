@@ -8,6 +8,8 @@ import type { RealtimeInterviewSessionSnapshot } from "@/lib/realtime/interview-
 import type { RealtimeInterviewRuntime } from "@/lib/realtime/realtime-interview-runtime";
 import type { RealtimeTechnicalFailure } from "@/lib/realtime/recovery";
 import type { RealtimeSessionAuthorization } from "@/lib/realtime/session-authorization";
+import { createRealtimeTechnicalEventClient } from "@/lib/realtime/technical-event-client";
+import type { TechnicalEventCategory } from "@/lib/realtime/technical-event-repository";
 
 import { RealtimeInterview } from "./realtime-interview";
 
@@ -36,6 +38,24 @@ type LauncherState =
   | "error";
 
 const MAX_RECOVERY_ATTEMPTS = 2;
+
+function technicalEventCategoryForFailure(
+  failure: RealtimeTechnicalFailure,
+): TechnicalEventCategory {
+  if (failure.kind === "microphone-lost") return "microphone_failure";
+  if (failure.kind === "browser-unsupported") return "browser_disconnect";
+  if (
+    failure.kind === "provider-closed" ||
+    failure.kind === "provider-error" ||
+    failure.kind === "credential-expired" ||
+    failure.kind === "send-failed" ||
+    failure.kind === "decode-failed"
+  ) {
+    return "provider_disconnect";
+  }
+
+  return "reconnect_failure";
+}
 
 function isAuthorizedRealtimeSession(value: unknown): value is AuthorizedRealtimeSession {
   if (!value || typeof value !== "object") return false;
@@ -84,6 +104,26 @@ async function authorizeRealtimeInterview(
   }
 }
 
+async function finalizeRealtimeInterview(
+  token: string,
+  attemptId: string,
+): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `/api/interview/${encodeURIComponent(token)}/realtime-finalize`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ attemptId }),
+      },
+    );
+
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 function connectedState(snapshot: RealtimeInterviewSessionSnapshot): RealtimeConnectionState {
   return {
     connection: snapshot.status === "ended" ? "ended" : "connected",
@@ -103,6 +143,8 @@ export function RealtimeInterviewLauncher({
   const [sessionSnapshot, setSessionSnapshot] =
     useState<RealtimeInterviewSessionSnapshot | null>(null);
   const runtimeRef = useRef<RealtimeInterviewRuntime | null>(null);
+  const attemptIdRef = useRef<string | null>(null);
+  const finalizationRef = useRef<Promise<void> | null>(null);
   const operationGenerationRef = useRef(0);
 
   useEffect(
@@ -110,10 +152,50 @@ export function RealtimeInterviewLauncher({
       operationGenerationRef.current += 1;
       const runtime = runtimeRef.current;
       runtimeRef.current = null;
+      attemptIdRef.current = null;
       void runtime?.stop();
     },
     [],
   );
+
+  async function finalizeAttempt(runtime: RealtimeInterviewRuntime | null) {
+    if (finalizationRef.current) {
+      await finalizationRef.current;
+      return;
+    }
+
+    const attemptId = attemptIdRef.current;
+    if (!attemptId) {
+      setState("error");
+      return;
+    }
+
+    operationGenerationRef.current += 1;
+    if (runtimeRef.current === runtime) {
+      runtimeRef.current = null;
+    }
+    attemptIdRef.current = null;
+
+    const finalization = (async () => {
+      await runtime?.stop();
+
+      if (!(await finalizeRealtimeInterview(token, attemptId))) {
+        setState("error");
+        return;
+      }
+
+      setState("ended");
+    })();
+
+    finalizationRef.current = finalization;
+    try {
+      await finalization;
+    } finally {
+      if (finalizationRef.current === finalization) {
+        finalizationRef.current = null;
+      }
+    }
+  }
 
   async function connectRuntime(recoveryAttempt: number) {
     const operationGeneration = ++operationGenerationRef.current;
@@ -126,17 +208,34 @@ export function RealtimeInterviewLauncher({
       return;
     }
 
+    attemptIdRef.current = result.attemptId;
+    const recordTechnicalEvent = createRealtimeTechnicalEventClient({
+      rawToken: token,
+      attemptId: result.attemptId,
+    });
     const runtime = createRuntime(
       result,
       (snapshot) => {
         if (runtimeRef.current === runtime) {
           setSessionSnapshot(snapshot);
+          if (snapshot.status === "completed") {
+            void finalizeAttempt(runtime);
+          }
         }
       },
       token,
-      () => {
+      (failure) => {
         if (runtimeRef.current === runtime) {
-          void recoverRuntime(runtime, recoveryAttempt);
+          void recordTechnicalEvent({
+            category: technicalEventCategoryForFailure(failure),
+            occurredAt: new Date().toISOString(),
+          }).catch(() => undefined);
+          void recoverRuntime(runtime, recoveryAttempt, () => {
+            void recordTechnicalEvent({
+              category: "reconnect_failure",
+              occurredAt: new Date().toISOString(),
+            }).catch(() => undefined);
+          });
         }
       },
     );
@@ -158,6 +257,7 @@ export function RealtimeInterviewLauncher({
         runtimeRef.current === runtime
       ) {
         runtimeRef.current = null;
+        attemptIdRef.current = null;
         await runtime.stop();
         if (operationGenerationRef.current === operationGeneration) {
           setState("error");
@@ -169,6 +269,7 @@ export function RealtimeInterviewLauncher({
   async function recoverRuntime(
     runtime: RealtimeInterviewRuntime,
     recoveryAttempt: number,
+    recordReconnectFailure: () => void,
   ) {
     if (runtimeRef.current !== runtime) return;
 
@@ -179,6 +280,7 @@ export function RealtimeInterviewLauncher({
 
     if (operationGenerationRef.current !== stopGeneration) return;
     if (recoveryAttempt >= MAX_RECOVERY_ATTEMPTS) {
+      recordReconnectFailure();
       setState("error");
       return;
     }
@@ -206,11 +308,7 @@ export function RealtimeInterviewLauncher({
   }
 
   async function handleEnd() {
-    operationGenerationRef.current += 1;
-    const runtime = runtimeRef.current;
-    runtimeRef.current = null;
-    await runtime?.stop();
-    setState("ended");
+    await finalizeAttempt(runtimeRef.current);
   }
 
   const showInterview =

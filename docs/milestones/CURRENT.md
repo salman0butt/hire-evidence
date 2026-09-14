@@ -1,80 +1,70 @@
 # Current Milestone
 
 Milestone:
-Realtime AI Interview
+Transcript + Durable Session
 
 Legacy roadmap identifier:
-M05
+M06
 
 Status:
-CLOSEOUT / MERGE GATE
+IMPLEMENTATION COMPLETE — MERGE GATE
 
 Branch:
-`feat/realtime-ai-interview`
+`feat/transcript-durable-session`
 
 Base:
-`main` at verified M04 merge SHA `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`
+`main` at verified M05 merge SHA `5c3843c6444bad256974ea391a4a6a978bf88f24`
 
 PR:
-#7 — `Build realtime AI interview` — OPEN / DRAFT until the final exact-head closeout gate is green. Reuse this PR; do not create a duplicate.
+#8 — `Build transcript durable session` — OPEN / DRAFT pending exact-final-head closeout CI. Reuse this PR; do not create a duplicate.
 
 Canonical compact recovery state:
 `docs/progress/STATUS.md`
 
 ## Iterations
 
-1. M05.1 — Reference characterization — **VERIFIED**.
-2. M05.2 — Session authorization/provider boundary — **VERIFIED**. Authoritative attempt binding, consent/version gating, constrained Gemini Live ephemeral credential issuance, production realtime-session endpoint, and capability-bound realtime-progress endpoint are implemented. Long-lived `GEMINI_API_KEY` remains server-only and missing configuration fails closed.
-3. M05.3 — Browser compatibility + microphone diagnostics — **VERIFIED**.
-4. M05.4 — Deterministic Web Audio capture — **VERIFIED**.
-5. M05.5 — Provider-neutral realtime transport — **VERIFIED (REPOSITORY SCOPE)**. The provider-neutral boundary and Gemini Live adapter are isolated behind the app-owned transport interface.
-6. M05.6 — AI audio playback — **VERIFIED**. Provider interruption and candidate-speech barge-in both interrupt obsolete playback.
-7. M05.7 — Connection state machine + accessible controls — **VERIFIED**.
-8. M05.8 — Deterministic interview-plan execution — **VERIFIED**.
-9. M05.9 — Pacing/time budget — **VERIFIED**.
-10. M05.10 — Bounded follow-ups — **VERIFIED**.
-11. M05.11 — Realtime orchestration — **VERIFIED (REPOSITORY SCOPE)**. Production browser runtime composition, capability authorization, authoritative snapshots, capture/playback/Gemini transport, mute/end controls, and interruption handling are covered by deterministic repository tests.
-12. M05.12 — Timeout/error handling — **VERIFIED**.
-13. M05.13 — Same-attempt reconnect — **VERIFIED**. Server-authoritative checkpoints, idempotent processed event IDs, capability-bound progress persistence, immutable-plan restoration, stale-generation rejection, persistence gating, and deterministic production-browser disconnect→reauthorize reconnect are covered.
-14. M05.14 — Full realtime E2E and closeout — **REPOSITORY ACCEPTANCE COMPLETE / FINAL CI PENDING**. Deterministic browser acceptance covers production launcher/runtime composition, short-lived credential non-display, same-attempt reconnect, mute/end controls, readiness/accessibility, mobile layout, safe unavailable-provider behavior, and relevant realtime failure paths.
-
-## Owner-Approved Live Provider Deferral
-
-On 2026-09-14 the repository owner explicitly chose to provide real Gemini credentials locally and instructed autonomous development to complete the repository without blocking on that external credential.
-
-This changes the acceptance classification, not the facts:
-
-- no live Gemini-backed browser run is claimed;
-- deterministic repository acceptance remains the M05 merge gate;
-- the real-provider smoke is a local/deployment acceptance check documented in `docs/LOCAL-REALTIME-ACCEPTANCE.md`;
-- any failure found by that future smoke is a real defect and must be fixed before relying on that deployment;
-- long-lived provider secrets remain server-only and all safety/privacy/evidence-integrity boundaries remain unchanged.
+1. M06.1 — Provider event normalization — **VERIFIED**.
+2. M06.2 — Ephemeral partials vs immutable finalized transcript state — **VERIFIED**.
+3. M06.3 — Attempt-scoped durable finalized transcript messages — **VERIFIED**.
+4. M06.4 — Duplicate/order/speaker/immutability correctness guards — **VERIFIED**.
+5. M06.5 — Idempotent attempt lifecycle — **VERIFIED**.
+6. M06.6 — Same-attempt reconnect transcript restoration — **VERIFIED**.
+7. M06.7 — Separate technical interruption events — **VERIFIED**.
+8. M06.8 — Idempotent session finalization — **VERIFIED**.
+9. M06.9 — Durability browser acceptance and milestone closeout — **VERIFIED**.
 
 ## Latest Verification
 
-M04 PR #6 was squash-merged to `main` as `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`; post-merge CI #517 / `34692492691` passed the complete repository gate.
+M05 merged to `main` as `5c3843c6444bad256974ea391a4a6a978bf88f24` before M06 activation.
 
-Provider-interruption TDD RED: `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772 / `34857082289` — expected failure because provider `interrupted` did not stop obsolete playback.
+M06.4 chronology RED: `f34d095fb5607bddef3252cfec5a04228954153a`, CI #821 / run `34884154545`; GREEN: `ef898009c063c57a42af1ae64463719a77e13d50`, CI #822 / run `34884400868`.
 
-Provider-interruption GREEN: `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN after the minimal interruption fix.
+M06.5 terminal-replay RED: `8117a3eed5ab3114e1ed81697f680dd8c8f98699`, CI #823 / run `34885046377`; GREEN: `fd2da242a636acd5ec4ea879c6ec43d6359e5f10`, CI #824 / run `34885300353`.
 
-Pre-closeout documentation head `5c8710559ab1c40073843cb9a7909e626d8a0dc3` passed CI #781 / `34860464517` — complete repository gate GREEN.
+M06.6–M06.8 integrated exact head `4943d949ff943b2585580655e1596ac32f006e32`, CI #861 / run `34903314993` — complete repository gate GREEN.
 
-The current closeout documentation head must receive fresh exact-head CI before PR #7 can merge.
+M06.9 browser RED: `02dfe4704892110d59873efc3262421b0e7e4890`, CI #863 / run `34906932165` — all pre-E2E gates passed and the new durability browser acceptance failed. GREEN: `ddf3d32024fc6d5c67115326aba0405ba87d0d96`, CI #864 / run `34907376635` — complete repository gate GREEN including Chromium E2E and PRD coverage.
+
+Closeout status/ledger/handoff/feature/traceability documents were reconciled after the verified implementation head. Their final exact SHA must pass the complete CI gate before merge.
 
 ## Review State
 
-- Unresolved Critical findings: **0** at latest recovery.
-- Unresolved Important findings: **0** at latest recovery.
-- PR #7 has no known unresolved blocking review threads at latest recovery.
-- Final merge still requires exact-final-head CI, concurrency/head recheck, mergeability, and repository protection checks.
+- Unresolved Critical findings: **0**.
+- Unresolved Important findings: **0**.
+- PR #8 had no submitted reviews or unresolved inline review comments at latest recovery.
+- M06 acceptance criteria are satisfied at the verified implementation head; only final closeout exact-head verification remains before the authorized merge.
 
 ## Constraints
 
-- `GEMINI_API_KEY` is required at runtime for provider-backed sessions; absence must continue to fail closed without leaking configuration details.
-- Do not regress capability authorization, provider isolation, authoritative attempt continuity, cleanup, consent, safety, privacy, evidence integrity, or human-review boundaries.
-- Do not describe the deferred local live-provider smoke as executed evidence.
+- Persist only finalized transcript turns; partial provider hypotheses remain UI-only.
+- Transcript speaker identity comes from normalized event semantics, never text inference.
+- Durable ordering/identity are server-authoritative and attempt-scoped.
+- Cross-attempt/cross-capability transcript access must fail closed.
+- Reconnect restores only the same authoritative attempt and discards stale ephemeral partials/generation callbacks.
+- Technical failures remain separate from candidate evidence and cannot reduce assessment.
+- Finalization remains retry-safe and exactly-once for durable completion/assessment-trigger state.
+- Do not introduce autonomous hire/reject decisions or unsupported protected-trait/emotion/personality/deception/appearance/accent-quality inference.
 
 ## Next Action
 
-Reconcile M05 ledger/status/known issues/traceability/handoff to the owner-approved acceptance decision, perform final skeptical review, verify the exact final PR head with the complete CI gate, then execute the authorized M05 auto-merge if every remaining gate passes. After merge, verify `main`, activate M06, and continue.
+Verify the exact final closeout head in GitHub Actions. If it is fully GREEN, recheck PR head/reviews/threads/mergeability/concurrency, mark PR #8 ready if required, execute the user-authorized squash merge, verify post-merge `main` CI, then activate M07 — Evidence-Based Assessment Engine and immediately begin its first valid unit.

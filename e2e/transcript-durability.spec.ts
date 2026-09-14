@@ -3,7 +3,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { expect, test } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
-const PASSWORD = "RealtimeRuntimeE2E-1234";
+const PASSWORD = "TranscriptDurabilityE2E-1234";
 
 function client(url: string, key: string) {
   return createClient(url, key, {
@@ -19,7 +19,7 @@ function environment() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !publishableKey || !serviceRoleKey) {
     throw new Error(
-      "Realtime runtime E2E requires local Supabase URL, publishable key, and service role key.",
+      "Transcript durability E2E requires local Supabase URL, publishable key, and service role key.",
     );
   }
   return { supabaseUrl, publishableKey, serviceRoleKey };
@@ -46,7 +46,7 @@ async function confirmedUser(
 
 async function createInvitation(actor: TestClient, admin: TestClient, suffix: string) {
   const organization = await actor.rpc("create_organization", {
-    p_name: `Realtime Runtime Org ${suffix}`,
+    p_name: `Transcript Durability Org ${suffix}`,
     p_company_size: null,
     p_hiring_use_case: null,
   });
@@ -55,7 +55,7 @@ async function createInvitation(actor: TestClient, admin: TestClient, suffix: st
 
   const job = await actor.rpc("create_job", {
     p_organization_id: organization.data,
-    p_title: `Realtime Runtime Engineer ${suffix}`,
+    p_title: `Transcript Durability Engineer ${suffix}`,
     p_department: "Engineering",
     p_description: "Build reliable evidence-backed systems.",
     p_responsibilities: "Own secure production services.",
@@ -73,7 +73,7 @@ async function createInvitation(actor: TestClient, admin: TestClient, suffix: st
     p_organization_id: organization.data,
     p_job_id: job.data,
     p_full_name: `Candidate ${suffix}`,
-    p_email: `runtime-${suffix}@example.test`,
+    p_email: `transcript-${suffix}@example.test`,
   });
   expect(candidate.error).toBeNull();
   if (typeof candidate.data !== "string") throw new Error("Missing candidate id.");
@@ -137,7 +137,7 @@ async function createInvitation(actor: TestClient, admin: TestClient, suffix: st
     p_organization_id: organization.data,
     p_job_id: job.data,
     p_plan_id: plan.data,
-    p_name: "Realtime Runtime Interviewer",
+    p_name: "Transcript Durability Interviewer",
     p_interview_type: "technical",
     p_persona: "professional",
     p_language: "English",
@@ -187,7 +187,9 @@ async function createInvitation(actor: TestClient, admin: TestClient, suffix: st
   return { rawToken, versionId: published.data, questionId: question.data };
 }
 
-test("production launcher composes the default browser runtime and reconnects the same attempt after disconnect", async ({
+const durableCandidateTurn = "I restored service by rolling back the deploy.";
+
+test("reconnect restores finalized transcript while recording the disconnect separately", async ({
   page,
 }) => {
   test.setTimeout(120_000);
@@ -198,11 +200,10 @@ test("production launcher composes the default browser runtime and reconnects th
     admin,
     supabaseUrl,
     publishableKey,
-    `runtime-owner-${suffix}@example.test`,
+    `transcript-owner-${suffix}@example.test`,
   );
   const { rawToken, versionId, questionId } = await createInvitation(owner, admin, suffix);
-  const syntheticCredential = "e2e-short-lived-credential";
-  const attemptId = "attempt-e2e-runtime";
+  const attemptId = "attempt-e2e-transcript-durability";
 
   await page.addInitScript(() => {
     class FakeBufferSource {
@@ -241,10 +242,13 @@ test("production launcher composes the default browser runtime and reconnects th
     }
 
     class FakeWebSocket {
-      private listeners = new Map<string, Array<(event: { data?: string; reason?: string }) => void>>();
+      private listeners = new Map<
+        string,
+        Array<(event: { data?: string; reason?: string }) => void>
+      >();
       constructor(public url: string) {
         window.addEventListener(
-          "e2e-realtime-disconnect",
+          "e2e-transcript-disconnect",
           () => this.emit("close", { reason: "network-lost" }),
           { once: true },
         );
@@ -294,6 +298,22 @@ test("production launcher composes the default browser runtime and reconnects th
   let authorizationCalls = 0;
   await page.route(`**/api/interview/${rawToken}/realtime-session`, async (route) => {
     authorizationCalls += 1;
+    const transcriptTurns =
+      authorizationCalls === 1
+        ? []
+        : [
+            {
+              id: "message-1",
+              eventId: "event-1",
+              sequence: 1,
+              speaker: "candidate",
+              text: durableCandidateTurn,
+              startedAt: null,
+              endedAt: null,
+              finalizedAt: "2026-09-14T19:00:05.000Z",
+            },
+          ];
+
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -321,16 +341,21 @@ test("production launcher composes the default browser runtime and reconnects th
           ],
         },
         providerCredential: {
-          credential: syntheticCredential,
+          credential: "e2e-short-lived-credential",
           expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
         },
+        transcriptTurns,
       }),
     });
   });
 
-  const finalizationBodies: unknown[] = [];
+  const technicalEventBodies: unknown[] = [];
+  await page.route(`**/api/interview/${rawToken}/realtime-technical-event`, async (route) => {
+    technicalEventBodies.push(route.request().postDataJSON());
+    await route.fulfill({ status: 204, body: "" });
+  });
+
   await page.route(`**/api/interview/${rawToken}/realtime-finalize`, async (route) => {
-    finalizationBodies.push(route.request().postDataJSON());
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -345,30 +370,23 @@ test("production launcher composes the default browser runtime and reconnects th
 
   await page.goto(`/interview/${rawToken}`);
   await page.getByRole("button", { name: "Start live interview" }).click();
-
-  await expect(page.getByText("Technical evidence")).toBeVisible();
-  await expect(
-    page.getByText("Describe a production system design decision you owned."),
-  ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Mute microphone" })).toBeVisible();
-  await expect(page.getByText(syntheticCredential)).toHaveCount(0);
-  expect(authorizationCalls).toBe(1);
+  await expect(page.getByText(durableCandidateTurn)).toHaveCount(0);
 
   await page.evaluate(() => {
-    window.dispatchEvent(new Event("e2e-realtime-disconnect"));
+    window.dispatchEvent(new Event("e2e-transcript-disconnect"));
   });
-  await expect.poll(() => authorizationCalls).toBe(2);
-  await expect(page.getByText("Technical evidence")).toBeVisible();
-  await expect(
-    page.getByText("Describe a production system design decision you owned."),
-  ).toBeVisible();
-  await expect(page.getByText(syntheticCredential)).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Mute microphone" }).click();
-  await expect(page.getByRole("button", { name: "Unmute microphone" })).toBeVisible();
+  await expect.poll(() => authorizationCalls).toBe(2);
+  await expect(page.getByText(durableCandidateTurn)).toBeVisible();
+  await expect.poll(() => technicalEventBodies.length).toBe(1);
+  expect(technicalEventBodies).toEqual([
+    {
+      attemptId,
+      category: "provider_disconnect",
+      occurredAt: expect.any(String),
+    },
+  ]);
 
   await page.getByRole("button", { name: "End interview" }).click();
   await expect(page.getByRole("status")).toContainText("Interview ended");
-  expect(finalizationBodies).toEqual([{ attemptId }]);
-  await expect(page.getByText(syntheticCredential)).toHaveCount(0);
 });

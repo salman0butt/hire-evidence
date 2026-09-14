@@ -47,12 +47,30 @@ type RealtimeProgressRow = Readonly<{
   processed_event_ids: readonly string[];
 }>;
 
+type RealtimeFinalizationRow = Readonly<{
+  attempt_id: string;
+  attempt_state: "completed";
+  completed_at: string;
+  duration_seconds: number;
+  assessment_trigger_id: string;
+}>;
+
 export type RealtimeAttemptProgressResult =
   | Readonly<{
       status: "active";
       checkpoint: RealtimeResumeCheckpoint;
     }>
   | Readonly<{ status: "completed" }>
+  | Readonly<{ status: "conflict" }>;
+
+export type RealtimeAttemptFinalizationResult =
+  | Readonly<{
+      status: "completed";
+      attemptId: string;
+      completedAt: string;
+      durationSeconds: number;
+      assessmentTriggerId: string;
+    }>
   | Readonly<{ status: "conflict" }>;
 
 export type RealtimeSessionRepository = Pick<
@@ -66,6 +84,10 @@ export type RealtimeSessionRepository = Pick<
       eventId: string;
       questionId: string;
     }>): Promise<RealtimeAttemptProgressResult>;
+    finalizeAttempt(input: Readonly<{
+      rawToken: string;
+      attemptId: string;
+    }>): Promise<RealtimeAttemptFinalizationResult>;
   }>;
 
 function isNonEmptyString(value: unknown): value is string {
@@ -192,6 +214,20 @@ function isRealtimeProgressRow(value: unknown): value is RealtimeProgressRow {
   );
 }
 
+function isRealtimeFinalizationRow(value: unknown): value is RealtimeFinalizationRow {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+
+  const row = value as Record<string, unknown>;
+  return (
+    isNonEmptyString(row.attempt_id) &&
+    row.attempt_state === "completed" &&
+    isNonEmptyString(row.completed_at) &&
+    !Number.isNaN(Date.parse(row.completed_at)) &&
+    isNonNegativeInteger(row.duration_seconds) &&
+    isNonEmptyString(row.assessment_trigger_id)
+  );
+}
+
 function toResumeCheckpoint(row: RealtimeAttemptRow): RealtimeResumeCheckpoint {
   return Object.freeze({
     interviewerVersionId: row.interviewer_version_id,
@@ -287,6 +323,35 @@ export function createRealtimeSessionRepository(rpc: Rpc): RealtimeSessionReposi
           processedEventIds: Object.freeze([...row.processed_event_ids]),
         }),
       };
+    },
+
+    async finalizeAttempt(input): Promise<RealtimeAttemptFinalizationResult> {
+      if (!input.rawToken || !input.attemptId) return { status: "conflict" };
+
+      const { data, error } = await rpc("finalize_realtime_interview_session", {
+        p_token_hash: hashInvitationToken(input.rawToken),
+        p_attempt_id: input.attemptId,
+      });
+
+      if (
+        error ||
+        !Array.isArray(data) ||
+        data.length !== 1 ||
+        !isRealtimeFinalizationRow(data[0])
+      ) {
+        return { status: "conflict" };
+      }
+
+      const row = data[0];
+      if (row.attempt_id !== input.attemptId) return { status: "conflict" };
+
+      return Object.freeze({
+        status: "completed",
+        attemptId: row.attempt_id,
+        completedAt: row.completed_at,
+        durationSeconds: row.duration_seconds,
+        assessmentTriggerId: row.assessment_trigger_id,
+      });
     },
   };
 }

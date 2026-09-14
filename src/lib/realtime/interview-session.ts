@@ -16,6 +16,12 @@ import {
   type RealtimeResumeCheckpoint,
 } from "./reconnect";
 import type { RealtimeAttemptProgressResult } from "./session-repository";
+import {
+  applyTranscriptEvent,
+  createTranscriptState,
+  type InterviewTranscriptTurn,
+  type TranscriptState,
+} from "./transcript-state";
 import type { RealtimeTransportEvent } from "./transport";
 
 export type RealtimeInterviewSessionSnapshot = Readonly<{
@@ -27,6 +33,7 @@ export type RealtimeInterviewSessionSnapshot = Readonly<{
     questionId: string;
     prompt: string;
   }> | null;
+  transcript: TranscriptState;
 }>;
 
 export type RealtimeInterviewSession = Readonly<{
@@ -44,6 +51,7 @@ export type RealtimeInterviewSession = Readonly<{
 
 function toSnapshot(
   state: InterviewPlanRunnerState,
+  transcript: TranscriptState,
   generation: number,
   ended: boolean,
 ): RealtimeInterviewSessionSnapshot {
@@ -60,6 +68,7 @@ function toSnapshot(
           prompt: current.prompt,
         })
       : null,
+    transcript,
   });
 }
 
@@ -77,6 +86,7 @@ export function createRealtimeInterviewSession(input: Readonly<{
   plan: InterviewPlanInput;
   playback: RealtimeAudioPlayback;
   resumeCheckpoint?: RealtimeResumeCheckpoint | undefined;
+  transcriptTurns?: readonly InterviewTranscriptTurn[] | undefined;
   persistProgress?:
     | ((input: Readonly<{ eventId: string; questionId: string }>) => Promise<RealtimeAttemptProgressResult>)
     | undefined;
@@ -86,11 +96,12 @@ export function createRealtimeInterviewSession(input: Readonly<{
   let planState = input.resumeCheckpoint
     ? restoreInterviewPlanState(input.plan, input.resumeCheckpoint)
     : createInterviewPlanState(input.plan);
+  let transcriptState = createTranscriptState(input.transcriptTurns);
   let generation = 1;
   let ended = false;
 
   function getSnapshot() {
-    return toSnapshot(planState, generation, ended);
+    return toSnapshot(planState, transcriptState, generation, ended);
   }
 
   function publishSnapshot() {
@@ -110,6 +121,17 @@ export function createRealtimeInterviewSession(input: Readonly<{
       case "interrupted":
         input.playback.interrupt();
         return;
+      case "partialTranscript":
+      case "finalTranscript": {
+        const nextTranscriptState = applyTranscriptEvent(transcriptState, event);
+        if (nextTranscriptState === transcriptState) {
+          return;
+        }
+
+        transcriptState = nextTranscriptState;
+        publishSnapshot();
+        return;
+      }
       default:
         return;
     }

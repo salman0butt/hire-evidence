@@ -26,12 +26,16 @@ export function createRealtimeSessionHandler(
       return Response.json({
         status: "authorized",
         attemptId: authorization.attemptId,
+        interviewerVersionId: authorization.interviewerVersionId,
         durationSeconds: authorization.durationSeconds,
         language: authorization.language,
         interviewPlan: authorization.interviewPlan,
         providerCredential: authorization.providerCredential,
         ...(authorization.resumeCheckpoint
           ? { resumeCheckpoint: authorization.resumeCheckpoint }
+          : {}),
+        ...(authorization.transcriptTurns
+          ? { transcriptTurns: authorization.transcriptTurns }
           : {}),
       });
     } catch {

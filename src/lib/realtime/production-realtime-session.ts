@@ -3,6 +3,7 @@ import { createProviderTokenIssuer } from "./provider-token";
 import { createRealtimeSessionHandler } from "./realtime-session-handler";
 import { createRealtimeSessionRepository } from "./session-repository";
 import { authorizeRealtimeSession } from "./session-authorization";
+import { createTranscriptRepository } from "./transcript-repository";
 
 type RpcResult = Readonly<{
   data: unknown;
@@ -36,6 +37,7 @@ export function createProductionRealtimeSessionHandler(
   }
 
   const repository = createRealtimeSessionRepository(options.rpc);
+  const transcriptRepository = createTranscriptRepository(options.rpc);
   const issueProviderCredential = createProviderTokenIssuer(
     createGeminiProviderTokenAdapter({
       apiKey,
@@ -49,6 +51,7 @@ export function createProductionRealtimeSessionHandler(
     authorizeRealtimeSession(rawToken, {
       resolveCandidateSession: repository.resolveCandidateSession,
       getOrCreateAttempt: repository.getOrCreateAttempt,
+      listFinalizedTurns: transcriptRepository.listFinalizedTurns,
       issueProviderCredential,
     }),
   );

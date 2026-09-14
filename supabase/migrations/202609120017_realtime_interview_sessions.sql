@@ -273,7 +273,7 @@ begin
     and candidate_invitation.state = 'started'
   for update of interview_attempt;
 
-  if attempt.id is null or not (attempt.state = 'active') then
+  if attempt.id is null then
     raise exception 'realtime progress unavailable';
   end if;
 
@@ -287,6 +287,10 @@ begin
       attempt.resume_follow_ups_used,
       attempt.processed_event_ids;
     return;
+  end if;
+
+  if not (attempt.state = 'active') then
+    raise exception 'realtime progress unavailable';
   end if;
 
   select version.*
