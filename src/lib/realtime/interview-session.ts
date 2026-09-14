@@ -19,6 +19,7 @@ import type { RealtimeAttemptProgressResult } from "./session-repository";
 import {
   applyTranscriptEvent,
   createTranscriptState,
+  type InterviewTranscriptTurn,
   type TranscriptState,
 } from "./transcript-state";
 import type { RealtimeTransportEvent } from "./transport";
@@ -85,6 +86,7 @@ export function createRealtimeInterviewSession(input: Readonly<{
   plan: InterviewPlanInput;
   playback: RealtimeAudioPlayback;
   resumeCheckpoint?: RealtimeResumeCheckpoint | undefined;
+  transcriptTurns?: readonly InterviewTranscriptTurn[] | undefined;
   persistProgress?:
     | ((input: Readonly<{ eventId: string; questionId: string }>) => Promise<RealtimeAttemptProgressResult>)
     | undefined;
@@ -94,7 +96,7 @@ export function createRealtimeInterviewSession(input: Readonly<{
   let planState = input.resumeCheckpoint
     ? restoreInterviewPlanState(input.plan, input.resumeCheckpoint)
     : createInterviewPlanState(input.plan);
-  let transcriptState = createTranscriptState();
+  let transcriptState = createTranscriptState(input.transcriptTurns);
   let generation = 1;
   let ended = false;
 
