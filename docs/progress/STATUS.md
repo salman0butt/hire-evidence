@@ -8,77 +8,66 @@ Last reconciled: 2026-09-14
 - SaaS Shell + Auth — **COMPLETE**. PR #3 merged as `ed10e1b55bb62cf202585c8c50e6487014e83c29`.
 - Organizations + RBAC — **COMPLETE**. PR #4 merged as `835d7d571a69cd13e3e802be4872e873ffdd34fe`.
 - Jobs + Interviewer Builder — **COMPLETE**. PR #5 merged as `729474ffb03075c93dfa2564f0004f1590533753`.
-- Candidates + Invitations — **COMPLETE**. PR #6 merged as `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`; post-merge CI #517 / `34692492691` passed the complete repository gate.
+- Candidates + Invitations — **COMPLETE**. PR #6 merged as `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
+- Realtime AI Interview — **COMPLETE**. PR #7 merged to `main` as `5c3843c6444bad256974ea391a4a6a978bf88f24`.
 
 ## Current Milestone
 
-Realtime AI Interview — **REPOSITORY ACCEPTANCE COMPLETE / FINAL MERGE GATE**.
+Transcript + Durable Session — **IN PROGRESS**.
 
-Active branch: `feat/realtime-ai-interview`
-Active PR: #7 — `Build realtime AI interview` — OPEN / DRAFT until final exact-head closeout CI and merge gates pass.
-Verified base/main: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
-Pre-closeout verified head: `5c8710559ab1c40073843cb9a7909e626d8a0dc3`.
-CI status: pre-closeout head `5c8710559ab1c40073843cb9a7909e626d8a0dc3`, CI #781 / `34860464517` — GREEN complete repository gate. The current closeout reconciliation head requires fresh exact-head CI before merge.
+Active branch: `feat/transcript-durable-session`.
+Active PR: #8 — `Build transcript durable session` — OPEN / DRAFT while M06 remains incomplete.
+Verified base/main: `5c3843c6444bad256974ea391a4a6a978bf88f24`.
+Latest fully verified implementation head: `73a43be166d87db0e1a20c89d4894f20bd550dbf`.
+CI status: CI #810 / run `34875410392` passed the complete repository gate at `73a43be166d87db0e1a20c89d4894f20bd550dbf`. Documentation reconciliation after that checkpoint requires fresh exact-head CI before being treated as independently verified.
 
-Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
-Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
-Local real-provider acceptance: `docs/LOCAL-REALTIME-ACCEPTANCE.md`.
+Selected design: `docs/superpowers/specs/2026-09-14-transcript-durable-session-design.md`.
+Selected plan: `docs/superpowers/plans/2026-09-14-transcript-durable-session.md`.
+Milestone ledger: `docs/milestones/M06-transcript-durable-session.md`.
 
-## M05 Task State
+## M06 Task State
 
-- M05.1 Reference characterization — **VERIFIED**.
-- M05.2 Session authorization/provider boundary — **VERIFIED**.
-- M05.3 Browser compatibility + microphone diagnostics — **VERIFIED**.
-- M05.4 Deterministic Web Audio capture — **VERIFIED**.
-- M05.5 Provider-neutral transport/Gemini adapter boundary — **VERIFIED (REPOSITORY SCOPE)**.
-- M05.6 AI audio playback/barge-in — **VERIFIED**.
-- M05.7 Connection state + accessible controls — **VERIFIED**.
-- M05.8 Deterministic immutable interview-plan runner — **VERIFIED**.
-- M05.9 Pacing/time budget — **VERIFIED**.
-- M05.10 Bounded follow-ups — **VERIFIED**.
-- M05.11 Realtime orchestration/production browser composition — **VERIFIED (REPOSITORY SCOPE)**.
-- M05.12 Timeout/error recovery — **VERIFIED**.
-- M05.13 Same-attempt reconnect/persistence gating — **VERIFIED**.
-- M05.14 deterministic realtime E2E / milestone closeout — **REPOSITORY ACCEPTANCE COMPLETE; FINAL CI/MERGE PENDING**.
-
-## Owner-Approved Provider Acceptance Decision
-
-On 2026-09-14 the repository owner explicitly instructed autonomous development to complete the repository-side milestone now and stated that real Gemini credentials will be supplied locally.
-
-Accordingly, the live Gemini browser smoke is a local/deployment acceptance check rather than an M05 repository merge blocker. This does **not** mean it has been run. No live Gemini-backed browser execution is claimed. The exact local checklist and evidence rules are in `docs/LOCAL-REALTIME-ACCEPTANCE.md`.
-
-`GEMINI_API_KEY` remains server-only. Missing provider configuration must fail closed. A future failed live smoke is a real defect and must be fixed before relying on that deployment for candidate interviews.
+- M06.1 Provider transcript-event normalization — **VERIFIED**.
+- M06.2 Partial/finalized transcript state separation — **VERIFIED**.
+- M06.3 Durable finalized transcript messages — **VERIFIED**.
+- M06.4 Correctness guards for duplication/order/speaker/immutability — **ACTIVE**.
+- M06.5 Idempotent attempt lifecycle — **NOT STARTED**.
+- M06.6 Same-attempt durable transcript reconnect — **NOT STARTED**.
+- M06.7 Separate technical interruption events — **NOT STARTED**.
+- M06.8 Idempotent session finalization — **NOT STARTED**.
+- M06.9 Durability E2E / milestone closeout — **NOT STARTED**.
 
 ## Latest TDD / Verification Evidence
 
-- Production route/provider checkpoint `56c78425f7052b2e54ac9cfea410a57c53aef805`, CI #713 / `34832502815` — GREEN.
-- Capability-bound progress checkpoint `ce161fbaa34450839ac8f323f6fcc3a33cdc4863`, CI #728 / `34834823096` — GREEN.
-- Provider-interruption RED `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772 / `34857082289` — intended behavioral failure.
-- Provider-interruption GREEN `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN.
-- Durable framework NOT GREEN checkpoint `3914a347a47090f666a5458014196d9ca9d4a338`, CI #778 / `34859783065` — verifier correctly caught missing durable `CI status:` contract.
-- Corrected pre-closeout head `5c8710559ab1c40073843cb9a7909e626d8a0dc3`, CI #781 / `34860464517` — complete repository gate GREEN.
+- M06.1 final GREEN `60fa653e8b5dc9c47a21dc9bea8c3d8aba6566e3`, CI #796 / `34868105525` — complete repository gate GREEN.
+- M06.2 valid integration RED `de9340078c556153b189cd088b18729fd881a00d`, CI #800 / `34872661481` — session snapshots lacked transcript state.
+- M06.2 GREEN `2e91eb529cdc56688aca65766c6e5785d6b1378b`, CI #804 / `34873181788` — complete repository gate GREEN.
+- M06.3 repository RED `1a35d109496c51fa5b4f1e740c0ff756f7903619`, CI #806 / `34873858138` — missing transcript repository module.
+- M06.3 migration RED `c219b68f24b2e900e5b4bfb69cd17c63ba34027d`, CI #809 / `34875215424` — migration absent; four intended contract failures, other 517 tests green.
+- M06.3 GREEN `73a43be166d87db0e1a20c89d4894f20bd550dbf`, CI #810 / `34875410392` — complete repository gate GREEN with 521 tests, local Supabase migration application, build, Chromium E2E and PRD coverage.
 
-Detailed historical RED/GREEN evidence remains in `docs/milestones/M05-realtime-ai-interview.md` and Git history.
+Detailed valid/invalid RED/GREEN history remains in `docs/milestones/M06-transcript-durable-session.md` and Git history.
 
 ## Review State
 
 Critical findings: **0 unresolved** at latest recovery.
 Important findings: **0 unresolved** at latest recovery.
-PR #7 has no known unresolved blocking review threads at latest recovery.
+PR #8 has no submitted reviews or known unresolved inline review comments at latest recovery.
 
-Final merge still requires the closeout head to pass exact-SHA CI plus a fresh remote-head/concurrency/review/mergeability check.
+M06 cannot enter its merge gate until M06.4–M06.9, milestone acceptance, durable reconciliation and exact-final-head CI all complete.
 
 ## Safety / Product Constraints
 
-- Long-lived Gemini credentials remain server-only; browser sessions receive constrained short-lived credentials only after authorization.
-- Invitation capability, consent, interviewer version, authoritative attempt continuity, and capability-bound persistence must not be weakened.
-- Candidate speech is untrusted and cannot rewrite policy, plan order, criteria, or follow-up bounds.
-- Technical/provider/browser/microphone failures cannot become negative candidate evidence.
-- No autonomous hire/reject decision or protected-trait/emotion/personality/deception/appearance/accent-quality inference is introduced.
-- Do not describe the deferred local live-provider smoke as executed evidence.
+- Partial transcript hypotheses remain ephemeral UI state and are not persisted as candidate evidence.
+- Finalized transcript text is untrusted evidence data, never instruction.
+- Speaker identity is explicit from normalized transport semantics; never infer/rewrite speaker from text.
+- Sequence and durable message identity are server-authoritative and attempt-scoped.
+- Invitation capability, tenant/attempt isolation and direct-table access restrictions must not be weakened.
+- Technical/provider/browser/microphone failures remain non-evaluative and cannot reduce candidate assessment.
+- No autonomous hire/reject decision or protected-trait/emotion/personality/deception/appearance/health/accent-quality inference is introduced.
 
 ## Durable Recovery
 
-Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, `docs/milestones/M05-realtime-ai-interview.md`, `docs/SESSION-HANDOFF.md`, `docs/requirements/TRACEABILITY.md`, requirements/PRD source, and the selected M05 design/plan. Git/code/current exact-SHA CI outrank stale Markdown.
+Recover actual Git/PR/CI first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, this file, `docs/milestones/CURRENT.md`, `docs/milestones/M06-transcript-durable-session.md`, `docs/SESSION-HANDOFF.md`, `docs/requirements/TRACEABILITY.md`, requirements/PRD source, and the selected M06 design/plan. Git/code/current exact-SHA CI outrank stale Markdown.
 
-Exact next work: finish closeout reconciliation, verify the exact current PR head with the complete CI gate, perform the final skeptical review/concurrency/mergeability check, merge PR #7 under the already-authorized auto-merge gates, verify post-merge `main`, then activate M06 — Transcript + Durable Session and continue.
+Exact next work: execute M06.4 with strict TDD. Start with an adversarial repository case that proves duplicate durable event identity cannot be accepted even if a malformed RPC response presents contiguous sequences; verify exact-head RED, add the smallest fail-closed guard, verify GREEN, then continue the remaining M06.4 invariants and proceed to M06.5.
