@@ -126,8 +126,7 @@ export function RealtimeInterviewLauncher({
       return;
     }
 
-    let runtime: RealtimeInterviewRuntime;
-    runtime = createRuntime(
+    const runtime = createRuntime(
       result,
       (snapshot) => {
         if (runtimeRef.current === runtime) {
@@ -135,7 +134,7 @@ export function RealtimeInterviewLauncher({
         }
       },
       token,
-      (_failure) => {
+      () => {
         if (runtimeRef.current === runtime) {
           void recoverRuntime(runtime, recoveryAttempt);
         }
