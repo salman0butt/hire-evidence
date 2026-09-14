@@ -74,4 +74,35 @@ describe("interview transcript correctness guards", () => {
       }),
     ).resolves.toEqual({ status: "conflict" });
   });
+
+  it("fails closed when the append response reassigns the finalized speaker", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: [
+        {
+          message_id: "message-1",
+          event_id: "event-1",
+          sequence: 1,
+          speaker: "interviewer",
+          text: "I built the service.",
+          started_at: null,
+          ended_at: null,
+          finalized_at: "2026-09-14T17:20:00.000Z",
+        },
+      ],
+      error: null,
+    });
+    const repository = createTranscriptRepository(rpc);
+
+    await expect(
+      repository.appendFinalizedTurn({
+        rawToken: "capability-secret",
+        attemptId: "attempt-1",
+        eventId: "event-1",
+        speaker: "candidate",
+        text: "I built the service.",
+        startedAt: null,
+        endedAt: null,
+      }),
+    ).resolves.toEqual({ status: "conflict" });
+  });
 });
