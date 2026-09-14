@@ -5,6 +5,11 @@ import type { RealtimeInterviewSessionSnapshot } from "@/lib/realtime/interview-
 
 import { RealtimeInterviewLauncher } from "./realtime-interview-launcher";
 
+const emptyTranscript = {
+  partials: { candidate: "", interviewer: "" },
+  finalizedTurns: [],
+} as const;
+
 describe("RealtimeInterviewLauncher", () => {
   it("authorizes the candidate capability and starts production runtime only after an explicit start action", async () => {
     const authorization = {
@@ -33,6 +38,7 @@ describe("RealtimeInterviewLauncher", () => {
         status: "active" as const,
         generation: 1,
         currentQuestion: null,
+        transcript: emptyTranscript,
       })),
     }));
 
@@ -94,6 +100,7 @@ describe("RealtimeInterviewLauncher", () => {
           questionId: "question-1",
           prompt: "Describe a production system design decision you owned.",
         },
+        transcript: emptyTranscript,
       })),
     }));
 
@@ -144,6 +151,7 @@ describe("RealtimeInterviewLauncher", () => {
         questionId: "question-1",
         prompt: "Describe a relevant project.",
       },
+      transcript: emptyTranscript,
     };
     const createRuntime = vi.fn(
       (
@@ -183,6 +191,7 @@ describe("RealtimeInterviewLauncher", () => {
           questionId: "question-2",
           prompt: "What trade-off did you make?",
         },
+        transcript: emptyTranscript,
       });
     });
 
@@ -234,6 +243,7 @@ describe("RealtimeInterviewLauncher", () => {
         status: "active" as const,
         generation: 1,
         currentQuestion: null,
+        transcript: emptyTranscript,
       })),
     }));
 
