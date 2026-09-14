@@ -4,31 +4,15 @@ Only unresolved or materially relevant issues belong here. Actual Git/code/curre
 
 ## Current unresolved issues
 
-### M05 live-provider browser acceptance
+### Runtime provider configuration / local live smoke
 
-Classification: **Incomplete milestone acceptance work**.
+Classification: **Deployment configuration and acceptance requirement; not an M05 repository merge blocker**.
 
-Production candidate-page realtime composition is implemented. The branch contains constrained Gemini Live ephemeral credential issuance, a provider-isolated Gemini transport adapter, the production realtime-session and progress routes, browser runtime composition, and the candidate-facing launcher that authorizes the capability, starts the runtime, renders authoritative snapshots, and exposes candidate mute/end controls.
+Provider-backed sessions require server-side `GEMINI_API_KEY`. Absence must continue to fail closed with a constant-safe response and must not expose configuration details, raw invitation capabilities, or provider credentials.
 
-Latest verified behavioral head before the current durable-document reconciliation is `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN, including deterministic browser E2E. Provider-interruption playback handling followed genuine RED `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772 / `34857082289`, to GREEN `d191b0d…`.
+On 2026-09-14 the repository owner explicitly chose to provide the real Gemini credential locally and instructed autonomous development to complete repository-side M05 without waiting for an external live-provider run. Therefore the real Gemini browser smoke is documented in `docs/LOCAL-REALTIME-ACCEPTANCE.md` and is a local/deployment acceptance check.
 
-The remaining gap is genuine live-provider browser acceptance: stable Gemini-backed multi-turn completion plus interruption/recovery, barge-in, timeout, and bounded same-attempt reconnect behavior. These paths must be verified without exposing long-lived credentials, raw invitation capabilities, or provider-specific internal details.
-
-### M05 full live realtime E2E closeout
-
-Classification: **Incomplete milestone acceptance work**.
-
-M05.14 requires a stable multi-turn live voice interview plus browser coverage for microphone denial/recovery, mute/end controls, barge-in, provider interruption, timeout, bounded reconnect, mobile/no-overflow, keyboard/status semantics, and unavailable/revoked/completed invitation safety.
-
-Deterministic browser coverage now verifies production launcher/runtime composition, short-lived credential non-display, disconnect→reauthorize same-attempt reconnect, mute/end controls, candidate-page microphone denial/recovery, keyboard focus, microphone selection, mobile no-overflow, no recording during readiness checks, and constant-safe unavailable-provider behavior when `GEMINI_API_KEY` is absent. Unit/component/provider-neutral coverage verifies bounded follow-ups, pacing, timeout/error handling, persistence, stale-generation rejection, and provider-interruption playback cancellation.
-
-Do not treat those layers as proof of successful live Gemini browser integration. PR #7 remains draft/unmerged until the required stable live-provider exit criterion, full review, durable closeout, and exact-final-head CI are genuinely satisfied.
-
-### Runtime provider configuration
-
-Classification: **Deployment configuration requirement**.
-
-Provider-backed sessions require server-side `GEMINI_API_KEY`. Absence must continue to fail closed with a constant-safe response and must not expose configuration or raw invitation capability values. A controlled acceptance environment with that server secret is required for the remaining live-provider milestone evidence. This is not a reason to invent client-side secrets or weaken authorization.
+The smoke has **not** been executed by repository CI and must never be described as executed evidence. If it later fails, treat that as a real defect and fix it before relying on that deployment for candidate interviews.
 
 ### External CI maintenance notices
 
@@ -36,23 +20,26 @@ Classification: **Informational / external maintenance**.
 
 GitHub-hosted CI reports Node runtime deprecation notices from third-party actions and some transitive packages. These notices are not an application correctness blocker. Address them only through normal dependency/action maintenance without weakening gates.
 
-## Recently resolved M05 issues
+## Resolved M05 issues
 
-- Realtime provider selection / credential issuance — **resolved in implementation**. Gemini Live credential issuance was defined at `3c34ac746b3d075bb604c72f873ef03cf6cd0773` and implemented at `d1346253e3ad2f42f89c67b624b9452fd0a7b9f6`.
-- Provider adapter — **resolved in implementation**. Gemini Live protocol RED was characterized in `8a381b3799724342da8a588af536c2c24d2b85b0` / `34e16c098ad409058c525f2052718e7e6a73497b`; adapter GREEN landed at `0b612411cb30eaf6a3130e6373cbc9ac213eebe7`.
-- Production Gemini session composition — **resolved in implementation**. RED `7f9b2f6beb195c48a03595fceb191d0adc83aa3f` → GREEN `409a899ce000674b441bd0da2ff8a01d4efc62db`.
-- Production realtime route provider wiring — **resolved in implementation** through `791b192fbe39a526ee478996ac16b69eaa295f84` → `a0934f76ed5583059c1976766eec1b8a99191b7b` with follow-up schema/adapter fixes through `56c78425f7052b2e54ac9cfea410a57c53aef805`.
-- Production candidate-page composition — **resolved in implementation**. Browser runtime + launcher composition obtains authorized session data, instantiates Gemini transport behind the provider-neutral boundary, wires capture/playback/runtime controls, forwards authoritative snapshots, and renders current interview state.
-- Capability-bound realtime progress persistence — **resolved in implementation** through the realtime progress route and server-authoritative attempt checkpoint semantics; checkpoint `ce161fbaa34450839ac8f323f6fcc3a33cdc4863` passed CI #728 / `34834823096`.
-- Deterministic production-browser reconnect — **resolved in deterministic acceptance scope**. Browser E2E proves a disconnect causes reauthorization and preserves candidate-facing authoritative state without displaying the ephemeral credential.
-- Provider-interruption playback cancellation — **resolved**. RED `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772, proved `interrupted` did not stop playback; GREEN `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773, routes provider interruption through `playback.interrupt()`.
-- Browser compatibility/microphone diagnostics are verified, including offline behavior, selected-device handling, usable input readiness, accessibility, and candidate-page integration.
-- Runtime question progression waits for authoritative persistence and consumes the returned checkpoint; malformed/conflicting checkpoints fail closed rather than advancing local state.
+- Realtime provider selection / credential issuance — **resolved**. Gemini Live credential issuance is server-side and constrained.
+- Provider adapter — **resolved**. Gemini Live protocol stays behind the app-owned provider-neutral transport boundary.
+- Production Gemini session composition — **resolved**.
+- Production realtime route provider wiring — **resolved**.
+- Production candidate-page composition — **resolved**. Browser runtime + launcher composition obtains authorized session data, instantiates provider transport behind the app-owned boundary, wires capture/playback/runtime controls, forwards authoritative snapshots, and renders current interview state.
+- Capability-bound realtime progress persistence — **resolved**. Progress remains tied to the authoritative invitation/attempt and database state.
+- Deterministic production-browser reconnect — **resolved in repository acceptance**. Browser E2E proves disconnect causes reauthorization while preserving same-attempt state without displaying the ephemeral credential.
+- Provider-interruption playback cancellation — **resolved**. RED `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772, proved `interrupted` did not stop playback; GREEN `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773, routes provider interruption through playback interruption.
+- Browser compatibility/microphone diagnostics — **resolved** with deterministic browser coverage for offline behavior, selected-device handling, usable input readiness, accessibility, and candidate-page integration.
+- Runtime question progression persistence authority — **resolved**. Progression waits for authoritative persistence and validates returned checkpoints; malformed/conflicting checkpoints fail closed.
+- M05 live-provider merge blocker — **resolved by explicit owner acceptance decision**. Real-provider execution remains a local/deployment smoke and no fake live evidence is claimed.
 
 ## Review blockers
 
-No unresolved Critical or Important review finding is currently known for the implemented M05 slices. PR #7 had no unresolved review threads at the latest recovery.
+No unresolved Critical or Important review finding is currently known for M05 at latest recovery. PR #7 had no unresolved review threads at latest recovery.
 
 ## Merge gate
 
-PR #7 remains OPEN / DRAFT and must not merge while stable live-provider multi-turn browser acceptance and final M05 closeout remain incomplete. Merge only after all M05 acceptance criteria, live provider/browser E2E, reviews, durable traceability, exact-final-head CI, concurrency checks, and repository protection requirements satisfy the owner's authorized auto-merge gates.
+PR #7 may merge only after the current closeout head has exact-final-head GREEN CI, durable closeout/traceability is current, remote head has not changed unexpectedly, no blocking reviews exist, concurrency is safe, and GitHub reports the PR mergeable under repository policy.
+
+The deferred real Gemini smoke does not satisfy or replace any of those repository gates and does not weaken safety, privacy, evidence-integrity, authorization, or human-review requirements.
