@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { parseInterviewAssessment } from "./assessment-schema";
 
-function assessmentWithScore(score: unknown) {
+function assessmentWithScore(
+  score: unknown,
+  evidenceSufficiency = "sufficient",
+) {
   return {
     summary: "Candidate explained a workable queue-based design.",
     competencies: [
@@ -16,7 +19,7 @@ function assessmentWithScore(score: unknown) {
             excerpt: "I would put the work on a queue",
           },
         ],
-        evidenceSufficiency: "sufficient",
+        evidenceSufficiency,
       },
     ],
     strengths: [],
@@ -36,10 +39,9 @@ describe("parseInterviewAssessment", () => {
   });
 
   it("requires a null score when competency evidence is insufficient", () => {
-    const assessment = assessmentWithScore(4);
-    assessment.competencies[0].evidenceSufficiency = "insufficient";
-
-    expect(parseInterviewAssessment(assessment)).toEqual({
+    expect(
+      parseInterviewAssessment(assessmentWithScore(4, "insufficient")),
+    ).toEqual({
       ok: false,
       message: "Insufficient competency evidence cannot have a score.",
     });
