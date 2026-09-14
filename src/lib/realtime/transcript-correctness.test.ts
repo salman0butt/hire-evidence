@@ -105,4 +105,35 @@ describe("interview transcript correctness guards", () => {
       }),
     ).resolves.toEqual({ status: "conflict" });
   });
+
+  it("fails closed when a finalized turn ends before it starts", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: [
+        {
+          message_id: "message-1",
+          event_id: "event-1",
+          sequence: 1,
+          speaker: "candidate",
+          text: "I built the service.",
+          started_at: "2026-09-14T17:20:05.000Z",
+          ended_at: "2026-09-14T17:20:03.000Z",
+          finalized_at: "2026-09-14T17:20:06.000Z",
+        },
+      ],
+      error: null,
+    });
+    const repository = createTranscriptRepository(rpc);
+
+    await expect(
+      repository.appendFinalizedTurn({
+        rawToken: "capability-secret",
+        attemptId: "attempt-1",
+        eventId: "event-1",
+        speaker: "candidate",
+        text: "I built the service.",
+        startedAt: "2026-09-14T17:20:05.000Z",
+        endedAt: "2026-09-14T17:20:03.000Z",
+      }),
+    ).resolves.toEqual({ status: "conflict" });
+  });
 });
