@@ -1,10 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
+import type { InterviewPlanInput } from "./plan-runner";
 import {
   authorizeRealtimeSession,
   type RealtimeSessionAuthorizationDeps,
 } from "./session-authorization";
 
-const interviewPlan = {
+const interviewPlan: InterviewPlanInput = {
   versionId: "version-1",
   sections: [
     {
@@ -20,14 +21,14 @@ const interviewPlan = {
       ],
     },
   ],
-} as const;
+};
 
 function availableCandidate(
   overrides: Partial<{
     hasCurrentConsent: boolean;
     interviewerVersionId: string | null;
     lifecycle: "sent" | "opened" | "started" | "completed";
-    interviewPlan: typeof interviewPlan;
+    interviewPlan: InterviewPlanInput;
   }> = {},
 ) {
   return {
@@ -113,7 +114,7 @@ describe("authorizeRealtimeSession", () => {
           interviewPlan: {
             ...interviewPlan,
             versionId: "different-version",
-          } as typeof interviewPlan,
+          },
         }),
       ),
       issueProviderCredential,
