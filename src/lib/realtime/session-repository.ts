@@ -65,7 +65,6 @@ export type RealtimeSessionRepository = Pick<
       attemptId: string;
       eventId: string;
       questionId: string;
-      interviewerVersionId: string;
     }>): Promise<RealtimeAttemptProgressResult>;
   }>;
 
@@ -258,13 +257,7 @@ export function createRealtimeSessionRepository(rpc: Rpc): RealtimeSessionReposi
     },
 
     async advanceAttemptProgress(input): Promise<RealtimeAttemptProgressResult> {
-      if (
-        !input.rawToken ||
-        !input.attemptId ||
-        !input.eventId ||
-        !input.questionId ||
-        !input.interviewerVersionId
-      ) {
+      if (!input.rawToken || !input.attemptId || !input.eventId || !input.questionId) {
         return { status: "conflict" };
       }
 
