@@ -97,12 +97,30 @@ describe("POST /api/interview/[token]/realtime-session", () => {
       followUpsUsed: { "question-1": 1 },
       processedEventIds: ["event-1"],
     } as const;
+    const interviewPlan = {
+      versionId: "internal-version-1",
+      sections: [
+        {
+          id: "section-1",
+          title: "Technical depth",
+          questions: [
+            {
+              id: "question-1",
+              prompt: "Describe a production incident you resolved.",
+              required: true,
+              followUpLimit: 1,
+            },
+          ],
+        },
+      ],
+    } as const;
     const authorize = vi.fn().mockResolvedValue({
       status: "authorized",
       attemptId: "attempt-1",
       interviewerVersionId: "internal-version-1",
       durationSeconds: 1800,
       language: "en",
+      interviewPlan,
       providerCredential: {
         credential: "short-lived-provider-token",
         expiresAt: "2026-09-12T13:00:00.000Z",
@@ -111,19 +129,24 @@ describe("POST /api/interview/[token]/realtime-session", () => {
     });
 
     const response = await createRealtimeSessionHandler(authorize)(request(), context);
+    const body = await response.text();
 
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({
+    expect(JSON.parse(body)).toEqual({
       status: "authorized",
       attemptId: "attempt-1",
       durationSeconds: 1800,
       language: "en",
+      interviewPlan,
       providerCredential: {
         credential: "short-lived-provider-token",
         expiresAt: "2026-09-12T13:00:00.000Z",
       },
       resumeCheckpoint,
     });
+    expect(body).not.toContain("rubric");
+    expect(body).not.toContain("criteria");
+    expect(body).not.toContain("capability-secret");
   });
 
   it("maps unexpected server/provider failures to a constant-safe retryable response", async () => {
