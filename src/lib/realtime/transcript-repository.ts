@@ -79,6 +79,9 @@ function isTranscriptRow(value: unknown): value is TranscriptRow {
     isNonEmptyString(row.text) &&
     isTimestampOrNull(row.started_at) &&
     isTimestampOrNull(row.ended_at) &&
+    (row.started_at === null ||
+      row.ended_at === null ||
+      Date.parse(row.ended_at) >= Date.parse(row.started_at)) &&
     isNonEmptyString(row.finalized_at) &&
     !Number.isNaN(Date.parse(row.finalized_at))
   );
