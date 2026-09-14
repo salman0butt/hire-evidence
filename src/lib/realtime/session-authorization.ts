@@ -1,5 +1,9 @@
 import type { InterviewPlanInput } from "./plan-runner";
 import type { RealtimeResumeCheckpoint } from "./reconnect";
+import type {
+  DurableTranscriptTurn,
+  ListFinalizedTurnsResult,
+} from "./transcript-repository";
 
 export type CandidateRealtimeSession =
   | Readonly<{ status: "unavailable" }>
@@ -38,6 +42,10 @@ export type RealtimeSessionAuthorizationDeps = Readonly<{
     candidateId: string;
     interviewerVersionId: string;
   }) => Promise<RealtimeAttemptResult>;
+  listFinalizedTurns?: ((input: {
+    rawToken: string;
+    attemptId: string;
+  }) => Promise<ListFinalizedTurnsResult>) | undefined;
   issueProviderCredential: (input: {
     attemptId: string;
     interviewerVersionId: string;
@@ -57,6 +65,7 @@ export type RealtimeSessionAuthorization =
       interviewPlan: InterviewPlanInput;
       providerCredential: ProviderCredential;
       resumeCheckpoint?: RealtimeResumeCheckpoint | undefined;
+      transcriptTurns?: readonly DurableTranscriptTurn[] | undefined;
     }>;
 
 const unavailable: RealtimeSessionAuthorization = { status: "unavailable" };
@@ -96,6 +105,18 @@ export async function authorizeRealtimeSession(
 
   if (attempt.status !== "ready") return unavailable;
 
+  let transcriptTurns: readonly DurableTranscriptTurn[] | undefined;
+  if (candidateSession.lifecycle === "started") {
+    if (!deps.listFinalizedTurns) return unavailable;
+
+    const transcript = await deps.listFinalizedTurns({
+      rawToken,
+      attemptId: attempt.attemptId,
+    });
+    if (transcript.status !== "available") return unavailable;
+    transcriptTurns = transcript.turns;
+  }
+
   const providerCredential = await deps.issueProviderCredential({
     attemptId: attempt.attemptId,
     interviewerVersionId: candidateSession.interviewerVersionId,
@@ -114,5 +135,6 @@ export async function authorizeRealtimeSession(
     ...(attempt.resumeCheckpoint
       ? { resumeCheckpoint: attempt.resumeCheckpoint }
       : {}),
+    ...(transcriptTurns ? { transcriptTurns } : {}),
   };
 }
