@@ -3,12 +3,16 @@ export type RealtimeTransportError = Readonly<{
   message: string;
 }>;
 
+export type TranscriptSpeaker = "candidate" | "interviewer";
+
 export type RealtimeTransportEvent =
   | Readonly<{ type: "open" }>
   | Readonly<{ type: "audio"; pcm: Float32Array; sampleRate: number }>
   | Readonly<{ type: "candidateSpeechStart" }>
   | Readonly<{ type: "candidateSpeechEnd" }>
   | Readonly<{ type: "modelTurn"; text: string }>
+  | Readonly<{ type: "partialTranscript"; speaker: TranscriptSpeaker; text: string }>
+  | Readonly<{ type: "finalTranscript"; speaker: TranscriptSpeaker; text: string }>
   | Readonly<{ type: "interrupted" }>
   | Readonly<{ type: "recoverableError"; error: RealtimeTransportError }>
   | Readonly<{ type: "fatalError"; error: RealtimeTransportError }>
