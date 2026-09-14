@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { createRealtimeSessionHandler } from "@/lib/realtime/realtime-session-handler";
-import { POST } from "./route";
+import {
+  createProductionRealtimeSessionRoute,
+  POST,
+} from "./route";
 
 function request() {
   return new Request("https://hire-evidence.example/api/interview/capability-secret/realtime-session", {
@@ -21,6 +24,50 @@ describe("POST /api/interview/[token]/realtime-session", () => {
     expect(response.status).toBe(503);
     expect(JSON.parse(body)).toEqual({ status: "unavailable" });
     expect(body).not.toContain("capability-secret");
+  });
+
+  it("wires the configured server provider key to a lazy Supabase RPC boundary", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: { ok: true }, error: null });
+    const createSupabaseClient = vi.fn().mockResolvedValue({ rpc });
+    const composedHandler = vi.fn().mockResolvedValue(
+      Response.json({ status: "authorized" }),
+    );
+    const createHandler = vi.fn((options: {
+      apiKey: string | undefined;
+      rpc: (
+        name: string,
+        args: Readonly<Record<string, unknown>>,
+      ) => Promise<Readonly<{ data: unknown; error: unknown }>>;
+    }) => {
+      expect(options.apiKey).toBe("server-gemini-key");
+
+      return async (incomingRequest: Request, incomingContext: typeof context) => {
+        expect(incomingRequest).toBeInstanceOf(Request);
+        expect(incomingContext).toBe(context);
+        await expect(
+          options.rpc("resolve_realtime_candidate_session", {
+            raw_token: "capability-secret",
+          }),
+        ).resolves.toEqual({ data: { ok: true }, error: null });
+
+        return composedHandler();
+      };
+    });
+
+    const route = createProductionRealtimeSessionRoute({
+      apiKey: "server-gemini-key",
+      createSupabaseClient,
+      createHandler,
+    });
+    const response = await route(request(), context);
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ status: "authorized" });
+    expect(createHandler).toHaveBeenCalledOnce();
+    expect(createSupabaseClient).toHaveBeenCalledOnce();
+    expect(rpc).toHaveBeenCalledWith("resolve_realtime_candidate_session", {
+      raw_token: "capability-secret",
+    });
   });
 
   it("returns one constant-safe unavailable response without echoing or logging the capability", async () => {
