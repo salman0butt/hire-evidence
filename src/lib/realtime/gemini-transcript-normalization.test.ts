@@ -131,4 +131,55 @@ describe("Gemini transcript normalization", () => {
 
     expect(events).toEqual([]);
   });
+
+  it("discards interrupted interviewer transcript fragments before the next turn", async () => {
+    const socket = new FakeWebSocket();
+    const events: RealtimeTransportEvent[] = [];
+    const adapter = createGeminiRealtimeTransportAdapter({
+      createWebSocket: () => socket,
+    });
+
+    await adapter.connect(
+      { credential: "token", attemptId: "attempt-1" },
+      (event) => events.push(event),
+    );
+
+    socket.emit("message", {
+      data: JSON.stringify({
+        serverContent: {
+          outputTranscription: { text: "Discard me" },
+        },
+      }),
+    });
+    socket.emit("message", {
+      data: JSON.stringify({ serverContent: { interrupted: true } }),
+    });
+    socket.emit("message", {
+      data: JSON.stringify({
+        serverContent: {
+          outputTranscription: { text: "Fresh turn" },
+          turnComplete: true,
+        },
+      }),
+    });
+
+    expect(events).toEqual([
+      {
+        type: "partialTranscript",
+        speaker: "interviewer",
+        text: "Discard me",
+      },
+      { type: "interrupted" },
+      {
+        type: "partialTranscript",
+        speaker: "interviewer",
+        text: "Fresh turn",
+      },
+      {
+        type: "finalTranscript",
+        speaker: "interviewer",
+        text: "Fresh turn",
+      },
+    ]);
+  });
 });
