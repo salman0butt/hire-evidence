@@ -4,6 +4,7 @@ import {
   type RealtimePlaybackAudioContext,
 } from "./audio-playback";
 import { createGeminiRealtimeTransportAdapter } from "./gemini-transport";
+import type { RealtimeInterviewSessionSnapshot } from "./interview-session";
 import {
   createRealtimeInterviewRuntime,
   type RealtimeInterviewRuntime,
@@ -147,6 +148,7 @@ function createCaptureBrowserAdapters() {
 
 export function createBrowserRealtimeInterviewRuntime(
   authorization: AuthorizedRealtimeSession,
+  onSnapshot?: (snapshot: RealtimeInterviewSessionSnapshot) => void,
 ): RealtimeInterviewRuntime {
   const playback = createRealtimeAudioPlayback({
     createAudioContext: createPlaybackContext,
@@ -156,6 +158,7 @@ export function createBrowserRealtimeInterviewRuntime(
   return createRealtimeInterviewRuntime({
     authorization,
     playback,
+    ...(onSnapshot ? { onSnapshot } : {}),
     createTransport: (onEvent) =>
       createRealtimeTransport({
         adapter: createGeminiRealtimeTransportAdapter(),
