@@ -77,7 +77,11 @@ export function createRealtimeInterviewRuntime(
       return;
     }
 
-    if (event.type === "recoverableError" && started && !stopped) {
+    if (
+      (event.type === "recoverableError" || event.type === "close") &&
+      started &&
+      !stopped
+    ) {
       options.onRecoverableFailure?.({ kind: "provider-error" });
       return;
     }
