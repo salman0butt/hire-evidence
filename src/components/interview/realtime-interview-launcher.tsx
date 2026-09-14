@@ -1,31 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-type AuthorizedRealtimeSession = Readonly<{
-  status: "authorized";
-  attemptId: string;
-  durationSeconds: number;
-  language: string;
-  interviewPlan: unknown;
-  providerCredential: unknown;
-  resumeCheckpoint?: unknown;
-}>;
+import { createBrowserRealtimeInterviewRuntime } from "@/lib/realtime/browser-realtime-interview-runtime";
+import type { RealtimeInterviewRuntime } from "@/lib/realtime/realtime-interview-runtime";
+import type { RealtimeSessionAuthorization } from "@/lib/realtime/session-authorization";
 
-type RealtimeAuthorizationResult =
-  | AuthorizedRealtimeSession
-  | Readonly<{ status: "unavailable" }>;
+type AuthorizedRealtimeSession = Extract<
+  RealtimeSessionAuthorization,
+  { status: "authorized" }
+>;
 
 type RealtimeInterviewLauncherProps = Readonly<{
   token: string;
-  authorize?: (token: string) => Promise<RealtimeAuthorizationResult>;
+  authorize?: (token: string) => Promise<RealtimeSessionAuthorization>;
+  createRuntime?: (
+    authorization: AuthorizedRealtimeSession,
+  ) => RealtimeInterviewRuntime;
 }>;
 
-type LauncherState = "idle" | "authorizing" | "authorized" | "error";
+type LauncherState = "idle" | "authorizing" | "connected" | "error";
+
+function isAuthorizedRealtimeSession(value: unknown): value is AuthorizedRealtimeSession {
+  if (!value || typeof value !== "object") return false;
+  const body = value as Record<string, unknown>;
+  if (
+    body.status !== "authorized" ||
+    typeof body.attemptId !== "string" ||
+    typeof body.interviewerVersionId !== "string" ||
+    typeof body.durationSeconds !== "number" ||
+    typeof body.language !== "string" ||
+    !body.interviewPlan ||
+    typeof body.interviewPlan !== "object" ||
+    !body.providerCredential ||
+    typeof body.providerCredential !== "object"
+  ) {
+    return false;
+  }
+
+  const credential = body.providerCredential as Record<string, unknown>;
+  return (
+    typeof credential.credential === "string" &&
+    credential.credential.length > 0 &&
+    typeof credential.expiresAt === "string"
+  );
+}
 
 async function authorizeRealtimeInterview(
   token: string,
-): Promise<RealtimeAuthorizationResult> {
+): Promise<RealtimeSessionAuthorization> {
   try {
     const response = await fetch(
       `/api/interview/${encodeURIComponent(token)}/realtime-session`,
@@ -36,12 +59,10 @@ async function authorizeRealtimeInterview(
       return { status: "unavailable" };
     }
 
-    const body = (await response.json()) as { status?: unknown };
-    if (body.status !== "authorized") {
-      return { status: "unavailable" };
-    }
-
-    return body as AuthorizedRealtimeSession;
+    const body: unknown = await response.json();
+    return isAuthorizedRealtimeSession(body)
+      ? body
+      : { status: "unavailable" };
   } catch {
     return { status: "unavailable" };
   }
@@ -50,15 +71,45 @@ async function authorizeRealtimeInterview(
 export function RealtimeInterviewLauncher({
   token,
   authorize = authorizeRealtimeInterview,
+  createRuntime = createBrowserRealtimeInterviewRuntime,
 }: RealtimeInterviewLauncherProps) {
   const [state, setState] = useState<LauncherState>("idle");
+  const runtimeRef = useRef<RealtimeInterviewRuntime | null>(null);
+
+  useEffect(
+    () => () => {
+      const runtime = runtimeRef.current;
+      runtimeRef.current = null;
+      void runtime?.stop();
+    },
+    [],
+  );
 
   async function handleStart() {
-    if (state === "authorizing") return;
+    if (state === "authorizing" || state === "connected") return;
 
     setState("authorizing");
     const result = await authorize(token);
-    setState(result.status === "authorized" ? "authorized" : "error");
+    if (result.status !== "authorized") {
+      setState("error");
+      return;
+    }
+
+    const runtime = createRuntime(result);
+    runtimeRef.current = runtime;
+
+    try {
+      await runtime.start();
+      if (runtimeRef.current === runtime) {
+        setState("connected");
+      }
+    } catch {
+      if (runtimeRef.current === runtime) {
+        runtimeRef.current = null;
+        await runtime.stop();
+        setState("error");
+      }
+    }
   }
 
   return (
@@ -76,9 +127,9 @@ export function RealtimeInterviewLauncher({
         </p>
       </div>
 
-      {state === "authorized" ? (
+      {state === "connected" ? (
         <p role="status" aria-live="polite" className="text-sm text-slate-700">
-          Realtime session authorized
+          Live interview connected
         </p>
       ) : state === "error" ? (
         <p role="alert" className="text-sm text-slate-700">
