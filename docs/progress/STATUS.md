@@ -69,4 +69,4 @@ Closeout review confirms transcript text is rendered as inert React text, partia
 
 ## Durable Recovery / Next Action
 
-Recover actual Git/PR/CI first. M06 implementation and browser acceptance are complete; finish durable closeout/traceability reconciliation, run exact-final-head CI, then execute the user-authorized auto-merge gate for PR #8. After merge, verify resulting `main` CI, activate M07 Evidence-Based Assessment Engine from the durable roadmap/PRD, create/reuse its branch/PR according to repository conventions, and immediately begin its first valid unfinished unit.
+Exact next work: recover actual Git/PR/CI first; verify this closeout repair on the exact final PR head, then execute the authorized PR #8 merge gate. After merge, verify resulting `main` CI, activate M07 Evidence-Based Assessment Engine from the durable roadmap/PRD, create/reuse its branch/PR according to repository conventions, and immediately begin its first valid unfinished unit.
