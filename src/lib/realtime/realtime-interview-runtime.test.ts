@@ -99,6 +99,44 @@ describe("production realtime interview runtime", () => {
     expect(playback.enqueue).toHaveBeenCalledWith(outputPcm, 24000);
   });
 
+  it("persists explicit app-owned question completion before advancing the interview", async () => {
+    const persistProgress = vi.fn().mockResolvedValue({ status: "completed" as const });
+    const transport: RealtimeTransport = {
+      connect: vi.fn(async () => undefined),
+      sendAudio: vi.fn(),
+      disconnect: vi.fn(async () => undefined),
+    };
+    const capture: RealtimeAudioCapture = {
+      start: vi.fn(async () => undefined),
+      setMuted: vi.fn(),
+      stop: vi.fn(async () => undefined),
+    };
+    const playback: RealtimeAudioPlayback = {
+      enqueue: vi.fn(),
+      interrupt: vi.fn(),
+      stop: vi.fn(async () => undefined),
+    };
+
+    const runtime = createRealtimeInterviewRuntime({
+      authorization,
+      createTransport: () => transport,
+      createCapture: () => capture,
+      playback,
+      persistProgress,
+    });
+
+    await runtime.completeCurrentQuestion("turn-1");
+
+    expect(persistProgress).toHaveBeenCalledWith({
+      eventId: "turn-1",
+      questionId: "question-1",
+    });
+    expect(runtime.getSnapshot()).toMatchObject({
+      status: "completed",
+      currentQuestion: null,
+    });
+  });
+
   it("stops capture, transport, and playback idempotently", async () => {
     let onTransportEvent: ((event: RealtimeTransportEvent) => void) | undefined;
     const transport: RealtimeTransport = {
