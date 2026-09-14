@@ -202,6 +202,7 @@ test("production launcher composes the default browser runtime and reconnects th
   );
   const { rawToken, versionId, questionId } = await createInvitation(owner, admin, suffix);
   const syntheticCredential = "e2e-short-lived-credential";
+  const attemptId = "attempt-e2e-runtime";
 
   await page.addInitScript(() => {
     class FakeBufferSource {
@@ -298,7 +299,7 @@ test("production launcher composes the default browser runtime and reconnects th
       contentType: "application/json",
       body: JSON.stringify({
         status: "authorized",
-        attemptId: "attempt-e2e-runtime",
+        attemptId,
         interviewerVersionId: versionId,
         durationSeconds: 1800,
         language: "English",
@@ -323,6 +324,21 @@ test("production launcher composes the default browser runtime and reconnects th
           credential: syntheticCredential,
           expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
         },
+      }),
+    });
+  });
+
+  const finalizationBodies: unknown[] = [];
+  await page.route(`**/api/interview/${rawToken}/realtime-finalize`, async (route) => {
+    finalizationBodies.push(route.request().postDataJSON());
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        status: "completed",
+        attemptId,
+        completedAt: new Date().toISOString(),
+        durationSeconds: 600,
       }),
     });
   });
@@ -353,5 +369,6 @@ test("production launcher composes the default browser runtime and reconnects th
 
   await page.getByRole("button", { name: "End interview" }).click();
   await expect(page.getByRole("status")).toContainText("Interview ended");
+  expect(finalizationBodies).toEqual([{ attemptId }]);
   await expect(page.getByText(syntheticCredential)).toHaveCount(0);
 });
