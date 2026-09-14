@@ -9,6 +9,7 @@ import {
   createRealtimeInterviewRuntime,
   type RealtimeInterviewRuntime,
 } from "./realtime-interview-runtime";
+import { createRealtimeProgressClient } from "./realtime-progress-client";
 import type { RealtimeSessionAuthorization } from "./session-authorization";
 import { createRealtimeTransport } from "./transport";
 
@@ -148,7 +149,8 @@ function createCaptureBrowserAdapters() {
 
 export function createBrowserRealtimeInterviewRuntime(
   authorization: AuthorizedRealtimeSession,
-  onSnapshot?: (snapshot: RealtimeInterviewSessionSnapshot) => void,
+  onSnapshot: ((snapshot: RealtimeInterviewSessionSnapshot) => void) | undefined,
+  rawToken: string,
 ): RealtimeInterviewRuntime {
   const playback = createRealtimeAudioPlayback({
     createAudioContext: createPlaybackContext,
@@ -158,6 +160,10 @@ export function createBrowserRealtimeInterviewRuntime(
   return createRealtimeInterviewRuntime({
     authorization,
     playback,
+    persistProgress: createRealtimeProgressClient({
+      rawToken,
+      attemptId: authorization.attemptId,
+    }),
     ...(onSnapshot ? { onSnapshot } : {}),
     createTransport: (onEvent) =>
       createRealtimeTransport({
