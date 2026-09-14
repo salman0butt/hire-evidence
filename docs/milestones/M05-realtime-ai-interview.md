@@ -33,7 +33,7 @@ Exit:
 candidate can complete stable multi-turn voice interview.
 
 ## Dependencies
-Candidates + Invitations; published Interviewer Builder configuration; authoritative Gemini Live runtime configuration for final live-provider acceptance.
+Candidates + Invitations; published Interviewer Builder configuration; authoritative Gemini Live runtime configuration and a controlled server-side `GEMINI_API_KEY` acceptance environment for final live-provider verification.
 
 ## In Scope
 The authoritative definition plus M05.1–M05.14 from the selected implementation plan.
@@ -44,7 +44,7 @@ Later milestones, autonomous hiring decisions, protected-trait/emotion/personali
 ## Architecture Notes
 Server-authorized realtime setup; short-lived Gemini provider credentials; app-owned provider-neutral transport boundary; explicit browser diagnostics; deterministic audio capture/playback lifecycles; app-owned connection state; immutable interview-plan runner; monotonic pacing; bounded job-related follow-ups; same-attempt reconnect. Candidate speech is untrusted data. Technical failures never lower candidate evaluation. Runtime plan progression is committed only after authoritative attempt persistence succeeds and a returned server checkpoint is validated.
 
-The production candidate path now includes `POST /api/interview/[token]/realtime-session`, the capability-bound realtime-progress boundary, Gemini Live ephemeral credential issuance, the Gemini transport adapter, browser capture/playback composition, and `RealtimeInterviewLauncher`. Missing server `GEMINI_API_KEY` continues to fail closed with constant-safe unavailability.
+The production candidate path includes `POST /api/interview/[token]/realtime-session`, the capability-bound realtime-progress boundary, Gemini Live ephemeral credential issuance, the Gemini transport adapter, browser capture/playback composition, and `RealtimeInterviewLauncher`. Missing server `GEMINI_API_KEY` continues to fail closed with constant-safe unavailability.
 
 ## Selected Design / Implementation Plan
 - Design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`
@@ -68,32 +68,34 @@ The production candidate path now includes `POST /api/interview/[token]/realtime
 3. **VERIFIED** — M05.3 Browser compatibility + microphone diagnostics.
 4. **VERIFIED** — M05.4 Deterministic Web Audio capture.
 5. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.5 Provider-neutral realtime transport with Gemini Live adapter behind the app-owned boundary.
-6. **VERIFIED** — M05.6 AI audio playback.
+6. **VERIFIED** — M05.6 AI audio playback. Candidate-speech and provider-interruption events both invalidate obsolete playback.
 7. **VERIFIED** — M05.7 Explicit connection state machine + accessible controls.
 8. **VERIFIED** — M05.8 Deterministic interview-plan runner.
 9. **VERIFIED** — M05.9 Pacing/time budget.
 10. **VERIFIED** — M05.10 Bounded follow-up policy.
-11. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.11 Realtime interview orchestrator/barge-in integration. Production candidate-page launcher/runtime composition now authorizes the capability, creates Gemini transport/capture/playback behind provider-neutral interfaces, renders authoritative snapshots, and exposes mute/end controls.
+11. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.11 Realtime interview orchestrator/barge-in integration. Production candidate-page launcher/runtime composition authorizes the capability, creates Gemini transport/capture/playback behind provider-neutral interfaces, renders authoritative snapshots, exposes mute/end controls, and handles candidate/provider interruption without mutating plan authority.
 12. **VERIFIED (provider-neutral scope)** — M05.12 Timeout/error recovery.
-13. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.13 Same-authoritative-attempt reconnect. Server-authoritative checkpoints, capability-bound progress persistence, immutable-plan restoration, stale-generation handling, and runtime persistence gating are implemented; live Gemini browser reconnect/interruption acceptance remains open.
-14. **ACTIVE / PARTIALLY VERIFIED** — M05.14 Full realtime E2E and closeout. Browser coverage verifies microphone denial/recovery, keyboard focus, microphone selection, mobile no-overflow, no recording during readiness checks, and constant-safe unavailable-provider behavior when the server secret is absent. Stable Gemini-backed multi-turn completion plus interruption/recovery/barge-in/timeout/bounded reconnect acceptance remain open.
+13. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.13 Same-authoritative-attempt reconnect. Server-authoritative checkpoints, capability-bound progress persistence, immutable-plan restoration, stale-generation handling, runtime persistence gating, and deterministic browser disconnect→reauthorize same-attempt reconnect are implemented; live Gemini browser reconnect/interruption acceptance remains open.
+14. **ACTIVE / PARTIALLY VERIFIED** — M05.14 Full realtime E2E and closeout. Deterministic browser acceptance verifies production launcher/runtime composition, short-lived credential non-display, disconnect→reauthorize reconnect, mute/end controls, microphone denial/recovery, keyboard focus, microphone selection, mobile no-overflow, no recording during readiness checks, and constant-safe unavailable-provider behavior. Stable Gemini-backed multi-turn completion plus live interruption/barge-in, timeout/error recovery, and bounded reconnect acceptance remain open.
 
 ## TDD Evidence
 
 Earlier M05 checkpoints remain historically preserved in Git and prior revisions of this ledger. Important recent checkpoints include:
 
 - production Gemini session composition RED/GREEN: `7f9b2f6beb195c48a03595fceb191d0adc83aa3f` → `409a899ce000674b441bd0da2ff8a01d4efc62db`.
-- production browser runtime/launcher composition advanced through later commits, including snapshot forwarding `6bfef96dbeb4a9d4c529eb710f7d15c6b74ac5dc` and authoritative snapshot rendering `95106d791b42220a53788bc058327182902cc99a`.
+- production browser runtime/launcher composition advanced through snapshot forwarding `6bfef96dbeb4a9d4c529eb710f7d15c6b74ac5dc` and authoritative snapshot rendering `95106d791b42220a53788bc058327182902cc99a`.
 - historical M05.13 persistence evidence includes repository RED `87406dc5d0186d5f28f3b8d5cdd5f19c9f50b2b1`, authority review RED `a2cf5eb633751d58cfcf3e3fb0b2e657504cc00a`, reviewed GREEN `576d5dbad4138b85876eeac22ddfe8e7247381ce`, runtime persistence RED `f3b01a0e1f3f9ca17cf5058aea73816f6e639d49`, fail-closed review RED `a0fcda2590020b4bd574dcd342a3aec308e34300`, and reviewed GREEN `5e9328d2f945cd10eaecea312896f29fbc93b10e`.
-- documentation reconciliation checkpoint `52f0ccb2a3a1e0c3f2fa4a38860dc9a097da5aba`, CI #750 / `34841743614` — **NOT GREEN**. Lint, typecheck, 120 test files / 497 tests, and verifier unit tests passed, but `scripts/verify_autonomous_framework.py` correctly rejected this ledger because the exact required `## TDD Evidence` and `## Integration Test Evidence` section headings had been accidentally combined. This commit restores the required durable ledger contract rather than weakening the verifier.
+- provider-interruption barge-in RED: `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772 / `34857082289` — intended failure because provider `interrupted` did not stop obsolete interviewer playback.
+- provider-interruption GREEN: `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — minimal fix routes provider `interrupted` through `playback.interrupt()` and the complete repository gate passed.
+- documentation checkpoint `3914a347a47090f666a5458014196d9ca9d4a338`, CI #778 / `34859783065` — **NOT GREEN**. Lint, typecheck, 125 test files / 506 tests, framework-verifier tests, and requirements-source-verifier tests passed, but `scripts/verify_autonomous_framework.py` correctly rejected `docs/progress/STATUS.md` because the literal `CI status:` durable contract was missing. The downstream `supabase: command not found` cleanup message followed skipped setup and was not the root cause. Commit `619faa671577711e5b67428dbb2f8c4855355dff` restores that contract and requires fresh exact-head CI together with the subsequent durable-doc reconciliation.
 
 ## Integration Test Evidence
 
 - production route/provider wiring and schema fixes through `56c78425f7052b2e54ac9cfea410a57c53aef805`, CI #713 / `34832502815` — complete repository gate GREEN.
 - capability-bound realtime progress checkpoint `ce161fbaa34450839ac8f323f6fcc3a33cdc4863`, CI #728 / `34834823096` — complete repository gate GREEN.
-- exact behavioral head `95106d791b42220a53788bc058327182902cc99a`, CI #745 / `34839902037` — complete repository gate GREEN before the documentation reconciliation.
-- CI #750 / `34841743614` on `52f0ccb2a3a1e0c3f2fa4a38860dc9a097da5aba` is an invalid final verification checkpoint because the autonomous framework verifier failed on the ledger heading contract; later build/E2E steps were consequently skipped. The cleanup `supabase: command not found` message was downstream of skipped Supabase setup, not the root failure.
-- Stable live Gemini multi-turn browser completion and recovery remain an M05.14 exit requirement and are not yet satisfied.
+- deterministic production-browser composition covers authorized launcher/runtime setup, short-lived credential non-display, authoritative snapshot rendering, mute/end controls, and same-attempt disconnect→reauthorize recovery.
+- exact behavioral head `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN, including Chromium E2E.
+- stable live Gemini multi-turn browser completion and live recovery remain an M05.14 exit requirement and are not yet satisfied.
 
 ## Security Review
 
@@ -103,7 +105,7 @@ Invitation capability and current consent remain server authorization requiremen
 
 ## Accessibility Review
 
-Diagnostic UI and realtime controls provide semantic status/alert information, keyboard-operable controls, labelled mute/end/retry actions, pressed/disabled state, and live status text. Candidate-facing current-question/completion presentation is covered by component tests. Browser coverage verifies keyboard focus, recovery presentation, microphone selection, and mobile no-overflow. Full live Gemini browser accessibility acceptance remains open.
+Diagnostic UI and realtime controls provide semantic status/alert information, keyboard-operable controls, labelled mute/end/retry actions, pressed/disabled state, and live status text. Candidate-facing current-question/completion presentation is covered by component tests. Browser coverage verifies keyboard focus, recovery presentation, microphone selection, mute/end controls, and mobile no-overflow. Full live Gemini browser accessibility acceptance remains open.
 
 ## Performance Review
 
@@ -117,21 +119,22 @@ Capture/playback/transport lifecycles use bounded cleanup and stale-generation r
 - Important — **fixed**: progress checkpoint authority initially depended on caller input; persisted attempt version now wins.
 - Important — **fixed**: malformed authoritative progress checkpoint could throw; it now fails closed.
 - Important — **fixed**: production browser composition gap. Candidate page now authorizes the session, instantiates the browser runtime/Gemini transport, and renders authoritative snapshots.
+- Important — **fixed**: provider `interrupted` events did not cancel obsolete interviewer playback; RED #772 → GREEN #773 regression coverage now protects this behavior.
 - Critical: **0 unresolved** for implemented slices.
 - Important: **0 unresolved** for implemented slices at latest recovery.
 - PR #7 has no unresolved review threads at latest recovery.
 
 ## Known Limitations / Blocker
 
-The remaining blocker is acceptance evidence, not production composition. Stable live Gemini multi-turn browser completion and recovery paths have not yet been demonstrated in CI because provider-backed execution requires server `GEMINI_API_KEY` and controlled browser/provider conditions. Existing E2E intentionally proves constant-safe unavailability when the runtime secret is absent.
+The remaining blocker is live acceptance evidence, not production composition. Stable live Gemini multi-turn browser completion and recovery paths have not yet been demonstrated because provider-backed execution requires server `GEMINI_API_KEY` and controlled browser/provider conditions. Existing deterministic E2E proves production composition and constant-safe unavailability when the runtime secret is absent, but it is not proof of successful live-provider execution.
 
-Do not substitute provider-neutral/component tests for live-provider acceptance and do not expose client-side long-lived secrets to manufacture E2E evidence. M05.14 remains incomplete. PR #7 must stay draft and unmerged until live-provider acceptance, final reviews, durable traceability, exact-final-head CI, concurrency checks, and repository merge gates are all satisfied.
+Do not substitute provider-neutral/component/deterministic browser tests for live-provider acceptance and do not expose client-side long-lived secrets to manufacture evidence. M05.14 remains incomplete. PR #7 must stay draft and unmerged until live-provider acceptance, final reviews, durable traceability, exact-final-head CI, concurrency checks, and repository merge gates are all satisfied.
 
 ## Fresh Verification Results
 
-Latest verified behavioral SHA before the current documentation reconciliation: `95106d791b42220a53788bc058327182902cc99a`, CI #745 / `34839902037` — complete repository gate GREEN.
+Latest verified behavioral SHA before the current durable-document reconciliation: `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN.
 
-Checkpoint `52f0ccb2a3a1e0c3f2fa4a38860dc9a097da5aba`, CI #750 / `34841743614` — **NOT GREEN** because the framework verifier detected missing exact required ledger headings. The current correction requires fresh exact-head CI before becoming final branch verification evidence.
+Documentation checkpoint `3914a347a47090f666a5458014196d9ca9d4a338`, CI #778 / `34859783065` — **NOT GREEN** because the framework verifier detected the missing literal `CI status:` field in `docs/progress/STATUS.md`; all 125 test files / 506 tests, lint, typecheck, and verifier unit tests passed before that contract failure. The current durable-document correction chain requires fresh exact-head CI before becoming final branch verification evidence.
 
 ## Fresh Verification Commands
 
@@ -157,7 +160,7 @@ Recover actual Git/GitHub first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `
 
 ## Completion Checklist
 - [ ] Requirements and all M05 iterations accounted for.
-- [ ] Stable multi-turn candidate interview acceptance criterion verified.
+- [ ] Stable live multi-turn candidate interview acceptance criterion verified.
 - [ ] Required TDD/integration/provider/browser/E2E evidence recorded.
 - [ ] Security/accessibility/performance/AI-safety reviews complete.
 - [ ] 0 Critical / 0 Important findings at milestone closeout.
@@ -166,7 +169,7 @@ Recover actual Git/GitHub first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `
 - [ ] Final PR head/review/concurrency/mergeability gates green before authorized merge.
 
 ## Next Action
-Add deterministic browser acceptance around the production launcher/runtime composition without exposing provider secrets, then execute live Gemini-backed browser acceptance when server `GEMINI_API_KEY` is available. Verify stable multi-turn completion, interruption/barge-in, timeout/error recovery, bounded same-attempt reconnect, mute/end controls, accessibility/mobile behavior, and invitation safety; then reconcile final traceability/feature/handoff state and run the complete quality gate.
+Verify the current durable-document reconciliation head with the complete CI gate. When a controlled server-side `GEMINI_API_KEY` acceptance environment is available, execute live Gemini-backed browser acceptance covering stable multi-turn completion, interruption/barge-in, timeout/error recovery, bounded same-attempt reconnect, mute/end controls, accessibility/mobile behavior, and invitation safety. Then reconcile any resulting evidence, perform skeptical closeout review, verify exact-final-head CI, and execute the authorized milestone merge gate only if every gate passes.
 
 ## Next Milestone
 M06 — Transcript + Durable Session, only after M05 is genuinely complete, merged, and post-merge `main` is verified.
