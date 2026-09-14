@@ -124,7 +124,18 @@ export function createTranscriptRepository(rpc: Rpc): TranscriptRepository {
         return { status: "conflict" };
       }
 
-      return { status: "appended", turn: toTurn(data[0]) };
+      const row = data[0];
+      if (
+        row.event_id !== input.eventId ||
+        row.speaker !== input.speaker ||
+        row.text !== input.text ||
+        row.started_at !== input.startedAt ||
+        row.ended_at !== input.endedAt
+      ) {
+        return { status: "conflict" };
+      }
+
+      return { status: "appended", turn: toTurn(row) };
     },
 
     async listFinalizedTurns(input): Promise<ListFinalizedTurnsResult> {
