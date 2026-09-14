@@ -24,6 +24,12 @@ Exit: completed interview produces durable accurate transcript.
 ## Dependencies
 M05 — Realtime AI Interview — **COMPLETE**, merged to `main` as `5c3843c6444bad256974ea391a4a6a978bf88f24`.
 
+## In Scope
+The authoritative M06 definition and iterations M06.1–M06.9, including normalized transcript handling, durable finalized messages, ordering/speaker/idempotency/reconnect/technical-event/finalization guarantees, and durability E2E.
+
+## Out of Scope
+M07 assessment/scoring logic and later milestones; speculative transcript interpretation; persistence or evaluation of partial hypotheses; any protected-trait, emotion, personality, deception, appearance, health, or accent-quality inference.
+
 ## Selected Design / Implementation Plan
 - Design: `docs/superpowers/specs/2026-09-14-transcript-durable-session-design.md`
 - Plan: `docs/superpowers/plans/2026-09-14-transcript-durable-session.md`
@@ -66,11 +72,15 @@ M05 — Realtime AI Interview — **COMPLETE**, merged to `main` as `5c3843c6444
 - **NOT GREEN** `530d8ef2eb5c0899042f8b5653536ed221199019`, CI run `34872992584`: minimal session integration exposed a compatibility failure because existing UI/runtime test fixtures still constructed the pre-transcript snapshot shape. Production type safety was preserved; fixtures were updated rather than weakening the type.
 - **GREEN** `2e91eb529cdc56688aca65766c6e5785d6b1378b`, CI #804 / run `34873181788`: install, lint, typecheck, unit/component tests, framework/requirements verifiers, local Supabase startup, build, Chromium, E2E and PRD coverage all passed.
 
+### M06.3 — Durable messages
+- **RED** `1a35d109496c51fa5b4f1e740c0ff756f7903619`, CI #806 / run `34873858138`: install/lint passed and typecheck failed solely because the durable transcript repository module did not yet exist.
+- **NOT GREEN** `5c9231a10d2063dec10e42732a21773fb32232be`, CI #807 / run `34874048598`: repository implementation passed lint, typecheck and all 517 unit/component tests, but the autonomous-framework verifier correctly rejected this ledger because a prior reconciliation accidentally removed required `In Scope` / `Out of Scope` headings. The product implementation was not claimed GREEN.
+
 ## Integration Test Evidence
-M06.2 exact-head CI #804 / `34873181788` passed the complete repository gate, including local-Supabase-backed E2E.
+M06.2 exact-head CI #804 / `34873181788` passed the complete repository gate, including local-Supabase-backed E2E. M06.3 durable database integration remains active work.
 
 ## Security Review
-Current M06.1/M06.2 review: no Critical or Important findings. Transcript text remains untrusted data; partials are in-memory only; stale-generation callbacks are rejected by the existing session guard; no scoring or protected-trait/emotion/personality/accent inference is introduced.
+Current M06.1/M06.2 review: no Critical or Important findings. Transcript text remains untrusted data; partials are in-memory only; stale-generation callbacks are rejected by the existing session guard; no scoring or protected-trait/emotion/personality/accent inference is introduced. M06.3 repository calls are capability-bound and fail closed; database-side attempt isolation remains pending migration verification.
 
 ## Accessibility Review
 No transcript UI was introduced by M06.1/M06.2. Existing interview UI/accessibility acceptance passed CI #804. Transcript presentation remains future acceptance work if/when exposed.
@@ -84,20 +94,20 @@ Transcript text is evidence input, never trusted instruction. Technical/browser/
 ## Code Review Findings
 - Critical: 0 unresolved.
 - Important: 0 unresolved.
-- PR #8 had no submitted reviews or unresolved review threads at the latest M06.2 recovery.
+- PR #8 had no submitted reviews or unresolved review threads at the latest recovery.
 - Minor/performance observation: immutable finalized-turn arrays are copied by the state helper; no correctness or safety impact at current scale.
 
 ## Fresh Verification Results
-Latest verified M06.2 head: `2e91eb529cdc56688aca65766c6e5785d6b1378b`, CI #804 / `34873181788` — complete repository gate GREEN.
+Latest fully verified M06 head: `2e91eb529cdc56688aca65766c6e5785d6b1378b`, CI #804 / `34873181788` — complete repository gate GREEN. M06.3 head requires fresh full exact-head verification after the ledger-contract repair.
 
 ## Commits / Files Changed
-M06.1/M06.2 introduced normalized transcript transport handling, Gemini transcript mapping/interruption cleanup, `src/lib/realtime/transcript-state.ts`, transcript state tests, session transcript integration tests, and snapshot fixture updates. Git history is authoritative for the exact diff.
+M06.1/M06.2 introduced normalized transcript transport handling, Gemini transcript mapping/interruption cleanup, `src/lib/realtime/transcript-state.ts`, transcript state tests, session transcript integration tests, and snapshot fixture updates. M06.3 has added `src/lib/realtime/transcript-repository.test.ts` and `src/lib/realtime/transcript-repository.ts`. Git history is authoritative for the exact diff.
 
 ## Known Limitations
-Durable finalized-turn persistence, correctness/idempotency guards, reconnect transcript restore, technical-event persistence, finalization and durability E2E remain unfinished M06 work.
+Durable finalized-turn database persistence, correctness/idempotency guards, reconnect transcript restore, technical-event persistence, finalization and durability E2E remain unfinished M06 work.
 
 ## Documentation Updated
-This ledger was reconciled after exact-head M06.2 GREEN. `docs/milestones/CURRENT.md`, `docs/progress/STATUS.md` and `docs/SESSION-HANDOFF.md` must remain aligned as work advances.
+This ledger records valid RED/GREEN/NOT GREEN checkpoints. `docs/milestones/CURRENT.md`, `docs/progress/STATUS.md` and `docs/SESSION-HANDOFF.md` must remain aligned as work advances.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → actual Git/PR/CI → this ledger → `docs/progress/STATUS.md` → `docs/milestones/CURRENT.md` → `docs/SESSION-HANDOFF.md` → PRD/design/plan → source/tests.
@@ -113,7 +123,7 @@ This ledger was reconciled after exact-head M06.2 GREEN. `docs/milestones/CURREN
 - [ ] Durable status/closeout state current.
 
 ## Next Work
-M06.3 — add attempt-scoped immutable durable finalized transcript messages with server-assigned monotonic sequence, idempotent identity and capability-bound cross-attempt denial using strict RED → GREEN evidence.
+M06.3 — verify the durable transcript repository boundary on exact head, then add attempt-scoped immutable finalized transcript database messages with server-assigned monotonic sequence, idempotent identity and capability-bound cross-attempt denial using strict RED → GREEN evidence.
 
 ## Next Milestone
 M07 — Evidence-Based Assessment Engine.
