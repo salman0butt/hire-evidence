@@ -13,6 +13,24 @@ const request = new Request(
 );
 const context = { params: Promise.resolve({ token: "capability-secret" }) };
 
+const interviewPlan = {
+  versionId: "33333333-3333-4333-8333-333333333333",
+  sections: [
+    {
+      id: "55555555-5555-4555-8555-555555555555",
+      title: "Technical depth",
+      questions: [
+        {
+          id: "66666666-6666-4666-8666-666666666666",
+          prompt: "Describe a difficult production incident you resolved.",
+          required: true,
+          followUpLimit: 1,
+        },
+      ],
+    },
+  ],
+};
+
 describe("production realtime session composition", () => {
   it("fails closed without a Gemini server API key", async () => {
     const rpc = vi.fn<Rpc>();
@@ -44,6 +62,7 @@ describe("production realtime session composition", () => {
               language: "en",
               lifecycle: "sent",
               has_current_consent: true,
+              interview_plan: interviewPlan,
             },
           ],
           error: null,
@@ -89,6 +108,7 @@ describe("production realtime session composition", () => {
       attemptId: "44444444-4444-4444-8444-444444444444",
       durationSeconds: 1800,
       language: "en",
+      interviewPlan,
       providerCredential: {
         credential: "auth_tokens/ephemeral-1",
         expiresAt: "2026-09-14T08:34:00.000Z",
