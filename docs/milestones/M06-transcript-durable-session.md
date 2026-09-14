@@ -28,7 +28,7 @@ M05 — Realtime AI Interview — **COMPLETE**, merged to `main` as `5c3843c6444
 - **PASS** — Finalization/assessment trigger is exactly-once/idempotent.
 - **PASS** — Browser acceptance proves finalized reconnect transcript restoration and separate technical interruption handling.
 - **PASS** — Security/privacy/tenancy/accessibility/performance/AI-safety review has 0 unresolved Critical/Important findings.
-- **ACTIVE GATE** — Final closeout documentation head still requires exact-final-head CI before merge.
+- **ACTIVE GATE** — Final closeout documentation head requires exact-final-head CI before merge.
 
 ## Iterations
 1. **VERIFIED** — M06.1 Provider event normalization.
@@ -46,7 +46,7 @@ M05 — Realtime AI Interview — **COMPLETE**, merged to `main` as `5c3843c6444
 ### M06.1–M06.3
 - M06.1 final GREEN `60fa653e8b5dc9c47a21dc9bea8c3d8aba6566e3`, CI #796 / `34868105525`.
 - M06.2 RED `de9340078c556153b189cd088b18729fd881a00d`, CI #800 / `34872661481`; GREEN `2e91eb529cdc56688aca65766c6e5785d6b1378b`, CI #804 / `34873181788`.
-- M06.3 repository RED `1a35d109496c51fa5b4f1e740c0ff756f7903619`, CI #806 / `34873858138`; migration RED `c219b68f24b2e900e5b4bfb69cd17c63ba34027d`, CI #809 / `34875215424`; GREEN `73a43be166d87db0e1a20c89d4894f20bd550dbf`, CI #810 / `34875410392`.
+- M06.3 repository RED `1a35d109496c51fa5b4f1e740c0ff756f7903619`, CI #806 / `34873858138`; migration RED `c219b68f24b2e900e5b4f1e740c0ff756f7903619`, CI #809 / `34875215424`; GREEN `73a43be166d87db0e1a20c89d4894f20bd550dbf`, CI #810 / `34875410392`.
 
 ### M06.4–M06.5
 - M06.4 chronology RED `f34d095fb5607bddef3252cfec5a04228954153a`, CI #821 / `34884154545`; GREEN `ef898009c063c57a42af1ae64463719a77e13d50`, CI #822 / `34884400868`.
@@ -92,9 +92,9 @@ Latest fully verified implementation head before closeout documentation: `ddf3d3
 - [x] Required TDD/integration/E2E evidence recorded.
 - [x] Security/accessibility/performance/AI-safety reviews complete.
 - [x] 0 Critical / 0 Important findings.
-- [ ] Traceability/feature/test matrices fully reconciled.
+- [x] Traceability/feature/test matrices fully reconciled.
 - [ ] Exact-final-head CI green after closeout docs.
 - [x] Durable status/handoff/current-milestone state reconciled.
 
 ## Next Work
-Finish traceability/feature/test-matrix reconciliation, verify exact-final-head CI, execute the user-authorized PR #8 merge gate, verify post-merge `main`, then activate M07 — Evidence-Based Assessment Engine and immediately begin its first valid unit under strict TDD.
+Verify exact-final-head CI for the final closeout head. If GREEN, recheck concurrency/reviews/mergeability, execute the user-authorized PR #8 merge gate, verify post-merge `main`, then activate M07 — Evidence-Based Assessment Engine and immediately begin its first valid unit under strict TDD.
