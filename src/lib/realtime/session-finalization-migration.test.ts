@@ -42,7 +42,7 @@ describe("interview session finalization migration", () => {
     expect(migration).toMatch(/candidate_invitation\.state\s*=\s*'started'/i);
     expect(migration).toMatch(/for update of interview_attempt/i);
     expect(migration).toMatch(/completed_at\s*=\s*coalesce\(interview_attempt\.completed_at/i);
-    expect(migration).toMatch(/duration_seconds\s*=\s*coalesce\(interview_attempt\.duration_seconds/i);
+    expect(migration).toMatch(/duration_seconds\s*=\s*coalesce\(\s*interview_attempt\.duration_seconds/i);
     expect(migration).toMatch(/on conflict \(attempt_id\) do nothing/i);
     expect(migration).toMatch(/grant execute on function public\.finalize_realtime_interview_session/i);
   });
