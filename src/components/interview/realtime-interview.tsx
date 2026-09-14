@@ -14,6 +14,10 @@ type RealtimeInterviewProps = Readonly<{
   onRetry?: () => void;
 }>;
 
+function speakerLabel(speaker: "candidate" | "interviewer") {
+  return speaker === "candidate" ? "You" : "Interviewer";
+}
+
 export function RealtimeInterview({
   connectionState,
   sessionSnapshot,
@@ -24,6 +28,11 @@ export function RealtimeInterview({
 }: RealtimeInterviewProps) {
   const currentQuestion = sessionSnapshot.currentQuestion;
   const completed = sessionSnapshot.status === "completed";
+  const { transcript } = sessionSnapshot;
+  const hasTranscript =
+    transcript.finalizedTurns.length > 0 ||
+    transcript.partials.candidate.length > 0 ||
+    transcript.partials.interviewer.length > 0;
 
   if (completed) {
     return (
@@ -49,6 +58,33 @@ export function RealtimeInterview({
           Preparing the next interview question
         </p>
       )}
+
+      {hasTranscript ? (
+        <section aria-label="Interview transcript" className="space-y-3">
+          <h3 className="text-sm font-semibold">Live transcript</h3>
+          {transcript.finalizedTurns.length > 0 ? (
+            <ol className="space-y-2">
+              {transcript.finalizedTurns.map((turn, index) => (
+                <li key={`${turn.speaker}-${index}`} className="text-sm leading-6">
+                  <span className="font-medium">{speakerLabel(turn.speaker)}:</span>{" "}
+                  <span>{turn.text}</span>
+                </li>
+              ))}
+            </ol>
+          ) : null}
+          {transcript.partials.interviewer ? (
+            <p aria-live="polite" className="text-sm text-slate-600">
+              <span className="font-medium">Interviewer:</span>{" "}
+              {transcript.partials.interviewer}
+            </p>
+          ) : null}
+          {transcript.partials.candidate ? (
+            <p aria-live="polite" className="text-sm text-slate-600">
+              <span className="font-medium">You:</span> {transcript.partials.candidate}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       <RealtimeControls
         state={connectionState}
