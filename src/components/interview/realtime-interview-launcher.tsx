@@ -20,6 +20,7 @@ type RealtimeInterviewLauncherProps = Readonly<{
   authorize?: (token: string) => Promise<RealtimeSessionAuthorization>;
   createRuntime?: (
     authorization: AuthorizedRealtimeSession,
+    onSnapshot: (snapshot: RealtimeInterviewSessionSnapshot) => void,
   ) => RealtimeInterviewRuntime;
 }>;
 
@@ -111,7 +112,11 @@ export function RealtimeInterviewLauncher({
       return;
     }
 
-    const runtime = createRuntime(result);
+    const runtime = createRuntime(result, (snapshot) => {
+      if (runtimeRef.current) {
+        setSessionSnapshot(snapshot);
+      }
+    });
     runtimeRef.current = runtime;
 
     try {
@@ -144,6 +149,11 @@ export function RealtimeInterviewLauncher({
     setState("ended");
   }
 
+  const showInterview =
+    state === "connected" &&
+    sessionSnapshot !== null &&
+    (sessionSnapshot.currentQuestion !== null || sessionSnapshot.status === "completed");
+
   return (
     <section
       aria-labelledby="live-interview-heading"
@@ -159,7 +169,7 @@ export function RealtimeInterviewLauncher({
         </p>
       </div>
 
-      {state === "connected" && sessionSnapshot?.currentQuestion ? (
+      {showInterview && sessionSnapshot ? (
         <RealtimeInterview
           connectionState={connectedState(sessionSnapshot)}
           sessionSnapshot={sessionSnapshot}
