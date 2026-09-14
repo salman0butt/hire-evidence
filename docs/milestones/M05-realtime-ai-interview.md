@@ -78,17 +78,22 @@ The production candidate path now includes `POST /api/interview/[token]/realtime
 13. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.13 Same-authoritative-attempt reconnect. Server-authoritative checkpoints, capability-bound progress persistence, immutable-plan restoration, stale-generation handling, and runtime persistence gating are implemented; live Gemini browser reconnect/interruption acceptance remains open.
 14. **ACTIVE / PARTIALLY VERIFIED** — M05.14 Full realtime E2E and closeout. Browser coverage verifies microphone denial/recovery, keyboard focus, microphone selection, mobile no-overflow, no recording during readiness checks, and constant-safe unavailable-provider behavior when the server secret is absent. Stable Gemini-backed multi-turn completion plus interruption/recovery/barge-in/timeout/bounded reconnect acceptance remain open.
 
-## TDD / Integration Evidence
+## TDD Evidence
 
 Earlier M05 checkpoints remain historically preserved in Git and prior revisions of this ledger. Important recent checkpoints include:
 
 - production Gemini session composition RED/GREEN: `7f9b2f6beb195c48a03595fceb191d0adc83aa3f` → `409a899ce000674b441bd0da2ff8a01d4efc62db`.
+- production browser runtime/launcher composition advanced through later commits, including snapshot forwarding `6bfef96dbeb4a9d4c529eb710f7d15c6b74ac5dc` and authoritative snapshot rendering `95106d791b42220a53788bc058327182902cc99a`.
+- historical M05.13 persistence evidence includes repository RED `87406dc5d0186d5f28f3b8d5cdd5f19c9f50b2b1`, authority review RED `a2cf5eb633751d58cfcf3e3fb0b2e657504cc00a`, reviewed GREEN `576d5dbad4138b85876eeac22ddfe8e7247381ce`, runtime persistence RED `f3b01a0e1f3f9ca17cf5058aea73816f6e639d49`, fail-closed review RED `a0fcda2590020b4bd574dcd342a3aec308e34300`, and reviewed GREEN `5e9328d2f945cd10eaecea312896f29fbc93b10e`.
+- documentation reconciliation checkpoint `52f0ccb2a3a1e0c3f2fa4a38860dc9a097da5aba`, CI #750 / `34841743614` — **NOT GREEN**. Lint, typecheck, 120 test files / 497 tests, and verifier unit tests passed, but `scripts/verify_autonomous_framework.py` correctly rejected this ledger because the exact required `## TDD Evidence` and `## Integration Test Evidence` section headings had been accidentally combined. This commit restores the required durable ledger contract rather than weakening the verifier.
+
+## Integration Test Evidence
+
 - production route/provider wiring and schema fixes through `56c78425f7052b2e54ac9cfea410a57c53aef805`, CI #713 / `34832502815` — complete repository gate GREEN.
 - capability-bound realtime progress checkpoint `ce161fbaa34450839ac8f323f6fcc3a33cdc4863`, CI #728 / `34834823096` — complete repository gate GREEN.
-- production browser runtime/launcher composition advanced through later commits, including snapshot forwarding `6bfef96dbeb4a9d4c529eb710f7d15c6b74ac5dc` and authoritative snapshot rendering `95106d791b42220a53788bc058327182902cc99a`.
-- exact behavioral head `95106d791b42220a53788bc058327182902cc99a`, CI #745 / `34839902037` — complete repository gate GREEN before the current documentation reconciliation.
-
-Historical M05.13 persistence evidence includes repository RED `87406dc5d0186d5f28f3b8d5cdd5f19c9f50b2b1`, authority review RED `a2cf5eb633751d58cfcf3e3fb0b2e657504cc00a`, reviewed GREEN `576d5dbad4138b85876eeac22ddfe8e7247381ce`, runtime persistence RED `f3b01a0e1f3f9ca17cf5058aea73816f6e639d49`, fail-closed review RED `a0fcda2590020b4bd574dcd342a3aec308e34300`, and reviewed GREEN `5e9328d2f945cd10eaecea312896f29fbc93b10e`.
+- exact behavioral head `95106d791b42220a53788bc058327182902cc99a`, CI #745 / `34839902037` — complete repository gate GREEN before the documentation reconciliation.
+- CI #750 / `34841743614` on `52f0ccb2a3a1e0c3f2fa4a38860dc9a097da5aba` is an invalid final verification checkpoint because the autonomous framework verifier failed on the ledger heading contract; later build/E2E steps were consequently skipped. The cleanup `supabase: command not found` message was downstream of skipped Supabase setup, not the root failure.
+- Stable live Gemini multi-turn browser completion and recovery remain an M05.14 exit requirement and are not yet satisfied.
 
 ## Security Review
 
@@ -126,7 +131,7 @@ Do not substitute provider-neutral/component tests for live-provider acceptance 
 
 Latest verified behavioral SHA before the current documentation reconciliation: `95106d791b42220a53788bc058327182902cc99a`, CI #745 / `34839902037` — complete repository gate GREEN.
 
-Documentation reconciliation commits after that SHA require their own exact-head CI before becoming final branch verification evidence.
+Checkpoint `52f0ccb2a3a1e0c3f2fa4a38860dc9a097da5aba`, CI #750 / `34841743614` — **NOT GREEN** because the framework verifier detected missing exact required ledger headings. The current correction requires fresh exact-head CI before becoming final branch verification evidence.
 
 ## Fresh Verification Commands
 
