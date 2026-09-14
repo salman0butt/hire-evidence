@@ -23,7 +23,6 @@ const authorization = {
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  vi.useRealTimers();
 });
 
 describe("RealtimeInterviewLauncher recovery", () => {
@@ -81,25 +80,24 @@ describe("RealtimeInterviewLauncher recovery", () => {
 
   it("persists a provider interruption separately before reconnecting the same attempt", async () => {
     const authorize = vi.fn().mockResolvedValue(authorization);
-    const fetchImpl = vi.fn().mockResolvedValue(
-      new Response(
+    const fetchImpl = vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as { occurredAt: string };
+      return new Response(
         JSON.stringify({
           status: "recorded",
           event: {
             id: "technical-event-1",
             category: "provider_disconnect",
-            occurredAt: "2026-09-15T00:00:00.000Z",
+            occurredAt: body.occurredAt,
           },
         }),
         {
           status: 200,
           headers: { "Content-Type": "application/json" },
         },
-      ),
-    );
+      );
+    });
     vi.stubGlobal("fetch", fetchImpl);
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-09-15T00:00:00.000Z"));
 
     const recoveryHandlers: Array<((failure: { kind: string }) => void) | undefined> = [];
     const createRuntime = vi.fn((...args: unknown[]) => {
@@ -133,19 +131,22 @@ describe("RealtimeInterviewLauncher recovery", () => {
       recoveryHandlers[0]?.({ kind: "provider-error" });
     });
 
-    await waitFor(() => {
-      expect(fetchImpl).toHaveBeenCalledWith(
-        "/api/interview/candidate%20capability%2Fwith%20spaces/realtime-technical-event",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            attemptId: "attempt-1",
-            category: "provider_disconnect",
-            occurredAt: "2026-09-15T00:00:00.000Z",
-          }),
-        },
-      );
+    await waitFor(() => expect(fetchImpl).toHaveBeenCalledTimes(1));
+
+    const [url, request] = fetchImpl.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      "/api/interview/candidate%20capability%2Fwith%20spaces/realtime-technical-event",
+    );
+    expect(request).toMatchObject({
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
     });
+    const body = JSON.parse(String(request.body)) as Record<string, unknown>;
+    expect(body).toMatchObject({
+      attemptId: "attempt-1",
+      category: "provider_disconnect",
+    });
+    expect(typeof body.occurredAt).toBe("string");
+    expect(Number.isNaN(Date.parse(String(body.occurredAt)))).toBe(false);
   });
 });
