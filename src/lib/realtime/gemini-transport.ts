@@ -174,7 +174,7 @@ export function createGeminiRealtimeTransportAdapter(
           JSON.stringify({
             setup: {
               model,
-              generationConfig: { responseModalities: ["AUDIO"] },
+              responseModalities: ["AUDIO"],
               sessionResumption: {},
             },
           }),
