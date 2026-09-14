@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M06
 
 Status:
-IN PROGRESS — M06.5 VERIFIED / M06.6 ACTIVE
+IN PROGRESS — M06.1–M06.8 VERIFIED / M06.9 ACTIVE
 
 Branch:
 `feat/transcript-durable-session`
@@ -28,10 +28,10 @@ Canonical compact recovery state:
 3. M06.3 — Attempt-scoped durable finalized transcript messages — **VERIFIED**.
 4. M06.4 — Duplicate/order/speaker/immutability correctness guards — **VERIFIED**.
 5. M06.5 — Idempotent attempt lifecycle — **VERIFIED**.
-6. M06.6 — Same-attempt reconnect transcript restoration — **ACTIVE**.
-7. M06.7 — Separate technical interruption events — **NOT STARTED**.
-8. M06.8 — Idempotent session finalization — **NOT STARTED**.
-9. M06.9 — Durability E2E and milestone closeout — **NOT STARTED**.
+6. M06.6 — Same-attempt reconnect transcript restoration — **VERIFIED**.
+7. M06.7 — Separate technical interruption events — **VERIFIED**.
+8. M06.8 — Idempotent session finalization — **VERIFIED**.
+9. M06.9 — Durability browser acceptance and milestone closeout — **ACTIVE**.
 
 ## Latest Verification
 
@@ -39,20 +39,22 @@ M05 merged to `main` as `5c3843c6444bad256974ea391a4a6a978bf88f24` before M06 ac
 
 M06.4 chronology RED: `f34d095fb5607bddef3252cfec5a04228954153a`, CI #821 / run `34884154545` — lint/typecheck passed and the intended reversed-timestamp transcript correctness test failed while 524 tests passed.
 
-M06.4 GREEN: `ef898009c063c57a42af1ae64463719a77e13d50`, CI #822 / run `34884400868` — complete repository gate GREEN, including unit/component tests, framework and requirements verifiers, local Supabase startup, build, Chromium E2E and PRD coverage.
+M06.4 GREEN: `ef898009c063c57a42af1ae64463719a77e13d50`, CI #822 / run `34884400868` — complete repository gate GREEN.
 
-M06.5 terminal-replay RED: `8117a3eed5ab3114e1ed81697f680dd8c8f98699`, CI #823 / run `34885046377` — lint/typecheck passed and the sole new lifecycle contract failed because completed-attempt rejection preceded processed-event replay; 525 tests passed.
+M06.5 terminal-replay RED: `8117a3eed5ab3114e1ed81697f680dd8c8f98699`, CI #823 / run `34885046377` — intended lifecycle contract failure with the rest of the suite healthy.
 
-M06.5 GREEN: `fd2da242a636acd5ec4ea879c6ec43d6359e5f10`, CI #824 / run `34885300353` — complete repository gate GREEN, including migration application in local Supabase, build, Chromium E2E and PRD coverage.
+M06.5 GREEN: `fd2da242a636acd5ec4ea879c6ec43d6359e5f10`, CI #824 / run `34885300353` — complete repository gate GREEN.
 
-CI status: the latest fully verified implementation SHA is `fd2da242a636acd5ec4ea879c6ec43d6359e5f10`. Documentation commits after that checkpoint require fresh exact-head verification and do not supersede this implementation evidence until CI passes.
+Subsequent verified work added same-attempt durable transcript reconnect, separate non-evaluative technical event persistence, idempotent session finalization, launcher finalization, interviewer-version preservation, and durable transcript hydration into the realtime runtime.
+
+Latest fully verified implementation head before this reconciliation: `4943d949ff943b2585580655e1596ac32f006e32`, CI #861 / run `34903314993` — complete GitHub Actions CI GREEN. The exact head includes `feat: restore transcript into realtime runtime` and all M06.6–M06.8 implementation/tests. This documentation commit requires its own exact-head CI before milestone completion.
 
 ## Review State
 
 - Unresolved Critical findings: **0** at latest recovery.
 - Unresolved Important findings: **0** at latest recovery.
 - PR #8 has no submitted reviews or unresolved inline review comments at latest recovery.
-- M06 is not merge-ready because M06.6–M06.9 remain incomplete.
+- M06 is not merge-ready because M06.9 browser durability acceptance, closeout review/traceability, and exact-final-head verification remain incomplete.
 
 ## Constraints
 
@@ -60,10 +62,11 @@ CI status: the latest fully verified implementation SHA is `fd2da242a636acd5ec4e
 - Transcript speaker identity comes from normalized event semantics, never text inference.
 - Durable ordering/identity are server-authoritative and attempt-scoped.
 - Cross-attempt/cross-capability transcript access must fail closed.
-- Reconnect must restore only the same authoritative attempt and discard stale ephemeral partials/generation callbacks.
+- Reconnect restores only the same authoritative attempt and discards stale ephemeral partials/generation callbacks.
 - Technical failures remain separate from candidate evidence and cannot reduce assessment.
+- Finalization remains retry-safe and exactly-once for durable completion/assessment-trigger state.
 - Do not introduce autonomous hire/reject decisions or unsupported protected-trait/emotion/personality/deception/appearance/accent-quality inference.
 
 ## Next Action
 
-Execute M06.6 under strict TDD: define the smallest reconnect-persistence RED proving committed finalized turns are restored only for the authoritative resumed attempt, verify the intended exact-head failure, implement the minimal composition without restoring ephemeral partials or leaking another attempt, verify GREEN, update durable evidence, and continue without stopping at a green checkpoint.
+Execute M06.9 under strict TDD. Add the smallest browser acceptance proving durable finalized transcript data is restored across a same-attempt reconnect while partial hypotheses are not restored and technical interruptions remain separate; verify an intended RED on the exact test-only head, implement only missing runtime/UI composition, verify GREEN, then complete skeptical review, traceability/feature/test-matrix reconciliation, exact-final-head CI, and the authorized milestone merge gate.
