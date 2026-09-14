@@ -14,6 +14,12 @@ Exit: completed interview produces durable accurate transcript.
 ## Dependencies
 M05 — Realtime AI Interview — **COMPLETE**, merged to `main` as `5c3843c6444bad256974ea391a4a6a978bf88f24`.
 
+## In Scope
+Provider-neutral transcript event normalization; browser-only partial hypotheses; immutable attempt-scoped finalized transcript messages; duplicate/order/speaker/immutability correctness; idempotent attempt lifecycle; same-attempt reconnect hydration; separately persisted non-evaluative technical interruptions; idempotent session finalization; accessible transcript presentation; and browser durability acceptance.
+
+## Out of Scope
+M07 assessment/scoring logic and later milestones; persistence or evaluation of partial hypotheses; autonomous hire/reject decisions; speculative transcript interpretation; and protected-trait, emotion, personality, deception, appearance, health, or accent-quality inference.
+
 ## Selected Design / Plan
 - Design: `docs/superpowers/specs/2026-09-14-transcript-durable-session-design.md`
 - Plan: `docs/superpowers/plans/2026-09-14-transcript-durable-session.md`
@@ -30,7 +36,7 @@ M05 — Realtime AI Interview — **COMPLETE**, merged to `main` as `5c3843c6444
 - **PASS** — Security/privacy/tenancy/accessibility/performance/AI-safety review has 0 unresolved Critical/Important findings.
 - **ACTIVE GATE** — Final closeout documentation head requires exact-final-head CI before merge.
 
-## Iterations
+## Tasks / Iterations
 1. **VERIFIED** — M06.1 Provider event normalization.
 2. **VERIFIED** — M06.2 Ephemeral partials vs immutable finalized transcript state.
 3. **VERIFIED** — M06.3 Attempt-scoped durable finalized transcript messages.
@@ -41,7 +47,7 @@ M05 — Realtime AI Interview — **COMPLETE**, merged to `main` as `5c3843c6444
 8. **VERIFIED** — M06.8 Idempotent session finalization and exactly-once assessment marker.
 9. **VERIFIED** — M06.9 Browser durability acceptance; closeout/merge gate active.
 
-## TDD / CI Evidence
+## TDD Evidence
 
 ### M06.1–M06.3
 - M06.1 final GREEN `60fa653e8b5dc9c47a21dc9bea8c3d8aba6566e3`, CI #796 / `34868105525`.
@@ -61,21 +67,19 @@ Representative implementation commits include reconnect transcript restoration (
 - **RED** `02dfe4704892110d59873efc3262421b0e7e4890`, CI #863 / run `34906932165`: frozen install, lint, typecheck, unit/component tests, verifiers, local Supabase and build passed; the newly added browser durability acceptance failed in E2E because reconnect-restored finalized transcript was not yet exposed through candidate-visible transcript UI.
 - **GREEN** `ddf3d32024fc6d5c67115326aba0405ba87d0d96`, CI #864 / run `34907376635`: complete repository gate GREEN, including Chromium E2E and PRD coverage. Minimal production change renders finalized turns plus ephemeral partial previews as accessible React text. The browser acceptance proves a same-attempt reconnect restores a finalized candidate turn while the provider disconnect is recorded through the separate technical-event path.
 
-## Reviews
+## Integration Test Evidence
+M06.3 CI #810 applied the durable transcript migration in local Supabase and verified attempt-scoped capability-bound append/list behavior. M06.6–M06.8 integrated CI #861 verified reconnect hydration, technical-event separation, and idempotent finalization with repository-wide tests. M06.9 CI #864 verified the production browser composition through Chromium E2E, including same-attempt reconnect transcript restoration and separate technical-event recording.
 
-### Security / Privacy / Tenancy
-No Critical or Important findings remain. Capability-bound repositories/RPCs preserve tenant and attempt isolation, direct browser table access remains denied, sealed/finalized transcript state cannot be silently mutated, and transcript text is treated as untrusted data rather than instruction.
+## Security Review
+No Critical or Important findings remain. Capability-bound repositories/RPCs preserve tenant and attempt isolation, direct browser table access remains denied, sealed/finalized transcript state cannot be silently mutated, and transcript text is treated as untrusted data rather than instruction. Technical failures cannot reduce candidate assessment.
 
-### Accessibility / Browser
+## Accessibility Review
 Finalized transcript and current partial previews are available as text rather than audio-only information. Partial previews use live-region semantics; finalized content remains ordinary readable text. Chromium acceptance passed CI #864.
 
-### Architecture / YAGNI
-Provider schemas remain isolated behind the app-owned transport vocabulary. Transcript state, durable repository authority, technical events, reconnect, and finalization remain separate focused boundaries. The M06.9 UI change only exposes state already owned by the runtime; it adds no new persistence authority.
-
-### Performance
+## Performance Review
 Ephemeral state is bounded to two speaker previews. Durable reads remain attempt-scoped and ordered/indexed. Sequence allocation intentionally serializes per attempt for correctness.
 
-### AI Safety / Evidence Integrity
+## AI / Eval Review
 Technical failures never become candidate-performance evidence. Transcript text cannot act as system instruction. No unsupported emotion/accent/personality/deception/protected-trait/appearance/health inference is added. M07 assessment remains explicitly downstream and evidence-grounded.
 
 ## Code Review Findings
@@ -83,8 +87,13 @@ Technical failures never become candidate-performance evidence. Transcript text 
 - Important: **0 unresolved**.
 - PR #8 has no submitted reviews or unresolved inline review comments at latest recovery.
 
-## Fresh Verification
-Latest fully verified implementation head before closeout documentation: `ddf3d32024fc6d5c67115326aba0405ba87d0d96`, CI #864 / `34907376635` — full repository gate GREEN. Closeout documentation commits after this SHA require one final exact-head CI run before merge; this does not invalidate the verified implementation evidence.
+## Fresh Verification Results
+Latest fully verified implementation head before closeout documentation: `ddf3d32024fc6d5c67115326aba0405ba87d0d96`, CI #864 / `34907376635` — full repository gate GREEN.
+
+Closeout head `bddea8c8aa4b59b9ff6e1389487871d875a84397`, CI #872 / run `34908228069`, was **NOT GREEN**: frozen install, lint, typecheck, unit/component tests and verifier tests passed, but `Verify autonomous framework` failed because this ledger rewrite had dropped required durable-ledger section headings. That failure is a documentation-framework contract failure, not product behavior evidence. This commit restores the mandatory sections; its own exact-head CI must pass before merge.
+
+## Durable Recovery Sources
+Recover `AGENTS.md` and `docs/AUTONOMOUS-DEVELOPMENT.md` first, then actual Git/PR/CI state, `docs/progress/STATUS.md`, `docs/milestones/CURRENT.md`, this ledger, `docs/SESSION-HANDOFF.md`, traceability/feature/test matrices, the M06 design/plan, source and tests. Actual Git/code/exact-SHA CI outrank stale prose.
 
 ## Completion Checklist
 - [x] Requirements and all M06 iterations accounted for.
@@ -97,4 +106,4 @@ Latest fully verified implementation head before closeout documentation: `ddf3d3
 - [x] Durable status/handoff/current-milestone state reconciled.
 
 ## Next Work
-Verify exact-final-head CI for the final closeout head. If GREEN, recheck concurrency/reviews/mergeability, execute the user-authorized PR #8 merge gate, verify post-merge `main`, then activate M07 — Evidence-Based Assessment Engine and immediately begin its first valid unit under strict TDD.
+Verify exact-final-head CI for the restored framework-contract head. If GREEN, recheck concurrency/reviews/mergeability, execute the user-authorized PR #8 merge gate, verify post-merge `main`, then activate M07 — Evidence-Based Assessment Engine and immediately begin its first valid unit under strict TDD.
