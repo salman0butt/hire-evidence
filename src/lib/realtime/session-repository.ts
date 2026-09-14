@@ -1,5 +1,6 @@
 import { hashInvitationToken } from "@/lib/candidates/invitation-token";
 
+import type { InterviewPlanInput } from "./plan-runner";
 import type { RealtimeResumeCheckpoint } from "./reconnect";
 import type {
   CandidateRealtimeSession,
@@ -25,6 +26,7 @@ type CandidateSessionRow = Readonly<{
   language: string;
   lifecycle: "sent" | "opened" | "started";
   has_current_consent: boolean;
+  interview_plan: InterviewPlanInput;
 }>;
 
 type RealtimeAttemptRow = Readonly<{
@@ -91,6 +93,57 @@ function isProcessedEventIds(value: unknown): value is readonly string[] {
   );
 }
 
+function isInterviewPlanInput(value: unknown): value is InterviewPlanInput {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+
+  const plan = value as Record<string, unknown>;
+  if (!isNonEmptyString(plan.versionId) || !Array.isArray(plan.sections) || plan.sections.length === 0) {
+    return false;
+  }
+
+  const sectionIds = new Set<string>();
+  const questionIds = new Set<string>();
+
+  return plan.sections.every((sectionValue) => {
+    if (!sectionValue || typeof sectionValue !== "object" || Array.isArray(sectionValue)) {
+      return false;
+    }
+
+    const section = sectionValue as Record<string, unknown>;
+    if (
+      !isNonEmptyString(section.id) ||
+      sectionIds.has(section.id) ||
+      !isNonEmptyString(section.title) ||
+      !Array.isArray(section.questions) ||
+      section.questions.length === 0
+    ) {
+      return false;
+    }
+    sectionIds.add(section.id);
+
+    return section.questions.every((questionValue) => {
+      if (!questionValue || typeof questionValue !== "object" || Array.isArray(questionValue)) {
+        return false;
+      }
+
+      const question = questionValue as Record<string, unknown>;
+      if (
+        !isNonEmptyString(question.id) ||
+        questionIds.has(question.id) ||
+        !isNonEmptyString(question.prompt) ||
+        typeof question.required !== "boolean" ||
+        !isNonNegativeInteger(question.followUpLimit) ||
+        question.followUpLimit > 2
+      ) {
+        return false;
+      }
+
+      questionIds.add(question.id);
+      return true;
+    });
+  });
+}
+
 function isCandidateSessionRow(value: unknown): value is CandidateSessionRow {
   if (!value || typeof value !== "object") return false;
 
@@ -106,7 +159,9 @@ function isCandidateSessionRow(value: unknown): value is CandidateSessionRow {
     (row.lifecycle === "sent" ||
       row.lifecycle === "opened" ||
       row.lifecycle === "started") &&
-    typeof row.has_current_consent === "boolean"
+    typeof row.has_current_consent === "boolean" &&
+    isInterviewPlanInput(row.interview_plan) &&
+    row.interview_plan.versionId === row.interviewer_version_id
   );
 }
 
@@ -173,6 +228,7 @@ export function createRealtimeSessionRepository(rpc: Rpc): RealtimeSessionReposi
         language: row.language,
         lifecycle: row.lifecycle,
         hasCurrentConsent: row.has_current_consent,
+        interviewPlan: row.interview_plan,
       };
     },
 
