@@ -22,6 +22,10 @@ const activeSnapshot: RealtimeInterviewSessionSnapshot = {
     questionId: "q1",
     prompt: "Tell me about a recent project.",
   },
+  transcript: {
+    partials: { candidate: "", interviewer: "" },
+    finalizedTurns: [],
+  },
 };
 
 describe("RealtimeInterview", () => {
