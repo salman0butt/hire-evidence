@@ -1,47 +1,62 @@
 # Session Handoff
 
-This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, and live GitHub state first.
+This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, and live GitHub state first.
 
 ## Repository state
 
 - Repository: `salman0butt/hire-evidence`
 - Default branch: `main`
-- Verified base/main SHA: `729474ffb03075c93dfa2564f0004f1590533753` (M03 PR #5); post-merge CI #432 / `34677775158` passed.
-- Active branch: `feat/candidates-invitations`
-- Active PR: #6 — `Build candidates and secure invitations` — OPEN / DRAFT / unmerged.
-- Latest verified implementation head: `8a6f6cc8adba2d39f2b255a74db166e3285527ba`.
-- CI #507 / `34691558117` passed the full repository gate on that implementation head.
-- Durable-document reconciliation creates newer branch heads; fresh exact-final-head CI is mandatory before merge.
+- Verified base/main SHA: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` (Candidates + Invitations PR #6 squash merge).
+- Base post-merge main CI: #517 / `34692492691` — GREEN full repository gate.
+- Active branch: `feat/realtime-ai-interview`
+- Active milestone: M05 — Realtime AI Interview — **repository acceptance complete / final merge gate**.
+- Active milestone PR: #7 — `Build realtime AI interview` — OPEN / DRAFT until final exact-head closeout CI and merge gates pass.
+- Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
+- Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
+- Local provider smoke: `docs/LOCAL-REALTIME-ACCEPTANCE.md`.
+- Pre-closeout verified head: `5c8710559ab1c40073843cb9a7909e626d8a0dc3`, CI #781 / `34860464517` — complete repository gate GREEN.
+- Current closeout reconciliation head requires fresh exact-head CI before merge.
 
-## Current milestone
+## M05 state
 
-M04 — Candidates + Invitations is at **CLOSEOUT / MERGE GATE**.
+M05.1–M05.14 are complete at repository/deterministic acceptance scope. Production code includes invitation/consent/version-gated realtime authorization, constrained Gemini Live ephemeral credential issuance, provider-neutral transport with Gemini adapter isolation, browser readiness/microphone diagnostics, deterministic capture/playback, explicit connection state, immutable plan execution, pacing, bounded follow-ups, interruption/barge-in, timeout/error recovery, capability-bound progress persistence, same-attempt reconnect, and production candidate-page runtime composition.
 
-All iterations M04.1–M04.8 are verified: candidate persistence; secure hash-at-rest opaque invitations; lifecycle/replay controls; public token resolution; pre-interview UI; AI/transcription/data/retention disclosure and append-only consent; trusted accommodation/support path; provider/browser security closeout.
+Deterministic browser acceptance covers production launcher/runtime composition, constrained credential non-display, authoritative snapshots, microphone denial/recovery, keyboard operation, device selection, mobile no-overflow, mute/end controls, safe missing-provider behavior, and disconnect→reauthorize same-attempt recovery. Unit/provider/security coverage protects orchestration, persistence, stale generations, timeout/error decisions, pacing/follow-ups, and interruption playback cancellation.
 
-## Latest debugging / closeout evidence
+## Owner-approved live-provider decision
 
-CI #505 failed only in the older organization settings keyboard E2E after two legitimate candidate-support inputs were added. The UI implementation was correct; the test expected Save immediately after Hiring use case. Commit `ac047aff7cffb335226702e24b443cd1706796a9` updated the focus sequence to include candidate support email/URL. CI #506 / `34691250632` then passed the complete gate.
+On 2026-09-14 the repository owner explicitly instructed autonomous development to complete M05 now and stated that real Gemini credentials will be used locally.
 
-M04.8 added `e2e/candidate-invitation-ui.spec.ts` at `8a6f6cc8adba2d39f2b255a74db166e3285527ba`. CI #507 / `34691558117` passed install, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase, build, Chromium E2E, PRD coverage, and cleanup. The browser test verifies the valid mobile invitation and consent flow plus the same unavailable state for wrong, expired, revoked, and completed tokens.
+Therefore the real Gemini browser run is a local/deployment acceptance check rather than an M05 repository merge blocker. No live-provider execution is claimed. Follow `docs/LOCAL-REALTIME-ACCEPTANCE.md` when the owner supplies `GEMINI_API_KEY` server-side. A future failed smoke is a real defect and must be fixed before relying on that deployment.
+
+## Current evidence
+
+- production Gemini route/integration checkpoint `56c78425f7052b2e54ac9cfea410a57c53aef805`, CI #713 / `34832502815` — GREEN.
+- capability-bound realtime progress checkpoint `ce161fbaa34450839ac8f323f6fcc3a33cdc4863`, CI #728 / `34834823096` — GREEN.
+- provider-interruption RED `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772 / `34857082289` — intended failure because provider `interrupted` did not interrupt obsolete playback.
+- provider-interruption GREEN `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN after the minimal fix.
+- framework durable-status NOT GREEN checkpoint `3914a347a47090f666a5458014196d9ca9d4a338`, CI #778 / `34859783065` — verifier correctly rejected the missing literal `CI status:` contract.
+- corrected pre-closeout head `5c8710559ab1c40073843cb9a7909e626d8a0dc3`, CI #781 / `34860464517` — complete repository gate GREEN.
+
+Historical RED/GREEN evidence remains in `docs/milestones/M05-realtime-ai-interview.md` and Git history.
 
 ## Review / safety state
 
-- Critical findings: 0 unresolved.
-- Important findings: 0 unresolved.
-- GitHub review threads: 0 unresolved at latest recovery.
-- Raw invitation tokens are not persisted/logged; server hashes before the narrow public RPC.
-- Tenant/job/candidate/version constraints and RLS remain authoritative.
-- Consent is versioned and append-only from browser roles; current consent is required before `started`.
-- Candidate support settings remain owner/admin constrained and only safe parsed destinations leave the public boundary.
-- Humans remain hiring decision makers; no autonomous hire/reject or prohibited inference capability was added.
+- Critical findings: 0 unresolved at latest recovery.
+- Important findings: 0 unresolved at latest recovery.
+- PR #7 has no known unresolved blocking review threads at latest recovery.
+- Raw invitation capabilities and long-lived provider secrets remain server-side/non-persisted by M05 production code.
+- Candidate speech is untrusted and cannot mutate policy, criteria, plan order, or follow-up bounds.
+- Reconnect resumes the same authoritative attempt and cannot silently reset progress.
+- Technical/browser/provider/microphone failures never become negative candidate evidence.
+- No autonomous hire/reject decision or protected-trait/emotion/personality/deception/appearance/accent-quality inference is introduced.
 
 ## Exact next work
 
-1. Recover the exact current PR head and ensure no competing autonomous run advanced it.
-2. Finish durable closeout (`STATUS`, `CURRENT`, M04 ledger, handoff, feature matrix, traceability, known issues, PR body).
-3. Verify fresh CI against the exact final documentation head.
-4. Recheck unresolved threads, mergeability, base/head stability and concurrency.
-5. If every authorized gate is green, mark PR #6 ready if required and squash-merge it automatically.
-6. Recover the new `main` SHA and verify post-merge main CI.
-7. Activate M05 — Realtime AI Interview, create/reuse its feature branch and draft PR according to repo conventions, update durable state, and immediately begin the first valid TDD unit.
+1. Recover the exact PR #7 remote head after this closeout reconciliation.
+2. Verify the exact current head with the complete GitHub Actions quality gate.
+3. Recheck unresolved reviews, concurrency, mergeability, and branch protection against that same head.
+4. If all authorized merge gates pass, mark PR #7 ready if necessary and merge it using repository convention.
+5. Recover and verify post-merge `main` exact SHA/CI.
+6. Activate M06 — Transcript + Durable Session and continue autonomous development.
+7. Separately, when real `GEMINI_API_KEY` is supplied locally, execute `docs/LOCAL-REALTIME-ACCEPTANCE.md`; do not backfill fake evidence if it has not run.

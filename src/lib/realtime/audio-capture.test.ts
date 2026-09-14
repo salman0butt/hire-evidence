@@ -1,0 +1,364 @@
+import { describe, expect, it, vi } from "vitest";
+
+import { createRealtimeAudioCapture } from "./audio-capture";
+
+describe("RealtimeAudioCapture", () => {
+  it("acquires the selected microphone and emits mono PCM only after start", async () => {
+    const stopTrack = vi.fn();
+    const onChunk = vi.fn();
+    const postMessage = vi.fn();
+    const connect = vi.fn();
+    const disconnect = vi.fn();
+    let workletMessage:
+      | ((event: {
+          data: {
+            type: string;
+            pcm?: Float32Array | undefined;
+            level?: number | undefined;
+          };
+        }) => void)
+      | undefined;
+
+    const stream = {
+      getTracks: () => [{ stop: stopTrack }],
+    };
+    const source = { connect, disconnect };
+    const workletNode = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      port: {
+        postMessage,
+        set onmessage(handler: typeof workletMessage) {
+          workletMessage = handler;
+        },
+      },
+    };
+    const audioContext = {
+      sampleRate: 48_000,
+      audioWorklet: { addModule: vi.fn().mockResolvedValue(undefined) },
+      createMediaStreamSource: vi.fn(() => source),
+      destination: {},
+      close: vi.fn().mockResolvedValue(undefined),
+    };
+    const getUserMedia = vi.fn().mockResolvedValue(stream);
+    const createAudioContext = vi.fn(() => audioContext);
+    const createWorkletNode = vi.fn(() => workletNode);
+
+    const capture = createRealtimeAudioCapture({
+      selectedInputDeviceId: "usb-mic",
+      getUserMedia,
+      createAudioContext,
+      createWorkletNode,
+      onChunk,
+    });
+
+    expect(onChunk).not.toHaveBeenCalled();
+
+    await capture.start();
+
+    expect(getUserMedia).toHaveBeenCalledWith({
+      audio: {
+        deviceId: { exact: "usb-mic" },
+        channelCount: 1,
+      },
+      video: false,
+    });
+    expect(audioContext.audioWorklet.addModule).toHaveBeenCalledWith(
+      "/worklets/interview-mic-processor.js",
+    );
+    expect(source.connect).toHaveBeenCalledWith(workletNode);
+
+    const pcm = new Float32Array([0.25, -0.5]);
+    workletMessage?.({ data: { type: "pcm", pcm } });
+
+    expect(onChunk).toHaveBeenCalledTimes(1);
+    expect(onChunk).toHaveBeenCalledWith(pcm, 48_000);
+  });
+
+  it("releases the microphone and audio context when startup fails", async () => {
+    const workletFailure = new Error("worklet failed");
+    const stopTrack = vi.fn();
+    const close = vi.fn().mockResolvedValue(undefined);
+    const stream = {
+      getTracks: () => [{ stop: stopTrack }],
+    };
+    const source = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+    };
+    const audioContext = {
+      sampleRate: 48_000,
+      audioWorklet: { addModule: vi.fn().mockRejectedValue(workletFailure) },
+      createMediaStreamSource: vi.fn(() => source),
+      destination: {},
+      close,
+    };
+
+    const capture = createRealtimeAudioCapture({
+      getUserMedia: vi.fn().mockResolvedValue(stream),
+      createAudioContext: vi.fn(() => audioContext),
+      createWorkletNode: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        port: { postMessage: vi.fn() },
+      })),
+      onChunk: vi.fn(),
+    });
+
+    await expect(capture.start()).rejects.toThrow("worklet failed");
+
+    expect(stopTrack).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it("coalesces concurrent start requests into one microphone acquisition", async () => {
+    const stream = {
+      getTracks: () => [{ stop: vi.fn() }],
+    };
+    const source = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+    };
+    const workletNode = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      port: { postMessage: vi.fn() },
+    };
+    const audioContext = {
+      sampleRate: 48_000,
+      audioWorklet: { addModule: vi.fn().mockResolvedValue(undefined) },
+      createMediaStreamSource: vi.fn(() => source),
+      destination: {},
+      close: vi.fn().mockResolvedValue(undefined),
+    };
+    const getUserMedia = vi.fn().mockResolvedValue(stream);
+    const capture = createRealtimeAudioCapture({
+      getUserMedia,
+      createAudioContext: vi.fn(() => audioContext),
+      createWorkletNode: vi.fn(() => workletNode),
+      onChunk: vi.fn(),
+    });
+
+    await Promise.all([capture.start(), capture.start()]);
+
+    expect(getUserMedia).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not activate capture when stopped while microphone acquisition is pending", async () => {
+    type PendingStream = {
+      getTracks: () => { stop: () => void }[];
+    };
+
+    const stopTrack = vi.fn();
+    const close = vi.fn().mockResolvedValue(undefined);
+    const addModule = vi.fn().mockResolvedValue(undefined);
+    const stream: PendingStream = {
+      getTracks: () => [{ stop: stopTrack }],
+    };
+    let resolveStream: ((stream: PendingStream) => void) | undefined;
+    const getUserMedia = vi.fn(
+      () =>
+        new Promise<PendingStream>((resolve) => {
+          resolveStream = resolve;
+        }),
+    );
+    const capture = createRealtimeAudioCapture({
+      getUserMedia,
+      createAudioContext: vi.fn(() => ({
+        sampleRate: 48_000,
+        audioWorklet: { addModule },
+        createMediaStreamSource: vi.fn(() => ({
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        })),
+        destination: {},
+        close,
+      })),
+      createWorkletNode: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        port: { postMessage: vi.fn() },
+      })),
+      onChunk: vi.fn(),
+    });
+
+    const startPromise = capture.start();
+    await Promise.resolve();
+    await capture.stop();
+    resolveStream?.(stream);
+    await startPromise;
+
+    expect(stopTrack).toHaveBeenCalledTimes(1);
+    expect(addModule).not.toHaveBeenCalled();
+    expect(close).not.toHaveBeenCalled();
+  });
+
+  it("does not activate capture when stopped while the worklet module is loading", async () => {
+    const stopTrack = vi.fn();
+    const close = vi.fn().mockResolvedValue(undefined);
+    const sourceConnect = vi.fn();
+    const createWorkletNode = vi.fn(() => ({
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      port: { postMessage: vi.fn() },
+    }));
+    let resolveModule: (() => void) | undefined;
+    const addModule = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveModule = resolve;
+        }),
+    );
+    const stream = {
+      getTracks: () => [{ stop: stopTrack }],
+    };
+    const capture = createRealtimeAudioCapture({
+      getUserMedia: vi.fn().mockResolvedValue(stream),
+      createAudioContext: vi.fn(() => ({
+        sampleRate: 48_000,
+        audioWorklet: { addModule },
+        createMediaStreamSource: vi.fn(() => ({
+          connect: sourceConnect,
+          disconnect: vi.fn(),
+        })),
+        destination: {},
+        close,
+      })),
+      createWorkletNode,
+      onChunk: vi.fn(),
+    });
+
+    const startPromise = capture.start();
+    await Promise.resolve();
+    await Promise.resolve();
+    await capture.stop();
+    resolveModule?.();
+    await startPromise;
+
+    expect(stopTrack).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(sourceConnect).not.toHaveBeenCalled();
+    expect(createWorkletNode).not.toHaveBeenCalled();
+  });
+
+  it("can restart immediately after canceling a pending microphone acquisition", async () => {
+    type PendingStream = {
+      getTracks: () => { stop: () => void }[];
+    };
+
+    const firstStopTrack = vi.fn();
+    const secondStopTrack = vi.fn();
+    const firstStream: PendingStream = {
+      getTracks: () => [{ stop: firstStopTrack }],
+    };
+    const secondStream: PendingStream = {
+      getTracks: () => [{ stop: secondStopTrack }],
+    };
+    let resolveFirstStream: ((stream: PendingStream) => void) | undefined;
+    const getUserMedia = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise<PendingStream>((resolve) => {
+            resolveFirstStream = resolve;
+          }),
+      )
+      .mockResolvedValueOnce(secondStream);
+    const createAudioContext = vi.fn(() => ({
+      sampleRate: 48_000,
+      audioWorklet: { addModule: vi.fn().mockResolvedValue(undefined) },
+      createMediaStreamSource: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+      })),
+      destination: {},
+      close: vi.fn().mockResolvedValue(undefined),
+    }));
+    const capture = createRealtimeAudioCapture({
+      getUserMedia,
+      createAudioContext,
+      createWorkletNode: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        port: { postMessage: vi.fn() },
+      })),
+      onChunk: vi.fn(),
+    });
+
+    const firstStart = capture.start();
+    await Promise.resolve();
+    await capture.stop();
+
+    const secondStart = capture.start();
+    await Promise.resolve();
+
+    expect(getUserMedia).toHaveBeenCalledTimes(2);
+
+    resolveFirstStream?.(firstStream);
+    await Promise.all([firstStart, secondStart]);
+
+    expect(firstStopTrack).toHaveBeenCalledTimes(1);
+    expect(secondStopTrack).not.toHaveBeenCalled();
+
+    await capture.stop();
+    expect(secondStopTrack).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not tear down a restarted capture when a canceled acquisition rejects later", async () => {
+    type PendingStream = {
+      getTracks: () => { stop: () => void }[];
+    };
+
+    const firstFailure = new Error("first microphone request failed");
+    const secondStopTrack = vi.fn();
+    const secondClose = vi.fn().mockResolvedValue(undefined);
+    const secondStream: PendingStream = {
+      getTracks: () => [{ stop: secondStopTrack }],
+    };
+    let rejectFirstStream: ((error: Error) => void) | undefined;
+    const getUserMedia = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise<PendingStream>((_resolve, reject) => {
+            rejectFirstStream = reject;
+          }),
+      )
+      .mockResolvedValueOnce(secondStream);
+    const createAudioContext = vi.fn(() => ({
+      sampleRate: 48_000,
+      audioWorklet: { addModule: vi.fn().mockResolvedValue(undefined) },
+      createMediaStreamSource: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+      })),
+      destination: {},
+      close: secondClose,
+    }));
+    const capture = createRealtimeAudioCapture({
+      getUserMedia,
+      createAudioContext,
+      createWorkletNode: vi.fn(() => ({
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        port: { postMessage: vi.fn() },
+      })),
+      onChunk: vi.fn(),
+    });
+
+    const firstStart = capture.start();
+    await Promise.resolve();
+    await capture.stop();
+    await capture.start();
+
+    rejectFirstStream?.(firstFailure);
+    await expect(firstStart).rejects.toThrow("first microphone request failed");
+
+    expect(secondStopTrack).not.toHaveBeenCalled();
+    expect(secondClose).not.toHaveBeenCalled();
+
+    await capture.stop();
+    expect(secondStopTrack).toHaveBeenCalledTimes(1);
+    expect(secondClose).toHaveBeenCalledTimes(1);
+  });
+});

@@ -1,23 +1,45 @@
 # Known Issues
 
-Only unresolved or materially relevant issues belong here.
+Only unresolved or materially relevant issues belong here. Actual Git/code/current exact-SHA CI outrank stale historical text.
 
 ## Current unresolved issues
 
-No Critical or Important M04 implementation/review issue is currently known.
+### Runtime provider configuration / local live smoke
 
-The only current M04 merge blocker is procedural/evidence-based: durable closeout documentation changes the PR head after implementation CI #507 passed, so fresh exact-final-head CI is required before merge.
+Classification: **Deployment configuration and acceptance requirement; not an M05 repository merge blocker**.
 
-Supabase logout uses the SDK default session scope. Classification: **Minor / product-semantics decision**; do not alter multi-device logout behavior without an explicit product requirement.
+Provider-backed sessions require server-side `GEMINI_API_KEY`. Absence must continue to fail closed with a constant-safe response and must not expose configuration details, raw invitation capabilities, or provider credentials.
 
-GitHub-hosted CI emits deprecation notices from third-party action runtimes being forced from Node 20 to Node 24, plus transitive runtime deprecation notices. Classification: **Informational/external maintenance**, not an application correctness blocker.
+On 2026-09-14 the repository owner explicitly chose to provide the real Gemini credential locally and instructed autonomous development to complete repository-side M05 without waiting for an external live-provider run. Therefore the real Gemini browser smoke is documented in `docs/LOCAL-REALTIME-ACCEPTANCE.md` and is a local/deployment acceptance check.
 
-## Recently resolved M04 execution issues
+The smoke has **not** been executed by repository CI and must never be described as executed evidence. If it later fails, treat that as a real defect and fix it before relying on that deployment for candidate interviews.
 
-- CI #505 / `34690796275` failed only in `e2e/organization-ui.spec.ts`: after candidate-support email and URL were correctly added to organization settings, the older keyboard test still expected `Save settings` immediately after `Hiring use case`. Root cause was stale accessibility coverage, not incorrect UI behavior. Commit `ac047aff7cffb335226702e24b443cd1706796a9` updated the expected focus sequence; CI #506 / `34691250632` passed the complete quality gate.
-- M04.8 browser/security closeout commit `8a6f6cc8adba2d39f2b255a74db166e3285527ba` passed CI #507 / `34691558117`, including local Supabase, build, Chromium E2E, and PRD coverage.
-- Earlier M04.3 provider checkpoint `9d97ec54c1fd2872fca62b9abe1e7290427d4264` exposed a test fixture timestamp that violated the legitimate `revoked_at >= created_at` constraint by milliseconds. The fixture was corrected without weakening production constraints; `d8c5317c1d5a28aaec89a826002847db96ed9cdf` / CI #460 passed.
+### External CI maintenance notices
+
+Classification: **Informational / external maintenance**.
+
+GitHub-hosted CI reports Node runtime deprecation notices from third-party actions and some transitive packages. These notices are not an application correctness blocker. Address them only through normal dependency/action maintenance without weakening gates.
+
+## Resolved M05 issues
+
+- Realtime provider selection / credential issuance — **resolved**. Gemini Live credential issuance is server-side and constrained.
+- Provider adapter — **resolved**. Gemini Live protocol stays behind the app-owned provider-neutral transport boundary.
+- Production Gemini session composition — **resolved**.
+- Production realtime route provider wiring — **resolved**.
+- Production candidate-page composition — **resolved**. Browser runtime + launcher composition obtains authorized session data, instantiates provider transport behind the app-owned boundary, wires capture/playback/runtime controls, forwards authoritative snapshots, and renders current interview state.
+- Capability-bound realtime progress persistence — **resolved**. Progress remains tied to the authoritative invitation/attempt and database state.
+- Deterministic production-browser reconnect — **resolved in repository acceptance**. Browser E2E proves disconnect causes reauthorization while preserving same-attempt state without displaying the ephemeral credential.
+- Provider-interruption playback cancellation — **resolved**. RED `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772, proved `interrupted` did not stop playback; GREEN `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773, routes provider interruption through playback interruption.
+- Browser compatibility/microphone diagnostics — **resolved** with deterministic browser coverage for offline behavior, selected-device handling, usable input readiness, accessibility, and candidate-page integration.
+- Runtime question progression persistence authority — **resolved**. Progression waits for authoritative persistence and validates returned checkpoints; malformed/conflicting checkpoints fail closed.
+- M05 live-provider merge blocker — **resolved by explicit owner acceptance decision**. Real-provider execution remains a local/deployment smoke and no fake live evidence is claimed.
+
+## Review blockers
+
+No unresolved Critical or Important review finding is currently known for M05 at latest recovery. PR #7 had no unresolved review threads at latest recovery.
 
 ## Merge gate
 
-PR #6 remains OPEN / DRAFT until final documentation/PR reconciliation is complete, exact-final-head CI is green, and the final remote head/review/concurrency/mergeability checks succeed. With those gates satisfied, the repository owner's standing authorization permits autonomous squash merge without additional approval.
+PR #7 may merge only after the current closeout head has exact-final-head GREEN CI, durable closeout/traceability is current, remote head has not changed unexpectedly, no blocking reviews exist, concurrency is safe, and GitHub reports the PR mergeable under repository policy.
+
+The deferred real Gemini smoke does not satisfy or replace any of those repository gates and does not weaken safety, privacy, evidence-integrity, authorization, or human-review requirements.
