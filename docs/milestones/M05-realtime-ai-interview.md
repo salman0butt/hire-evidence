@@ -33,18 +33,18 @@ Exit:
 candidate can complete stable multi-turn voice interview.
 
 ## Dependencies
-Candidates + Invitations; published Interviewer Builder configuration; an authoritative realtime provider selection/configuration is required for the final live provider path.
+Candidates + Invitations; published Interviewer Builder configuration; authoritative Gemini Live runtime configuration for final live-provider acceptance.
 
 ## In Scope
 The authoritative definition plus M05.1–M05.14 from the selected implementation plan.
 
 ## Out of Scope
-Later milestones, autonomous hiring decisions, protected-trait/emotion/personality/deception/appearance/accent-quality inference, fabricated candidate evidence, and provider coupling not justified by authoritative requirements.
+Later milestones, autonomous hiring decisions, protected-trait/emotion/personality/deception/appearance/accent-quality inference, fabricated candidate evidence, and provider coupling outside the selected Gemini Live integration.
 
 ## Architecture Notes
-Server-authorized realtime setup; short-lived provider credentials; provider-neutral boundaries until a provider is authoritative; explicit browser diagnostics; deterministic audio capture/playback lifecycles; app-owned connection state; immutable interview-plan runner; monotonic pacing; bounded job-related follow-ups; same-attempt reconnect. Candidate speech is untrusted data. Technical failures never lower candidate evaluation. Runtime plan progression is committed only after authoritative attempt persistence succeeds and a returned server checkpoint is validated.
+Server-authorized realtime setup; short-lived Gemini provider credentials; app-owned provider-neutral transport boundary; explicit browser diagnostics; deterministic audio capture/playback lifecycles; app-owned connection state; immutable interview-plan runner; monotonic pacing; bounded job-related follow-ups; same-attempt reconnect. Candidate speech is untrusted data. Technical failures never lower candidate evaluation. Runtime plan progression is committed only after authoritative attempt persistence succeeds and a returned server checkpoint is validated.
 
-The production `POST /api/interview/[token]/realtime-session` endpoint now exists and intentionally fails closed with constant-safe `503 { status: "unavailable" }` while no authoritative provider is configured. This prevents accidental provider fabrication or credential issuance while preserving a real production integration point for the later provider adapter.
+The production candidate path now includes `POST /api/interview/[token]/realtime-session`, the capability-bound realtime-progress boundary, Gemini Live ephemeral credential issuance, the Gemini transport adapter, browser capture/playback composition, and `RealtimeInterviewLauncher`. Missing server `GEMINI_API_KEY` continues to fail closed with constant-safe unavailability.
 
 ## Selected Design / Implementation Plan
 - Design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`
@@ -64,61 +64,45 @@ The production `POST /api/interview/[token]/realtime-session` endpoint now exist
 
 ## Tasks / Iterations
 1. **VERIFIED** — M05.1 Reference characterization.
-2. **ACTIVE / PARTIALLY VERIFIED** — M05.2 Session authorization/provider boundary. Provider-neutral authorization/attempt/persistence/token-lifetime boundaries and the real production endpoint are verified. Provider-specific credential issuance remains blocked on authoritative provider selection/configuration.
+2. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.2 Session authorization/provider boundary. Authoritative attempt binding, consent/version gating, short-lived credential constraints, Gemini Live ephemeral credential issuance, production realtime-session endpoint, and capability-bound realtime-progress endpoint are implemented.
 3. **VERIFIED** — M05.3 Browser compatibility + microphone diagnostics.
 4. **VERIFIED** — M05.4 Deterministic Web Audio capture.
-5. **VERIFIED (provider-neutral scope)** — M05.5 Provider-neutral realtime transport. Provider-specific adapter remains blocked pending provider selection/configuration.
+5. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.5 Provider-neutral realtime transport with Gemini Live adapter behind the app-owned boundary.
 6. **VERIFIED** — M05.6 AI audio playback.
 7. **VERIFIED** — M05.7 Explicit connection state machine + accessible controls.
 8. **VERIFIED** — M05.8 Deterministic interview-plan runner.
 9. **VERIFIED** — M05.9 Pacing/time budget.
 10. **VERIFIED** — M05.10 Bounded follow-up policy.
-11. **ACTIVE / PARTIALLY VERIFIED** — M05.11 Realtime interview orchestrator/barge-in integration. Provider-neutral controller/presentation behavior is verified; production provider/page composition remains blocked.
+11. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.11 Realtime interview orchestrator/barge-in integration. Production candidate-page launcher/runtime composition now authorizes the capability, creates Gemini transport/capture/playback behind provider-neutral interfaces, renders authoritative snapshots, and exposes mute/end controls.
 12. **VERIFIED (provider-neutral scope)** — M05.12 Timeout/error recovery.
-13. **VERIFIED (provider-neutral scope)** — M05.13 Same-authoritative-attempt reconnect. Server-authoritative checkpoints, capability-bound progress persistence, immutable-plan restoration, stale-generation handling, and runtime persistence gating are implemented and exact-head verified. Provider-backed reconnect remains blocked by provider selection.
-14. **ACTIVE / PARTIALLY VERIFIED** — M05.14 Full realtime E2E and closeout. Browser coverage verifies microphone denial/recovery, keyboard focus, microphone selection, mobile no-overflow, no recording during readiness checks, and the production realtime endpoint's fail-closed/no-secret behavior. Stable provider-backed multi-turn voice completion remains blocked.
+13. **IMPLEMENTED / ACTIVE VERIFICATION** — M05.13 Same-authoritative-attempt reconnect. Server-authoritative checkpoints, capability-bound progress persistence, immutable-plan restoration, stale-generation handling, and runtime persistence gating are implemented; live Gemini browser reconnect/interruption acceptance remains open.
+14. **ACTIVE / PARTIALLY VERIFIED** — M05.14 Full realtime E2E and closeout. Browser coverage verifies microphone denial/recovery, keyboard focus, microphone selection, mobile no-overflow, no recording during readiness checks, and constant-safe unavailable-provider behavior when the server secret is absent. Stable Gemini-backed multi-turn completion plus interruption/recovery/barge-in/timeout/bounded reconnect acceptance remain open.
 
-## TDD Evidence
+## TDD / Integration Evidence
 
-Earlier M05.2–M05.12 checkpoints remain historically preserved in Git and prior revisions of this ledger.
+Earlier M05 checkpoints remain historically preserved in Git and prior revisions of this ledger. Important recent checkpoints include:
 
-Key M05.13 checkpoints:
-- authoritative progress repository RED: `87406dc5d0186d5f28f3b8d5cdd5f19c9f50b2b1`, CI #665 / `34732181229`.
-- initial repository GREEN: `41d35ab89d24ef8b093c37c47a1dc8261f3285d1`, CI #666 / `34732252665`.
-- authority review RED: `a2cf5eb633751d58cfcf3e3fb0b2e657504cc00a`, CI #667 / `34732505070`.
-- reviewed repository GREEN: `576d5dbad4138b85876eeac22ddfe8e7247381ce`, CI #669 / `34732650018`.
-- runtime persistence RED: `f3b01a0e1f3f9ca17cf5058aea73816f6e639d49`, CI #671 / `34732962547`.
-- fail-closed review RED: `a0fcda2590020b4bd574dcd342a3aec308e34300`, CI #673 / `34733342412`.
-- reviewed GREEN: `5e9328d2f945cd10eaecea312896f29fbc93b10e`, CI #674 / `34733465242`.
+- production Gemini session composition RED/GREEN: `7f9b2f6beb195c48a03595fceb191d0adc83aa3f` → `409a899ce000674b441bd0da2ff8a01d4efc62db`.
+- production route/provider wiring and schema fixes through `56c78425f7052b2e54ac9cfea410a57c53aef805`, CI #713 / `34832502815` — complete repository gate GREEN.
+- capability-bound realtime progress checkpoint `ce161fbaa34450839ac8f323f6fcc3a33cdc4863`, CI #728 / `34834823096` — complete repository gate GREEN.
+- production browser runtime/launcher composition advanced through later commits, including snapshot forwarding `6bfef96dbeb4a9d4c529eb710f7d15c6b74ac5dc` and authoritative snapshot rendering `95106d791b42220a53788bc058327182902cc99a`.
+- exact behavioral head `95106d791b42220a53788bc058327182902cc99a`, CI #745 / `34839902037` — complete repository gate GREEN before the current documentation reconciliation.
 
-M05.14 browser/production-route evidence:
-- readiness browser checkpoint `829d9d92c3f9b92d32944b54622436b1a54b63a5`, CI #681 / `34734365068` — **NOT GREEN** because a generic `role=alert` locator also matched the Next.js route announcer; product behavior reached the intended state.
-- readiness reviewed GREEN `1c4635618aa1d3471284ca30cfb8658981afdd94`, CI #682 / `34734661625` — scoped alert locator; complete repository gate GREEN.
-- production-route RED `e5a38034fbb35203e47a97fa2491cca5142b116b`, CI #687 / `34765320016` — intended TypeScript RED: `Cannot find module './route'` proved the real route was absent.
-- production-route GREEN `cf37ffadcea1bab410e32d89060df22138af4324`, CI #688 / `34765378818` — minimal constant-safe fail-closed production route; complete repository gate GREEN.
-- browser/API integration GREEN `db86e81fa19af2daf2c830c0b5cb0082fd118fd9`, CI #689 / `34765662964` — real candidate capability exercises the production route and verifies `503 { status: "unavailable" }`, no raw capability echo, and no credential exposure; complete repository gate GREEN.
-
-## Integration Test Evidence
-
-CI #689 / `34765662964` on `db86e81fa19af2daf2c830c0b5cb0082fd118fd9` passed frozen dependency installation, lint, typecheck, unit/component tests, framework/source verifiers, local Supabase startup/migrations, production build, Chromium E2E, PRD coverage, and cleanup.
-
-The browser path now exercises the real candidate invitation page on a mobile viewport, proves microphone denial/retry recovery, accessible keyboard focus, enumerated microphone selection, no horizontal overflow, no recording during readiness checks, and the production realtime endpoint's safe unavailable response while provider configuration is absent.
-
-Full stable multi-turn live-provider browser E2E remains an M05.14 closeout requirement and is not satisfied.
+Historical M05.13 persistence evidence includes repository RED `87406dc5d0186d5f28f3b8d5cdd5f19c9f50b2b1`, authority review RED `a2cf5eb633751d58cfcf3e3fb0b2e657504cc00a`, reviewed GREEN `576d5dbad4138b85876eeac22ddfe8e7247381ce`, runtime persistence RED `f3b01a0e1f3f9ca17cf5058aea73816f6e639d49`, fail-closed review RED `a0fcda2590020b4bd574dcd342a3aec308e34300`, and reviewed GREEN `5e9328d2f945cd10eaecea312896f29fbc93b10e`.
 
 ## Security Review
 
 Implemented M05 work does not create candidate scores or autonomous hire/reject decisions. Candidate speech remains untrusted. Technical failure, microphone/network/provider state, accent, prosody, emotion, protected traits, or infrastructure downtime cannot become negative candidate evidence.
 
-Invitation capability and current consent remain server authorization requirements. Raw capability tokens and long-lived provider secrets are not persisted/logged. Progress persistence is capability-bound and database-authoritative. The production realtime endpoint currently issues no credential and returns only constant-safe unavailability, so it cannot bypass consent or expose provider secrets before provider configuration exists.
+Invitation capability and current consent remain server authorization requirements. Raw capability tokens and long-lived provider secrets are not persisted/logged. Progress persistence is capability-bound and database-authoritative. Gemini long-lived credentials remain server-only; the browser receives only constrained short-lived session credentials after authorization.
 
 ## Accessibility Review
 
-M05.3 diagnostic UI and M05.7 realtime controls provide semantic status/alert information, keyboard-operable controls, labelled mute/end/retry actions, pressed/disabled state, and live status text. Candidate-facing current-question/completion presentation is covered by component tests. Browser coverage verifies keyboard focus, recovery presentation, microphone selection, and mobile no-overflow. Full live realtime browser accessibility coverage remains provider-blocked.
+Diagnostic UI and realtime controls provide semantic status/alert information, keyboard-operable controls, labelled mute/end/retry actions, pressed/disabled state, and live status text. Candidate-facing current-question/completion presentation is covered by component tests. Browser coverage verifies keyboard focus, recovery presentation, microphone selection, and mobile no-overflow. Full live Gemini browser accessibility acceptance remains open.
 
 ## Performance Review
 
-Capture/playback/transport lifecycles use bounded cleanup and stale-generation rejection. Plan, pacing, follow-up, recovery, reconnect, and persistence bookkeeping are bounded. The fail-closed endpoint performs constant work and does not allocate provider resources. Browser fixtures use bounded mocked media calls only in test execution.
+Capture/playback/transport lifecycles use bounded cleanup and stale-generation rejection. Plan, pacing, follow-up, recovery, reconnect, and persistence bookkeeping are bounded. Provider setup and progress boundaries use bounded request/response payloads. No unbounded background retry or browser queue has been introduced.
 
 ## Code Review Findings
 
@@ -127,25 +111,22 @@ Capture/playback/transport lifecycles use bounded cleanup and stale-generation r
 - Important — **fixed**: M05.8 initially authorized future planned questions; current-question-only authority is regression-tested.
 - Important — **fixed**: progress checkpoint authority initially depended on caller input; persisted attempt version now wins.
 - Important — **fixed**: malformed authoritative progress checkpoint could throw; it now fails closed.
-- Test quality — **fixed**: initial browser alert locator was ambiguous.
-- Production integration gap — **fixed in provider-neutral scope**: the realtime-session route test existed without a production route. RED `e5a38034…` proved the absence; GREEN `cf37ffad…` added a fail-closed production endpoint; E2E GREEN `db86e81f…` proves no capability/credential leakage.
+- Important — **fixed**: production browser composition gap. Candidate page now authorizes the session, instantiates the browser runtime/Gemini transport, and renders authoritative snapshots.
 - Critical: **0 unresolved** for implemented slices.
-- Important: **0 unresolved** for verified provider-neutral slices through the current browser/route coverage.
-- PR #7 has no unresolved review threads at the latest recovery check.
+- Important: **0 unresolved** for implemented slices at latest recovery.
+- PR #7 has no unresolved review threads at latest recovery.
 
 ## Known Limitations / Blocker
 
-No authoritative realtime provider SDK/configuration or production credential-minting contract exists. Therefore provider-specific credential issuance, provider adapter composition, final live page/transport wiring, provider-backed reconnect/interruption recovery, and the live stable multi-turn browser exit criterion remain unresolved. Do not invent a provider merely to close M05.
+The remaining blocker is acceptance evidence, not production composition. Stable live Gemini multi-turn browser completion and recovery paths have not yet been demonstrated in CI because provider-backed execution requires server `GEMINI_API_KEY` and controlled browser/provider conditions. Existing E2E intentionally proves constant-safe unavailability when the runtime secret is absent.
 
-Existing candidate invitation browser E2E already covers unusable, expired, revoked, and completed invitation safety. Provider-neutral tests already cover mute/end controls, barge-in, timeout/error recovery, and bounded reconnect semantics. Surfacing a fake "live" interview page solely to exercise those browser states would fabricate integration evidence and is not legitimate progress.
-
-M05.14 remains incomplete. PR #7 must stay draft and unmerged until all acceptance, exact-final-head CI, review, traceability, and live-provider gates are genuinely satisfied.
+Do not substitute provider-neutral/component tests for live-provider acceptance and do not expose client-side long-lived secrets to manufacture E2E evidence. M05.14 remains incomplete. PR #7 must stay draft and unmerged until live-provider acceptance, final reviews, durable traceability, exact-final-head CI, concurrency checks, and repository merge gates are all satisfied.
 
 ## Fresh Verification Results
 
-Latest verified behavioral/browser SHA `db86e81fa19af2daf2c830c0b5cb0082fd118fd9` passed CI #689 / `34765662964`, including frozen dependency install, lint, typecheck, unit/component tests, framework/source verification, local Supabase startup/migrations, production build, Chromium E2E, PRD coverage, and cleanup.
+Latest verified behavioral SHA before the current documentation reconciliation: `95106d791b42220a53788bc058327182902cc99a`, CI #745 / `34839902037` — complete repository gate GREEN.
 
-Documentation commits after `db86e81f…` require their own exact-head CI before they become final branch verification evidence.
+Documentation reconciliation commits after that SHA require their own exact-head CI before becoming final branch verification evidence.
 
 ## Fresh Verification Commands
 
@@ -180,7 +161,7 @@ Recover actual Git/GitHub first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `
 - [ ] Final PR head/review/concurrency/mergeability gates green before authorized merge.
 
 ## Next Action
-When authoritative realtime provider/configuration is available, wire the existing server authorization boundary to short-lived provider credential issuance, implement the provider adapter/live candidate-page composition, verify provider-backed reconnect/interruption recovery, and complete stable multi-turn browser E2E. Until then preserve the blocker and keep PR #7 draft/unmerged.
+Add deterministic browser acceptance around the production launcher/runtime composition without exposing provider secrets, then execute live Gemini-backed browser acceptance when server `GEMINI_API_KEY` is available. Verify stable multi-turn completion, interruption/barge-in, timeout/error recovery, bounded same-attempt reconnect, mute/end controls, accessibility/mobile behavior, and invitation safety; then reconcile final traceability/feature/handoff state and run the complete quality gate.
 
 ## Next Milestone
 M06 — Transcript + Durable Session, only after M05 is genuinely complete, merged, and post-merge `main` is verified.
