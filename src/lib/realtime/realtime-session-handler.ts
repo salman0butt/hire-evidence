@@ -28,6 +28,7 @@ export function createRealtimeSessionHandler(
         attemptId: authorization.attemptId,
         durationSeconds: authorization.durationSeconds,
         language: authorization.language,
+        interviewPlan: authorization.interviewPlan,
         providerCredential: authorization.providerCredential,
         ...(authorization.resumeCheckpoint
           ? { resumeCheckpoint: authorization.resumeCheckpoint }
