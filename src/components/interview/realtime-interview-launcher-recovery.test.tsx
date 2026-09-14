@@ -3,6 +3,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import { RealtimeInterviewLauncher } from "./realtime-interview-launcher";
 
+const emptyTranscript = {
+  partials: { candidate: "", interviewer: "" },
+  finalizedTurns: [],
+} as const;
+
 describe("RealtimeInterviewLauncher recovery", () => {
   it("stops the stale runtime and reauthorizes the same candidate capability after a recoverable provider failure", async () => {
     const authorization = {
@@ -34,6 +39,7 @@ describe("RealtimeInterviewLauncher recovery", () => {
           status: "active" as const,
           generation: index + 1,
           currentQuestion: null,
+          transcript: emptyTranscript,
         })),
       };
     });
