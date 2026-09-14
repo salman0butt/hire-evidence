@@ -4,7 +4,7 @@ import { hashInvitationToken } from "@/lib/candidates/invitation-token";
 import { createRealtimeSessionRepository } from "./session-repository";
 
 describe("realtime session repository", () => {
-  it("resolves a candidate session through the hashed invitation capability", async () => {
+  it("resolves a candidate session through the hashed invitation capability with its immutable runtime plan", async () => {
     const rpc = vi.fn().mockResolvedValue({
       data: [
         {
@@ -15,6 +15,23 @@ describe("realtime session repository", () => {
           language: "en",
           lifecycle: "opened",
           has_current_consent: true,
+          interview_plan: {
+            versionId: "version-1",
+            sections: [
+              {
+                id: "section-1",
+                title: "Technical depth",
+                questions: [
+                  {
+                    id: "question-1",
+                    prompt: "Describe a difficult production incident you resolved.",
+                    required: true,
+                    followUpLimit: 1,
+                  },
+                ],
+              },
+            ],
+          },
         },
       ],
       error: null,
@@ -32,6 +49,23 @@ describe("realtime session repository", () => {
       language: "en",
       lifecycle: "opened",
       hasCurrentConsent: true,
+      interviewPlan: {
+        versionId: "version-1",
+        sections: [
+          {
+            id: "section-1",
+            title: "Technical depth",
+            questions: [
+              {
+                id: "question-1",
+                prompt: "Describe a difficult production incident you resolved.",
+                required: true,
+                followUpLimit: 1,
+              },
+            ],
+          },
+        ],
+      },
     });
 
     expect(rpc).toHaveBeenCalledWith("resolve_realtime_candidate_session", {
