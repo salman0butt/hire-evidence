@@ -187,7 +187,7 @@ async function createInvitation(actor: TestClient, admin: TestClient, suffix: st
   return { rawToken, versionId: published.data, questionId: question.data };
 }
 
-test("production launcher composes the default browser runtime without a live provider secret", async ({
+test("production launcher composes the default browser runtime and reconnects the same attempt after disconnect", async ({
   page,
 }) => {
   test.setTimeout(120_000);
@@ -242,6 +242,11 @@ test("production launcher composes the default browser runtime without a live pr
     class FakeWebSocket {
       private listeners = new Map<string, Array<(event: { data?: string; reason?: string }) => void>>();
       constructor(public url: string) {
+        window.addEventListener(
+          "e2e-realtime-disconnect",
+          () => this.emit("close", { reason: "network-lost" }),
+          { once: true },
+        );
         queueMicrotask(() => this.emit("open", {}));
       }
       addEventListener(type: string, listener: (event: { data?: string; reason?: string }) => void) {
@@ -285,7 +290,9 @@ test("production launcher composes the default browser runtime without a live pr
     });
   });
 
+  let authorizationCalls = 0;
   await page.route(`**/api/interview/${rawToken}/realtime-session`, async (route) => {
+    authorizationCalls += 1;
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -328,6 +335,17 @@ test("production launcher composes the default browser runtime without a live pr
     page.getByText("Describe a production system design decision you owned."),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Mute microphone" })).toBeVisible();
+  await expect(page.getByText(syntheticCredential)).toHaveCount(0);
+  expect(authorizationCalls).toBe(1);
+
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("e2e-realtime-disconnect"));
+  });
+  await expect.poll(() => authorizationCalls).toBe(2);
+  await expect(page.getByText("Technical evidence")).toBeVisible();
+  await expect(
+    page.getByText("Describe a production system design decision you owned."),
+  ).toBeVisible();
   await expect(page.getByText(syntheticCredential)).toHaveCount(0);
 
   await page.getByRole("button", { name: "Mute microphone" }).click();
