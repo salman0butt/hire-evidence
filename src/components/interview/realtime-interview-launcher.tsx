@@ -3,8 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 
 import { createBrowserRealtimeInterviewRuntime } from "@/lib/realtime/browser-realtime-interview-runtime";
+import type { RealtimeConnectionState } from "@/lib/realtime/connection-machine";
+import type { RealtimeInterviewSessionSnapshot } from "@/lib/realtime/interview-session";
 import type { RealtimeInterviewRuntime } from "@/lib/realtime/realtime-interview-runtime";
 import type { RealtimeSessionAuthorization } from "@/lib/realtime/session-authorization";
+
+import { RealtimeInterview } from "./realtime-interview";
 
 type AuthorizedRealtimeSession = Extract<
   RealtimeSessionAuthorization,
@@ -19,7 +23,7 @@ type RealtimeInterviewLauncherProps = Readonly<{
   ) => RealtimeInterviewRuntime;
 }>;
 
-type LauncherState = "idle" | "authorizing" | "connected" | "error";
+type LauncherState = "idle" | "authorizing" | "connected" | "ended" | "error";
 
 function isAuthorizedRealtimeSession(value: unknown): value is AuthorizedRealtimeSession {
   if (!value || typeof value !== "object") return false;
@@ -68,12 +72,24 @@ async function authorizeRealtimeInterview(
   }
 }
 
+function connectedState(snapshot: RealtimeInterviewSessionSnapshot): RealtimeConnectionState {
+  return {
+    connection: snapshot.status === "ended" ? "ended" : "connected",
+    presentation: "listening",
+    generation: snapshot.generation,
+    error: undefined,
+  };
+}
+
 export function RealtimeInterviewLauncher({
   token,
   authorize = authorizeRealtimeInterview,
   createRuntime = createBrowserRealtimeInterviewRuntime,
 }: RealtimeInterviewLauncherProps) {
   const [state, setState] = useState<LauncherState>("idle");
+  const [muted, setMuted] = useState(false);
+  const [sessionSnapshot, setSessionSnapshot] =
+    useState<RealtimeInterviewSessionSnapshot | null>(null);
   const runtimeRef = useRef<RealtimeInterviewRuntime | null>(null);
 
   useEffect(
@@ -101,6 +117,8 @@ export function RealtimeInterviewLauncher({
     try {
       await runtime.start();
       if (runtimeRef.current === runtime) {
+        setSessionSnapshot(runtime.getSnapshot());
+        setMuted(false);
         setState("connected");
       }
     } catch {
@@ -110,6 +128,20 @@ export function RealtimeInterviewLauncher({
         setState("error");
       }
     }
+  }
+
+  function handleMutedChange(nextMuted: boolean) {
+    const runtime = runtimeRef.current;
+    if (!runtime) return;
+    runtime.setMuted(nextMuted);
+    setMuted(nextMuted);
+  }
+
+  async function handleEnd() {
+    const runtime = runtimeRef.current;
+    runtimeRef.current = null;
+    await runtime?.stop();
+    setState("ended");
   }
 
   return (
@@ -127,9 +159,21 @@ export function RealtimeInterviewLauncher({
         </p>
       </div>
 
-      {state === "connected" ? (
+      {state === "connected" && sessionSnapshot?.currentQuestion ? (
+        <RealtimeInterview
+          connectionState={connectedState(sessionSnapshot)}
+          sessionSnapshot={sessionSnapshot}
+          muted={muted}
+          onMutedChange={handleMutedChange}
+          onEnd={() => void handleEnd()}
+        />
+      ) : state === "connected" ? (
         <p role="status" aria-live="polite" className="text-sm text-slate-700">
           Live interview connected
+        </p>
+      ) : state === "ended" ? (
+        <p role="status" aria-live="polite" className="text-sm text-slate-700">
+          Interview ended
         </p>
       ) : state === "error" ? (
         <p role="alert" className="text-sm text-slate-700">
