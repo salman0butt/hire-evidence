@@ -104,6 +104,26 @@ async function authorizeRealtimeInterview(
   }
 }
 
+async function finalizeRealtimeInterview(
+  token: string,
+  attemptId: string,
+): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `/api/interview/${encodeURIComponent(token)}/realtime-finalize`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ attemptId }),
+      },
+    );
+
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 function connectedState(snapshot: RealtimeInterviewSessionSnapshot): RealtimeConnectionState {
   return {
     connection: snapshot.status === "ended" ? "ended" : "connected",
@@ -123,6 +143,7 @@ export function RealtimeInterviewLauncher({
   const [sessionSnapshot, setSessionSnapshot] =
     useState<RealtimeInterviewSessionSnapshot | null>(null);
   const runtimeRef = useRef<RealtimeInterviewRuntime | null>(null);
+  const attemptIdRef = useRef<string | null>(null);
   const operationGenerationRef = useRef(0);
 
   useEffect(
@@ -130,6 +151,7 @@ export function RealtimeInterviewLauncher({
       operationGenerationRef.current += 1;
       const runtime = runtimeRef.current;
       runtimeRef.current = null;
+      attemptIdRef.current = null;
       void runtime?.stop();
     },
     [],
@@ -146,6 +168,7 @@ export function RealtimeInterviewLauncher({
       return;
     }
 
+    attemptIdRef.current = result.attemptId;
     const recordTechnicalEvent = createRealtimeTechnicalEventClient({
       rawToken: token,
       attemptId: result.attemptId,
@@ -191,6 +214,7 @@ export function RealtimeInterviewLauncher({
         runtimeRef.current === runtime
       ) {
         runtimeRef.current = null;
+        attemptIdRef.current = null;
         await runtime.stop();
         if (operationGenerationRef.current === operationGeneration) {
           setState("error");
@@ -243,8 +267,16 @@ export function RealtimeInterviewLauncher({
   async function handleEnd() {
     operationGenerationRef.current += 1;
     const runtime = runtimeRef.current;
+    const attemptId = attemptIdRef.current;
     runtimeRef.current = null;
+    attemptIdRef.current = null;
     await runtime?.stop();
+
+    if (!attemptId || !(await finalizeRealtimeInterview(token, attemptId))) {
+      setState("error");
+      return;
+    }
+
     setState("ended");
   }
 
