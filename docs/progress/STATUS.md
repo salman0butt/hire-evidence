@@ -9,64 +9,60 @@ Last reconciled: 2026-09-15
 - Organizations + RBAC — **COMPLETE**. PR #4 merged as `835d7d571a69cd13e3e802be4872e873ffdd34fe`.
 - Jobs + Interviewer Builder — **COMPLETE**. PR #5 merged as `729474ffb03075c93dfa2564f0004f1590533753`.
 - Candidates + Invitations — **COMPLETE**. PR #6 merged as `943e8a5c1dd45dc1652453ddf8ebc4ae31951925`.
-- Realtime AI Interview — **COMPLETE**. PR #7 merged to `main` as `5c3843c6444bad256974ea391a4a6a978bf88f24`.
+- Realtime AI Interview — **COMPLETE**. PR #7 merged as `5c3843c6444bad256974ea391a4a6a978bf88f24`.
+- Transcript + Durable Session — **COMPLETE**. PR #8 squash-merged as `45d1e1a6083b44b5793c242091ef8d8fe3df9f96`; post-merge main CI #875 / run `34909208645` passed the complete repository gate.
 
 ## Current Milestone
 
-Transcript + Durable Session (M06) — **IMPLEMENTATION COMPLETE / CLOSEOUT**.
+Evidence-Based Assessment Engine (M07) — **DESIGN / IMPLEMENTATION STARTING**.
 
-Active branch: `feat/transcript-durable-session`.
-Active PR: #8 — `Build transcript durable session` — OPEN / DRAFT pending final closeout docs and exact-final-head CI.
-Verified base/main: `5c3843c6444bad256974ea391a4a6a978bf88f24`.
-Latest fully verified implementation head before closeout docs: `ddf3d32024fc6d5c67115326aba0405ba87d0d96`.
-CI status: CI #864 / run `34907376635` passed the complete repository gate at `ddf3d32024fc6d5c67115326aba0405ba87d0d96`, including frozen install, lint, typecheck, unit/component tests, repository verifiers, local Supabase, build, Chromium E2E and PRD coverage.
+Active branch: `feat/evidence-assessment-engine`.
+Active PR: none yet; create one draft after the first coherent implementation state rather than duplicating work.
+Verified base/main: `45d1e1a6083b44b5793c242091ef8d8fe3df9f96` with post-merge CI #875 / run `34909208645` GREEN.
+CI status: M07 design/plan commits are documentation-only activation state; M07.1 behavioral RED/GREEN exact-SHA CI has not yet been created.
 
-Selected design: `docs/superpowers/specs/2026-09-14-transcript-durable-session-design.md`.
-Selected plan: `docs/superpowers/plans/2026-09-14-transcript-durable-session.md`.
-Milestone ledger: `docs/milestones/M06-transcript-durable-session.md`.
+Selected design: `docs/superpowers/specs/2026-09-15-evidence-assessment-engine-design.md`.
+Selected plan: `docs/superpowers/plans/2026-09-15-evidence-assessment-engine.md`.
+Milestone ledger: `docs/milestones/M07-evidence-assessment-engine.md`.
 
-## M06 Task State
+## M07 Task State
 
-- M06.1 Provider transcript-event normalization — **VERIFIED**.
-- M06.2 Partial/finalized transcript state separation — **VERIFIED**.
-- M06.3 Durable finalized transcript messages — **VERIFIED**.
-- M06.4 Correctness guards for duplication/order/speaker/immutability — **VERIFIED**.
-- M06.5 Idempotent attempt lifecycle — **VERIFIED**.
-- M06.6 Same-attempt durable transcript reconnect — **VERIFIED**.
-- M06.7 Separate technical interruption events — **VERIFIED**.
-- M06.8 Idempotent session finalization — **VERIFIED**.
-- M06.9 Durability browser acceptance — **VERIFIED**; milestone closeout/merge gate remains active.
+- M07.1 Assessment domain/schema — **ACTIVE**.
+- M07.2 Trusted prompt composition — **NOT STARTED**.
+- M07.3 Competency scoring — **NOT STARTED**.
+- M07.4 Evidence citations — **NOT STARTED**.
+- M07.5 Evidence validator — **NOT STARTED**.
+- M07.6 Evidence sufficiency + question coverage — **NOT STARTED**.
+- M07.7 Prompt-injection defense — **NOT STARTED**.
+- M07.8 Provenance — **NOT STARTED**.
+- M07.9 Idempotent generation — **NOT STARTED**.
+- M07.10 Regeneration/history — **NOT STARTED**.
+- M07.11 Golden fixtures — **NOT STARTED**.
 
-## Latest TDD / Verification Evidence
+## Latest Verification Evidence
 
-- M06.1 GREEN `60fa653e8b5dc9c47a21dc9bea8c3d8aba6566e3`, CI #796 / `34868105525` — complete repository gate GREEN.
-- M06.2 GREEN `2e91eb529cdc56688aca65766c6e5785d6b1378b`, CI #804 / `34873181788` — complete repository gate GREEN.
-- M06.3 GREEN `73a43be166d87db0e1a20c89d4894f20bd550dbf`, CI #810 / `34875410392` — complete repository gate GREEN.
-- M06.4 chronology RED `f34d095fb5607bddef3252cfec5a04228954153a`, CI #821 / `34884154545`; GREEN `ef898009c063c57a42af1ae64463719a77e13d50`, CI #822 / `34884400868`.
-- M06.5 terminal replay RED `8117a3eed5ab3114e1ed81697f680dd8c8f98699`, CI #823 / `34885046377`; GREEN `fd2da242a636acd5ec4ea879c6ec43d6359e5f10`, CI #824 / `34885300353`.
-- M06.6–M06.8 are present in the verified Git history and were included in exact-head GREEN CI #861 at `4943d949ff943b2585580655e1596ac32f006e32`.
-- M06.9 browser RED `02dfe4704892110d59873efc3262421b0e7e4890`, CI #863 / run `34906932165` — install/lint/typecheck/unit/build succeeded and E2E failed on the new durability acceptance.
-- M06.9 GREEN `ddf3d32024fc6d5c67115326aba0405ba87d0d96`, CI #864 / run `34907376635` — complete repository gate GREEN; reconnect restores finalized transcript into the accessible browser UI and records the disconnect through the separate technical-event path.
-
-Detailed valid/invalid RED/GREEN history remains in `docs/milestones/M06-transcript-durable-session.md` and Git history.
+- M06 final PR head `a2bfed802c54b43ce76ea3cc590d52244b16b1de` passed exact-head CI #874 / run `34908831048` before merge.
+- M06 merge/main SHA `45d1e1a6083b44b5793c242091ef8d8fe3df9f96` passed post-merge CI #875 / run `34909208645`, including frozen install, lint, typecheck, unit/component tests, autonomous/requirements verifiers, local Supabase, build, Chromium E2E and PRD coverage.
+- M07 design commit `a8b270c2e676b37ffde38a54851cdda10cb00e09` establishes the evidence-grounded architecture.
+- M07 implementation plan is present on the active branch; no M07 behavioral RED/GREEN claim exists yet.
 
 ## Review State
 
-Critical findings: **0 unresolved**.
-Important findings: **0 unresolved**.
-PR #8 has no submitted reviews or unresolved inline review comments at latest recovery.
-Closeout review confirms transcript text is rendered as inert React text, partial hypotheses remain browser-only, technical failures remain non-evaluative, same-attempt authority remains server-bound, and finalization remains idempotent.
+Critical findings: **0 known unresolved** at activation.
+Important findings: **0 known unresolved** at activation.
+M07 implementation requires fresh review after each meaningful unit and before milestone closeout.
 
 ## Safety / Product Constraints
 
-- Partial transcript hypotheses remain ephemeral UI state and are not persisted as candidate evidence.
-- Finalized transcript text is untrusted evidence data, never instruction.
-- Speaker identity is explicit from normalized transport semantics; never infer/rewrite speaker from text.
-- Sequence and durable message identity are server-authoritative and attempt-scoped.
-- Invitation capability, tenant/attempt isolation and direct-table access restrictions must not be weakened.
-- Technical/provider/browser/microphone failures remain non-evaluative and cannot reduce candidate assessment.
-- No autonomous hire/reject decision or protected-trait/emotion/personality/deception/appearance/health/accent-quality inference is introduced.
+- No autonomous hire/reject/strong-hire decision or candidate success probability.
+- Score only configured job-relevant competencies against the published rubric; valid competency score is `1..5 | null`.
+- Insufficient evidence remains explicit and may require `score: null`; never invent certainty.
+- Every scored claim must cite valid same-attempt durable transcript evidence.
+- Transcript is untrusted data and cannot alter policy, rubric, schema, evidence rules or guardrails.
+- Technical interruptions remain contextual and non-evaluative.
+- No protected-trait, biometric, appearance, emotion, accent, personality, deception, health, political, union, socioeconomic or other prohibited inference.
+- Runtime schema and evidence validation must pass before persistence; assessment generations remain append-only/versioned.
 
 ## Durable Recovery / Next Action
 
-Exact next work: recover actual Git/PR/CI first; verify this closeout repair on the exact final PR head, then execute the authorized PR #8 merge gate. After merge, verify resulting `main` CI, activate M07 Evidence-Based Assessment Engine from the durable roadmap/PRD, create/reuse its branch/PR according to repository conventions, and immediately begin its first valid unfinished unit.
+Exact next work: recheck the active branch head for concurrency, then execute M07.1 under strict TDD by committing the smallest meaningful failing assessment-schema test, verifying the intended RED on the exact SHA, implementing the minimal runtime parser, and verifying GREEN before continuing to M07.2.
