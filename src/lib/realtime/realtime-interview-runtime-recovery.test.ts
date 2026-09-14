@@ -41,49 +41,73 @@ const authorization: Extract<
   },
 };
 
+function runtimeHarness() {
+  let onTransportEvent: ((event: RealtimeTransportEvent) => void) | undefined;
+  const onRecoverableFailure = vi.fn();
+  const transport: RealtimeTransport = {
+    connect: vi.fn(async () => undefined),
+    sendAudio: vi.fn(),
+    disconnect: vi.fn(async () => undefined),
+  };
+  const capture: RealtimeAudioCapture = {
+    start: vi.fn(async () => undefined),
+    setMuted: vi.fn(),
+    stop: vi.fn(async () => undefined),
+  };
+  const playback: RealtimeAudioPlayback = {
+    enqueue: vi.fn(),
+    interrupt: vi.fn(),
+    stop: vi.fn(async () => undefined),
+  };
+
+  const runtime = createRealtimeInterviewRuntime({
+    authorization,
+    createTransport: (handler) => {
+      onTransportEvent = handler;
+      return transport;
+    },
+    createCapture: () => capture,
+    playback,
+    onRecoverableFailure,
+  });
+
+  return {
+    runtime,
+    onRecoverableFailure,
+    emit(event: RealtimeTransportEvent) {
+      onTransportEvent?.(event);
+    },
+  };
+}
+
 describe("production realtime runtime recovery signal", () => {
   it("reports a normalized provider failure after connection so the launcher can reauthorize the same attempt", async () => {
-    let onTransportEvent: ((event: RealtimeTransportEvent) => void) | undefined;
-    const onRecoverableFailure = vi.fn();
-    const transport: RealtimeTransport = {
-      connect: vi.fn(async () => undefined),
-      sendAudio: vi.fn(),
-      disconnect: vi.fn(async () => undefined),
-    };
-    const capture: RealtimeAudioCapture = {
-      start: vi.fn(async () => undefined),
-      setMuted: vi.fn(),
-      stop: vi.fn(async () => undefined),
-    };
-    const playback: RealtimeAudioPlayback = {
-      enqueue: vi.fn(),
-      interrupt: vi.fn(),
-      stop: vi.fn(async () => undefined),
-    };
-
-    const runtimeOptions = {
-      authorization,
-      createTransport: (handler: (event: RealtimeTransportEvent) => void) => {
-        onTransportEvent = handler;
-        return transport;
-      },
-      createCapture: () => capture,
-      playback,
-      onRecoverableFailure,
-    };
-
-    const runtime = createRealtimeInterviewRuntime(runtimeOptions);
+    const { runtime, onRecoverableFailure, emit } = runtimeHarness();
     const startPromise = runtime.start();
-    onTransportEvent?.({ type: "open" });
+    emit({ type: "open" });
     await startPromise;
 
-    onTransportEvent?.({
+    emit({
       type: "recoverableError",
       error: {
         code: "provider-transport-error",
         message: "Realtime provider connection failed.",
       },
     });
+
+    expect(onRecoverableFailure).toHaveBeenCalledTimes(1);
+    expect(onRecoverableFailure).toHaveBeenCalledWith({
+      kind: "provider-error",
+    });
+  });
+
+  it("reports an unexpected provider close after connection so the launcher can reconnect the same attempt", async () => {
+    const { runtime, onRecoverableFailure, emit } = runtimeHarness();
+    const startPromise = runtime.start();
+    emit({ type: "open" });
+    await startPromise;
+
+    emit({ type: "close", reason: "network-lost" });
 
     expect(onRecoverableFailure).toHaveBeenCalledTimes(1);
     expect(onRecoverableFailure).toHaveBeenCalledWith({
