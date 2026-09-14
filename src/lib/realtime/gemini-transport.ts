@@ -135,6 +135,7 @@ export function createGeminiRealtimeTransportAdapter(
     if (!content) return;
 
     if (content.interrupted) {
+      outputTranscript = "";
       onEvent?.({ type: "interrupted" });
     }
 
