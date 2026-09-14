@@ -27,10 +27,16 @@ type GeminiRealtimeTransportOptions = Readonly<{
   model?: string;
 }>;
 
+type GeminiTranscription = Readonly<{ text?: unknown }>;
+
 type GeminiServerMessage = Readonly<{
   setupComplete?: unknown;
   serverContent?: Readonly<{
     interrupted?: boolean;
+    turnComplete?: boolean;
+    interimInputTranscription?: GeminiTranscription;
+    inputTranscription?: GeminiTranscription;
+    outputTranscription?: GeminiTranscription;
     modelTurn?: Readonly<{
       parts?: ReadonlyArray<
         Readonly<{
@@ -103,6 +109,12 @@ function normalizeModel(model: string): string {
   return trimmed.startsWith("models/") ? trimmed : `models/${trimmed}`;
 }
 
+function transcriptText(transcription: GeminiTranscription | undefined): string | undefined {
+  if (typeof transcription?.text !== "string") return undefined;
+  const text = transcription.text.trim();
+  return text || undefined;
+}
+
 export function createGeminiRealtimeTransportAdapter(
   options: GeminiRealtimeTransportOptions = {},
 ): RealtimeTransportAdapter {
@@ -111,6 +123,7 @@ export function createGeminiRealtimeTransportAdapter(
   let socket: GeminiWebSocket | undefined;
   let onEvent: ((event: RealtimeTransportEvent) => void) | undefined;
   let setupComplete = false;
+  let outputTranscript = "";
 
   function emitServerMessage(message: GeminiServerMessage) {
     if (message.setupComplete !== undefined && !setupComplete) {
@@ -123,6 +136,48 @@ export function createGeminiRealtimeTransportAdapter(
 
     if (content.interrupted) {
       onEvent?.({ type: "interrupted" });
+    }
+
+    const interimCandidate = transcriptText(content.interimInputTranscription);
+    if (interimCandidate) {
+      onEvent?.({
+        type: "partialTranscript",
+        speaker: "candidate",
+        text: interimCandidate,
+      });
+    }
+
+    const finalCandidate = transcriptText(content.inputTranscription);
+    if (finalCandidate) {
+      onEvent?.({
+        type: "finalTranscript",
+        speaker: "candidate",
+        text: finalCandidate,
+      });
+    }
+
+    if (typeof content.outputTranscription?.text === "string") {
+      outputTranscript += content.outputTranscription.text;
+      const partialInterviewer = outputTranscript.trim();
+      if (partialInterviewer) {
+        onEvent?.({
+          type: "partialTranscript",
+          speaker: "interviewer",
+          text: partialInterviewer,
+        });
+      }
+    }
+
+    if (content.turnComplete) {
+      const finalInterviewer = outputTranscript.trim();
+      if (finalInterviewer) {
+        onEvent?.({
+          type: "finalTranscript",
+          speaker: "interviewer",
+          text: finalInterviewer,
+        });
+      }
+      outputTranscript = "";
     }
 
     const parts = content.modelTurn?.parts ?? [];
@@ -165,6 +220,7 @@ export function createGeminiRealtimeTransportAdapter(
 
       onEvent = nextOnEvent;
       setupComplete = false;
+      outputTranscript = "";
       const url = `${GEMINI_LIVE_ENDPOINT}?access_token=${encodeURIComponent(input.credential)}`;
       const nextSocket = createWebSocket(url);
       socket = nextSocket;
@@ -177,6 +233,8 @@ export function createGeminiRealtimeTransportAdapter(
               generationConfig: {
                 responseModalities: ["AUDIO"],
               },
+              inputAudioTranscription: {},
+              outputAudioTranscription: {},
               sessionResumption: {},
             },
           }),
@@ -211,6 +269,7 @@ export function createGeminiRealtimeTransportAdapter(
       nextSocket.addEventListener("close", (event) => {
         if (socket === nextSocket) socket = undefined;
         setupComplete = false;
+        outputTranscript = "";
         onEvent?.({
           type: "close",
           ...(event.reason ? { reason: event.reason } : {}),
@@ -242,6 +301,7 @@ export function createGeminiRealtimeTransportAdapter(
       const activeSocket = socket;
       socket = undefined;
       setupComplete = false;
+      outputTranscript = "";
       onEvent = undefined;
       activeSocket?.close();
     },
