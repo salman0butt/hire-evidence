@@ -25,13 +25,20 @@ function freezeState(
   });
 }
 
-export function createTranscriptState(): TranscriptState {
+export function createTranscriptState(
+  finalizedTurns: readonly InterviewTranscriptTurn[] = [],
+): TranscriptState {
   return freezeState(
     {
       candidate: "",
       interviewer: "",
     },
-    [],
+    finalizedTurns.map((turn) =>
+      Object.freeze({
+        speaker: turn.speaker,
+        text: turn.text,
+      }),
+    ),
   );
 }
 
