@@ -140,10 +140,13 @@ export function createTranscriptRepository(rpc: Rpc): TranscriptRepository {
       }
 
       const rows = data as TranscriptRow[];
+      const eventIds = new Set<string>();
       for (let index = 0; index < rows.length; index += 1) {
-        if (rows[index]?.sequence !== index + 1) {
+        const row = rows[index];
+        if (!row || row.sequence !== index + 1 || eventIds.has(row.event_id)) {
           return { status: "conflict" };
         }
+        eventIds.add(row.event_id);
       }
 
       return Object.freeze({
