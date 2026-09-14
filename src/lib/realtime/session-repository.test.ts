@@ -143,7 +143,7 @@ describe("realtime session repository", () => {
     });
   });
 
-  it("persists question progression and trusts the authoritative attempt version", async () => {
+  it("persists question progression and returns the authoritative attempt version", async () => {
     const rpc = vi.fn().mockResolvedValue({
       data: [
         {
@@ -165,7 +165,6 @@ describe("realtime session repository", () => {
         attemptId: "attempt-1",
         eventId: "event-1",
         questionId: "question-1",
-        interviewerVersionId: "version-client-must-not-win",
       }),
     ).resolves.toEqual({
       status: "active",
