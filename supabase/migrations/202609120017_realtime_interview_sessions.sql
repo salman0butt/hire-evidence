@@ -39,7 +39,8 @@ returns table (
   duration_seconds integer,
   language text,
   lifecycle text,
-  has_current_consent boolean
+  has_current_consent boolean,
+  interview_plan jsonb
 )
 language sql
 stable
@@ -64,7 +65,49 @@ as $$
           'data_processing',
           'retention'
         ]::text[]
-    ) as has_current_consent
+    ) as has_current_consent,
+    jsonb_build_object(
+      'versionId', interviewer_version.id::text,
+      'sections', coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', section_entry.value -> 'section' ->> 'id',
+              'title', section_entry.value -> 'section' ->> 'purpose',
+              'questions', coalesce(
+                (
+                  select jsonb_agg(
+                    jsonb_build_object(
+                      'id', matched_question.question ->> 'id',
+                      'prompt', matched_question.question ->> 'question_text',
+                      'required', coalesce((matched_question.question ->> 'is_required')::boolean, true),
+                      'followUpLimit', coalesce(
+                        nullif(interviewer_version.snapshot -> 'interviewer_config' ->> 'max_follow_ups_per_question', '')::integer,
+                        0
+                      )
+                    )
+                    order by question_ref.ordinality
+                  )
+                  from jsonb_array_elements_text(section_entry.value -> 'question_ids')
+                    with ordinality question_ref(question_id, ordinality)
+                  join lateral (
+                    select question_record.value as question
+                    from jsonb_array_elements(interviewer_version.snapshot -> 'questions') question_record(value)
+                    where question_record.value ->> 'id' = question_ref.question_id
+                    limit 1
+                  ) matched_question on true
+                ),
+                '[]'::jsonb
+              )
+            )
+            order by section_entry.ordinality
+          )
+          from jsonb_array_elements(interviewer_version.snapshot -> 'interview_plan' -> 'sections')
+            with ordinality section_entry(value, ordinality)
+        ),
+        '[]'::jsonb
+      )
+    ) as interview_plan
   from public.candidate_invitations invitation
   join public.interviewer_versions interviewer_version
     on interviewer_version.id = invitation.interviewer_version_id
