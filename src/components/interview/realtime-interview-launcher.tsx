@@ -21,6 +21,7 @@ type RealtimeInterviewLauncherProps = Readonly<{
   createRuntime?: (
     authorization: AuthorizedRealtimeSession,
     onSnapshot: (snapshot: RealtimeInterviewSessionSnapshot) => void,
+    rawToken: string,
   ) => RealtimeInterviewRuntime;
 }>;
 
@@ -112,11 +113,15 @@ export function RealtimeInterviewLauncher({
       return;
     }
 
-    const runtime = createRuntime(result, (snapshot) => {
-      if (runtimeRef.current) {
-        setSessionSnapshot(snapshot);
-      }
-    });
+    const runtime = createRuntime(
+      result,
+      (snapshot) => {
+        if (runtimeRef.current) {
+          setSessionSnapshot(snapshot);
+        }
+      },
+      token,
+    );
     runtimeRef.current = runtime;
 
     try {
