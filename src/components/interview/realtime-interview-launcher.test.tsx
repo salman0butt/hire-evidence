@@ -51,7 +51,11 @@ describe("RealtimeInterviewLauncher", () => {
 
     await waitFor(() => {
       expect(authorize).toHaveBeenCalledWith("candidate-capability");
-      expect(createRuntime).toHaveBeenCalledWith(authorization, expect.any(Function));
+      expect(createRuntime).toHaveBeenCalledWith(
+        authorization,
+        expect.any(Function),
+        "candidate-capability",
+      );
       expect(start).toHaveBeenCalledTimes(1);
     });
     expect(screen.getByRole("status")).toHaveTextContent(
