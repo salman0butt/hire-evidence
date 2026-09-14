@@ -28,6 +28,7 @@ describe("RealtimeInterviewLauncher", () => {
       start,
       stop: vi.fn(async () => undefined),
       setMuted: vi.fn(),
+      completeCurrentQuestion: vi.fn(async () => undefined),
       getSnapshot: vi.fn(() => ({
         status: "active" as const,
         generation: 1,
@@ -78,6 +79,7 @@ describe("RealtimeInterviewLauncher", () => {
       start: vi.fn(async () => undefined),
       stop,
       setMuted,
+      completeCurrentQuestion: vi.fn(async () => undefined),
       getSnapshot: vi.fn(() => ({
         status: "active" as const,
         generation: 3,
@@ -148,6 +150,7 @@ describe("RealtimeInterviewLauncher", () => {
           start: vi.fn(async () => undefined),
           stop: vi.fn(async () => undefined),
           setMuted: vi.fn(),
+          completeCurrentQuestion: vi.fn(async () => undefined),
           getSnapshot: vi.fn(() => initialSnapshot),
         };
       },
@@ -221,6 +224,7 @@ describe("RealtimeInterviewLauncher", () => {
       }),
       stop: vi.fn(async () => undefined),
       setMuted: vi.fn(),
+      completeCurrentQuestion: vi.fn(async () => undefined),
       getSnapshot: vi.fn(() => ({
         status: "active" as const,
         generation: 1,
