@@ -63,6 +63,14 @@ export function createRealtimeInterviewRuntime(
     ...(options.authorization.resumeCheckpoint
       ? { resumeCheckpoint: options.authorization.resumeCheckpoint }
       : {}),
+    ...(options.authorization.transcriptTurns
+      ? {
+          transcriptTurns: options.authorization.transcriptTurns.map((turn) => ({
+            speaker: turn.speaker,
+            text: turn.text,
+          })),
+        }
+      : {}),
     ...(options.persistProgress ? { persistProgress: options.persistProgress } : {}),
     onSnapshot: options.onSnapshot,
   });
