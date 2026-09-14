@@ -6,57 +6,49 @@ This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENT
 
 - Repository: `salman0butt/hire-evidence`
 - Default branch: `main`
-- Verified base/main SHA: `943e8a5c1dd45dc1652453ddf8ebc4ae31951925` (Candidates + Invitations PR #6 squash merge).
-- Base post-merge main CI: #517 / `34692492691` — GREEN full repository gate.
-- Active branch: `feat/realtime-ai-interview`
-- Active milestone: M05 — Realtime AI Interview — **repository acceptance complete / final merge gate**.
-- Active milestone PR: #7 — `Build realtime AI interview` — OPEN / DRAFT until final exact-head closeout CI and merge gates pass.
-- Selected design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`.
-- Selected plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`.
-- Local provider smoke: `docs/LOCAL-REALTIME-ACCEPTANCE.md`.
-- Pre-closeout verified head: `5c8710559ab1c40073843cb9a7909e626d8a0dc3`, CI #781 / `34860464517` — complete repository gate GREEN.
-- Current closeout reconciliation head requires fresh exact-head CI before merge.
+- Verified base/main SHA: `5c3843c6444bad256974ea391a4a6a978bf88f24` (M05 Realtime AI Interview squash merge).
+- Active branch: `feat/transcript-durable-session`
+- Active milestone: M06 — Transcript + Durable Session — **IN PROGRESS**.
+- Active milestone PR: #8 — `Build transcript durable session` — OPEN / DRAFT while M06 remains incomplete.
+- Selected design: `docs/superpowers/specs/2026-09-14-transcript-durable-session-design.md`.
+- Selected plan: `docs/superpowers/plans/2026-09-14-transcript-durable-session.md`.
+- Latest fully verified implementation head: `73a43be166d87db0e1a20c89d4894f20bd550dbf`, CI #810 / `34875410392` — complete repository gate GREEN.
+- CI status: documentation reconciliation after `73a43be166d87db0e1a20c89d4894f20bd550dbf` requires fresh exact-head CI before being treated as independently verified.
 
-## M05 state
+## M06 state
 
-M05.1–M05.14 are complete at repository/deterministic acceptance scope. Production code includes invitation/consent/version-gated realtime authorization, constrained Gemini Live ephemeral credential issuance, provider-neutral transport with Gemini adapter isolation, browser readiness/microphone diagnostics, deterministic capture/playback, explicit connection state, immutable plan execution, pacing, bounded follow-ups, interruption/barge-in, timeout/error recovery, capability-bound progress persistence, same-attempt reconnect, and production candidate-page runtime composition.
+M06.1 provider transcript normalization, M06.2 ephemeral/finalized transcript state, and M06.3 durable finalized transcript persistence are verified. M06.4 correctness guards are active. M06.5–M06.9 remain unfinished.
 
-Deterministic browser acceptance covers production launcher/runtime composition, constrained credential non-display, authoritative snapshots, microphone denial/recovery, keyboard operation, device selection, mobile no-overflow, mute/end controls, safe missing-provider behavior, and disconnect→reauthorize same-attempt recovery. Unit/provider/security coverage protects orchestration, persistence, stale generations, timeout/error decisions, pacing/follow-ups, and interruption playback cancellation.
-
-## Owner-approved live-provider decision
-
-On 2026-09-14 the repository owner explicitly instructed autonomous development to complete M05 now and stated that real Gemini credentials will be used locally.
-
-Therefore the real Gemini browser run is a local/deployment acceptance check rather than an M05 repository merge blocker. No live-provider execution is claimed. Follow `docs/LOCAL-REALTIME-ACCEPTANCE.md` when the owner supplies `GEMINI_API_KEY` server-side. A future failed smoke is a real defect and must be fixed before relying on that deployment.
+The durable transcript boundary now stores finalized turns only, with attempt-scoped immutable event identity, positive monotonic server-assigned sequence, explicit candidate/interviewer speaker, timestamps, direct browser table access revoked, and capability-bound append/list SECURITY DEFINER RPCs. Identical event replay is idempotent; conflicting replay fails closed. Local Supabase startup in CI #810 applied the migration successfully.
 
 ## Current evidence
 
-- production Gemini route/integration checkpoint `56c78425f7052b2e54ac9cfea410a57c53aef805`, CI #713 / `34832502815` — GREEN.
-- capability-bound realtime progress checkpoint `ce161fbaa34450839ac8f323f6fcc3a33cdc4863`, CI #728 / `34834823096` — GREEN.
-- provider-interruption RED `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772 / `34857082289` — intended failure because provider `interrupted` did not interrupt obsolete playback.
-- provider-interruption GREEN `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN after the minimal fix.
-- framework durable-status NOT GREEN checkpoint `3914a347a47090f666a5458014196d9ca9d4a338`, CI #778 / `34859783065` — verifier correctly rejected the missing literal `CI status:` contract.
-- corrected pre-closeout head `5c8710559ab1c40073843cb9a7909e626d8a0dc3`, CI #781 / `34860464517` — complete repository gate GREEN.
+- M06.1 final GREEN `60fa653e8b5dc9c47a21dc9bea8c3d8aba6566e3`, CI #796 / `34868105525`.
+- M06.2 valid integration RED `de9340078c556153b189cd088b18729fd881a00d`, CI #800 / `34872661481`.
+- M06.2 GREEN `2e91eb529cdc56688aca65766c6e5785d6b1378b`, CI #804 / `34873181788`.
+- M06.3 repository RED `1a35d109496c51fa5b4f1e740c0ff756f7903619`, CI #806 / `34873858138`.
+- M06.3 migration RED `c219b68f24b2e900e5b4bfb69cd17c63ba34027d`, CI #809 / `34875215424`: four intended missing-migration failures while the other 517 tests passed.
+- M06.3 GREEN `73a43be166d87db0e1a20c89d4894f20bd550dbf`, CI #810 / `34875410392`: frozen install, lint, typecheck, 521 tests, verifiers, local Supabase migration application, build, Chromium E2E, PRD coverage and cleanup all passed.
 
-Historical RED/GREEN evidence remains in `docs/milestones/M05-realtime-ai-interview.md` and Git history.
+Historical valid/invalid RED/GREEN evidence remains in `docs/milestones/M06-transcript-durable-session.md` and Git history.
 
 ## Review / safety state
 
 - Critical findings: 0 unresolved at latest recovery.
 - Important findings: 0 unresolved at latest recovery.
-- PR #7 has no known unresolved blocking review threads at latest recovery.
-- Raw invitation capabilities and long-lived provider secrets remain server-side/non-persisted by M05 production code.
-- Candidate speech is untrusted and cannot mutate policy, criteria, plan order, or follow-up bounds.
-- Reconnect resumes the same authoritative attempt and cannot silently reset progress.
-- Technical/browser/provider/microphone failures never become negative candidate evidence.
-- No autonomous hire/reject decision or protected-trait/emotion/personality/deception/appearance/accent-quality inference is introduced.
+- PR #8 has no submitted reviews or known unresolved inline review comments at latest recovery.
+- Partial transcript hypotheses remain UI-only and are never persisted as candidate evidence.
+- Finalized transcript text is untrusted evidence data, not instruction.
+- Speaker is explicit provider-normalized semantics and must never be inferred from transcript content.
+- Cross-attempt/cross-capability durable access must fail closed.
+- Technical failures remain non-evaluative and cannot reduce candidate assessment.
+- No autonomous hire/reject decision or protected-trait/emotion/personality/deception/appearance/health/accent-quality inference is introduced.
 
 ## Exact next work
 
-1. Recover the exact PR #7 remote head after this closeout reconciliation.
-2. Verify the exact current head with the complete GitHub Actions quality gate.
-3. Recheck unresolved reviews, concurrency, mergeability, and branch protection against that same head.
-4. If all authorized merge gates pass, mark PR #7 ready if necessary and merge it using repository convention.
-5. Recover and verify post-merge `main` exact SHA/CI.
-6. Activate M06 — Transcript + Durable Session and continue autonomous development.
-7. Separately, when real `GEMINI_API_KEY` is supplied locally, execute `docs/LOCAL-REALTIME-ACCEPTANCE.md`; do not backfill fake evidence if it has not run.
+1. Recheck PR #8 remote head/concurrency before writing.
+2. Execute M06.4 strict TDD with an adversarial behavioral RED proving duplicate durable `event_id` responses cannot be accepted even when sequences are contiguous.
+3. Verify the intended exact-head RED through CI rather than assuming it.
+4. Add the smallest repository fail-closed duplicate-identity guard and verify full exact-head GREEN.
+5. Continue M06.4 order/speaker/whitespace/immutability coverage, then advance automatically to M06.5 idempotent attempt lifecycle.
+6. Keep `docs/milestones/M06-transcript-durable-session.md`, `docs/milestones/CURRENT.md`, `docs/progress/STATUS.md`, and this handoff current as checkpoints advance.
