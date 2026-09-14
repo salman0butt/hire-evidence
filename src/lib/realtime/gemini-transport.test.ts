@@ -64,7 +64,7 @@ describe("Gemini Live realtime transport adapter", () => {
     expect(JSON.parse(socket.sent[0]!)).toEqual({
       setup: {
         model: "models/gemini-3.1-flash-live-preview",
-        generationConfig: { responseModalities: ["AUDIO"] },
+        responseModalities: ["AUDIO"],
         sessionResumption: {},
       },
     });
