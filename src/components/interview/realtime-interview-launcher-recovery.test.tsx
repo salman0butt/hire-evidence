@@ -149,4 +149,80 @@ describe("RealtimeInterviewLauncher recovery", () => {
     expect(typeof body.occurredAt).toBe("string");
     expect(Number.isNaN(Date.parse(String(body.occurredAt)))).toBe(false);
   });
+
+  it("records a separate reconnect failure when the retry budget is exhausted", async () => {
+    const authorize = vi.fn().mockResolvedValue(authorization);
+    const fetchImpl = vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as {
+        category: string;
+        occurredAt: string;
+      };
+      return new Response(
+        JSON.stringify({
+          status: "recorded",
+          event: {
+            id: `technical-event-${body.category}`,
+            category: body.category,
+            occurredAt: body.occurredAt,
+          },
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    });
+    vi.stubGlobal("fetch", fetchImpl);
+
+    const recoveryHandlers: Array<((failure: { kind: string }) => void) | undefined> = [];
+    const createRuntime = vi.fn((...args: unknown[]) => {
+      recoveryHandlers.push(args[3] as ((failure: { kind: string }) => void) | undefined);
+      return {
+        start: vi.fn(async () => undefined),
+        stop: vi.fn(async () => undefined),
+        setMuted: vi.fn(),
+        completeCurrentQuestion: vi.fn(async () => undefined),
+        getSnapshot: vi.fn(() => ({
+          status: "active" as const,
+          generation: recoveryHandlers.length,
+          currentQuestion: null,
+          transcript: emptyTranscript,
+        })),
+      };
+    });
+
+    render(
+      <RealtimeInterviewLauncher
+        token="candidate-capability"
+        authorize={authorize}
+        createRuntime={createRuntime}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Start live interview" }));
+    await waitFor(() => expect(createRuntime).toHaveBeenCalledTimes(1));
+
+    act(() => recoveryHandlers[0]?.({ kind: "provider-error" }));
+    await waitFor(() => expect(createRuntime).toHaveBeenCalledTimes(2));
+
+    act(() => recoveryHandlers[1]?.({ kind: "provider-error" }));
+    await waitFor(() => expect(createRuntime).toHaveBeenCalledTimes(3));
+
+    act(() => recoveryHandlers[2]?.({ kind: "provider-error" }));
+    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+    await waitFor(() => expect(fetchImpl).toHaveBeenCalledTimes(4));
+
+    const categories = fetchImpl.mock.calls.map(([, init]) => {
+      const body = JSON.parse(String((init as RequestInit).body)) as {
+        category: string;
+      };
+      return body.category;
+    });
+    expect(categories).toEqual([
+      "provider_disconnect",
+      "provider_disconnect",
+      "provider_disconnect",
+      "reconnect_failure",
+    ]);
+  });
 });
