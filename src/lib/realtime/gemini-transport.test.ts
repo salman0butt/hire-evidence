@@ -5,6 +5,8 @@ import type { RealtimeTransportEvent } from "./transport";
 
 type Listener = (event: { data?: string; reason?: string }) => void;
 
+type WebSocketFactory = (url: string) => FakeWebSocket;
+
 class FakeWebSocket {
   readonly sent: string[] = [];
   private readonly listeners = new Map<string, Listener[]>();
@@ -41,16 +43,16 @@ describe("Gemini Live realtime transport adapter", () => {
     let openedUrl = "";
     const events: RealtimeTransportEvent[] = [];
 
-    const adapter = createGeminiRealtimeTransportAdapter({
-      createWebSocket(url) {
-        openedUrl = url;
-        return socket;
-      },
-    });
+    const createWebSocket: WebSocketFactory = (url: string) => {
+      openedUrl = url;
+      return socket;
+    };
+
+    const adapter = createGeminiRealtimeTransportAdapter({ createWebSocket });
 
     await adapter.connect(
       { credential: "auth_tokens/token/with spaces", attemptId: "attempt-1" },
-      (event) => events.push(event),
+      (event: RealtimeTransportEvent) => events.push(event),
     );
 
     expect(openedUrl).toBe(
