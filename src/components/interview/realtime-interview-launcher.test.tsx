@@ -55,6 +55,7 @@ describe("RealtimeInterviewLauncher", () => {
         authorization,
         expect.any(Function),
         "candidate-capability",
+        expect.any(Function),
       );
       expect(start).toHaveBeenCalledTimes(1);
     });
