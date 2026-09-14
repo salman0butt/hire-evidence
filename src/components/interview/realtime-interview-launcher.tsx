@@ -6,6 +6,7 @@ import { createBrowserRealtimeInterviewRuntime } from "@/lib/realtime/browser-re
 import type { RealtimeConnectionState } from "@/lib/realtime/connection-machine";
 import type { RealtimeInterviewSessionSnapshot } from "@/lib/realtime/interview-session";
 import type { RealtimeInterviewRuntime } from "@/lib/realtime/realtime-interview-runtime";
+import type { RealtimeTechnicalFailure } from "@/lib/realtime/recovery";
 import type { RealtimeSessionAuthorization } from "@/lib/realtime/session-authorization";
 
 import { RealtimeInterview } from "./realtime-interview";
@@ -22,10 +23,19 @@ type RealtimeInterviewLauncherProps = Readonly<{
     authorization: AuthorizedRealtimeSession,
     onSnapshot: (snapshot: RealtimeInterviewSessionSnapshot) => void,
     rawToken: string,
+    onRecoverableFailure: (failure: RealtimeTechnicalFailure) => void,
   ) => RealtimeInterviewRuntime;
 }>;
 
-type LauncherState = "idle" | "authorizing" | "connected" | "ended" | "error";
+type LauncherState =
+  | "idle"
+  | "authorizing"
+  | "recovering"
+  | "connected"
+  | "ended"
+  | "error";
+
+const MAX_RECOVERY_ATTEMPTS = 2;
 
 function isAuthorizedRealtimeSession(value: unknown): value is AuthorizedRealtimeSession {
   if (!value || typeof value !== "object") return false;
@@ -93,9 +103,11 @@ export function RealtimeInterviewLauncher({
   const [sessionSnapshot, setSessionSnapshot] =
     useState<RealtimeInterviewSessionSnapshot | null>(null);
   const runtimeRef = useRef<RealtimeInterviewRuntime | null>(null);
+  const operationGenerationRef = useRef(0);
 
   useEffect(
     () => () => {
+      operationGenerationRef.current += 1;
       const runtime = runtimeRef.current;
       runtimeRef.current = null;
       void runtime?.stop();
@@ -103,41 +115,88 @@ export function RealtimeInterviewLauncher({
     [],
   );
 
-  async function handleStart() {
-    if (state === "authorizing" || state === "connected") return;
+  async function connectRuntime(recoveryAttempt: number) {
+    const operationGeneration = ++operationGenerationRef.current;
+    setState(recoveryAttempt === 0 ? "authorizing" : "recovering");
 
-    setState("authorizing");
     const result = await authorize(token);
+    if (operationGenerationRef.current !== operationGeneration) return;
     if (result.status !== "authorized") {
       setState("error");
       return;
     }
 
-    const runtime = createRuntime(
+    let runtime: RealtimeInterviewRuntime;
+    runtime = createRuntime(
       result,
       (snapshot) => {
-        if (runtimeRef.current) {
+        if (runtimeRef.current === runtime) {
           setSessionSnapshot(snapshot);
         }
       },
       token,
+      (_failure) => {
+        if (runtimeRef.current === runtime) {
+          void recoverRuntime(runtime, recoveryAttempt);
+        }
+      },
     );
     runtimeRef.current = runtime;
 
     try {
       await runtime.start();
-      if (runtimeRef.current === runtime) {
+      if (
+        operationGenerationRef.current === operationGeneration &&
+        runtimeRef.current === runtime
+      ) {
         setSessionSnapshot(runtime.getSnapshot());
         setMuted(false);
         setState("connected");
       }
     } catch {
-      if (runtimeRef.current === runtime) {
+      if (
+        operationGenerationRef.current === operationGeneration &&
+        runtimeRef.current === runtime
+      ) {
         runtimeRef.current = null;
         await runtime.stop();
-        setState("error");
+        if (operationGenerationRef.current === operationGeneration) {
+          setState("error");
+        }
       }
     }
+  }
+
+  async function recoverRuntime(
+    runtime: RealtimeInterviewRuntime,
+    recoveryAttempt: number,
+  ) {
+    if (runtimeRef.current !== runtime) return;
+
+    runtimeRef.current = null;
+    const stopGeneration = ++operationGenerationRef.current;
+    setState("recovering");
+    await runtime.stop();
+
+    if (operationGenerationRef.current !== stopGeneration) return;
+    if (recoveryAttempt >= MAX_RECOVERY_ATTEMPTS) {
+      setState("error");
+      return;
+    }
+
+    await connectRuntime(recoveryAttempt + 1);
+  }
+
+  function handleStart() {
+    if (
+      state === "authorizing" ||
+      state === "recovering" ||
+      state === "connected"
+    ) {
+      return;
+    }
+
+    void connectRuntime(0);
   }
 
   function handleMutedChange(nextMuted: boolean) {
@@ -148,6 +207,7 @@ export function RealtimeInterviewLauncher({
   }
 
   async function handleEnd() {
+    operationGenerationRef.current += 1;
     const runtime = runtimeRef.current;
     runtimeRef.current = null;
     await runtime?.stop();
@@ -185,6 +245,10 @@ export function RealtimeInterviewLauncher({
       ) : state === "connected" ? (
         <p role="status" aria-live="polite" className="text-sm text-slate-700">
           Live interview connected
+        </p>
+      ) : state === "recovering" ? (
+        <p role="status" aria-live="polite" className="text-sm text-slate-700">
+          Reconnecting live interview…
         </p>
       ) : state === "ended" ? (
         <p role="status" aria-live="polite" className="text-sm text-slate-700">
