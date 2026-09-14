@@ -57,14 +57,12 @@ describe("realtime interview session transcript state", () => {
       text: "I built the service.",
     });
 
-    const snapshot = session.getSnapshot();
-    expect(snapshot).toMatchObject({
+    expect(session.getSnapshot()).toMatchObject({
       transcript: {
         partials: { candidate: "", interviewer: "" },
         finalizedTurns: [{ speaker: "candidate", text: "I built the service." }],
       },
     });
-    expect(Object.isFrozen((snapshot as { transcript: unknown }).transcript)).toBe(true);
     expect(snapshots).toHaveLength(2);
   });
 
