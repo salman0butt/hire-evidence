@@ -135,6 +135,7 @@ describe("POST /api/interview/[token]/realtime-session", () => {
     expect(JSON.parse(body)).toEqual({
       status: "authorized",
       attemptId: "attempt-1",
+      interviewerVersionId: "internal-version-1",
       durationSeconds: 1800,
       language: "en",
       interviewPlan,
