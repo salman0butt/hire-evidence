@@ -164,7 +164,12 @@ export function RealtimeInterviewLauncher({
             category: technicalEventCategoryForFailure(failure),
             occurredAt: new Date().toISOString(),
           }).catch(() => undefined);
-          void recoverRuntime(runtime, recoveryAttempt);
+          void recoverRuntime(runtime, recoveryAttempt, () => {
+            void recordTechnicalEvent({
+              category: "reconnect_failure",
+              occurredAt: new Date().toISOString(),
+            }).catch(() => undefined);
+          });
         }
       },
     );
@@ -197,6 +202,7 @@ export function RealtimeInterviewLauncher({
   async function recoverRuntime(
     runtime: RealtimeInterviewRuntime,
     recoveryAttempt: number,
+    recordReconnectFailure: () => void,
   ) {
     if (runtimeRef.current !== runtime) return;
 
@@ -207,6 +213,7 @@ export function RealtimeInterviewLauncher({
 
     if (operationGenerationRef.current !== stopGeneration) return;
     if (recoveryAttempt >= MAX_RECOVERY_ATTEMPTS) {
+      recordReconnectFailure();
       setState("error");
       return;
     }
