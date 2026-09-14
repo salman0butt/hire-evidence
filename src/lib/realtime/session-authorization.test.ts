@@ -4,11 +4,30 @@ import {
   type RealtimeSessionAuthorizationDeps,
 } from "./session-authorization";
 
+const interviewPlan = {
+  versionId: "version-1",
+  sections: [
+    {
+      id: "section-1",
+      title: "Technical depth",
+      questions: [
+        {
+          id: "question-1",
+          prompt: "Describe a difficult production incident you resolved.",
+          required: true,
+          followUpLimit: 1,
+        },
+      ],
+    },
+  ],
+} as const;
+
 function availableCandidate(
   overrides: Partial<{
     hasCurrentConsent: boolean;
     interviewerVersionId: string | null;
     lifecycle: "sent" | "opened" | "started" | "completed";
+    interviewPlan: typeof interviewPlan;
   }> = {},
 ) {
   return {
@@ -20,6 +39,7 @@ function availableCandidate(
     language: "en",
     hasCurrentConsent: true,
     lifecycle: "opened" as const,
+    interviewPlan,
     ...overrides,
   };
 }
@@ -85,6 +105,26 @@ describe("authorizeRealtimeSession", () => {
     expect(issueProviderCredential).not.toHaveBeenCalled();
   });
 
+  it("rejects a runtime plan that is not bound to the authoritative interviewer version", async () => {
+    const issueProviderCredential = vi.fn();
+    const dependencies = deps({
+      resolveCandidateSession: vi.fn().mockResolvedValue(
+        availableCandidate({
+          interviewPlan: {
+            ...interviewPlan,
+            versionId: "different-version",
+          } as typeof interviewPlan,
+        }),
+      ),
+      issueProviderCredential,
+    });
+
+    await expect(
+      authorizeRealtimeSession("candidate-token", dependencies),
+    ).resolves.toEqual({ status: "unavailable" });
+    expect(issueProviderCredential).not.toHaveBeenCalled();
+  });
+
   it("does not mint a credential when an authoritative attempt cannot be safely created or resumed", async () => {
     const issueProviderCredential = vi.fn();
     const dependencies = deps({
@@ -120,6 +160,7 @@ describe("authorizeRealtimeSession", () => {
       status: "authorized",
       attemptId: "attempt-1",
       interviewerVersionId: "version-1",
+      interviewPlan,
       resumeCheckpoint,
     });
   });
@@ -149,6 +190,7 @@ describe("authorizeRealtimeSession", () => {
       interviewerVersionId: "version-1",
       durationSeconds: 1800,
       language: "en",
+      interviewPlan,
       providerCredential: {
         credential: "short-lived-provider-token",
         expiresAt: "2026-09-12T12:30:00.000Z",
