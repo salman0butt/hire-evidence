@@ -5,6 +5,7 @@ import {
   type RealtimeInterviewSession,
   type RealtimeInterviewSessionSnapshot,
 } from "./interview-session";
+import type { RealtimeTechnicalFailure } from "./recovery";
 import type { RealtimeSessionAuthorization } from "./session-authorization";
 import type { RealtimeAttemptProgressResult } from "./session-repository";
 import type {
@@ -30,6 +31,7 @@ type RealtimeInterviewRuntimeOptions = Readonly<{
     | ((input: Readonly<{ eventId: string; questionId: string }>) => Promise<RealtimeAttemptProgressResult>)
     | undefined;
   onSnapshot?: ((snapshot: RealtimeInterviewSessionSnapshot) => void) | undefined;
+  onRecoverableFailure?: ((failure: RealtimeTechnicalFailure) => void) | undefined;
 }>;
 
 export type RealtimeInterviewRuntime = Readonly<{
@@ -72,6 +74,11 @@ export function createRealtimeInterviewRuntime(
       resolveReady?.();
       resolveReady = undefined;
       rejectReady = undefined;
+      return;
+    }
+
+    if (event.type === "recoverableError" && started && !stopped) {
+      options.onRecoverableFailure?.({ kind: "provider-error" });
       return;
     }
 
