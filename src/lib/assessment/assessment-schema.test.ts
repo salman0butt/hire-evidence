@@ -34,4 +34,14 @@ describe("parseInterviewAssessment", () => {
       message: "Competency score must be an integer from 1 to 5 or null.",
     });
   });
+
+  it("requires a null score when competency evidence is insufficient", () => {
+    const assessment = assessmentWithScore(4);
+    assessment.competencies[0].evidenceSufficiency = "insufficient";
+
+    expect(parseInterviewAssessment(assessment)).toEqual({
+      ok: false,
+      message: "Insufficient competency evidence cannot have a score.",
+    });
+  });
 });
