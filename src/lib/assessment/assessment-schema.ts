@@ -50,6 +50,16 @@ export function parseInterviewAssessment(value: unknown): AssessmentValidationRe
         message: "Competency score must be an integer from 1 to 5 or null.",
       };
     }
+
+    if (
+      competency.evidenceSufficiency === "insufficient" &&
+      competency.score !== null
+    ) {
+      return {
+        ok: false,
+        message: "Insufficient competency evidence cannot have a score.",
+      };
+    }
   }
 
   return { ok: true, value: value as InterviewAssessment };
