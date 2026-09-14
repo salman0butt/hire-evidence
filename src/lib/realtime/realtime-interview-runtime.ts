@@ -6,6 +6,7 @@ import {
   type RealtimeInterviewSessionSnapshot,
 } from "./interview-session";
 import type { RealtimeSessionAuthorization } from "./session-authorization";
+import type { RealtimeAttemptProgressResult } from "./session-repository";
 import type {
   RealtimeTransport,
   RealtimeTransportEvent,
@@ -25,6 +26,9 @@ type RealtimeInterviewRuntimeOptions = Readonly<{
     onChunk: (pcm: Float32Array, sampleRate: number) => void,
   ) => RealtimeAudioCapture;
   playback: RealtimeAudioPlayback;
+  persistProgress?:
+    | ((input: Readonly<{ eventId: string; questionId: string }>) => Promise<RealtimeAttemptProgressResult>)
+    | undefined;
   onSnapshot?: ((snapshot: RealtimeInterviewSessionSnapshot) => void) | undefined;
 }>;
 
@@ -32,6 +36,7 @@ export type RealtimeInterviewRuntime = Readonly<{
   start(): Promise<void>;
   stop(): Promise<void>;
   setMuted(muted: boolean): void;
+  completeCurrentQuestion(eventId: string): Promise<void>;
   getSnapshot(): RealtimeInterviewSessionSnapshot;
 }>;
 
@@ -56,6 +61,7 @@ export function createRealtimeInterviewRuntime(
     ...(options.authorization.resumeCheckpoint
       ? { resumeCheckpoint: options.authorization.resumeCheckpoint }
       : {}),
+    ...(options.persistProgress ? { persistProgress: options.persistProgress } : {}),
     onSnapshot: options.onSnapshot,
   });
 
@@ -139,6 +145,9 @@ export function createRealtimeInterviewRuntime(
     stop,
     setMuted(muted) {
       capture.setMuted(muted);
+    },
+    completeCurrentQuestion(eventId) {
+      return session.completeCurrentQuestion(eventId);
     },
     getSnapshot() {
       return session.getSnapshot();
