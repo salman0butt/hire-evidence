@@ -52,7 +52,10 @@ export const POST = createProductionRealtimeSessionRoute({
     const client = await createClient();
 
     return {
-      rpc: (name, args) => client.rpc(name, args),
+      rpc: async (name, args) => {
+        const { data, error } = await client.rpc(name, args);
+        return { data, error };
+      },
     };
   },
 });
