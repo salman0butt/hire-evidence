@@ -30,6 +30,18 @@ Exit:
 
 candidate can complete stable multi-turn voice interview.
 
+## Dependencies
+
+Candidates + Invitations, a published immutable interviewer version, current candidate consent, authoritative attempt state, and the M05 realtime provider boundary. A real server-side `GEMINI_API_KEY` is required only for the separate local/deployment live-provider smoke documented in `docs/LOCAL-REALTIME-ACCEPTANCE.md`.
+
+## In Scope
+
+The authoritative M05 definition plus M05.1–M05.14: authorization/provider boundaries, browser/microphone diagnostics, deterministic capture/playback, provider-neutral transport, connection/recovery state, immutable plan execution, pacing, bounded follow-ups, barge-in, timeout/error handling, same-attempt reconnect, production browser composition, and deterministic realtime E2E acceptance.
+
+## Out of Scope
+
+Later milestones; autonomous hiring decisions; protected-trait, emotion, personality, deception, appearance, or accent-quality inference; fabricated candidate evidence; provider coupling outside the isolated Gemini adapter; and claiming an external live-provider run that has not actually occurred.
+
 ## Scope Resolution
 
 Repository implementation and deterministic acceptance for M05 are complete. The external Gemini Live service smoke is intentionally separated from repository CI because it requires a real server-side credential and provider availability.
@@ -51,12 +63,26 @@ This resolution does not fabricate evidence: no live Gemini-backed browser run i
 - M05 introduces no autonomous hire/reject decision and no protected-trait, emotion, personality, deception, appearance, or accent-quality inference.
 
 ## Selected Design / Implementation Plan
+
 - Design: `docs/superpowers/specs/2026-09-12-realtime-ai-interview-design.md`
 - Plan: `docs/superpowers/plans/2026-09-12-realtime-ai-interview.md`
 - Local live-provider acceptance: `docs/LOCAL-REALTIME-ACCEPTANCE.md`
 - Talk Tutor reference: `69b6beee90c8dbd186730389f8a1462c2239fe61`.
 
-## Iterations
+## Acceptance Criteria
+
+- PRD M05 deliverables are implemented at repository scope.
+- Deterministic production-path acceptance demonstrates stable multi-turn orchestration, interruption, bounded recovery, same-attempt continuity, and candidate-safe controls.
+- Authorization, consent, provider-secret isolation, evidence integrity, privacy, accessibility, performance, and AI-safety invariants pass repository review/tests.
+- Technical/provider failures cannot become negative candidate evidence.
+- Candidate content cannot rewrite trusted policy, plan order, criteria, or follow-up bounds.
+- Same-attempt reconnect cannot reset persisted progress or bounded budgets.
+- 0 unresolved Critical or Important findings remain.
+- Durable status/traceability/handoff state matches actual Git/code/tests/CI.
+- Exact-final-head repository CI is green before the authorized merge.
+- The separate real Gemini local/deployment smoke is not represented as executed unless it is actually run with an owner-supplied server credential.
+
+## Tasks / Iterations
 
 1. **VERIFIED** — M05.1 Reference characterization.
 2. **VERIFIED** — M05.2 Session authorization/provider boundary.
@@ -73,7 +99,7 @@ This resolution does not fabricate evidence: no live Gemini-backed browser run i
 13. **VERIFIED** — M05.13 Same-authoritative-attempt reconnect and persistence gating.
 14. **REPOSITORY ACCEPTANCE COMPLETE** — M05.14 deterministic full browser/E2E closeout. Real Gemini smoke deferred to local/deployment acceptance by explicit owner decision.
 
-## TDD / Verification Evidence
+## TDD Evidence
 
 Important preserved checkpoints include:
 
@@ -81,31 +107,44 @@ Important preserved checkpoints include:
 - capability-bound realtime progress checkpoint `ce161fbaa34450839ac8f323f6fcc3a33cdc4863`, CI #728 / `34834823096` — GREEN;
 - provider-interruption RED `6d22bdf5e1b36a105f151cc6f8698c433854957b`, CI #772 / `34857082289` — intended failure because provider `interrupted` did not stop obsolete playback;
 - provider-interruption GREEN `d191b0d6414190c90956b8a964dbc0fbc26f330d`, CI #773 / `34857361292` — complete repository gate GREEN after the minimal orchestration fix;
-- durable-document contract failure `3914a347a47090f666a5458014196d9ca9d4a338`, CI #778 / `34859783065` — legitimate NOT GREEN checkpoint caught by the framework verifier;
-- corrected pre-closeout head `5c8710559ab1c40073843cb9a7909e626d8a0dc3`, CI #781 / `34860464517` — complete repository gate GREEN.
+- durable-document contract failure `3914a347a47090f666a5458014196d9ca9d4a338`, CI #778 / `34859783065` — legitimate NOT GREEN checkpoint caught by the framework verifier.
 
-Deterministic browser acceptance covers production launcher/runtime setup, constrained credential non-display, authoritative snapshots, readiness/microphone flows, mute/end controls, mobile no-overflow, safe provider unavailability, interruption handling, and disconnect→reauthorize same-attempt recovery. Unit/provider/security coverage verifies bounded follow-ups, pacing, timeout/error behavior, persistence, stale-generation rejection, and provider-interruption playback cancellation.
+## Integration Test Evidence
 
-## Review State
+Deterministic production browser acceptance covers authorized launcher/runtime setup, constrained credential non-display, authoritative snapshots, readiness/microphone flows, mute/end controls, mobile no-overflow, safe provider unavailability, provider/candidate interruption, and disconnect→reauthorize same-attempt recovery. Unit/provider/security integration coverage verifies bounded follow-ups, pacing, timeout/error behavior, persistence, stale-generation rejection, capability binding, and provider-interruption playback cancellation.
+
+The corrected pre-closeout branch head `5c8710559ab1c40073843cb9a7909e626d8a0dc3` passed complete CI #781 / `34860464517` before the owner-approved closeout-document reconciliation.
+
+## Security Review
+
+Invitation capability and current consent remain server authorization requirements. Raw capability tokens and long-lived provider secrets are not persisted or logged by M05 production code. Progress is capability-bound and database-authoritative. Candidate content remains untrusted. Technical failure cannot become negative candidate evidence. No autonomous hire/reject decision or protected-trait/emotion/personality/deception/appearance/accent-quality inference is introduced.
+
+## Accessibility Review
+
+Candidate diagnostics and realtime controls expose semantic status/alerts, keyboard-operable controls, labelled mute/end/retry actions, pressed/disabled state, live text, microphone selection, and mobile-safe layout in deterministic browser coverage.
+
+## Performance Review
+
+Capture/playback/transport cleanup is bounded; stale generations are rejected; retry/reconnect bookkeeping is bounded; no unbounded background retry or browser queue is introduced.
+
+## Code Review Findings
 
 - Critical findings: **0 unresolved** at latest recovery.
 - Important findings: **0 unresolved** at latest recovery.
 - PR #7 has no known unresolved blocking review threads at latest recovery.
 - Previously identified authorization, diagnostics wiring, question-authority, progress-authority, malformed-checkpoint, production composition, and provider-interruption findings were fixed and regression-covered.
 
-## Security / Privacy / Accessibility / Performance
-
-Invitation capability and current consent remain server authorization requirements. Raw capability tokens and long-lived provider secrets are not persisted or logged by M05 production code. Progress is capability-bound and database-authoritative. Candidate content remains untrusted. Technical failure cannot become negative candidate evidence.
-
-Candidate diagnostics and realtime controls expose semantic status/alerts, keyboard-operable controls, labelled mute/end/retry actions, pressed/disabled state, live text, microphone selection, and mobile-safe layout in deterministic browser coverage.
-
-Capture/playback/transport cleanup is bounded; stale generations are rejected; retry/reconnect bookkeeping is bounded; no unbounded background retry or browser queue is introduced.
-
 ## Live Provider Acceptance
 
 The real-provider smoke has **not been executed** in repository CI. It requires a real server-side `GEMINI_API_KEY` and controlled environment. The owner will supply that credential locally. Follow `docs/LOCAL-REALTIME-ACCEPTANCE.md` and record only sanitized pass/fail evidence if it is run.
 
 The absence of this external smoke is no longer an M05 repository merge blocker by explicit owner decision. It remains a deployment-readiness check and must not be described as completed until actually executed.
+
+## Fresh Verification Results
+
+- Pre-closeout head `5c8710559ab1c40073843cb9a7909e626d8a0dc3`, CI #781 / `34860464517` — **GREEN** complete repository gate.
+- Closeout-document head `1404a6d0a211d8be052a7e8098418b704a221dd9`, CI #788 / `34862420793` — **NOT GREEN**. Frozen install, lint, typecheck, 125 test files / 506 tests, framework-verifier unit tests, and requirements-source-verifier unit tests passed. `scripts/verify_autonomous_framework.py` then correctly rejected this M05 ledger because its closeout rewrite omitted required durable headings. Build/E2E/PRD coverage were skipped after that verifier failure. The downstream `supabase: command not found` cleanup message followed skipped setup and was not the root cause.
+- This commit restores the required ledger headings without weakening the verifier. Fresh exact-head CI is required before merge.
 
 ## Fresh Verification Commands
 
@@ -125,19 +164,26 @@ python3 scripts/verify_prd_coverage.py
 
 plus focused realtime/provider/browser/security tests required by the active unit.
 
+## Durable Recovery Sources
+
+Recover actual Git/GitHub state first, then read `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, `docs/progress/STATUS.md`, `docs/progress/KNOWN-ISSUES.md`, `docs/milestones/CURRENT.md`, this milestone ledger, `docs/SESSION-HANDOFF.md`, `docs/requirements/TRACEABILITY.md`, the authoritative requirements/PRD source, and the selected M05 design/plan. Actual Git graph, source/tests, and exact-SHA CI outrank stale Markdown or prior chat/task summaries.
+
 ## Completion Checklist
+
 - [x] Requirements and all M05 iterations accounted for at repository scope.
 - [x] Deterministic multi-turn/runtime acceptance and production composition covered.
 - [x] Required TDD/integration/provider/browser/E2E evidence recorded.
 - [x] Security/accessibility/performance/AI-safety reviews complete at repository scope.
 - [x] 0 Critical / 0 Important findings at latest closeout recovery.
-- [ ] Traceability/status/handoff reconciliation commit complete.
-- [ ] Exact-final-head CI green after closeout reconciliation.
+- [x] Traceability/status/handoff reconciliation complete.
+- [ ] Exact-final-head CI green after this framework-contract correction.
 - [ ] Final PR head/review/concurrency/mergeability gates green.
 - [ ] Authorized PR #7 merge and post-merge `main` verification.
 
 ## Next Action
-Finish durable closeout reconciliation, verify the exact final PR head with the complete CI gate, recheck reviews/concurrency/mergeability, then execute the authorized M05 merge. After merge, verify `main`, activate M06, and continue.
+
+Verify this exact corrected branch head with the complete CI gate. Recheck remote head, reviews, concurrency, and mergeability. If every authorized merge gate passes, mark PR #7 ready and squash-merge it. Then verify post-merge `main`, activate M06 — Transcript + Durable Session, and continue.
 
 ## Next Milestone
+
 M06 — Transcript + Durable Session, after M05 merges and post-merge `main` is verified.
