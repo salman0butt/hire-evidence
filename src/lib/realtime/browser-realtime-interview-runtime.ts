@@ -10,6 +10,7 @@ import {
   type RealtimeInterviewRuntime,
 } from "./realtime-interview-runtime";
 import { createRealtimeProgressClient } from "./realtime-progress-client";
+import type { RealtimeTechnicalFailure } from "./recovery";
 import type { RealtimeSessionAuthorization } from "./session-authorization";
 import { createRealtimeTransport } from "./transport";
 
@@ -151,6 +152,7 @@ export function createBrowserRealtimeInterviewRuntime(
   authorization: AuthorizedRealtimeSession,
   onSnapshot: ((snapshot: RealtimeInterviewSessionSnapshot) => void) | undefined,
   rawToken: string,
+  onRecoverableFailure?: (failure: RealtimeTechnicalFailure) => void,
 ): RealtimeInterviewRuntime {
   const playback = createRealtimeAudioPlayback({
     createAudioContext: createPlaybackContext,
@@ -165,6 +167,7 @@ export function createBrowserRealtimeInterviewRuntime(
       attemptId: authorization.attemptId,
     }),
     ...(onSnapshot ? { onSnapshot } : {}),
+    ...(onRecoverableFailure ? { onRecoverableFailure } : {}),
     createTransport: (onEvent) =>
       createRealtimeTransport({
         adapter: createGeminiRealtimeTransportAdapter(),
