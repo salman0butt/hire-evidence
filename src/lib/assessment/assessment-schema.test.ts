@@ -172,4 +172,42 @@ describe("parseInterviewAssessment", () => {
       message: "Question technical interruption flag must be boolean.",
     });
   });
+
+  it.each([0, -1, 1.5, "4"])("rejects invalid evidence sequence %s", (messageSequence) => {
+    expect(
+      parseInterviewAssessment(
+        assessment([{ ...competency(), evidence: [{ messageSequence, excerpt: "queue" }] }]),
+      ),
+    ).toEqual({ ok: false, message: "Assessment evidence sequence must be a positive integer." });
+  });
+
+  it("rejects blank and oversized evidence excerpts", () => {
+    expect(
+      parseInterviewAssessment(
+        assessment([{ ...competency(), evidence: [{ messageSequence: 4, excerpt: "  " }] }]),
+      ),
+    ).toEqual({ ok: false, message: "Assessment evidence excerpt must be non-empty and bounded." });
+
+    expect(
+      parseInterviewAssessment(
+        assessment([{ ...competency(), evidence: [{ messageSequence: 4, excerpt: "x".repeat(1001) }] }]),
+      ),
+    ).toEqual({ ok: false, message: "Assessment evidence excerpt must be non-empty and bounded." });
+  });
+
+  it("rejects duplicate exact citations", () => {
+    const citation = { messageSequence: 4, excerpt: "I would put the work on a queue" };
+    expect(
+      parseInterviewAssessment(
+        assessment([{ ...competency(), evidence: [citation, { ...citation }] }]),
+      ),
+    ).toEqual({ ok: false, message: "Assessment evidence citations must be unique." });
+  });
+
+  it("requires evidence for a scored competency with sufficient evidence", () => {
+    expect(parseInterviewAssessment(assessment([{ ...competency(), evidence: [] }]))).toEqual({
+      ok: false,
+      message: "A scored competency with sufficient evidence must cite evidence.",
+    });
+  });
 });
