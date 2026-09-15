@@ -115,4 +115,61 @@ describe("parseInterviewAssessment", () => {
       message: "Assessment cannot include autonomous hiring decision fields.",
     });
   });
+
+  it("rejects blank assessment and rationale text", () => {
+    expect(parseInterviewAssessment({ ...assessment(), summary: "  " })).toEqual({
+      ok: false,
+      message: "Assessment summary must be a non-empty string.",
+    });
+
+    expect(
+      parseInterviewAssessment(
+        assessment([{ ...competency(), rationale: "\t" }]),
+      ),
+    ).toEqual({
+      ok: false,
+      message: "Competency rationale must be a non-empty string.",
+    });
+  });
+
+  it("rejects unsupported evidence sufficiency values", () => {
+    expect(
+      parseInterviewAssessment(
+        assessment([competency("system-design", 4, "certain")]),
+      ),
+    ).toEqual({
+      ok: false,
+      message: "Competency evidence sufficiency is invalid.",
+    });
+
+    expect(
+      parseInterviewAssessment({ ...assessment(), evidenceSufficiency: "certain" }),
+    ).toEqual({
+      ok: false,
+      message: "Overall evidence sufficiency is invalid.",
+    });
+  });
+
+  it("rejects malformed question coverage states", () => {
+    expect(
+      parseInterviewAssessment(
+        assessment([competency()], [{ ...questionCoverage(), status: "unknown" }]),
+      ),
+    ).toEqual({
+      ok: false,
+      message: "Question coverage status is invalid.",
+    });
+
+    expect(
+      parseInterviewAssessment(
+        assessment(
+          [competency()],
+          [{ ...questionCoverage(), technicalInterruption: "no" }],
+        ),
+      ),
+    ).toEqual({
+      ok: false,
+      message: "Question technical interruption flag must be boolean.",
+    });
+  });
 });
