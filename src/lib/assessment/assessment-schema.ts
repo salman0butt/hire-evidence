@@ -43,6 +43,9 @@ const DECISION_FIELDS = new Set([
   "outcome",
   "successProbability",
 ]);
+const EVIDENCE_SUFFICIENCY = new Set(["insufficient", "partial", "sufficient"]);
+const OVERALL_EVIDENCE_SUFFICIENCY = new Set(["low", "medium", "high"]);
+const QUESTION_COVERAGE_STATUS = new Set(["answered", "partially_answered", "skipped"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -65,41 +68,37 @@ export function parseInterviewAssessment(value: unknown): AssessmentValidationRe
   }
 
   if (Object.keys(value).some((key) => DECISION_FIELDS.has(key))) {
-    return {
-      ok: false,
-      message: "Assessment cannot include autonomous hiring decision fields.",
-    };
+    return { ok: false, message: "Assessment cannot include autonomous hiring decision fields." };
+  }
+
+  if (!isNonEmptyString(value.summary)) {
+    return { ok: false, message: "Assessment summary must be a non-empty string." };
+  }
+
+  if (!OVERALL_EVIDENCE_SUFFICIENCY.has(value.evidenceSufficiency as string)) {
+    return { ok: false, message: "Overall evidence sufficiency is invalid." };
   }
 
   const competencyIds = new Set<string>();
   for (const competency of value.competencies) {
     if (!isRecord(competency) || !isAssessmentScore(competency.score)) {
-      return {
-        ok: false,
-        message: "Competency score must be an integer from 1 to 5 or null.",
-      };
+      return { ok: false, message: "Competency score must be an integer from 1 to 5 or null." };
     }
-
     if (!isNonEmptyString(competency.competencyId)) {
       return { ok: false, message: "Competency ID must be a non-empty string." };
     }
-
     if (competencyIds.has(competency.competencyId)) {
-      return {
-        ok: false,
-        message: "Assessment cannot contain duplicate competency IDs.",
-      };
+      return { ok: false, message: "Assessment cannot contain duplicate competency IDs." };
     }
     competencyIds.add(competency.competencyId);
-
-    if (
-      competency.evidenceSufficiency === "insufficient" &&
-      competency.score !== null
-    ) {
-      return {
-        ok: false,
-        message: "Insufficient competency evidence cannot have a score.",
-      };
+    if (!isNonEmptyString(competency.rationale)) {
+      return { ok: false, message: "Competency rationale must be a non-empty string." };
+    }
+    if (!EVIDENCE_SUFFICIENCY.has(competency.evidenceSufficiency as string)) {
+      return { ok: false, message: "Competency evidence sufficiency is invalid." };
+    }
+    if (competency.evidenceSufficiency === "insufficient" && competency.score !== null) {
+      return { ok: false, message: "Insufficient competency evidence cannot have a score." };
     }
   }
 
@@ -112,14 +111,16 @@ export function parseInterviewAssessment(value: unknown): AssessmentValidationRe
     if (!isRecord(question) || !isNonEmptyString(question.questionId)) {
       return { ok: false, message: "Question ID must be a non-empty string." };
     }
-
     if (questionIds.has(question.questionId)) {
-      return {
-        ok: false,
-        message: "Assessment cannot contain duplicate question IDs.",
-      };
+      return { ok: false, message: "Assessment cannot contain duplicate question IDs." };
     }
     questionIds.add(question.questionId);
+    if (!QUESTION_COVERAGE_STATUS.has(question.status as string)) {
+      return { ok: false, message: "Question coverage status is invalid." };
+    }
+    if (typeof question.technicalInterruption !== "boolean") {
+      return { ok: false, message: "Question technical interruption flag must be boolean." };
+    }
   }
 
   return { ok: true, value: value as InterviewAssessment };
