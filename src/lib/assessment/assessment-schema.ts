@@ -46,6 +46,7 @@ const DECISION_FIELDS = new Set([
 const EVIDENCE_SUFFICIENCY = new Set(["insufficient", "partial", "sufficient"]);
 const OVERALL_EVIDENCE_SUFFICIENCY = new Set(["low", "medium", "high"]);
 const QUESTION_COVERAGE_STATUS = new Set(["answered", "partially_answered", "skipped"]);
+const MAX_EVIDENCE_EXCERPT_LENGTH = 500;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -99,6 +100,38 @@ export function parseInterviewAssessment(value: unknown): AssessmentValidationRe
     }
     if (competency.evidenceSufficiency === "insufficient" && competency.score !== null) {
       return { ok: false, message: "Insufficient competency evidence cannot have a score." };
+    }
+    if (!Array.isArray(competency.evidence)) {
+      return { ok: false, message: "Competency evidence must be an array." };
+    }
+    const citationKeys = new Set<string>();
+    for (const citation of competency.evidence) {
+      if (
+        !isRecord(citation) ||
+        typeof citation.messageSequence !== "number" ||
+        !Number.isInteger(citation.messageSequence) ||
+        citation.messageSequence <= 0
+      ) {
+        return { ok: false, message: "Assessment evidence sequence must be a positive integer." };
+      }
+      if (
+        !isNonEmptyString(citation.excerpt) ||
+        citation.excerpt.length > MAX_EVIDENCE_EXCERPT_LENGTH
+      ) {
+        return { ok: false, message: "Assessment evidence excerpt must be non-empty and bounded." };
+      }
+      const citationKey = `${citation.messageSequence}\u0000${citation.excerpt}`;
+      if (citationKeys.has(citationKey)) {
+        return { ok: false, message: "Assessment evidence citations must be unique." };
+      }
+      citationKeys.add(citationKey);
+    }
+    if (
+      competency.score !== null &&
+      competency.evidenceSufficiency === "sufficient" &&
+      competency.evidence.length === 0
+    ) {
+      return { ok: false, message: "A scored competency with sufficient evidence must cite evidence." };
     }
   }
 
