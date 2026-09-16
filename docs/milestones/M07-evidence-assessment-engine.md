@@ -1,146 +1,103 @@
 # M07 — Evidence-Based Assessment Engine
 
-Status: **IMPLEMENTING — M07.1 ACTIVE**
+Status: **IMPLEMENTATION COMPLETE — CLOSEOUT / MERGE GATE**
 
 ## Goal
-Deliver the authoritative PRD milestone below as a reviewable, evidence-backed capability.
+Deliver a provider-neutral, runtime-validatable, evidence-grounded assessment engine that is reviewable, versioned, and safe for human hiring-team review without making autonomous hiring decisions.
 
 ## Authoritative PRD Milestone Definition
 
-# 202. MILESTONE 07 — EVIDENCE-BASED ASSESSMENT ENGINE
+MILESTONE 07 — EVIDENCE-BASED ASSESSMENT ENGINE
 
-Deliver:
-
-```text
-structured assessment
-competency scores
-rubric enforcement
-evidence citations
-evidence sufficiency
-strengths
-concerns
-question coverage
-guardrails
-schema validation
-prompt injection defense
-assessment provenance
-```
-
-Do NOT include autonomous hire/reject.
-
-Exit:
-
-assessment is reviewable and every score is evidence-grounded.
+Deliver: structured assessment, competency scores, rubric enforcement, evidence citations, evidence sufficiency, strengths, concerns, question coverage, guardrails, schema validation, prompt-injection defense, and assessment provenance. Do not include autonomous hire/reject. Exit: assessment is reviewable and every score is evidence-grounded.
 
 ## Dependencies
-Durable Transcript; Jobs/Competencies/Rubrics/Questions. M06 merged as `45d1e1a6083b44b5793c242091ef8d8fe3df9f96` and post-merge main CI #875 / run `34909208645` passed before M07 activation.
+M06 Durable Transcript + Durable Session merged as `45d1e1a6083b44b5793c242091ef8d8fe3df9f96`; post-merge main CI #875 passed before M07 activation. Jobs/competencies/rubrics/questions and immutable published interviewer versions were already verified from M03.
 
-## In Scope
-The authoritative definition plus every default iteration listed below, grounded in PRD sections 58 and 69–81.
-
-## Out of Scope
-Later milestones, speculative abstractions, behavior not justified by the PRD, autonomous hire/reject, candidate success probability, coding sandbox, and M08 reviewer workflow beyond M07 acceptance needs.
-
-## Architecture Notes
-Assessment operates on immutable trusted inputs and runtime-validated structured output. Every score links to validated candidate evidence; insufficient evidence yields null/insufficient rather than invented certainty. Transcript content is untrusted data. Assessment generations and provenance are versioned and append-only.
-
-## Selected Design / Implementation Plan
-- Design: `docs/superpowers/specs/2026-09-15-evidence-assessment-engine-design.md` (`a8b270c2e676b37ffde38a54851cdda10cb00e09`).
-- Plan: `docs/superpowers/plans/2026-09-15-evidence-assessment-engine.md` (`7a68209f8352b4f1a5090712be828362ace7eb2f`).
+## Selected Design / Plan
+- Design: `docs/superpowers/specs/2026-09-15-evidence-assessment-engine-design.md`.
+- Plan: `docs/superpowers/plans/2026-09-15-evidence-assessment-engine.md`.
 
 ## Acceptance Criteria
-- PRD deliverables and exit criteria pass.
-- Every non-null competency score is 1–5, rubric-aligned, and backed by validated same-attempt transcript evidence.
-- Insufficient evidence can yield `score: null`; no forced certainty.
-- Transcript instructions cannot alter assessment policy, rubric, schema, evidence validation, or guardrails.
-- No autonomous hire/reject or prohibited protected-trait/biometric/appearance/emotion/accent/personality/deception/health/political/union/socioeconomic inference.
-- Generation/provenance/history are append-only, retry-safe, and tenant/attempt scoped.
-- All required iterations are complete or explicitly resolved.
-- Relevant security/privacy/tenancy/accessibility/performance/AI-safety gates pass.
-- 0 unresolved Critical or Important review findings.
-- Traceability and feature state are reconciled.
-- Exact-final-head CI is green.
+- **PASS** — structured assessment is runtime validated.
+- **PASS** — every non-null competency score is 1–5, rubric-aligned and backed by validated same-attempt candidate transcript evidence.
+- **PASS** — insufficient evidence yields explicit insufficient state / `score: null`; no forced certainty.
+- **PASS** — transcript instructions remain inert data and cannot alter policy/rubric/schema/evidence/guardrails.
+- **PASS** — no autonomous hire/reject/strong-hire outcome or candidate success probability.
+- **PASS** — prohibited protected-trait/biometric/appearance/emotion/accent/personality/deception/health/political/union/socioeconomic inference is rejected in model-authored evaluative text.
+- **PASS** — generation/provenance/history are append-only, retry-safe and tenant/attempt scoped.
+- **PASS** — all M07.1–M07.11 implementation iterations are complete.
+- **PASS** — latest implementation exact-head CI is green and 0 known unresolved Critical/Important findings remain.
+- **PENDING FINAL DOC HEAD** — closeout docs/traceability are being reconciled and require fresh exact-final-head CI before merge.
 
 ## Tasks / Iterations
-1. **ACTIVE** — M07.1 — Assessment domain/schema: runtime-validatable structures and states.
-2. **NOT STARTED** — M07.2 — Trusted prompt composition: immutable rubric/job/questions + delimited transcript.
-3. **NOT STARTED** — M07.3 — Competency scoring: rubric-aligned 1–5/null behavior.
-4. **NOT STARTED** — M07.4 — Evidence citations: candidate message sequences/excerpts.
-5. **NOT STARTED** — M07.5 — Evidence validator: sequence/speaker/excerpt existence and fabricated-citation rejection.
-6. **NOT STARTED** — M07.6 — Evidence sufficiency + question coverage: insufficient/partial/sufficient and asked/answered/skipped.
-7. **NOT STARTED** — M07.7 — Prompt-injection defense: transcript treated strictly as data.
-8. **NOT STARTED** — M07.8 — Provenance: model/prompt/rubric/interviewer/guardrail/transcript version capture.
-9. **NOT STARTED** — M07.9 — Idempotent generation: pending/processing/completed/failed atomic claim.
-10. **NOT STARTED** — M07.10 — Regeneration/history: preserve prior assessment versions.
-11. **NOT STARTED** — M07.11 — Golden fixtures: deterministic and model-based assessment test cases.
+1. **VERIFIED** — M07.1 runtime-validatable assessment domain/schema.
+2. **VERIFIED** — M07.2 trusted immutable input and prompt composition.
+3. **VERIFIED** — M07.3 configured rubric-aligned competency scoring.
+4. **VERIFIED** — M07.4 bounded evidence citation structures.
+5. **VERIFIED** — M07.5 durable same-attempt evidence validator and fabricated-citation rejection.
+6. **VERIFIED** — M07.6 evidence sufficiency and deterministic question coverage with non-evaluative technical interruption context.
+7. **VERIFIED** — M07.7 prompt-injection/prohibited-output defense.
+8. **VERIFIED** — M07.8 application-owned assessment provenance.
+9. **VERIFIED** — M07.9 idempotent tenant-safe generation persistence.
+10. **VERIFIED** — M07.10 append-only regeneration/history.
+11. **VERIFIED IMPLEMENTATION** — M07.11 integrated acceptance and safety closeout; final documentation head verification remains.
 
-## TDD Evidence
-PENDING M07.1 behavioral RED. Design/activation commits are not RED/GREEN evidence and must not be reported as such.
+## TDD / Integration Evidence
 
-## Integration Test Evidence
-PENDING — implementation has not reached an integration boundary.
+M07 was developed through genuine RED→GREEN checkpoints. Late milestone evidence includes:
+- M07.8 provenance RED `f374920e567231d91030144c8a37391437c964ca` → GREEN `a96e686474af27b5038146cd98637b325f415277`, CI #902 GREEN.
+- M07.9 persistence migration RED `366218c1a633ba102e19423332bcddcd40c82a7a` → implementation `c595b89453335730080b163d902717c31a78cdd0`, CI #904 GREEN.
+- M07.9 repository boundary RED `b2c10d6d8aa7248dd28a86cf5322118115558a80` → GREEN `cd1a4ec02df32625b544b1a01560ba3d59c73b99`, CI #906 GREEN.
+- M07.10 history RED `55cc238d794a42671b43a1102fa37fc3cab6390b` → GREEN `86afd0179bd7f4ad004b0506aeb2ad6df81e695a`, CI #908 GREEN.
+- M07.11 integrated RED `82a65ab8d3a81d0e3befe17166ef3d40da69078a`, CI #909, failed at the intended missing `assessment-pipeline` boundary.
+- Integrated pipeline `77146dfef64e03290f03b05c5a9fdac0bfa9398e` plus rationale safety fix `121bfdf3452fc4ef1e02ce5f39a1feb8f8cb99fe`; exact-head CI #911 / run `35049947377` GREEN.
 
-## E2E / Visual Verification
-PENDING — M08 owns the full reviewer experience; add M07 browser acceptance only where needed to prove evidence reviewability at milestone closeout.
+The integrated acceptance covers grounded scoring, explicit insufficient evidence, fabricated-citation rejection, candidate prompt-injection inertness, and prohibited inference in model-authored rationale.
 
-## Security Review
-PENDING implementation review. Required focus: tenant/attempt isolation, prompt input minimization, untrusted transcript handling, fabricated/cross-attempt citations, immutable completed generations, and secrets/provider boundaries.
+## Security / AI-Safety Review
 
-## Accessibility Review
-PENDING where M07 exposes user-visible state. Full assessment review interaction is M08 scope.
-
-## Performance Review
-PENDING implementation review. Keep prompt/output collections bounded, evidence validation O(n) over transcript turns, and generation/history queries indexed.
-
-## AI / Eval Review
-No autonomous hire/reject. Reject fabricated citations, candidate prompt injection, unsupported inferences, protected-trait signals, appearance/emotion/accent/personality/deception scoring, and model self-confidence as calibrated confidence. Deterministic validators remain authoritative over model output.
+- Tenant/attempt isolation is enforced through RLS/security-definer RPC and repository boundaries; direct unsafe assessment mutation is denied.
+- Completed generation mutation is not the regeneration mechanism; regeneration creates a new append-only generation.
+- Candidate transcript text is untrusted evidence data and is not interpreted as policy or model rationale.
+- Evidence validation rejects nonexistent sequence, wrong speaker, absent excerpt, duplicate transcript sequence and mixed fabricated evidence.
+- Persistence completion is validation-gated and fail-closed.
+- Application-owned provenance cannot be overridden by model output.
+- No autonomous hiring decision or unsupported candidate-success probability exists.
 
 ## Code Review Findings
-None yet for M07 implementation; fresh review starts after the first behavioral unit.
 
-## Fixes / Re-review
-PENDING when evidence-backed findings exist.
+Critical: **0 known unresolved**.
 
-## Fresh Verification Commands
-Run repository-wide verification plus milestone-specific tests. Baseline:
+Important: **0 known unresolved**. During M07.11 review, competency rationales were found to be omitted from prohibited-inference scanning. Fix `121bfdf3…` adds rationales to evaluative guardrail input while deliberately excluding raw candidate evidence excerpts. CI #911 verified the fix.
 
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm e2e
-python3 scripts/verify_autonomous_framework.py
-python3 scripts/verify_prd_coverage.py
-```
+Minor/deferred: external GitHub Actions/Node maintenance notices remain informational and are not M07 correctness blockers.
 
-## Fresh Verification Results
-- M06 base/main `45d1e1a6083b44b5793c242091ef8d8fe3df9f96`: post-merge CI #875 / run `34909208645` complete GREEN before branch activation.
-- M07 behavioral verification: PENDING M07.1 RED/GREEN.
+## Performance / Accessibility Review
 
-## Commits / Files Changed
-- `a8b270c2e676b37ffde38a54851cdda10cb00e09` — selected M07 design.
-- `7a68209f8352b4f1a5090712be828362ace7eb2f` — executable M07 implementation plan.
-- Durable activation docs updated on `feat/evidence-assessment-engine` before first behavioral RED.
+Evidence validation indexes transcript turns rather than repeatedly scanning for sequence lookup; generation history is bounded by attempt and ordered by generation. No new user-facing M07 interaction is introduced; full assessment-review UX/accessibility belongs to M08. Existing assessment data remains structured for accessible review presentation.
+
+## Verification
+
+Latest fully verified implementation head: `121bfdf3452fc4ef1e02ce5f39a1feb8f8cb99fe`.
+CI #911 / run `35049947377`: **GREEN**.
+
+Repository CI is the authoritative full gate. Closeout documentation commits after `121bfdf3…` create a new exact head and must receive fresh exact-final-head GREEN CI before merge.
 
 ## Known Limitations
-No model/provider or persistence implementation exists yet for M07. This is expected at activation; do not infer completion from design artifacts.
 
-## Documentation Updated
-`docs/progress/STATUS.md`, `docs/milestones/CURRENT.md`, this ledger, selected design and implementation plan establish fresh-session recovery state.
-
-## Durable Recovery Sources
-`AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → relevant PRD → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
+Real external Gemini deployment smoke remains separately deferred from M05 and is not fabricated as M07 evidence. M07 intentionally does not implement the hiring-team review UI; that is M08 scope. M07 also does not make hire/reject decisions.
 
 ## Completion Checklist
-- [ ] Requirements and iterations accounted for.
-- [ ] Acceptance criteria verified.
-- [ ] Required TDD/integration/E2E evidence recorded.
-- [ ] Security/accessibility/performance/AI-eval reviews complete where relevant.
-- [ ] 0 Critical / 0 Important findings.
-- [ ] Traceability/feature matrix reconciled.
-- [ ] Exact-final-head CI green.
-- [ ] Durable status/closeout state current.
+- [x] Requirements and iterations accounted for.
+- [x] Acceptance behavior implemented and verified at implementation head.
+- [x] Required TDD/integration/security/adversarial evidence exists.
+- [x] Security/performance/AI-safety review complete for M07 scope.
+- [x] 0 known unresolved Critical / Important findings.
+- [x] Traceability and feature matrix reconciled in closeout commits.
+- [ ] Exact-final-documentation-head CI green.
+- [ ] PR #9 merged under authorized merge gate.
+- [ ] Post-merge `main` CI green.
 
 ## Next Milestone
-M08 — Hiring Team Review Experience.
+M08 — Hiring Team Review Experience. Activate automatically only after M07 merge and post-merge `main` verification.
