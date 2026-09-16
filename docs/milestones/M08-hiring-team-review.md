@@ -1,126 +1,98 @@
 # M08 — Hiring Team Review Experience
 
-Status: **NOT STARTED**
+Status: **IMPLEMENTING — M08.1 ACTIVE**
 
 ## Goal
-Deliver the authoritative PRD milestone below as a reviewable, evidence-backed capability.
+Enable an authorized human hiring-team member to independently review AI assessment and transcript evidence, record human judgment and preserve disagreement/audit history.
 
 ## Authoritative PRD Milestone Definition
-
-# 203. MILESTONE 08 — HIRING TEAM REVIEW EXPERIENCE
-
-Deliver:
-
-```text
-candidate results
-assessment dashboard
-transcript viewer
-evidence deep links
-human score override
-reviewer notes
-review status
-AI/human disagreement
-job candidate dashboard
-```
-
-Exit:
-
-human can independently review AI assessment.
+Deliver candidate results, assessment dashboard, transcript viewer, evidence deep links, human score override, reviewer notes, review status, AI/human disagreement and job candidate dashboard. Exit: human can independently review AI assessment.
 
 ## Dependencies
-Evidence-Based Assessment Engine.
+M07 Evidence-Based Assessment Engine squash-merged as `d85883f4177e2ec122a695092d5c6ac846afbe72`. Post-merge main CI #920 / run `35054705165` passed the complete repository gate before M08 activation.
 
 ## In Scope
-The authoritative definition plus every default iteration listed below.
+M08.1–M08.9: result page, competency/evidence cards, transcript viewer, evidence deep links, human overrides, reviewer notes/status, disagreement data, job candidate dashboard and visual/accessibility/E2E closeout.
 
 ## Out of Scope
-Later milestones, speculative abstractions, and behavior not justified by the PRD.
+Autonomous hire/reject/strong-hire, candidate success probability, AI best-candidate ranking, destructive rewriting of AI assessment history, later billing/usage/eval milestones and unrelated provider changes.
 
 ## Architecture Notes
-Human-review-first result experience with score/evidence cards, transcript navigation, evidence deep links, reviewer notes/states, and append-only human override records that preserve AI output and reasons.
+Human-review-first experience over immutable M07 assessment generations and M06 durable transcript. Review state and human judgment are separate from AI output. Overrides preserve AI score and require reason/reviewer attribution. Tenant/job/candidate/attempt relationships remain server-authoritative.
 
 ## Selected Design / Implementation Plan
-- Not created yet. On activation, recover requirements, use Superpowers brainstorming/design, write an executable plan, and record the selected paths here.
+- Design: `docs/superpowers/specs/2026-09-16-hiring-team-review-design.md`.
+- Plan: `docs/superpowers/plans/2026-09-16-hiring-team-review.md`.
 
 ## Acceptance Criteria
-- PRD deliverables and exit criteria pass.
-- All required iterations are complete or explicitly resolved.
-- Relevant security/privacy/tenancy/accessibility/performance/AI-safety gates pass.
-- 0 unresolved Critical or Important review findings.
-- Traceability and feature state are reconciled.
-- Exact-final-head CI is green.
+- Human can independently review AI assessment and exact supporting transcript evidence.
+- Human overrides preserve original AI score and require attributable reason.
+- No AI best-candidate ranking or autonomous hire/reject behavior.
+- Tenant/job/candidate/attempt/assessment authorization fails closed.
+- Relevant security/privacy/accessibility/performance/AI-safety gates pass.
+- 0 unresolved Critical/Important findings; traceability/docs current; exact-final-head CI green.
 
 ## Tasks / Iterations
-1. **NOT STARTED** — M08.1 — Candidate result page: identity/job/interview/status summary.
-2. **NOT STARTED** — M08.2 — Competency/evidence cards: score, rationale, sufficiency.
-3. **NOT STARTED** — M08.3 — Transcript viewer: speaker separation, search, markers.
-4. **NOT STARTED** — M08.4 — Evidence deep links: score → exact transcript turn/highlight.
-5. **NOT STARTED** — M08.5 — Human overrides: preserve AI score + human score + reason.
-6. **NOT STARTED** — M08.6 — Reviewer notes + states: awaiting review/reviewed and notes.
-7. **NOT STARTED** — M08.7 — AI/human disagreement data: durable comparison for evals.
-8. **NOT STARTED** — M08.8 — Job candidate dashboard: workflow status without AI "best candidate" ranking.
-9. **NOT STARTED** — M08.9 — Visual/accessibility/E2E QA: desktop/mobile and independent-review flow.
+1. **ACTIVE** — M08.1 candidate result projection/page.
+2. **NOT STARTED** — M08.2 competency/evidence cards.
+3. **NOT STARTED** — M08.3 transcript viewer.
+4. **NOT STARTED** — M08.4 evidence deep links.
+5. **NOT STARTED** — M08.5 human score overrides.
+6. **NOT STARTED** — M08.6 reviewer notes/status lifecycle.
+7. **NOT STARTED** — M08.7 AI/human disagreement data.
+8. **NOT STARTED** — M08.8 job candidate dashboard without AI ranking.
+9. **NOT STARTED** — M08.9 visual/accessibility/E2E closeout.
 
 ## TDD Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+PENDING M08.1 behavioral RED. Design/activation commits are not RED/GREEN evidence.
 
 ## Integration Test Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+PENDING implementation.
 
 ## E2E / Visual Verification
-PENDING — define milestone-specific browser/realtime/visual scenarios before closeout where applicable.
+PENDING. M08.9 owns independent-review browser acceptance, keyboard/focus, evidence deep links and mobile layout.
 
 ## Security Review
-PENDING — cover auth/authz, tenant isolation, untrusted input, secrets, data exposure, injection and milestone-specific threats.
+Required focus: tenant/job/candidate/attempt/assessment authorization, immutable AI history, reviewer attribution, inert text rendering and no client authority over organization/reviewer identity.
 
 ## Accessibility Review
-PENDING where UI exists — keyboard, focus, semantics, labels, status/error states, responsive and assistive-technology paths.
+Required throughout: semantic structure, keyboard/focus, evidence navigation, labels/status, mobile no-overflow and no color-only meaning.
 
 ## Performance Review
-PENDING where relevant — bounded work, pagination, resource limits, retries and hot-path cost.
+Keep result/transcript queries bounded/indexed; avoid N+1 evidence lookup and unbounded cross-job history.
 
 ## AI / Eval Review
-Humans make hiring decisions. AI/human disagreement data is retained for evaluation, not used to silently overwrite either history.
+Humans make hiring decisions. AI/human disagreement is retained for evaluation and never silently overwrites either history.
 
 ## Code Review Findings
-None yet; milestone has not started.
+None yet for M08 implementation.
 
 ## Fixes / Re-review
-PENDING when evidence-backed findings exist.
+PENDING when findings exist.
 
 ## Fresh Verification Commands
-Run repository-wide verification plus milestone-specific tests. Baseline:
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm e2e
-python3 scripts/verify_autonomous_framework.py
-python3 scripts/verify_prd_coverage.py
-```
+Use full repository CI plus focused M08 tests/provider/browser gates.
 
 ## Fresh Verification Results
-PENDING — milestone has not started.
+M07 merge/main `d85883f4177e2ec122a695092d5c6ac846afbe72`: post-merge CI #920 / run `35054705165` complete GREEN before M08 activation. M08 behavioral verification pending M08.1 RED.
 
 ## Commits / Files Changed
-None yet.
+M08 design and implementation plan created on `feat/hiring-team-review`; durable activation state is being reconciled.
 
 ## Known Limitations
-Milestone is NOT STARTED; implementation-specific limitations are not yet known.
+M08 implementation has only just activated; no behavioral completion is claimed.
 
 ## Documentation Updated
-This living ledger must be reconciled whenever milestone state/evidence changes.
+This ledger, design/plan and canonical recovery docs establish M08 durable state.
 
 ## Durable Recovery Sources
-`AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → relevant PRD → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
+`AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → requirements source → selected design/plan → active PR/reviews/exact-head CI → source/tests.
 
 ## Completion Checklist
 - [ ] Requirements and iterations accounted for.
 - [ ] Acceptance criteria verified.
 - [ ] Required TDD/integration/E2E evidence recorded.
-- [ ] Security/accessibility/performance/AI-eval reviews complete where relevant.
+- [ ] Security/accessibility/performance/AI-eval reviews complete.
 - [ ] 0 Critical / 0 Important findings.
 - [ ] Traceability/feature matrix reconciled.
 - [ ] Exact-final-head CI green.
