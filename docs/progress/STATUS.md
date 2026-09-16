@@ -20,6 +20,7 @@ Active branch: `feat/evidence-assessment-engine`.
 Active PR: #9 — `Build evidence-based assessment engine` — OPEN / DRAFT.
 Base/main: `45d1e1a6083b44b5793c242091ef8d8fe3df9f96`.
 Latest verified implementation head: `121bfdf3452fc4ef1e02ce5f39a1feb8f8cb99fe`, CI #911 / run `35049947377` — GREEN.
+CI status: closeout head `3e45d016575418494c8a9cdcf438109b02775633` reached CI #917 / run `35054114221`; install, lint, typecheck, all 622 unit/component tests and verifier unit tests passed, but autonomous framework verification correctly failed because closeout docs omitted required invariant headings. This is a documentation/framework failure, not an application regression. The headings are being restored and a new exact-head CI is required.
 
 Selected design: `docs/superpowers/specs/2026-09-15-evidence-assessment-engine-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-15-evidence-assessment-engine.md`.
@@ -42,10 +43,9 @@ Milestone ledger: `docs/milestones/M07-evidence-assessment-engine.md`.
 ## Latest Verification Evidence
 
 - M07.10 history implementation `86afd0179bd7f4ad004b0506aeb2ad6df81e695a` passed CI #908 / run `35042481116`.
-- M07.11 integration RED `82a65ab8d3a81d0e3befe17166ef3d40da69078a` was genuine: exact-head CI #909 reached the intended missing `assessment-pipeline` boundary.
-- Integrated pipeline implementation `77146dfef64e03290f03b05c5a9fdac0bfa9398e` plus rationale guardrail fix `121bfdf3452fc4ef1e02ce5f39a1feb8f8cb99fe` passed exact-head CI #911 / run `35049947377`.
-- The integrated pipeline validates runtime schema, authoritative rubric alignment, same-attempt transcript evidence, prohibited-output guardrails, and deterministic structured scoring before persistence.
-- Candidate transcript excerpts remain inert untrusted evidence data; model-authored summary/strengths/concerns/competency rationales are guardrail-validated.
+- M07.11 integration RED `82a65ab8d3a81d0e3befe17166ef3d40da69078a` was genuine: CI #909 reached the intended missing `assessment-pipeline` boundary.
+- Integrated pipeline implementation `77146dfef64e03290f03b05c5a9fdac0bfa9398e` plus rationale guardrail fix `121bfdf3452fc4ef1e02ce5f39a1feb8f8cb99fe` passed CI #911 / run `35049947377`.
+- CI #917 on the first closeout-doc head proved application code/tests remain green through 622 tests; its failure was isolated to required durable-document framework headings.
 
 ## Review State
 
@@ -57,15 +57,15 @@ PR #9 currently has no submitted reviews or unresolved inline review threads.
 
 - No autonomous hire/reject/strong-hire decision or candidate success probability.
 - Only configured job-relevant competencies are scored against published rubrics; valid score is `1..5 | null`.
-- Insufficient evidence remains explicit and cannot be converted into invented certainty.
+- Insufficient evidence remains explicit and cannot become invented certainty.
 - Every scored claim requires validated same-attempt durable candidate transcript evidence.
-- Transcript is untrusted data and cannot alter policy, rubric, schema, evidence validation, or guardrails.
+- Transcript is untrusted data and cannot alter policy, rubric, schema, evidence validation or guardrails.
 - Technical interruptions remain contextual and non-evaluative.
-- Protected-trait, biometric, appearance, emotion, accent, personality, deception, health, political, union, socioeconomic and related prohibited inference remain excluded.
+- Prohibited protected/biometric/appearance/emotion/accent/personality/deception/health/political/union/socioeconomic inference remains excluded.
 - Runtime schema/evidence/safety validation must pass before persistence; generations/provenance/history remain append-only and tenant/attempt scoped.
 
 ## Closeout State
 
-Implementation acceptance is GREEN at `121bfdf3…`. Durable closeout documents were stale and are now being reconciled. Any closeout documentation commit creates a new exact head and therefore requires fresh exact-head CI before PR #9 can satisfy the authorized merge gate.
+Implementation acceptance is GREEN at `121bfdf3…`. CI #917 exposed only closeout-document contract omissions. Restore those exact framework invariants, verify the resulting exact head, then execute the authorized merge gate.
 
-Exact next work: finish M07 ledger/current/handoff/traceability/feature-matrix reconciliation, verify the resulting exact PR head with complete CI, recheck reviews/mergeability/concurrency, then automatically squash-merge PR #9 if all gates remain satisfied; verify post-merge `main` CI and activate M08 immediately.
+Exact next work: verify the framework-invariant documentation fix on the new exact PR head, recheck reviews/mergeability/concurrency, automatically squash-merge PR #9 if all gates pass, verify post-merge `main` CI, then activate M08 immediately.
