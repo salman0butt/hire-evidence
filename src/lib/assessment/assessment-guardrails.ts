@@ -2,6 +2,7 @@ export type AssessmentGuardrailInput = {
   summary: string;
   strengths: string[];
   concerns: string[];
+  rationales?: string[];
   evidenceExcerpts?: string[];
 };
 
@@ -29,7 +30,12 @@ export function validateAssessmentGuardrails(
 ): AssessmentGuardrailResult {
   // Evidence excerpts are intentionally excluded: transcript evidence is untrusted
   // candidate data and must never be interpreted as model rationale or instructions.
-  const evaluativeText = [assessment.summary, ...assessment.strengths, ...assessment.concerns];
+  const evaluativeText = [
+    assessment.summary,
+    ...assessment.strengths,
+    ...assessment.concerns,
+    ...(assessment.rationales ?? []),
+  ];
 
   for (const text of evaluativeText) {
     for (const prohibited of prohibitedPatterns) {
