@@ -161,7 +161,75 @@ as $$
     and generation.generation_number = p_generation_number;
 $$;
 
+create or replace function public.list_assessment_generations(
+  p_organization_id uuid,
+  p_attempt_id uuid
+)
+returns setof public.assessment_generations
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select generation.*
+  from public.assessment_generations generation
+  where generation.organization_id = p_organization_id
+    and generation.attempt_id = p_attempt_id
+  order by generation.generation_number asc;
+$$;
+
+create or replace function public.create_assessment_regeneration(
+  p_organization_id uuid,
+  p_attempt_id uuid
+)
+returns public.assessment_generations
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  interview_attempt public.interview_attempts;
+  generation public.assessment_generations;
+  next_generation_number integer;
+begin
+  if p_organization_id is null or p_attempt_id is null then
+    raise exception 'assessment generation unavailable';
+  end if;
+
+  select attempt.* into interview_attempt
+  from public.interview_attempts attempt
+  where attempt.id = p_attempt_id
+    and attempt.organization_id = p_organization_id
+    and attempt.state = 'completed'
+  for update;
+
+  if interview_attempt.id is null then
+    raise exception 'assessment generation unavailable';
+  end if;
+
+  select coalesce(max(existing.generation_number), 0) + 1
+    into next_generation_number
+  from public.assessment_generations existing
+  where existing.organization_id = p_organization_id
+    and existing.attempt_id = p_attempt_id;
+
+  insert into public.assessment_generations (
+    organization_id, attempt_id, generation_number, status
+  ) values (
+    p_organization_id, p_attempt_id, next_generation_number, 'pending'
+  )
+  returning * into generation;
+
+  return generation;
+exception
+  when unique_violation then
+    raise exception 'assessment generation unavailable';
+end;
+$$;
+
 revoke all on function public.claim_assessment_generation(uuid, uuid, integer) from public;
 revoke all on function public.complete_assessment_generation(uuid, uuid, integer, jsonb, jsonb, boolean) from public;
 revoke all on function public.fail_assessment_generation(uuid, uuid, integer, text) from public;
 revoke all on function public.get_assessment_generation(uuid, uuid, integer) from public;
+revoke all on function public.list_assessment_generations(uuid, uuid) from public;
+revoke all on function public.create_assessment_regeneration(uuid, uuid) from public;
