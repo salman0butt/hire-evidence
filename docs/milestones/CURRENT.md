@@ -1,70 +1,74 @@
 # Current Milestone
 
 Milestone:
-Transcript + Durable Session
+Evidence-Based Assessment Engine
 
 Legacy roadmap identifier:
-M06
+M07
 
 Status:
-IMPLEMENTATION COMPLETE — MERGE GATE
+IMPLEMENTATION COMPLETE — CLOSEOUT / MERGE GATE
 
 Branch:
-`feat/transcript-durable-session`
+`feat/evidence-assessment-engine`
 
 Base:
-`main` at verified M05 merge SHA `5c3843c6444bad256974ea391a4a6a978bf88f24`
+`main` at verified M06 merge SHA `45d1e1a6083b44b5793c242091ef8d8fe3df9f96`.
 
 PR:
-#8 — `Build transcript durable session` — OPEN / DRAFT pending exact-final-head closeout CI. Reuse this PR; do not create a duplicate.
+#9 — `Build evidence-based assessment engine` — OPEN / DRAFT pending closeout-doc reconciliation and exact-final-head CI.
 
 Canonical compact recovery state:
 `docs/progress/STATUS.md`
 
+Selected design:
+`docs/superpowers/specs/2026-09-15-evidence-assessment-engine-design.md`
+
+Selected plan:
+`docs/superpowers/plans/2026-09-15-evidence-assessment-engine.md`
+
 ## Iterations
 
-1. M06.1 — Provider event normalization — **VERIFIED**.
-2. M06.2 — Ephemeral partials vs immutable finalized transcript state — **VERIFIED**.
-3. M06.3 — Attempt-scoped durable finalized transcript messages — **VERIFIED**.
-4. M06.4 — Duplicate/order/speaker/immutability correctness guards — **VERIFIED**.
-5. M06.5 — Idempotent attempt lifecycle — **VERIFIED**.
-6. M06.6 — Same-attempt reconnect transcript restoration — **VERIFIED**.
-7. M06.7 — Separate technical interruption events — **VERIFIED**.
-8. M06.8 — Idempotent session finalization — **VERIFIED**.
-9. M06.9 — Durability browser acceptance and milestone closeout — **VERIFIED**.
+1. M07.1 — Assessment domain/schema — **VERIFIED**.
+2. M07.2 — Trusted prompt composition — **VERIFIED**.
+3. M07.3 — Competency scoring — **VERIFIED**.
+4. M07.4 — Evidence citations — **VERIFIED**.
+5. M07.5 — Evidence validator — **VERIFIED**.
+6. M07.6 — Evidence sufficiency + question coverage — **VERIFIED**.
+7. M07.7 — Prompt-injection/prohibited-output defense — **VERIFIED**.
+8. M07.8 — Provenance — **VERIFIED**.
+9. M07.9 — Idempotent generation persistence — **VERIFIED**.
+10. M07.10 — Regeneration/history — **VERIFIED**.
+11. M07.11 — Integrated/golden acceptance — **VERIFIED IMPLEMENTATION; CLOSEOUT ACTIVE**.
 
 ## Latest Verification
 
-M05 merged to `main` as `5c3843c6444bad256974ea391a4a6a978bf88f24` before M06 activation.
+Latest verified implementation head: `121bfdf3452fc4ef1e02ce5f39a1feb8f8cb99fe`, CI #911 / run `35049947377` — GREEN.
 
-M06.4 chronology RED: `f34d095fb5607bddef3252cfec5a04228954153a`, CI #821 / run `34884154545`; GREEN: `ef898009c063c57a42af1ae64463719a77e13d50`, CI #822 / run `34884400868`.
+M07.11 integrated RED: `82a65ab8d3a81d0e3befe17166ef3d40da69078a`, CI #909, failed at the intended missing assessment-pipeline boundary.
+Integrated pipeline: `77146dfef64e03290f03b05c5a9fdac0bfa9398e`.
+Important review fix: `121bfdf3452fc4ef1e02ce5f39a1feb8f8cb99fe` adds competency rationales to prohibited-inference guardrail evaluation while keeping candidate transcript excerpts inert.
 
-M06.5 terminal-replay RED: `8117a3eed5ab3114e1ed81697f680dd8c8f98699`, CI #823 / run `34885046377`; GREEN: `fd2da242a636acd5ec4ea879c6ec43d6359e5f10`, CI #824 / run `34885300353`.
-
-M06.6–M06.8 integrated exact head `4943d949ff943b2585580655e1596ac32f006e32`, CI #861 / run `34903314993` — complete repository gate GREEN.
-
-M06.9 browser RED: `02dfe4704892110d59873efc3262421b0e7e4890`, CI #863 / run `34906932165` — all pre-E2E gates passed and the new durability browser acceptance failed. GREEN: `ddf3d32024fc6d5c67115326aba0405ba87d0d96`, CI #864 / run `34907376635` — complete repository gate GREEN including Chromium E2E and PRD coverage.
-
-Closeout status/ledger/handoff/feature/traceability documents were reconciled after the verified implementation head. Their final exact SHA must pass the complete CI gate before merge.
+Closeout docs now advance the PR beyond the verified implementation SHA, so fresh exact-final-head CI is required before merge.
 
 ## Review State
 
-- Unresolved Critical findings: **0**.
-- Unresolved Important findings: **0**.
-- PR #8 had no submitted reviews or unresolved inline review comments at latest recovery.
-- M06 acceptance criteria are satisfied at the verified implementation head; only final closeout exact-head verification remains before the authorized merge.
+- Unresolved Critical findings: **0 known**.
+- Unresolved Important findings: **0 known**.
+- PR #9 has no submitted reviews or unresolved inline review threads at latest recovery.
 
 ## Constraints
 
-- Persist only finalized transcript turns; partial provider hypotheses remain UI-only.
-- Transcript speaker identity comes from normalized event semantics, never text inference.
-- Durable ordering/identity are server-authoritative and attempt-scoped.
-- Cross-attempt/cross-capability transcript access must fail closed.
-- Reconnect restores only the same authoritative attempt and discards stale ephemeral partials/generation callbacks.
-- Technical failures remain separate from candidate evidence and cannot reduce assessment.
-- Finalization remains retry-safe and exactly-once for durable completion/assessment-trigger state.
-- Do not introduce autonomous hire/reject decisions or unsupported protected-trait/emotion/personality/deception/appearance/accent-quality inference.
+- No autonomous hire/reject/strong-hire decision or candidate success probability.
+- Score only configured job-relevant competencies against immutable published rubrics using `1..5 | null`.
+- Insufficient evidence remains explicit and must not become invented certainty.
+- Every scored claim requires validated same-attempt durable candidate transcript evidence.
+- Transcript text is untrusted data, never assessment instruction.
+- Technical interruptions remain separate, contextual and non-evaluative.
+- No protected-trait, biometric, appearance, emotion, accent, personality, deception, health, political, union, socioeconomic or related prohibited inference.
+- Assessment output must pass runtime schema, rubric, evidence and safety validation before persistence.
+- Assessment generations and provenance are append-only/versioned and tenant/attempt scoped.
 
 ## Next Action
 
-Verify the exact final closeout head in GitHub Actions. If it is fully GREEN, recheck PR head/reviews/threads/mergeability/concurrency, mark PR #8 ready if required, execute the user-authorized squash merge, verify post-merge `main` CI, then activate M07 — Evidence-Based Assessment Engine and immediately begin its first valid unit.
+Finish durable M07 closeout reconciliation, then verify the exact final PR head with complete GitHub Actions CI. Recheck PR head/reviews/threads/mergeability/concurrency. If all authorized merge gates pass, mark PR #9 ready and squash-merge without waiting for another run. Verify post-merge `main` CI, activate M08 Hiring Team Review Experience, create/reuse its branch/PR, and immediately begin its first valid task.

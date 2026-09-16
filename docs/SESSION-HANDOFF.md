@@ -6,40 +6,42 @@ This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENT
 
 - Repository: `salman0butt/hire-evidence`
 - Default branch: `main`
-- Verified base/main SHA: `5c3843c6444bad256974ea391a4a6a978bf88f24` (M05 Realtime AI Interview merge).
-- Active branch: `feat/transcript-durable-session`
-- Active milestone: M06 — Transcript + Durable Session — **IMPLEMENTATION COMPLETE / CLOSEOUT**.
-- Active milestone PR: #8 — `Build transcript durable session` — OPEN / DRAFT pending final closeout reconciliation and exact-final-head CI.
-- Selected design: `docs/superpowers/specs/2026-09-14-transcript-durable-session-design.md`.
-- Selected plan: `docs/superpowers/plans/2026-09-14-transcript-durable-session.md`.
-- Latest fully verified implementation head before closeout docs: `ddf3d32024fc6d5c67115326aba0405ba87d0d96`, CI #864 / run `34907376635` — complete repository gate GREEN.
+- Verified base/main SHA: `45d1e1a6083b44b5793c242091ef8d8fe3df9f96` (M06 merge; post-merge CI #875 GREEN).
+- Active branch: `feat/evidence-assessment-engine`
+- Active milestone: M07 — Evidence-Based Assessment Engine — **IMPLEMENTATION COMPLETE / CLOSEOUT**.
+- Active milestone PR: #9 — `Build evidence-based assessment engine` — OPEN / DRAFT.
+- Selected design: `docs/superpowers/specs/2026-09-15-evidence-assessment-engine-design.md`.
+- Selected plan: `docs/superpowers/plans/2026-09-15-evidence-assessment-engine.md`.
+- Latest fully verified implementation head: `121bfdf3452fc4ef1e02ce5f39a1feb8f8cb99fe`, CI #911 / run `35049947377` — GREEN.
+- Closeout documentation commits are newer than that implementation head and require fresh exact-final-head CI.
 
-## M06 state
+## M07 state
 
-M06.1–M06.9 implementation and acceptance are verified. The branch now provides provider-neutral transcript events; ephemeral partial/finalized state separation; immutable attempt-scoped durable messages; duplicate/order/speaker/immutability guards; idempotent attempt lifecycle; same-attempt reconnect hydration; separately persisted non-evaluative technical interruption events; idempotent finalization; and browser durability acceptance.
+M07.1–M07.10 are implemented and verified: runtime assessment schema; immutable trusted prompt composition; rubric-aligned 1–5/null scoring; bounded evidence citations; same-attempt durable evidence validation; evidence sufficiency/question coverage; prompt-injection and prohibited-output defense; application-owned provenance; tenant/attempt-scoped idempotent append-only generation persistence; and immutable regeneration/history.
 
-The M06.9 browser RED is `02dfe4704892110d59873efc3262421b0e7e4890`, CI #863 / `34906932165`: lint, typecheck, unit tests, verifiers, local Supabase and build passed, while the new E2E acceptance failed before finalized reconnect transcript was exposed in the browser UI. Minimal GREEN `ddf3d32024fc6d5c67115326aba0405ba87d0d96`, CI #864 / `34907376635`, renders finalized transcript plus ephemeral partials as accessible inert text; reconnect-restored finalized turns are visible and the disconnect remains a separate technical event.
-
-Earlier durable evidence remains in `docs/milestones/M06-transcript-durable-session.md` and Git history, including M06.4 RED `f34d095…` → GREEN `ef898009…` and M06.5 RED `8117a3e…` → GREEN `fd2da242…`.
+M07.11 integrated acceptance is implemented. RED `82a65ab8d3a81d0e3befe17166ef3d40da69078a` / CI #909 proved the missing integrated pipeline boundary. Implementation `77146dfef64e03290f03b05c5a9fdac0bfa9398e` composes runtime schema → rubric validation → same-attempt evidence validation → safety guardrails → deterministic structured scoring. Review found one Important gap: competency rationales were not scanned by prohibited-output guardrails. Fix `121bfdf3452fc4ef1e02ce5f39a1feb8f8cb99fe` closes that gap; exact-head CI #911 / run `35049947377` passed.
 
 ## Review / safety state
 
 - Critical findings: **0 unresolved**.
-- Important findings: **0 unresolved**.
-- PR #8 has no submitted reviews or unresolved inline review comments at latest recovery.
-- Transcript text is rendered through normal React text nodes and remains untrusted evidence data, never instruction/HTML.
-- Partial transcript hypotheses remain browser-only and are never persisted as evidence.
-- Speaker and ordering are server/provider-normalized, never content-inferred.
-- Cross-attempt/cross-capability durable access fails closed.
-- Technical failures remain non-evaluative and cannot reduce candidate assessment.
-- Finalization is retry-safe and exactly-once for durable completion/assessment-trigger state.
-- No autonomous hire/reject decision or unsupported protected-trait/emotion/personality/deception/appearance/health/accent-quality inference is introduced.
+- Important findings: **0 unresolved** after the rationale guardrail fix.
+- PR #9 has no submitted reviews or unresolved inline review threads at latest recovery.
+- No autonomous hire/reject/strong-hire outcome or candidate success probability is produced.
+- Only configured job-related competencies may be scored against immutable published rubrics.
+- Insufficient evidence stays explicit with `score: null` rather than fabricated certainty.
+- Every scored claim is validated against candidate-authored evidence in the sealed same-attempt durable transcript.
+- Candidate transcript text remains inert untrusted data and is not keyword-filtered as model rationale.
+- Model-authored summary, strengths, concerns and competency rationales are safety-guardrail inputs.
+- Technical interruptions remain non-evaluative.
+- Protected-trait, biometric, appearance, emotion, accent, personality, deception, health, political, union, socioeconomic and related prohibited inference remain excluded.
+- Persistence is append-only/versioned, tenant/attempt scoped, and gated by validation.
 
 ## Exact next work
 
-1. Recover PR #8 remote head and ensure no competing same-unit worker advanced it.
-2. Finish M06 ledger/traceability/feature/test-matrix closeout reconciliation.
-3. Verify the exact final documentation head with the complete GitHub Actions gate.
-4. If all user-authorized merge gates still pass, mark PR #8 ready if required and merge using the repository convention (squash if no stronger convention exists).
-5. Recover the resulting `main` SHA and verify post-merge `main` CI.
-6. Activate M07 Evidence-Based Assessment Engine from the durable roadmap/PRD, create/reuse the correct branch/PR, update durable milestone state, and immediately begin the first valid M07 unit under strict TDD.
+1. Recover PR #9 remote head and ensure no competing same-unit worker advanced it.
+2. Finish M07 ledger, traceability and feature-matrix closeout reconciliation.
+3. Verify the resulting exact final documentation head with the complete GitHub Actions gate.
+4. Recheck reviews/threads/mergeability/concurrency and required checks.
+5. If every user-authorized merge gate passes, mark PR #9 ready and squash-merge automatically.
+6. Recover the resulting `main` SHA and verify post-merge `main` CI.
+7. Activate M08 — Hiring Team Review Experience from the durable roadmap/PRD, create/reuse its branch/PR, update durable state, and immediately begin its first valid unit under strict TDD.
