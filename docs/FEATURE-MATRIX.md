@@ -33,9 +33,10 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Idempotent append-only assessment generation persistence | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | Tenant/attempt-scoped lifecycle and validated-only completion. |
 | Immutable assessment regeneration/history | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | Monotonic generations preserve prior payload/provenance. |
 | Integrated evidence-grounded assessment acceptance | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | PR #9 merged; post-merge main CI #920 GREEN. |
-| Tenant-scoped candidate result projection/page | PRD roadmap | Hiring Team Review | VERIFIED | M08.1 exact head `f36b520e…`, CI #930 / run `35206818423`; provider-backed tenancy/completed-assessment coverage. |
-| Competency/evidence review cards | PRD roadmap | Hiring Team Review | ACTIVE | M08.2; use immutable published competency identity + validated assessment, no decision-like summary. |
-| Transcript review + evidence deep links | PRD roadmap | Hiring Team Review | PLANNED | M08.3–M08.4. |
+| Tenant-scoped candidate result projection/page | PRD roadmap | Hiring Team Review | VERIFIED | M08.1 exact head `f36b520e…`, CI #930 / run `35206818423`. |
+| Competency/evidence review cards | PRD roadmap | Hiring Team Review | VERIFIED | M08.2 exact behavioral head `6616fcc7…`, CI #941 / run `35215607658`; immutable competency identity, validated assessment summary/cards, fail-closed decision-like payload handling. |
+| Authenticated transcript review viewer | PRD roadmap | Hiring Team Review | ACTIVE | M08.3; exact tenant/job/candidate/attempt authority, finalized ordered speaker-separated transcript, search, inert text; candidate token RPC is not hiring authority. |
+| Evidence deep links | PRD roadmap | Hiring Team Review | PLANNED | M08.4; jump/focus exact cited transcript turn. |
 | Human overrides / notes / review status / disagreement | PRD roadmap | Hiring Team Review | PLANNED | M08.5–M08.7; preserve AI history and reviewer attribution. |
 | Job candidate workflow dashboard | PRD roadmap | Hiring Team Review | PLANNED | M08.8; neutral workflow metadata, no AI ranking. |
 | Billing and usage | PRD roadmap | Billing + Usage | PLANNED | Server-authoritative usage/idempotency. |
