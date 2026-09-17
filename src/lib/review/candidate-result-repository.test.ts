@@ -111,4 +111,39 @@ describe("candidate review result repository", () => {
       repository.getCandidateResult("org-1", "job-1", "candidate-1"),
     ).rejects.toThrow("completed assessment required");
   });
+
+  it("fails closed when a completed assessment payload is not review-safe", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: {
+        ...completedResult,
+        assessment: {
+          ...assessment,
+          recommendation: "hire",
+        },
+      },
+      error: null,
+    });
+    const repository = createCandidateResultRepository({ rpc });
+
+    await expect(
+      repository.getCandidateResult("org-1", "job-1", "candidate-1"),
+    ).rejects.toThrow("candidate assessment unavailable");
+  });
+
+  it("fails closed when immutable configured identity cannot resolve an assessed competency", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: {
+        ...completedResult,
+        competency_catalog: [
+          { id: "competency-other", name: "Different Competency" },
+        ],
+      },
+      error: null,
+    });
+    const repository = createCandidateResultRepository({ rpc });
+
+    await expect(
+      repository.getCandidateResult("org-1", "job-1", "candidate-1"),
+    ).rejects.toThrow("candidate competency unavailable");
+  });
 });
