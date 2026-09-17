@@ -135,6 +135,19 @@ describe("candidate result page", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders the validated assessment summary before competency review", async () => {
+    await renderPage();
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Assessment summary" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "The assessment is grounded in the completed interview evidence.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("renders evidence-grounded competency cards with explicit insufficient evidence", async () => {
     await renderPage();
 
