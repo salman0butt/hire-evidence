@@ -64,11 +64,14 @@ describe("candidate review result repository", () => {
     const rpc = vi.fn().mockResolvedValue({ data: completedResult, error: null });
     const repository = createCandidateResultRepository({ rpc });
 
-    const result = await repository.getCandidateResult(
+    const result = (await repository.getCandidateResult(
       "org-1",
       "job-1",
       "candidate-1",
-    );
+    )) as unknown as {
+      assessment: unknown;
+      review_competencies: unknown;
+    };
 
     expect(result.assessment).toEqual(assessment);
     expect(result.review_competencies).toEqual([
