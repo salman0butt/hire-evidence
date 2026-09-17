@@ -2,6 +2,33 @@ import { describe, expect, it, vi } from "vitest";
 
 import { createCandidateResultRepository } from "./candidate-result-repository";
 
+const assessment = {
+  summary: "Evidence-grounded assessment",
+  competencies: [
+    {
+      competencyId: "competency-1",
+      score: 4,
+      rationale: "The candidate explained concrete trade-offs.",
+      evidence: [
+        {
+          messageSequence: 7,
+          excerpt: "I would partition by tenant and keep writes idempotent.",
+        },
+      ],
+      evidenceSufficiency: "sufficient",
+    },
+  ],
+  strengths: [],
+  concerns: [],
+  unansweredAreas: [],
+  questionCoverage: [],
+  evidenceSufficiency: "high",
+};
+
+const competencyCatalog = [
+  { id: "competency-1", name: "System Design" },
+];
+
 const completedResult = {
   organization_id: "org-1",
   job_id: "job-1",
@@ -13,6 +40,8 @@ const completedResult = {
   review_status: "awaiting_review",
   generation_number: 1,
   assessment_status: "completed",
+  assessment,
+  competency_catalog: competencyCatalog,
 };
 
 describe("candidate review result repository", () => {
@@ -22,13 +51,41 @@ describe("candidate review result repository", () => {
 
     await expect(
       repository.getCandidateResult("org-1", "job-1", "candidate-1"),
-    ).resolves.toEqual(completedResult);
+    ).resolves.toMatchObject(completedResult);
 
     expect(rpc).toHaveBeenCalledWith("get_candidate_review_result", {
       p_organization_id: "org-1",
       p_job_id: "job-1",
       p_candidate_id: "candidate-1",
     });
+  });
+
+  it("enriches validated assessment competencies with immutable configured names", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: completedResult, error: null });
+    const repository = createCandidateResultRepository({ rpc });
+
+    const result = await repository.getCandidateResult(
+      "org-1",
+      "job-1",
+      "candidate-1",
+    );
+
+    expect(result.assessment).toEqual(assessment);
+    expect(result.review_competencies).toEqual([
+      {
+        competencyId: "competency-1",
+        name: "System Design",
+        score: 4,
+        rationale: "The candidate explained concrete trade-offs.",
+        evidence: [
+          {
+            messageSequence: 7,
+            excerpt: "I would partition by tenant and keep writes idempotent.",
+          },
+        ],
+        evidenceSufficiency: "sufficient",
+      },
+    ]);
   });
 
   it("fails closed when authorization or authoritative result lookup fails", async () => {
