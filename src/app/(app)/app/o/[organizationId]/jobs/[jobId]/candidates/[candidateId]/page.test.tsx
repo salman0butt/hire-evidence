@@ -48,6 +48,42 @@ const candidateResult = {
   review_status: "awaiting_review",
   generation_number: 2,
   assessment_status: "completed",
+  assessment: {
+    summary: "The assessment is grounded in the completed interview evidence.",
+    competencies: [],
+    strengths: [],
+    concerns: [],
+    unansweredAreas: [],
+    questionCoverage: [],
+    evidenceSufficiency: "medium",
+  },
+  competency_catalog: [
+    { id: "competency-system-design", name: "System Design" },
+    { id: "competency-communication", name: "Technical Communication" },
+  ],
+  review_competencies: [
+    {
+      competencyId: "competency-system-design",
+      name: "System Design",
+      score: 4,
+      rationale: "The candidate explained concrete scaling trade-offs.",
+      evidenceSufficiency: "sufficient",
+      evidence: [
+        {
+          messageSequence: 7,
+          excerpt: "I would partition by tenant and keep writes idempotent.",
+        },
+      ],
+    },
+    {
+      competencyId: "competency-communication",
+      name: "Technical Communication",
+      score: null,
+      rationale: "The interview did not collect enough evidence to score this competency.",
+      evidenceSufficiency: "insufficient",
+      evidence: [],
+    },
+  ],
 };
 
 async function renderPage() {
@@ -96,6 +132,34 @@ describe("candidate result page", () => {
       screen.getByText(
         "AI assessment supports independent human review; it is not a hiring decision.",
       ),
+    ).toBeInTheDocument();
+  });
+
+  it("renders evidence-grounded competency cards with explicit insufficient evidence", async () => {
+    await renderPage();
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Competency review" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 3, name: "System Design" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 3, name: "Technical Communication" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("4 / 5")).toBeInTheDocument();
+    expect(screen.getByText("Insufficient evidence")).toBeInTheDocument();
+    expect(
+      screen.getByText("The candidate explained concrete scaling trade-offs."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "The interview did not collect enough evidence to score this competency.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Turn 7")).toBeInTheDocument();
+    expect(
+      screen.getByText("I would partition by tenant and keep writes idempotent."),
     ).toBeInTheDocument();
   });
 
