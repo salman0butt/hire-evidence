@@ -77,6 +77,25 @@ export default async function CandidateResultPage({
         </div>
       </dl>
 
+      <section
+        aria-labelledby="assessment-summary-title"
+        className="space-y-2 rounded-xl border border-neutral-200 bg-white p-5"
+      >
+        <h2
+          id="assessment-summary-title"
+          className="text-2xl font-semibold tracking-tight"
+        >
+          Assessment summary
+        </h2>
+        <p className="max-w-3xl text-sm leading-6 text-neutral-700">
+          {result.assessment.summary}
+        </p>
+        <p className="text-xs leading-5 text-neutral-500">
+          This AI-generated summary is a review input only. The hiring team makes
+          the final decision after reviewing the underlying evidence.
+        </p>
+      </section>
+
       <section aria-labelledby="competency-review-title" className="space-y-5">
         <div className="space-y-2">
           <h2
