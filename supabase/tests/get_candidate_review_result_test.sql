@@ -6,7 +6,7 @@ select has_function(
   'public',
   'get_candidate_review_result',
   array['uuid', 'uuid', 'uuid'],
-  'M08.1 exposes the tenant/job/candidate-scoped candidate result RPC'
+  'M08 review exposes the tenant/job/candidate-scoped candidate result RPC'
 );
 
 select ok(
@@ -178,7 +178,7 @@ values (
   '00000000-0000-0000-0000-000000000020'::uuid,
   '00000000-0000-0000-0000-000000000050'::uuid,
   1,
-  '{}'::jsonb,
+  '{"competencies":[{"id":"00000000-0000-0000-0000-000000000090","name":"Immutable System Design"}]}'::jsonb,
   'test-platform-v1',
   'test-guardrail-v1',
   '00000000-0000-0000-0000-000000000001'::uuid
@@ -263,7 +263,7 @@ values
     '00000000-0000-0000-0000-000000000080'::uuid,
     1,
     'completed',
-    '{"competencies":[]}'::jsonb,
+    '{"summary":"Earlier assessment","competencies":[],"strengths":[],"concerns":[],"unansweredAreas":[],"questionCoverage":[],"evidenceSufficiency":"low"}'::jsonb,
     '{"source":"test-generation-1"}'::jsonb,
     now() - interval '1 minute'
   ),
@@ -272,7 +272,7 @@ values
     '00000000-0000-0000-0000-000000000080'::uuid,
     2,
     'completed',
-    '{"competencies":[]}'::jsonb,
+    '{"summary":"Evidence-grounded assessment","competencies":[{"competencyId":"00000000-0000-0000-0000-000000000090","score":4,"rationale":"The candidate described explicit trade-offs.","evidence":[{"messageSequence":7,"excerpt":"I would partition by tenant and keep writes idempotent."}],"evidenceSufficiency":"sufficient"}],"strengths":[],"concerns":[],"unansweredAreas":[],"questionCoverage":[],"evidenceSufficiency":"high"}'::jsonb,
     '{"source":"test-generation-2"}'::jsonb,
     now()
   );
@@ -326,9 +326,11 @@ select is(
     'interview_status', 'completed',
     'review_status', 'awaiting_review',
     'generation_number', 2,
-    'assessment_status', 'completed'
+    'assessment_status', 'completed',
+    'assessment', '{"summary":"Evidence-grounded assessment","competencies":[{"competencyId":"00000000-0000-0000-0000-000000000090","score":4,"rationale":"The candidate described explicit trade-offs.","evidence":[{"messageSequence":7,"excerpt":"I would partition by tenant and keep writes idempotent."}],"evidenceSufficiency":"sufficient"}],"strengths":[],"concerns":[],"unansweredAreas":[],"questionCoverage":[],"evidenceSufficiency":"high"}'::jsonb,
+    'competency_catalog', '[{"id":"00000000-0000-0000-0000-000000000090","name":"Immutable System Design"}]'::jsonb
   ),
-  'the RPC returns only the safe scoped projection from the latest completed assessment generation'
+  'the RPC returns the latest completed assessment with competency identity from the immutable interviewer snapshot'
 );
 
 select ok(
