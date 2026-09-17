@@ -17,7 +17,7 @@ type RpcResult = {
 };
 
 type RpcClient = {
-  rpc: (name: string, args: Record<string, unknown>) => Promise<RpcResult>;
+  rpc: (name: string, args: Record<string, unknown>) => PromiseLike<RpcResult>;
 };
 
 function isCandidateReviewResultRow(value: unknown): value is CandidateReviewResultRow {
