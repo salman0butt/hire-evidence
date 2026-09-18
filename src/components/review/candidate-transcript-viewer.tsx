@@ -145,7 +145,17 @@ export function CandidateTranscriptViewer({
           id="candidate-transcript-search"
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            if (activeEvidenceSequence !== null) {
+              window.history.replaceState(
+                null,
+                "",
+                `${window.location.pathname}${window.location.search}`,
+              );
+              setActiveEvidenceSequence(null);
+            }
+            setQuery(event.target.value);
+          }}
           className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
         />
       </div>
