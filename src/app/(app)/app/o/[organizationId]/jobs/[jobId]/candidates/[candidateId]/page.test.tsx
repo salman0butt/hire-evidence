@@ -112,6 +112,38 @@ describe("candidate result page", () => {
     expect(evidenceLink).toHaveAttribute("href", "#transcript-turn-2");
   });
 
+  it("highlights the validated citation excerpt inside the deep-linked transcript turn", async () => {
+    window.location.hash = "#transcript-turn-2";
+    getCandidateResult.mockResolvedValue({
+      ...candidateResult,
+      review_competencies: candidateResult.review_competencies.map((competency, index) =>
+        index === 0
+          ? {
+              ...competency,
+              evidence: [
+                {
+                  messageSequence: 2,
+                  excerpt: "partitioned writes by tenant",
+                },
+              ],
+            }
+          : competency,
+      ),
+    });
+
+    try {
+      await renderPage();
+
+      const target = document.getElementById("transcript-turn-2");
+      expect(target).not.toBeNull();
+      const highlightedExcerpt = target?.querySelector("mark");
+      expect(highlightedExcerpt).not.toBeNull();
+      expect(highlightedExcerpt).toHaveTextContent("partitioned writes by tenant");
+    } finally {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  });
+
   it("fails closed when the scoped result cannot be loaded", async () => {
     getCandidateResult.mockRejectedValue(new Error("candidate result unavailable"));
     await expect(CandidateResultPage({ params: Promise.resolve({ organizationId, jobId, candidateId }) })).rejects.toThrow("NEXT_NOT_FOUND");
