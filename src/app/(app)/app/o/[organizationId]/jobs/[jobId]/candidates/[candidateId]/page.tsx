@@ -46,7 +46,16 @@ export default async function CandidateResultPage({
     );
 
     const evidenceValidation = validateAssessmentEvidence(
-      result.assessment,
+      {
+        ...result.assessment,
+        competencies: result.review_competencies.map((competency) => ({
+          competencyId: competency.competencyId,
+          score: competency.score,
+          rationale: competency.rationale,
+          evidence: competency.evidence,
+          evidenceSufficiency: competency.evidenceSufficiency,
+        })),
+      },
       transcript,
     );
     if (!evidenceValidation.ok) {
