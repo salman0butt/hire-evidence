@@ -103,6 +103,15 @@ describe("candidate result page", () => {
     expect(screen.getAllByText("I partitioned writes by tenant and made retries idempotent.")).toHaveLength(2);
   });
 
+  it("links validated evidence to the exact reviewed transcript turn", async () => {
+    await renderPage();
+
+    const evidenceLink = screen.getByRole("link", {
+      name: "Review evidence from turn 2",
+    });
+    expect(evidenceLink).toHaveAttribute("href", "#transcript-turn-2");
+  });
+
   it("fails closed when the scoped result cannot be loaded", async () => {
     getCandidateResult.mockRejectedValue(new Error("candidate result unavailable"));
     await expect(CandidateResultPage({ params: Promise.resolve({ organizationId, jobId, candidateId }) })).rejects.toThrow("NEXT_NOT_FOUND");
