@@ -1,6 +1,6 @@
 # M08 — Hiring Team Review Experience
 
-Status: **IMPLEMENTING — M08.3 ACTIVE**
+Status: **IMPLEMENTING — M08.4 ACTIVE**
 
 ## Goal
 Enable an authorized human hiring-team member to independently review AI assessment and transcript evidence, record human judgment and preserve disagreement/audit history.
@@ -35,8 +35,8 @@ Human-review-first experience over immutable M07 assessment generations and M06 
 ## Tasks / Iterations
 1. **VERIFIED** — M08.1 candidate result projection/page.
 2. **VERIFIED** — M08.2 competency/evidence cards.
-3. **ACTIVE** — M08.3 transcript viewer.
-4. **NOT STARTED** — M08.4 evidence deep links.
+3. **VERIFIED** — M08.3 transcript viewer.
+4. **ACTIVE** — M08.4 evidence deep links.
 5. **NOT STARTED** — M08.5 human score overrides.
 6. **NOT STARTED** — M08.6 reviewer notes/status lifecycle.
 7. **NOT STARTED** — M08.7 AI/human disagreement data.
@@ -48,14 +48,16 @@ M08.1 repository RED `2f1f7dcc260e401a42392d717bd2957daafd0a3c` / CI #921 → re
 
 M08.2 provider projection RED `b129d5d67bb12beb6a4105070f021d1c77778aa3` / CI #932 run `35207711737` → GREEN `3ead20de07382d06a8d49ac1dfee7af6b48bb6ef` / CI #933 run `35208233526`. Repository genuine RED `7d0b86e98c83bfaae605c9891b95d7eee5b41342` failed on missing `review_competencies` → GREEN `fd50c8a1f7c9bc286b5f2a3eddb588e13d04b9f7` / CI #936. `90b39865…` is explicitly not counted as behavioral RED because it stopped at test typing. Card UI RED `82749fa7615df25c906c7afa7ce827155bcdc18d` / CI #937 → GREEN `803ca803c5e60d1b0baa9bf761ad88ee55fa994b` / CI #938. Assessment-summary RED `e46a68c79299f7cd4a53cffb672f0ff22cdd84c7` / CI #939 → GREEN `afc3b79ccc66faed15f7c7831fcd6f4f9d827873` / CI #940. Test-only fail-closed hardening `6616fcc735df5ee06616f3e6e2cb7146469cea7c` passed CI #941 / run `35215607658` and is not represented as a new RED.
 
+M08.3 provider RED `67196c6be2d829b779b5bf2c751950ddcec3122d` / CI #943 run `35293558169` failed at the intentionally missing transcript RPC → GREEN `a513963d476a68bccdd2a93534285085ad570a30` / CI #944. Repository checkpoint `1dd1d7a1…` / #946 and viewer checkpoint `2e32b19a…` / #948 stopped at TS2307 missing-module typecheck and are explicitly **NOT behavioral RED** evidence; implementations `d95e3122…` / #947 and `e9c1f1e2…` / #949 passed. Page integration RED `280ca6ee0cecc86b8a4a1f048ac128d09cbc7d11` / CI #950 reached the intended missing transcript assertions → GREEN `7cb2b5077aa5b03348c29ee86af0a56e954f0624` / CI #951 run `35320101385`.
+
 ## Integration Test Evidence
-`supabase/tests/get_candidate_review_result_test.sql` verifies authenticated execution, anonymous denial, unauthenticated failure, real cross-tenant denial, exact tenant/job/candidate result selection, latest completed assessment generation, immutable competency identity from the published interviewer-version snapshot, same-tenant wrong-job rejection, missing candidate and absent completed assessment. M08.2 exact-head CI #941 passed the local Supabase boundary stage.
+`supabase/tests/get_candidate_review_result_test.sql` verifies the candidate-result boundary. `supabase/tests/get_candidate_review_transcript_test.sql` verifies authenticated execution, anonymous denial, unauthenticated failure, real cross-tenant denial, same-tenant wrong-job/wrong-candidate rejection, exact attempt scoping, ordered transcript turns, and technical-event exclusion. M08.3 exact-head CI #951 passed the local Supabase boundary stage.
 
 ## E2E / Visual Verification
-CI #941 passed the existing Chromium E2E suite on the exact M08.2 behavioral head. Dedicated transcript/evidence-navigation visual acceptance remains owned by M08.3–M08.4 and final responsive/accessibility closeout by M08.9.
+CI #951 passed the existing Chromium E2E suite on the exact M08.3 head. Dedicated evidence-navigation focus/highlight acceptance remains owned by M08.4 and final responsive/accessibility closeout by M08.9.
 
 ## Security Review
-M08.2 review data remains behind the M08.1 authenticated organization/job/candidate boundary. Completed assessment payloads are re-parsed with the M07 runtime schema before rendering. Decision-like payload fields fail closed, and assessed competency IDs must resolve against immutable published-version identity. No Critical/Important security finding remains. M08.3 must add a hiring-team-specific authenticated transcript read boundary rather than reuse the candidate-facing token RPC.
+M08.2 review data remains behind the M08.1 authenticated organization/job/candidate boundary. Completed assessment payloads are re-parsed with the M07 runtime schema before rendering. Decision-like payload fields fail closed, and assessed competency IDs must resolve against immutable published-version identity. No Critical/Important security finding remains. M08.3 added a hiring-team-specific authenticated exact-scope transcript read boundary rather than reusing candidate invitation authority. Review found no unresolved Critical/Important security finding. M08.4 must fail closed if an assessment citation cannot resolve to the exact reviewed transcript.
 
 ## Accessibility Review
 The result page now exposes semantic assessment-summary and competency-review sections, configured competency headings, explicit AI score or insufficient-evidence state, rationale, evidence sufficiency and supporting turn/excerpt text. Evidence references are intentionally inert until M08.4 adds focus/deep-link behavior. Keyboard/focus/search/mobile transcript verification remains required in M08.3–M08.4/M08.9.

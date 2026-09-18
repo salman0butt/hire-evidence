@@ -35,8 +35,8 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Integrated evidence-grounded assessment acceptance | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | PR #9 merged; post-merge main CI #920 GREEN. |
 | Tenant-scoped candidate result projection/page | PRD roadmap | Hiring Team Review | VERIFIED | M08.1 exact head `f36b520e…`, CI #930 / run `35206818423`. |
 | Competency/evidence review cards | PRD roadmap | Hiring Team Review | VERIFIED | M08.2 exact behavioral head `6616fcc7…`, CI #941 / run `35215607658`; immutable competency identity, validated assessment summary/cards, fail-closed decision-like payload handling. |
-| Authenticated transcript review viewer | PRD roadmap | Hiring Team Review | ACTIVE | M08.3; exact tenant/job/candidate/attempt authority, finalized ordered speaker-separated transcript, search, inert text; candidate token RPC is not hiring authority. |
-| Evidence deep links | PRD roadmap | Hiring Team Review | PLANNED | M08.4; jump/focus exact cited transcript turn. |
+| Authenticated transcript review viewer | PRD roadmap | Hiring Team Review | VERIFIED | M08.3 exact head `7cb2b507…`, CI #951; dedicated hiring-team authority, ordered speaker-separated searchable inert transcript, technical events excluded. |
+| Evidence deep links | PRD roadmap | Hiring Team Review | ACTIVE | M08.4; fail-closed citation resolution plus exact cited turn/excerpt jump, focus and visible highlight. |
 | Human overrides / notes / review status / disagreement | PRD roadmap | Hiring Team Review | PLANNED | M08.5–M08.7; preserve AI history and reviewer attribution. |
 | Job candidate workflow dashboard | PRD roadmap | Hiring Team Review | PLANNED | M08.8; neutral workflow metadata, no AI ranking. |
 | Billing and usage | PRD roadmap | Billing + Usage | PLANNED | Server-authoritative usage/idempotency. |

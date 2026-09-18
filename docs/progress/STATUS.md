@@ -10,12 +10,12 @@ M07 PR #9 squash-merged as `d85883f4177e2ec122a695092d5c6ac846afbe72`. Post-merg
 
 ## Current Milestone
 
-Hiring Team Review Experience (M08) — **IMPLEMENTING M08.3**.
+Hiring Team Review Experience (M08) — **IMPLEMENTING M08.4**.
 
 Active branch: `feat/hiring-team-review`.
 Active PR: #10 — `Build hiring team review experience` — OPEN / DRAFT.
 Verified base/main: `d85883f4177e2ec122a695092d5c6ac846afbe72`.
-CI status: M08.2 final verified behavioral head `6616fcc735df5ee06616f3e6e2cb7146469cea7c` passed exact-head CI #941 / run `35215607658` including provider-backed database tests, build, Chromium E2E and PRD coverage.
+CI status: M08.3 final verified head `7cb2b5077aa5b03348c29ee86af0a56e954f0624` passed exact-head CI #951 / run `35320101385` including provider-backed database tests, build, Chromium E2E and PRD coverage.
 
 Selected design: `docs/superpowers/specs/2026-09-16-hiring-team-review-design.md`.
 Selected plan: `docs/superpowers/plans/2026-09-16-hiring-team-review.md`.
@@ -24,8 +24,8 @@ Milestone ledger: `docs/milestones/M08-hiring-team-review.md`.
 ## M08 Task State
 - M08.1 Candidate result projection/page — **VERIFIED**.
 - M08.2 Competency/evidence cards — **VERIFIED**. Completed assessment is runtime-validated, competency identity comes from the immutable published interviewer-version snapshot, the assessment summary and AI score/evidence state are rendered neutrally, and malformed decision-like payloads or unresolved competency identity fail closed.
-- M08.3 Transcript viewer — **ACTIVE**. Build an authenticated tenant/job/candidate/attempt-scoped hiring-review transcript boundary and accessible ordered/searchable viewer. Do not reuse the candidate-facing token RPC as hiring-team authority.
-- M08.4 Evidence deep links — **NOT STARTED**.
+- M08.3 Transcript viewer — **VERIFIED**. Dedicated authenticated exact-scope RPC returns only ordered durable transcript turns, strict repository parsing fails closed, and the result page renders an accessible searchable speaker-separated inert transcript using the server-derived reviewed attempt.
+- M08.4 Evidence deep links — **ACTIVE**. Resolve validated assessment citations against the exact reviewed transcript, fail closed on missing evidence, and add keyboard/focus/highlight navigation without trusting arbitrary client selectors.
 - M08.5 Human score overrides — **NOT STARTED**.
 - M08.6 Reviewer notes/status — **NOT STARTED**.
 - M08.7 AI/human disagreement — **NOT STARTED**.
@@ -45,4 +45,8 @@ PR #10 has no unresolved inline review threads at latest recovery. Humans remain
 - M08.2 assessment-summary RED `e46a68c79299f7cd4a53cffb672f0ff22cdd84c7` failed CI #939 for the missing summary section; GREEN `afc3b79ccc66faed15f7c7831fcd6f4f9d827873` passed CI #940.
 - Test-only safety hardening `6616fcc735df5ee06616f3e6e2cb7146469cea7c` passed CI #941 / run `35215607658` across all required gates.
 
-Exact next work: start M08.3 with a provider-backed RED for an authenticated `organization/job/candidate/attempt` transcript-review projection that returns only ordered durable transcript turns and never technical events; verify intended RED, implement the minimum security-definer boundary, then add strict repository parsing and an accessible searchable speaker-separated viewer through RED→GREEN cycles.
+- M08.3 provider RED `67196c6be2d829b779b5bf2c751950ddcec3122d` failed CI #943 / run `35293558169` at the intentionally missing database RPC; GREEN `a513963d476a68bccdd2a93534285085ad570a30` passed CI #944.
+- M08.3 repository checkpoint `1dd1d7a11736e3f3777c0cac1741f3ab02160fed` / CI #946 and viewer checkpoint `2e32b19a45b13e77a3be06746472b92be7759f5e` / CI #948 stopped at TS2307 missing-module typecheck and are **NOT behavioral RED** evidence. Implementations passed CI #947 and #949.
+- M08.3 page RED `280ca6ee0cecc86b8a4a1f048ac128d09cbc7d11` failed CI #950 on the intended missing transcript integration behavior; GREEN `7cb2b5077aa5b03348c29ee86af0a56e954f0624` passed CI #951 / run `35320101385` across every required stage.
+
+Exact next work: start M08.4 with a genuine behavioral RED requiring validated evidence citations to resolve against the exact reviewed transcript; then implement fail-closed resolution plus keyboard-accessible focus/highlight deep links to exact cited turns.

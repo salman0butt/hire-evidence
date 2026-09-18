@@ -18,9 +18,9 @@ GitHub-hosted CI may report Node runtime/dependency deprecation notices from thi
 
 ## M08 review blockers
 
-No unresolved Critical or Important finding is known for M08.1 after provider-backed scope-test hardening at `f36b520eacee26069ee7da8047bbae50ebe1f727`, CI #930 / run `35206818423` GREEN. PR #10 had zero unresolved inline review threads at latest recovery.
+No unresolved Critical or Important finding is known through M08.3. Exact head `7cb2b5077aa5b03348c29ee86af0a56e954f0624` passed CI #951 / run `35320101385`, and PR #10 had zero unresolved inline review threads at latest recovery.
 
-M08.2 and later work are incomplete capability work, not defects being hidden as resolved issues. They remain tracked in the M08 ledger/status/plan.
+Evidence-quality note: M08.3 repository/viewer checkpoints CI #946 and #948 stopped at missing-module typecheck and are not represented as behavioral RED. This is recorded transparently; later green heads plus genuine provider/page RED→GREEN evidence remain authoritative. M08.4 and later work are incomplete capability work, not hidden resolved defects.
 
 ## Merge gate
 

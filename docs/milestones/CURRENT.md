@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M08
 
 Status:
-IMPLEMENTING — M08.3 TRANSCRIPT VIEWER
+IMPLEMENTING — M08.4 EVIDENCE DEEP LINKS
 
 Branch:
 `feat/hiring-team-review`
@@ -30,8 +30,8 @@ Selected plan:
 ## Iterations
 1. M08.1 — Candidate result projection/page — **VERIFIED** at `f36b520eacee26069ee7da8047bbae50ebe1f727`, CI #930 / run `35206818423` GREEN.
 2. M08.2 — Competency/evidence cards — **VERIFIED** at `6616fcc735df5ee06616f3e6e2cb7146469cea7c`, CI #941 / run `35215607658` GREEN.
-3. M08.3 — Transcript viewer — **ACTIVE**.
-4. M08.4 — Evidence deep links — **NOT STARTED**.
+3. M08.3 — Transcript viewer — **VERIFIED** at `7cb2b5077aa5b03348c29ee86af0a56e954f0624`, CI #951 / run `35320101385` GREEN.
+4. M08.4 — Evidence deep links — **ACTIVE**.
 5. M08.5 — Human score overrides — **NOT STARTED**.
 6. M08.6 — Reviewer notes/status — **NOT STARTED**.
 7. M08.7 — AI/human disagreement — **NOT STARTED**.
@@ -39,7 +39,7 @@ Selected plan:
 9. M08.9 — Visual/accessibility/E2E closeout — **NOT STARTED**.
 
 ## Latest Verification
-M08.2 exact verified behavioral head `6616fcc735df5ee06616f3e6e2cb7146469cea7c`; CI #941 / run `35215607658` complete GREEN across lint, typecheck, unit/component tests, framework/source verification, local Supabase boundary tests, build, Chromium E2E and PRD coverage.
+M08.3 exact verified head `7cb2b5077aa5b03348c29ee86af0a56e954f0624`; CI #951 / run `35320101385` complete GREEN across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase boundary tests, build, Chromium E2E and PRD coverage. Provider RED `67196c6b…` / CI #943 and page integration RED `280ca6ee…` / CI #950 were genuine. Repository/viewer checkpoints `1dd1d7a1…` / #946 and `2e32b19a…` / #948 stopped at TS2307 missing-module typecheck and are explicitly **NOT** behavioral RED evidence.
 
 ## Review State
 - Unresolved Critical findings: **0 known**.
@@ -56,4 +56,4 @@ M08.2 exact verified behavioral head `6616fcc735df5ee06616f3e6e2cb7146469cea7c`;
 - Transcript/model/reviewer text is inert data; technical events remain separate from evaluative transcript turns.
 
 ## Next Action
-Execute M08.3 under strict TDD: add a provider-backed RED for an authenticated tenant/job/candidate/attempt transcript-review RPC, verify the intended missing-boundary failure, implement the minimum fail-closed projection over durable transcript turns, then add strict repository parsing and an accessible ordered/searchable speaker-separated transcript viewer.
+Execute M08.4 under strict TDD: require each validated assessment citation to resolve to an exact transcript turn, then add keyboard-accessible evidence links that move focus to that turn and visibly highlight the cited excerpt without trusting arbitrary client selectors. Fail closed when a citation cannot resolve to the reviewed transcript.
