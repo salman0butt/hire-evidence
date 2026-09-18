@@ -220,7 +220,12 @@ export default async function CandidateResultPage({
         </ul>
       </section>
 
-      <CandidateTranscriptViewer turns={transcript} />
+      <CandidateTranscriptViewer
+        turns={transcript}
+        evidenceCitations={result.review_competencies.flatMap(
+          (competency) => competency.evidence,
+        )}
+      />
     </main>
   );
 }
