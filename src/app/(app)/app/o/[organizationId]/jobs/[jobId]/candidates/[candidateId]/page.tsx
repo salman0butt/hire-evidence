@@ -1,4 +1,5 @@
 import { CandidateTranscriptViewer } from "@/components/review/candidate-transcript-viewer";
+import { validateAssessmentEvidence } from "@/lib/assessment/evidence-validator";
 import { createCandidateResultRepository } from "@/lib/review/candidate-result-repository";
 import { createCandidateReviewTranscriptRepository } from "@/lib/review/candidate-transcript-repository";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
@@ -43,6 +44,14 @@ export default async function CandidateResultPage({
       candidateId,
       result.attempt_id,
     );
+
+    const evidenceValidation = validateAssessmentEvidence(
+      result.assessment,
+      transcript,
+    );
+    if (!evidenceValidation.ok) {
+      throw new Error("candidate evidence unavailable");
+    }
   } catch {
     notFound();
   }
