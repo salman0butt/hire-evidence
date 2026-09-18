@@ -77,7 +77,7 @@ const candidateResult = {
       evidenceSufficiency: "sufficient",
       evidence: [
         {
-          messageSequence: 7,
+          messageSequence: 2,
           excerpt: "I would partition by tenant and keep writes idempotent.",
         },
       ],
@@ -230,7 +230,7 @@ describe("candidate result page", () => {
         "The interview did not collect enough evidence to score this competency.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("Turn 7")).toBeInTheDocument();
+    expect(screen.getByText("Turn 2")).toBeInTheDocument();
     expect(
       screen.getByText("I would partition by tenant and keep writes idempotent."),
     ).toBeInTheDocument();
@@ -238,6 +238,32 @@ describe("candidate result page", () => {
 
   it("fails closed when the scoped result cannot be loaded", async () => {
     getCandidateResult.mockRejectedValue(new Error("candidate result unavailable"));
+
+    await expect(
+      CandidateResultPage({
+        params: Promise.resolve({ organizationId, jobId, candidateId }),
+      }),
+    ).rejects.toThrow("NEXT_NOT_FOUND");
+
+    expect(mockedNotFound).toHaveBeenCalledOnce();
+  });
+
+
+  it("fails closed when assessment evidence does not resolve to the reviewed transcript", async () => {
+    getCandidateResult.mockResolvedValue({
+      ...candidateResult,
+      review_competencies: candidateResult.review_competencies.map((competency, index) =>
+        index === 0
+          ? {
+              ...competency,
+              evidence: competency.evidence.map((citation) => ({
+                ...citation,
+                messageSequence: 7,
+              })),
+            }
+          : competency,
+      ),
+    });
 
     await expect(
       CandidateResultPage({
