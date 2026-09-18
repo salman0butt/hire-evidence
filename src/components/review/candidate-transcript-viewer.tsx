@@ -1,19 +1,80 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import type { CandidateReviewTranscriptTurn } from "@/lib/review/candidate-transcript-repository";
 
+type CandidateTranscriptEvidenceCitation = Readonly<{
+  messageSequence: number;
+  excerpt: string;
+}>;
+
 type CandidateTranscriptViewerProps = Readonly<{
   turns: readonly CandidateReviewTranscriptTurn[];
+  evidenceCitations?: readonly CandidateTranscriptEvidenceCitation[];
 }>;
 
 function formatSpeaker(speaker: CandidateReviewTranscriptTurn["speaker"]): string {
   return speaker === "candidate" ? "Candidate" : "Interviewer";
 }
 
+function renderHighlightedText(
+  text: string,
+  excerpts: readonly string[],
+): ReactNode {
+  const ranges = excerpts
+    .map((excerpt) => {
+      const start = text.indexOf(excerpt);
+      return start >= 0 ? { start, end: start + excerpt.length } : null;
+    })
+    .filter((range): range is { start: number; end: number } => range !== null)
+    .sort((left, right) => left.start - right.start || right.end - left.end);
+
+  if (ranges.length === 0) return text;
+
+  const mergedRanges = ranges.reduce<Array<{ start: number; end: number }>>(
+    (merged, range) => {
+      const previous = merged.at(-1);
+      if (previous && range.start <= previous.end) {
+        previous.end = Math.max(previous.end, range.end);
+        return merged;
+      }
+
+      merged.push({ ...range });
+      return merged;
+    },
+    [],
+  );
+
+  const content: ReactNode[] = [];
+  let cursor = 0;
+
+  mergedRanges.forEach((range, index) => {
+    if (range.start > cursor) {
+      content.push(text.slice(cursor, range.start));
+    }
+
+    content.push(
+      <mark
+        key={`${range.start}-${range.end}-${index}`}
+        className="rounded-sm bg-yellow-100 px-0.5 text-inherit"
+      >
+        {text.slice(range.start, range.end)}
+      </mark>,
+    );
+    cursor = range.end;
+  });
+
+  if (cursor < text.length) {
+    content.push(text.slice(cursor));
+  }
+
+  return content;
+}
+
 export function CandidateTranscriptViewer({
   turns,
+  evidenceCitations = [],
 }: CandidateTranscriptViewerProps) {
   const [query, setQuery] = useState("");
   const [activeEvidenceSequence, setActiveEvidenceSequence] = useState<number | null>(null);
@@ -113,7 +174,17 @@ export function CandidateTranscriptViewer({
                   </p>
                 </div>
                 <p className="whitespace-pre-wrap text-sm leading-6 text-neutral-700">
-                  {turn.text}
+                  {activeEvidenceSequence === turn.sequence
+                    ? renderHighlightedText(
+                        turn.text,
+                        evidenceCitations
+                          .filter(
+                            (citation) =>
+                              citation.messageSequence === turn.sequence,
+                          )
+                          .map((citation) => citation.excerpt),
+                      )
+                    : turn.text}
                 </p>
               </article>
             </li>
