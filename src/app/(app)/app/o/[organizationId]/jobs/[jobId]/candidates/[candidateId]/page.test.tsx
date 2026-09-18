@@ -230,7 +230,7 @@ describe("candidate result page", () => {
         "The interview did not collect enough evidence to score this competency.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("Turn 2")).toBeInTheDocument();
+    expect(screen.getAllByText("Turn 2")).toHaveLength(2);
     expect(
       screen.getByText("I would partition by tenant and keep writes idempotent."),
     ).toBeInTheDocument();
