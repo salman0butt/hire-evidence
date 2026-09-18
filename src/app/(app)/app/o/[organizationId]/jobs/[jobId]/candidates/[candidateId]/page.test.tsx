@@ -78,7 +78,7 @@ const candidateResult = {
       evidence: [
         {
           messageSequence: 2,
-          excerpt: "I would partition by tenant and keep writes idempotent.",
+          excerpt: "I partitioned writes by tenant and made retries idempotent.",
         },
       ],
     },
@@ -232,8 +232,8 @@ describe("candidate result page", () => {
     ).toBeInTheDocument();
     expect(screen.getAllByText("Turn 2")).toHaveLength(2);
     expect(
-      screen.getByText("I would partition by tenant and keep writes idempotent."),
-    ).toBeInTheDocument();
+      screen.getAllByText("I partitioned writes by tenant and made retries idempotent."),
+    ).toHaveLength(2);
   });
 
   it("fails closed when the scoped result cannot be loaded", async () => {
@@ -247,7 +247,6 @@ describe("candidate result page", () => {
 
     expect(mockedNotFound).toHaveBeenCalledOnce();
   });
-
 
   it("fails closed when assessment evidence does not resolve to the reviewed transcript", async () => {
     getCandidateResult.mockResolvedValue({
