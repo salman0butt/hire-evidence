@@ -63,6 +63,19 @@ describe("candidate transcript viewer", () => {
     ).toBeInTheDocument();
   });
 
+  it("focuses and visibly marks an exact deep-linked transcript turn", () => {
+    window.location.hash = "#transcript-turn-2";
+
+    render(<CandidateTranscriptViewer turns={turns} />);
+
+    const target = document.getElementById("transcript-turn-2");
+    expect(target).not.toBeNull();
+    expect(target).toHaveFocus();
+    expect(target).toHaveAttribute("data-evidence-target", "active");
+
+    window.history.replaceState(null, "", window.location.pathname);
+  });
+
   it("announces when a search has no matching transcript turns", () => {
     render(<CandidateTranscriptViewer turns={turns} />);
 
