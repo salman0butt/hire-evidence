@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createCandidateResultRepository } from "@/lib/review/candidate-result-repository";
+import { createCandidateReviewTranscriptRepository } from "@/lib/review/candidate-transcript-repository";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
@@ -10,6 +11,9 @@ import CandidateResultPage from "./page";
 
 vi.mock("@/lib/review/candidate-result-repository", () => ({
   createCandidateResultRepository: vi.fn(),
+}));
+vi.mock("@/lib/review/candidate-transcript-repository", () => ({
+  createCandidateReviewTranscriptRepository: vi.fn(),
 }));
 vi.mock("@/lib/organization/require-membership", () => ({
   requireOrganizationMembership: vi.fn(),
@@ -25,6 +29,9 @@ vi.mock("next/navigation", () => ({
 
 const mockedCreateCandidateResultRepository = vi.mocked(
   createCandidateResultRepository,
+);
+const mockedCreateCandidateReviewTranscriptRepository = vi.mocked(
+  createCandidateReviewTranscriptRepository,
 );
 const mockedRequireOrganizationMembership = vi.mocked(
   requireOrganizationMembership,
@@ -86,6 +93,29 @@ const candidateResult = {
   ],
 };
 
+const transcript = [
+  {
+    id: "message-1",
+    eventId: "event-1",
+    sequence: 1,
+    speaker: "interviewer" as const,
+    text: "Describe a difficult scaling problem.",
+    startedAt: null,
+    endedAt: null,
+    finalizedAt: "2026-09-18T08:00:00.000Z",
+  },
+  {
+    id: "message-2",
+    eventId: "event-2",
+    sequence: 2,
+    speaker: "candidate" as const,
+    text: "I partitioned writes by tenant and made retries idempotent.",
+    startedAt: null,
+    endedAt: null,
+    finalizedAt: "2026-09-18T08:00:05.000Z",
+  },
+];
+
 async function renderPage() {
   render(
     await CandidateResultPage({
@@ -96,6 +126,7 @@ async function renderPage() {
 
 describe("candidate result page", () => {
   const getCandidateResult = vi.fn();
+  const getCandidateTranscript = vi.fn();
   const client = { rpc: vi.fn() };
 
   beforeEach(() => {
@@ -107,7 +138,11 @@ describe("candidate result page", () => {
     });
     mockedCreateClient.mockResolvedValue(client as never);
     getCandidateResult.mockResolvedValue(candidateResult);
+    getCandidateTranscript.mockResolvedValue(transcript);
     mockedCreateCandidateResultRepository.mockReturnValue({ getCandidateResult });
+    mockedCreateCandidateReviewTranscriptRepository.mockReturnValue({
+      getCandidateTranscript,
+    });
   });
 
   it("renders an authorized candidate result from the exact tenant/job/candidate scope", async () => {
@@ -131,6 +166,31 @@ describe("candidate result page", () => {
     expect(
       screen.getByText(
         "AI assessment supports independent human review; it is not a hiring decision.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("loads and renders the transcript from the server-derived reviewed attempt", async () => {
+    await renderPage();
+
+    expect(mockedCreateCandidateReviewTranscriptRepository).toHaveBeenCalledWith(
+      client,
+    );
+    expect(getCandidateTranscript).toHaveBeenCalledWith(
+      organizationId,
+      jobId,
+      candidateId,
+      attemptId,
+    );
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Interview transcript" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Describe a difficult scaling problem."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "I partitioned writes by tenant and made retries idempotent.",
       ),
     ).toBeInTheDocument();
   });
@@ -178,6 +238,20 @@ describe("candidate result page", () => {
 
   it("fails closed when the scoped result cannot be loaded", async () => {
     getCandidateResult.mockRejectedValue(new Error("candidate result unavailable"));
+
+    await expect(
+      CandidateResultPage({
+        params: Promise.resolve({ organizationId, jobId, candidateId }),
+      }),
+    ).rejects.toThrow("NEXT_NOT_FOUND");
+
+    expect(mockedNotFound).toHaveBeenCalledOnce();
+  });
+
+  it("fails closed when the exact reviewed transcript cannot be loaded", async () => {
+    getCandidateTranscript.mockRejectedValue(
+      new Error("candidate transcript unavailable"),
+    );
 
     await expect(
       CandidateResultPage({
