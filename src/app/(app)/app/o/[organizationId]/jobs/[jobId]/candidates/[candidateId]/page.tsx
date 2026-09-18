@@ -1,4 +1,6 @@
+import { CandidateTranscriptViewer } from "@/components/review/candidate-transcript-viewer";
 import { createCandidateResultRepository } from "@/lib/review/candidate-result-repository";
+import { createCandidateReviewTranscriptRepository } from "@/lib/review/candidate-transcript-repository";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
@@ -23,15 +25,23 @@ export default async function CandidateResultPage({
   await requireOrganizationMembership(organizationId);
 
   const client = await createClient();
-  const repository = createCandidateResultRepository(client);
+  const resultRepository = createCandidateResultRepository(client);
+  const transcriptRepository = createCandidateReviewTranscriptRepository(client);
 
   let result;
+  let transcript;
 
   try {
-    result = await repository.getCandidateResult(
+    result = await resultRepository.getCandidateResult(
       organizationId,
       jobId,
       candidateId,
+    );
+    transcript = await transcriptRepository.getCandidateTranscript(
+      organizationId,
+      jobId,
+      candidateId,
+      result.attempt_id,
     );
   } catch {
     notFound();
@@ -187,6 +197,8 @@ export default async function CandidateResultPage({
           })}
         </ul>
       </section>
+
+      <CandidateTranscriptViewer turns={transcript} />
     </main>
   );
 }
