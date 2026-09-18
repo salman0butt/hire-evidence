@@ -194,9 +194,13 @@ export default async function CandidateResultPage({
                             key={`${citation.messageSequence}-${citation.excerpt}`}
                             className="rounded-lg bg-neutral-50 p-3"
                           >
-                            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                            <a
+                              href={`#transcript-turn-${citation.messageSequence}`}
+                              aria-label={`Review evidence from turn ${citation.messageSequence}`}
+                              className="text-xs font-semibold uppercase tracking-wide text-neutral-600 underline underline-offset-2"
+                            >
                               Turn {citation.messageSequence}
-                            </p>
+                            </a>
                             <blockquote className="mt-1 text-sm leading-6 text-neutral-700">
                               {citation.excerpt}
                             </blockquote>
