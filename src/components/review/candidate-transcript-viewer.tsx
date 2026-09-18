@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { CandidateReviewTranscriptTurn } from "@/lib/review/candidate-transcript-repository";
 
@@ -16,6 +16,38 @@ export function CandidateTranscriptViewer({
   turns,
 }: CandidateTranscriptViewerProps) {
   const [query, setQuery] = useState("");
+  const [activeEvidenceSequence, setActiveEvidenceSequence] = useState<number | null>(null);
+
+  useEffect(() => {
+    const syncEvidenceTarget = () => {
+      const match = window.location.hash.match(/^#transcript-turn-(\d+)$/);
+      if (!match) {
+        setActiveEvidenceSequence(null);
+        return;
+      }
+
+      const sequence = Number(match[1]);
+      if (!turns.some((turn) => turn.sequence === sequence)) {
+        setActiveEvidenceSequence(null);
+        return;
+      }
+
+      setQuery("");
+      setActiveEvidenceSequence(sequence);
+    };
+
+    syncEvidenceTarget();
+    window.addEventListener("hashchange", syncEvidenceTarget);
+    return () => window.removeEventListener("hashchange", syncEvidenceTarget);
+  }, [turns]);
+
+  useEffect(() => {
+    if (activeEvidenceSequence === null) return;
+
+    document
+      .getElementById(`transcript-turn-${activeEvidenceSequence}`)
+      ?.focus();
+  }, [activeEvidenceSequence, query]);
 
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const visibleTurns = useMemo(() => {
@@ -61,8 +93,17 @@ export function CandidateTranscriptViewer({
         <ol className="space-y-3" aria-label="Interview transcript turns">
           {visibleTurns.map((turn) => (
             <li
+              id={`transcript-turn-${turn.sequence}`}
               key={turn.id}
-              className="rounded-xl border border-neutral-200 bg-white p-4"
+              tabIndex={-1}
+              data-evidence-target={
+                activeEvidenceSequence === turn.sequence ? "active" : undefined
+              }
+              className={`rounded-xl border bg-white p-4 focus:outline-none ${
+                activeEvidenceSequence === turn.sequence
+                  ? "border-neutral-900 outline outline-2 outline-offset-2"
+                  : "border-neutral-200"
+              }`}
             >
               <article className="space-y-2">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
