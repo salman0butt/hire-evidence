@@ -76,6 +76,24 @@ describe("candidate transcript viewer", () => {
     window.history.replaceState(null, "", window.location.pathname);
   });
 
+  it("clears an active evidence fragment when transcript search takes over", () => {
+    window.location.hash = "#transcript-turn-2";
+
+    render(<CandidateTranscriptViewer turns={turns} />);
+
+    fireEvent.change(
+      screen.getByRole("searchbox", { name: "Search transcript" }),
+      { target: { value: "kubernetes" } },
+    );
+
+    expect(window.location.hash).toBe("");
+    expect(
+      document.getElementById("transcript-turn-2"),
+    ).not.toBeInTheDocument();
+
+    window.history.replaceState(null, "", window.location.pathname);
+  });
+
   it("announces when a search has no matching transcript turns", () => {
     render(<CandidateTranscriptViewer turns={turns} />);
 
