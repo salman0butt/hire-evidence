@@ -34,6 +34,7 @@ const completedResult = {
   job_id: "job-1",
   candidate_id: "candidate-1",
   attempt_id: "attempt-1",
+  assessment_generation_id: "generation-1",
   candidate_name: "Candidate One",
   job_title: "Senior Engineer",
   interview_status: "completed",
@@ -58,6 +59,16 @@ describe("candidate review result repository", () => {
       p_job_id: "job-1",
       p_candidate_id: "candidate-1",
     });
+  });
+
+  it("requires the immutable completed assessment generation identity needed for human review writes", async () => {
+    const { assessment_generation_id: _missing, ...withoutGenerationId } = completedResult;
+    const rpc = vi.fn().mockResolvedValue({ data: withoutGenerationId, error: null });
+    const repository = createCandidateResultRepository({ rpc });
+
+    await expect(
+      repository.getCandidateResult("org-1", "job-1", "candidate-1"),
+    ).rejects.toThrow("candidate result unavailable");
   });
 
   it("enriches validated assessment competencies with immutable configured names", async () => {
