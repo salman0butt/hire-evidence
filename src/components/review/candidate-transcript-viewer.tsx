@@ -88,7 +88,12 @@ export function CandidateTranscriptViewer({
       }
 
       const sequence = Number(match[1]);
-      if (!turns.some((turn) => turn.sequence === sequence)) {
+      const isValidatedEvidenceTarget =
+        turns.some((turn) => turn.sequence === sequence) &&
+        evidenceCitations.some(
+          (citation) => citation.messageSequence === sequence,
+        );
+      if (!isValidatedEvidenceTarget) {
         setActiveEvidenceSequence(null);
         return;
       }
@@ -100,7 +105,7 @@ export function CandidateTranscriptViewer({
     syncEvidenceTarget();
     window.addEventListener("hashchange", syncEvidenceTarget);
     return () => window.removeEventListener("hashchange", syncEvidenceTarget);
-  }, [turns]);
+  }, [evidenceCitations, turns]);
 
   useEffect(() => {
     if (activeEvidenceSequence === null) return;
