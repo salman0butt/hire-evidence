@@ -18,9 +18,9 @@ GitHub-hosted CI may report Node runtime/dependency deprecation notices from thi
 
 ## M08 review blockers
 
-No unresolved Critical or Important finding is known through M08.3. Exact head `7cb2b5077aa5b03348c29ee86af0a56e954f0624` passed CI #951 / run `35320101385`, and PR #10 had zero unresolved inline review threads at latest recovery.
+No unresolved Critical or Important finding is known through M08.4. Exact behavioral head `d0ed14671c214e5a2e38351147bc6dc54b068f29` passed CI #970 / run `35444823271`. M08.4 skeptical review found arbitrary non-evidence transcript fragments could activate focus/highlight; genuine RED `ca7c1247…` / CI #968 proved the issue and final GREEN #970 fixed it by requiring the target sequence to exist in server-validated evidence citations. CI #969 is recorded as NOT GREEN because the search-takeover test fixture omitted the new validated-citation precondition.
 
-Evidence-quality note: M08.3 repository/viewer checkpoints CI #946 and #948 stopped at missing-module typecheck and are not represented as behavioral RED. This is recorded transparently; later green heads plus genuine provider/page RED→GREEN evidence remain authoritative. M08.4 and later work are incomplete capability work, not hidden resolved defects.
+M08.5 and later work remain incomplete capability work, not hidden resolved defects.
 
 ## Merge gate
 
