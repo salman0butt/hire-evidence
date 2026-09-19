@@ -7,7 +7,7 @@ Legacy roadmap identifier:
 M08
 
 Status:
-IMPLEMENTING — M08.4 EVIDENCE DEEP LINKS
+IMPLEMENTING — M08.5 HUMAN SCORE OVERRIDES
 
 Branch:
 `feat/hiring-team-review`
@@ -31,19 +31,19 @@ Selected plan:
 1. M08.1 — Candidate result projection/page — **VERIFIED** at `f36b520eacee26069ee7da8047bbae50ebe1f727`, CI #930 / run `35206818423` GREEN.
 2. M08.2 — Competency/evidence cards — **VERIFIED** at `6616fcc735df5ee06616f3e6e2cb7146469cea7c`, CI #941 / run `35215607658` GREEN.
 3. M08.3 — Transcript viewer — **VERIFIED** at `7cb2b5077aa5b03348c29ee86af0a56e954f0624`, CI #951 / run `35320101385` GREEN.
-4. M08.4 — Evidence deep links — **ACTIVE**.
-5. M08.5 — Human score overrides — **NOT STARTED**.
+4. M08.4 — Evidence deep links — **VERIFIED** at `d0ed14671c214e5a2e38351147bc6dc54b068f29`, CI #970 / run `35444823271` GREEN.
+5. M08.5 — Human score overrides — **ACTIVE**.
 6. M08.6 — Reviewer notes/status — **NOT STARTED**.
 7. M08.7 — AI/human disagreement — **NOT STARTED**.
 8. M08.8 — Job candidate dashboard — **NOT STARTED**.
 9. M08.9 — Visual/accessibility/E2E closeout — **NOT STARTED**.
 
 ## Latest Verification
-M08.3 exact verified head `7cb2b5077aa5b03348c29ee86af0a56e954f0624`; CI #951 / run `35320101385` complete GREEN across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase boundary tests, build, Chromium E2E and PRD coverage. Provider RED `67196c6b…` / CI #943 and page integration RED `280ca6ee…` / CI #950 were genuine. Repository/viewer checkpoints `1dd1d7a1…` / #946 and `2e32b19a…` / #948 stopped at TS2307 missing-module typecheck and are explicitly **NOT** behavioral RED evidence.
+M08.4 exact verified head `d0ed14671c214e5a2e38351147bc6dc54b068f29`; CI #970 / run `35444823271` complete GREEN across frozen install, lint, typecheck, unit/component tests, framework/source verification, local Supabase boundary tests, build, Chromium E2E and PRD coverage. Hardening RED `ca7c1247…` / CI #968 genuinely proved arbitrary non-evidence fragments could activate a transcript target. `2eb7ffd…` / CI #969 is explicitly NOT GREEN because the search-takeover test fixture omitted the newly required validated citation; fixture correction plus implementation passed #970.
 
 ## Review State
 - Unresolved Critical findings: **0 known**.
-- Unresolved Important findings: **0 known** after M08.2 skeptical review and validation hardening.
+- Unresolved Important findings: **0 known**. M08.4 arbitrary-fragment activation finding was fixed and reverified at CI #970.
 - PR #10 unresolved inline review threads: **0** at latest recovery.
 
 ## Constraints
@@ -56,4 +56,4 @@ M08.3 exact verified head `7cb2b5077aa5b03348c29ee86af0a56e954f0624`; CI #951 / 
 - Transcript/model/reviewer text is inert data; technical events remain separate from evaluative transcript turns.
 
 ## Next Action
-Execute M08.4 under strict TDD: require each validated assessment citation to resolve to an exact transcript turn, then add keyboard-accessible evidence links that move focus to that turn and visibly highlight the cited excerpt without trusting arbitrary client selectors. Fail closed when a citation cannot resolve to the reviewed transcript.
+Execute M08.5 under strict TDD: define append-only tenant-scoped human competency score override persistence that references the immutable completed assessment generation, preserves AI history, accepts only bounded `1..5 | null` human score with mandatory bounded reason, attributes the authenticated reviewer, and fails closed across tenant/job/candidate/attempt/assessment mismatches.
