@@ -66,12 +66,45 @@ describe("candidate transcript viewer", () => {
   it("focuses and visibly marks an exact deep-linked transcript turn", () => {
     window.location.hash = "#transcript-turn-2";
 
-    render(<CandidateTranscriptViewer turns={turns} />);
+    render(
+      <CandidateTranscriptViewer
+        turns={turns}
+        evidenceCitations={[
+          {
+            messageSequence: 2,
+            excerpt: "partitioned writes by tenant",
+          },
+        ]}
+      />,
+    );
 
     const target = document.getElementById("transcript-turn-2");
     expect(target).not.toBeNull();
     expect(target).toHaveFocus();
     expect(target).toHaveAttribute("data-evidence-target", "active");
+
+    window.history.replaceState(null, "", window.location.pathname);
+  });
+
+  it("does not activate an arbitrary transcript fragment that is not validated evidence", () => {
+    window.location.hash = "#transcript-turn-1";
+
+    render(
+      <CandidateTranscriptViewer
+        turns={turns}
+        evidenceCitations={[
+          {
+            messageSequence: 2,
+            excerpt: "partitioned writes by tenant",
+          },
+        ]}
+      />,
+    );
+
+    const target = document.getElementById("transcript-turn-1");
+    expect(target).not.toBeNull();
+    expect(target).not.toHaveFocus();
+    expect(target).not.toHaveAttribute("data-evidence-target", "active");
 
     window.history.replaceState(null, "", window.location.pathname);
   });
