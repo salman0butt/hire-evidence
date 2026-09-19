@@ -53,6 +53,8 @@ jobs:
         run: |
           supabase start
           supabase db reset
+      - name: Database boundary tests
+        run: supabase test db
       - name: Export local Supabase environment
         shell: bash
         run: |

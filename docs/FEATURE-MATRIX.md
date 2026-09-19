@@ -24,16 +24,21 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Idempotent session finalization + assessment marker | PRD 58+ durable session requirements | Transcript + Durable Session | VERIFIED | M06.8; retry-safe sealing/completion/assessment trigger. |
 | Durable transcript browser acceptance | PRD roadmap | Transcript + Durable Session | VERIFIED | M06.9 RED CI #863 → GREEN CI #864; PR #8 merged and post-merge CI #875 GREEN. |
 | Runtime-validatable structured assessment | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.1 schema/parser; invalid scores/states/decision-like output fail closed. |
-| Trusted immutable assessment input + prompt composition | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.2; only authoritative job/interviewer/rubric/question/transcript state enters prompt; transcript delimited as untrusted data. |
-| Rubric-aligned competency scoring | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.3; configured competencies only, exact rubric levels, deterministic weighted summary, `1..5 | null`. |
-| Evidence citations + same-attempt validation | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.4–M07.5; bounded citations, candidate-speaker/sequence/excerpt checks, fabricated citation rejection. |
-| Evidence sufficiency + question coverage | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.6; answered/partial/skipped coverage and technical interruptions remain non-evaluative. |
-| Assessment prompt-injection/prohibited-output defense | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.7 + M07.11 review fix; transcript instructions remain inert; model rationale cannot introduce hire/reject/protected/prohibited inference. |
-| Assessment provenance | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.8; application-owned attempt/provider/model/prompt/guardrail/interviewer/rubric/config/transcript/generation identity. |
-| Idempotent append-only assessment generation persistence | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.9; tenant/attempt-scoped RLS/RPC boundary with pending/processing/completed/failed lifecycle and validated-only completion. |
-| Immutable assessment regeneration/history | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.10; monotonically ordered generations preserve prior payload/provenance and serialize next-generation creation. |
-| Integrated evidence-grounded assessment acceptance | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.11 RED `82a65ab8…` CI #909 → integrated GREEN head `121bfdf3…` CI #911. Closeout docs require fresh final-head CI before merge. |
-| Hiring-team review | PRD roadmap | Hiring Team Review | PLANNED | M08; humans remain decision makers. |
+| Trusted immutable assessment input + prompt composition | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.2; authoritative immutable assessment inputs only. |
+| Rubric-aligned competency scoring | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.3; configured competencies, exact rubric levels, `1..5 | null`. |
+| Evidence citations + same-attempt validation | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.4–M07.5; bounded same-attempt candidate evidence validation. |
+| Evidence sufficiency + question coverage | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07.6; insufficient evidence explicit and technical interruptions non-evaluative. |
+| Assessment prompt-injection/prohibited-output defense | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | M07 guardrails preserve transcript as inert data and block decision/prohibited inference output. |
+| Assessment provenance | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | Application-owned immutable provenance. |
+| Idempotent append-only assessment generation persistence | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | Tenant/attempt-scoped lifecycle and validated-only completion. |
+| Immutable assessment regeneration/history | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | Monotonic generations preserve prior payload/provenance. |
+| Integrated evidence-grounded assessment acceptance | PRD 69–81, 202 | Evidence-Based Assessment | VERIFIED | PR #9 merged; post-merge main CI #920 GREEN. |
+| Tenant-scoped candidate result projection/page | PRD roadmap | Hiring Team Review | VERIFIED | M08.1 exact head `f36b520e…`, CI #930 / run `35206818423`. |
+| Competency/evidence review cards | PRD roadmap | Hiring Team Review | VERIFIED | M08.2 exact behavioral head `6616fcc7…`, CI #941 / run `35215607658`; immutable competency identity, validated assessment summary/cards, fail-closed decision-like payload handling. |
+| Authenticated transcript review viewer | PRD roadmap | Hiring Team Review | VERIFIED | M08.3 exact head `7cb2b507…`, CI #951; dedicated hiring-team authority, ordered speaker-separated searchable inert transcript, technical events excluded. |
+| Evidence deep links | PRD roadmap | Hiring Team Review | ACTIVE | M08.4; fail-closed citation resolution plus exact cited turn/excerpt jump, focus and visible highlight. |
+| Human overrides / notes / review status / disagreement | PRD roadmap | Hiring Team Review | PLANNED | M08.5–M08.7; preserve AI history and reviewer attribution. |
+| Job candidate workflow dashboard | PRD roadmap | Hiring Team Review | PLANNED | M08.8; neutral workflow metadata, no AI ranking. |
 | Billing and usage | PRD roadmap | Billing + Usage | PLANNED | Server-authoritative usage/idempotency. |
 | AI quality, guardrails, and evals | PRD roadmap | AI Quality / Guardrails / Evals | PLANNED | Evals required for measurable AI behavior. |
 | Enterprise readiness / integrations / advanced formats | PRD roadmap | Later milestones | PLANNED | Deferred to roadmap milestones. |
