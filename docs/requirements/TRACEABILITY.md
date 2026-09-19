@@ -32,11 +32,12 @@ This matrix tracks durable framework requirements and product capabilities. The 
 | M08-RESULT — Tenant-scoped candidate result projection/page | Hiring Team Review | M08 design/plan | candidate-result repository, `get_candidate_review_result`, result route | exact verified `f36b520e…` CI #930 | VERIFIED |
 | M08-CARDS — Competency/evidence review cards | Hiring Team Review | M08 design/plan | immutable completed-assessment projection, runtime validation/enrichment, summary + accessible cards | RED CI #932/#937/#939; GREEN through `6616fcc7…` CI #941 | VERIFIED |
 | M08-TRANSCRIPT — Authenticated transcript review viewer | Hiring Team Review | M08 design/plan | dedicated transcript RPC + strict repository + searchable speaker-separated viewer | provider RED #943/GREEN #944; page RED #950/GREEN #951; exact head `7cb2b507…` | VERIFIED |
-| M08-EVIDENCE-LINKS — Exact evidence deep links | Hiring Team Review | M08 design/plan | citation resolution + exact transcript focus/highlight navigation | TDD next | ACTIVE |
+| M08-EVIDENCE-LINKS — Exact evidence deep links | Hiring Team Review | M08 design/plan | fail-closed citation resolution + validated fragment targeting + exact transcript focus/highlight navigation | RED `ca7c1247…` CI #968 → verified `d0ed1467…` CI #970 / run `35444823271` | VERIFIED |
+| M08-OVERRIDES — Human competency score overrides | Hiring Team Review | M08 design/plan | append/audit-safe tenant-scoped human overrides preserving immutable AI generation | TDD active | ACTIVE |
 | PRD roadmap — Hiring-team review remaining scope | Hiring Team Review | M08 design/plan | human overrides/notes/disagreement/dashboard/closeout | milestone plan | PLANNED |
 
 ## Active requirement interpretation
 
-M00–M07 are integrated on `main`. M08 is active on draft PR #10. M08.1 is verified at `f36b520e…` / CI #930. M08.2 is verified at `6616fcc735df5ee06616f3e6e2cb7146469cea7c`, CI #941 / run `35215607658`. M08.3 is verified at `7cb2b5077aa5b03348c29ee86af0a56e954f0624`, CI #951 / run `35320101385`. M08.4 exact evidence deep links are active.
+M00–M07 are integrated on `main`. M08 is active on draft PR #10. M08.1 is verified at `f36b520e…` / CI #930. M08.2 is verified at `6616fcc735df5ee06616f3e6e2cb7146469cea7c`, CI #941 / run `35215607658`. M08.3 is verified at `7cb2b5077aa5b03348c29ee86af0a56e954f0624`, CI #951 / run `35320101385`. M08.4 exact evidence deep links are verified at `d0ed14671c214e5a2e38351147bc6dc54b068f29` / CI #970. M08.5 human score overrides are active.
 
 The M08 review boundary preserves human agency and historical evidence integrity. AI assessment is immutable review input, historical competency identity comes from the immutable published interviewer-version snapshot, and hiring-team transcript access must be independently authenticated and exact-scope authorized. Candidate invitation tokens are not hiring-review authority. Technical interruption events remain separate from evaluative transcript turns.
