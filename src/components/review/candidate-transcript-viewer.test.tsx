@@ -112,7 +112,17 @@ describe("candidate transcript viewer", () => {
   it("clears an active evidence fragment when transcript search takes over", () => {
     window.location.hash = "#transcript-turn-2";
 
-    render(<CandidateTranscriptViewer turns={turns} />);
+    render(
+      <CandidateTranscriptViewer
+        turns={turns}
+        evidenceCitations={[
+          {
+            messageSequence: 2,
+            excerpt: "partitioned writes by tenant",
+          },
+        ]}
+      />,
+    );
 
     fireEvent.change(
       screen.getByRole("searchbox", { name: "Search transcript" }),
