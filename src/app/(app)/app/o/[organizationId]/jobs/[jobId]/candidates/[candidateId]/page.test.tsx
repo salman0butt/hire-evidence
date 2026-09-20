@@ -25,9 +25,11 @@ const organizationId = "11111111-1111-4111-8111-111111111111";
 const jobId = "22222222-2222-4222-8222-222222222222";
 const candidateId = "33333333-3333-4333-8333-333333333333";
 const attemptId = "44444444-4444-4444-8444-444444444444";
+const assessmentGenerationId = "55555555-5555-4555-8555-555555555555";
 
 const candidateResult = {
   organization_id: organizationId, job_id: jobId, candidate_id: candidateId, attempt_id: attemptId,
+  assessment_generation_id: assessmentGenerationId,
   candidate_name: "Ada Candidate", job_title: "Senior Platform Engineer", interview_status: "completed",
   review_status: "awaiting_review", generation_number: 2, assessment_status: "completed",
   assessment: { summary: "The assessment is grounded in the completed interview evidence.", competencies: [], strengths: [], concerns: [], unansweredAreas: [], questionCoverage: [], evidenceSufficiency: "medium" },
@@ -103,12 +105,20 @@ describe("candidate result page", () => {
     expect(screen.getAllByText("I partitioned writes by tenant and made retries idempotent.")).toHaveLength(2);
   });
 
+  it("renders an accessible human score override form without replacing the AI score", async () => {
+    await renderPage();
+    const card = screen.getByRole("heading", { level: 3, name: "System Design" }).closest("article");
+    expect(card).not.toBeNull();
+    expect(card).toHaveTextContent("AI score");
+    expect(card).toHaveTextContent("4 / 5");
+    expect(screen.getByLabelText("Human score for System Design")).toBeInTheDocument();
+    expect(screen.getByLabelText("Reason for System Design score override")).toHaveAttribute("maxLength", "1000");
+    expect(screen.getByRole("button", { name: "Save human score for System Design" })).toBeInTheDocument();
+  });
+
   it("links validated evidence to the exact reviewed transcript turn", async () => {
     await renderPage();
-
-    const evidenceLink = screen.getByRole("link", {
-      name: "Review evidence from turn 2",
-    });
+    const evidenceLink = screen.getByRole("link", { name: "Review evidence from turn 2" });
     expect(evidenceLink).toHaveAttribute("href", "#transcript-turn-2");
   });
 
@@ -116,24 +126,10 @@ describe("candidate result page", () => {
     window.location.hash = "#transcript-turn-2";
     getCandidateResult.mockResolvedValue({
       ...candidateResult,
-      review_competencies: candidateResult.review_competencies.map((competency, index) =>
-        index === 0
-          ? {
-              ...competency,
-              evidence: [
-                {
-                  messageSequence: 2,
-                  excerpt: "partitioned writes by tenant",
-                },
-              ],
-            }
-          : competency,
-      ),
+      review_competencies: candidateResult.review_competencies.map((competency, index) => index === 0 ? { ...competency, evidence: [{ messageSequence: 2, excerpt: "partitioned writes by tenant" }] } : competency),
     });
-
     try {
       await renderPage();
-
       const target = document.getElementById("transcript-turn-2");
       expect(target).not.toBeNull();
       const highlightedExcerpt = target?.querySelector("mark");
@@ -151,10 +147,7 @@ describe("candidate result page", () => {
   });
 
   it("fails closed when assessment evidence does not resolve to the reviewed transcript", async () => {
-    getCandidateResult.mockResolvedValue({
-      ...candidateResult,
-      review_competencies: candidateResult.review_competencies.map((competency, index) => index === 0 ? { ...competency, evidence: competency.evidence.map((citation) => ({ ...citation, messageSequence: 7 })) } : competency),
-    });
+    getCandidateResult.mockResolvedValue({ ...candidateResult, review_competencies: candidateResult.review_competencies.map((competency, index) => index === 0 ? { ...competency, evidence: competency.evidence.map((citation) => ({ ...citation, messageSequence: 7 })) } : competency) });
     await expect(CandidateResultPage({ params: Promise.resolve({ organizationId, jobId, candidateId }) })).rejects.toThrow("NEXT_NOT_FOUND");
     expect(mockedNotFound).toHaveBeenCalledOnce();
   });
