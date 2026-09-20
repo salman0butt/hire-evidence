@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createCandidateResultRepository } from "@/lib/review/candidate-result-repository";
@@ -95,9 +95,10 @@ describe("candidate result page", () => {
   it("renders evidence-grounded competency cards with explicit insufficient evidence", async () => {
     await renderPage();
     expect(screen.getByRole("heading", { level: 2, name: "Competency review" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 3, name: "System Design" })).toBeInTheDocument();
+    const systemDesignCard = screen.getByRole("heading", { level: 3, name: "System Design" }).closest("article");
+    expect(systemDesignCard).not.toBeNull();
     expect(screen.getByRole("heading", { level: 3, name: "Technical Communication" })).toBeInTheDocument();
-    expect(screen.getByText("4 / 5")).toBeInTheDocument();
+    expect(within(systemDesignCard as HTMLElement).getByText("4 / 5", { selector: "dd" })).toBeInTheDocument();
     expect(screen.getByText("Insufficient evidence")).toBeInTheDocument();
     expect(screen.getByText("The candidate explained concrete scaling trade-offs.")).toBeInTheDocument();
     expect(screen.getByText("The interview did not collect enough evidence to score this competency.")).toBeInTheDocument();
