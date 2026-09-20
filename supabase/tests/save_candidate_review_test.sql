@@ -25,8 +25,8 @@ select throws_ok($$select public.save_candidate_review('00000000-0000-0000-0000-
 select lives_ok($$select public.save_candidate_review('00000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000020','00000000-0000-0000-0000-000000000030','00000000-0000-0000-0000-000000000080','00000000-0000-0000-0000-000000000099','in_review','Independent review in progress')$$,'review can advance to in_review');
 select lives_ok($$select public.save_candidate_review('00000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000020','00000000-0000-0000-0000-000000000030','00000000-0000-0000-0000-000000000080','00000000-0000-0000-0000-000000000099','reviewed','Independent review complete')$$,'review can advance to reviewed');
 select throws_ok($$select public.save_candidate_review('00000000-0000-0000-0000-000000000010','00000000-0000-0000-0000-000000000020','00000000-0000-0000-0000-000000000030','00000000-0000-0000-0000-000000000080','00000000-0000-0000-0000-000000000099','in_review','Do not reopen silently')$$,'22023','Invalid candidate review transition.','reviewed state cannot move backwards');
-select is((select reviewer_user_id from public.candidate_reviews where assessment_generation_id='00000000-0000-0000-0000-000000000099'),'00000000-0000-0000-0000-000000000001'::uuid,'review keeps authenticated attribution');
 reset role;
+select is((select reviewer_user_id from public.candidate_reviews where assessment_generation_id='00000000-0000-0000-0000-000000000099'),'00000000-0000-0000-0000-000000000001'::uuid,'review keeps authenticated attribution');
 
 select * from finish();
 rollback;
