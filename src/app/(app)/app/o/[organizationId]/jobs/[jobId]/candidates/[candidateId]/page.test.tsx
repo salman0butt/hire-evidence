@@ -3,20 +3,23 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createCandidateResultRepository } from "@/lib/review/candidate-result-repository";
 import { createCandidateReviewTranscriptRepository } from "@/lib/review/candidate-transcript-repository";
+import { createCandidateScoreOverrideRepository } from "@/lib/review/candidate-score-override-repository";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
-import CandidateResultPage from "./page";
+import CandidateResultPage, { saveHumanScoreOverride } from "./page";
 
 vi.mock("@/lib/review/candidate-result-repository", () => ({ createCandidateResultRepository: vi.fn() }));
 vi.mock("@/lib/review/candidate-transcript-repository", () => ({ createCandidateReviewTranscriptRepository: vi.fn() }));
+vi.mock("@/lib/review/candidate-score-override-repository", () => ({ createCandidateScoreOverrideRepository: vi.fn() }));
 vi.mock("@/lib/organization/require-membership", () => ({ requireOrganizationMembership: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("next/navigation", () => ({ notFound: vi.fn(() => { throw new Error("NEXT_NOT_FOUND"); }) }));
 
 const mockedCreateCandidateResultRepository = vi.mocked(createCandidateResultRepository);
 const mockedCreateCandidateReviewTranscriptRepository = vi.mocked(createCandidateReviewTranscriptRepository);
+const mockedCreateCandidateScoreOverrideRepository = vi.mocked(createCandidateScoreOverrideRepository);
 const mockedRequireOrganizationMembership = vi.mocked(requireOrganizationMembership);
 const mockedCreateClient = vi.mocked(createClient);
 const mockedNotFound = vi.mocked(notFound);
@@ -52,6 +55,7 @@ async function renderPage() {
 describe("candidate result page", () => {
   const getCandidateResult = vi.fn();
   const getCandidateTranscript = vi.fn();
+  const createScoreOverride = vi.fn();
   const client = { rpc: vi.fn() };
 
   beforeEach(() => {
@@ -62,6 +66,7 @@ describe("candidate result page", () => {
     getCandidateTranscript.mockResolvedValue(transcript);
     mockedCreateCandidateResultRepository.mockReturnValue({ getCandidateResult });
     mockedCreateCandidateReviewTranscriptRepository.mockReturnValue({ getCandidateTranscript });
+    mockedCreateCandidateScoreOverrideRepository.mockReturnValue({ createScoreOverride });
   });
 
   it("renders an authorized candidate result from the exact tenant/job/candidate scope", async () => {
@@ -116,6 +121,27 @@ describe("candidate result page", () => {
     expect(screen.getByLabelText("Human score for System Design")).toBeInTheDocument();
     expect(screen.getByLabelText("Reason for System Design score override")).toHaveAttribute("maxLength", "1000");
     expect(screen.getByRole("button", { name: "Save human score for System Design" })).toBeInTheDocument();
+  });
+
+  it("writes a human score through the audited exact assessment-generation scope", async () => {
+    const formData = new FormData();
+    formData.set("organizationId", organizationId);
+    formData.set("jobId", jobId);
+    formData.set("candidateId", candidateId);
+    formData.set("attemptId", attemptId);
+    formData.set("assessmentGenerationId", assessmentGenerationId);
+    formData.set("competencyId", "competency-system-design");
+    formData.set("humanScore", "5");
+    formData.set("reason", "Independent review of the cited evidence supports the higher score.");
+
+    await saveHumanScoreOverride(formData);
+
+    expect(mockedRequireOrganizationMembership).toHaveBeenCalledWith(organizationId);
+    expect(mockedCreateCandidateScoreOverrideRepository).toHaveBeenCalledWith(client);
+    expect(createScoreOverride).toHaveBeenCalledWith(
+      { organizationId, jobId, candidateId, attemptId, assessmentGenerationId },
+      { competencyId: "competency-system-design", humanScore: 5, reason: "Independent review of the cited evidence supports the higher score." },
+    );
   });
 
   it("links validated evidence to the exact reviewed transcript turn", async () => {
