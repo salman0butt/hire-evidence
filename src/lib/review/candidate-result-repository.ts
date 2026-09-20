@@ -9,6 +9,7 @@ export type CandidateReviewResultRow = {
   job_id: string;
   candidate_id: string;
   attempt_id: string;
+  assessment_generation_id: string;
   candidate_name: string;
   job_title: string;
   interview_status: string;
@@ -56,6 +57,8 @@ function isCandidateReviewResultRow(value: unknown): value is CandidateReviewRes
     typeof row.job_id === "string" &&
     typeof row.candidate_id === "string" &&
     typeof row.attempt_id === "string" &&
+    typeof row.assessment_generation_id === "string" &&
+    row.assessment_generation_id.length > 0 &&
     typeof row.candidate_name === "string" &&
     typeof row.job_title === "string" &&
     typeof row.interview_status === "string" &&
