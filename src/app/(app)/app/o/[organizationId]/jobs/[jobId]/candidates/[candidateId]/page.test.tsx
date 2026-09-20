@@ -96,10 +96,11 @@ describe("candidate result page", () => {
     await renderPage();
     expect(screen.getByRole("heading", { level: 2, name: "Competency review" })).toBeInTheDocument();
     const systemDesignCard = screen.getByRole("heading", { level: 3, name: "System Design" }).closest("article");
+    const communicationCard = screen.getByRole("heading", { level: 3, name: "Technical Communication" }).closest("article");
     expect(systemDesignCard).not.toBeNull();
-    expect(screen.getByRole("heading", { level: 3, name: "Technical Communication" })).toBeInTheDocument();
+    expect(communicationCard).not.toBeNull();
     expect(within(systemDesignCard as HTMLElement).getByText("4 / 5", { selector: "dd" })).toBeInTheDocument();
-    expect(screen.getByText("Insufficient evidence")).toBeInTheDocument();
+    expect(within(communicationCard as HTMLElement).getByText("Insufficient evidence", { selector: "dd" })).toBeInTheDocument();
     expect(screen.getByText("The candidate explained concrete scaling trade-offs.")).toBeInTheDocument();
     expect(screen.getByText("The interview did not collect enough evidence to score this competency.")).toBeInTheDocument();
     expect(screen.getAllByText("Turn 2")).toHaveLength(2);
