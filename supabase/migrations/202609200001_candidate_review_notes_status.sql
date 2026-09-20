@@ -34,6 +34,7 @@ as $$
 declare
   actor_id uuid := auth.uid();
   review_row public.candidate_reviews;
+  existing_status text;
   normalized_notes text := nullif(btrim(p_reviewer_notes), '');
 begin
   if actor_id is null then
@@ -73,6 +74,29 @@ begin
       and candidate.id = p_candidate_id
   ) then
     raise exception 'Candidate review scope unavailable.' using errcode = '42501';
+  end if;
+
+  select status
+    into existing_status
+    from public.candidate_reviews
+   where organization_id = p_organization_id
+     and job_id = p_job_id
+     and candidate_id = p_candidate_id
+     and attempt_id = p_attempt_id
+     and assessment_generation_id = p_assessment_generation_id
+   for update;
+
+  if existing_status is null then
+    if p_status <> 'awaiting_review' then
+      raise exception 'Invalid candidate review transition.' using errcode = '22023';
+    end if;
+  elsif p_status <> existing_status
+    and not (
+      (existing_status = 'awaiting_review' and p_status = 'in_review')
+      or (existing_status = 'in_review' and p_status = 'reviewed')
+    )
+  then
+    raise exception 'Invalid candidate review transition.' using errcode = '22023';
   end if;
 
   insert into public.candidate_reviews (
