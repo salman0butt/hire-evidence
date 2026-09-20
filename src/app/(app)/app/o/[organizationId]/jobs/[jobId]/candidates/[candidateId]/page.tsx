@@ -17,7 +17,7 @@ function requiredFormValue(formData: FormData, name: string): string {
   return value.trim();
 }
 
-export async function saveHumanScoreOverride(formData: FormData) {
+export async function saveHumanScoreOverride(formData: FormData): Promise<void> {
   "use server";
   const organizationId = requiredFormValue(formData, "organizationId");
   const jobId = requiredFormValue(formData, "jobId");
@@ -33,7 +33,7 @@ export async function saveHumanScoreOverride(formData: FormData) {
   await requireOrganizationMembership(organizationId);
   const client = await createClient();
   const repository = createCandidateScoreOverrideRepository(client);
-  return repository.createScoreOverride(
+  await repository.createScoreOverride(
     { organizationId, jobId, candidateId, attemptId, assessmentGenerationId },
     { competencyId, humanScore, reason },
   );
