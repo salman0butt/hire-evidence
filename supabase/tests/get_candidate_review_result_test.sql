@@ -321,6 +321,7 @@ select is(
     'job_id', '00000000-0000-0000-0000-000000000020'::uuid,
     'candidate_id', '00000000-0000-0000-0000-000000000030'::uuid,
     'attempt_id', '00000000-0000-0000-0000-000000000080'::uuid,
+    'assessment_generation_id', '00000000-0000-0000-0000-000000000099'::uuid,
     'candidate_name', 'Ada Candidate',
     'job_title', 'Senior Platform Engineer',
     'interview_status', 'completed',
