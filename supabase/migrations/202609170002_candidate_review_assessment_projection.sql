@@ -26,6 +26,7 @@ begin
     'job_id', candidate.job_id,
     'candidate_id', candidate.id,
     'attempt_id', selected.attempt_id,
+    'assessment_generation_id', selected.assessment_generation_id,
     'candidate_name', candidate.full_name,
     'job_title', job.title,
     'interview_status', selected.interview_status,
@@ -44,6 +45,7 @@ begin
     select
       attempt.id as attempt_id,
       attempt.state as interview_status,
+      generation.assessment_generation_id,
       generation.generation_number,
       generation.status as assessment_status,
       generation.assessment,
@@ -66,6 +68,7 @@ begin
      and interviewer_version.job_id = attempt.job_id
     join lateral (
       select
+        assessment_generation.id as assessment_generation_id,
         assessment_generation.generation_number,
         assessment_generation.status,
         assessment_generation.assessment
