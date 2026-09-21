@@ -2,7 +2,7 @@
 
 Milestone: Hiring Team Review Experience (M08)
 
-Status: **IMPLEMENTING — M08.8 JOB CANDIDATE DASHBOARD**
+Status: **IMPLEMENTING — M08.9 VISUAL / ACCESSIBILITY / E2E CLOSEOUT**
 
 Branch: `feat/hiring-team-review`
 PR: #10 — `Build hiring team review experience` — OPEN / DRAFT.
@@ -19,12 +19,12 @@ Plan: `docs/superpowers/plans/2026-09-16-hiring-team-review.md`
 4. M08.4 — Evidence deep links — **VERIFIED**.
 5. M08.5 — Human score overrides — **VERIFIED**.
 6. M08.6 — Reviewer notes/status lifecycle — **VERIFIED**.
-7. M08.7 — AI/human disagreement — **VERIFIED** at `071b894c440b3c63bf8126e948593ce1750acf2d`, CI #1010 / run `35568824247` GREEN. The projection derives comparison from immutable AI scores plus latest durable human overrides without mutating either source; invalid/orphaned override data fails closed.
-8. M08.8 — Job candidate dashboard — **ACTIVE**. Build job-scoped candidate/review workflow state with neutral filter/sort metadata and no AI best-candidate ranking.
-9. M08.9 — Visual/accessibility/E2E closeout — **NOT STARTED**.
+7. M08.7 — AI/human disagreement — **VERIFIED** at `071b894c440b3c63bf8126e948593ce1750acf2d`, CI #1010 / run `35568824247` GREEN.
+8. M08.8 — Job candidate dashboard — **VERIFIED** at `0d8710172958245ecf8b8b05f10dd35237e2468e`, CI #1019 / run `35606248055` GREEN. The tenant/job-scoped dashboard exposes neutral candidate/interview/review workflow metadata, direct human-review navigation and alphabetical presentation without AI ranking/recommendation behavior.
+9. M08.9 — Visual/accessibility/E2E closeout — **ACTIVE**. Execute full closeout verification and skeptical security/accessibility/architecture/performance/hiring-AI-safety review, fix all Critical/Important findings, reconcile durable docs/traceability/feature matrix, then verify exact-final-head CI and apply the authorized milestone merge gate.
 
 ## Latest Verification
-Exact head `071b894c440b3c63bf8126e948593ce1750acf2d` passed CI #1010 / run `35568824247`. The immediately preceding M08.7 implementation checkpoint failed only because its test fixture claimed sufficient evidence with no citation; that checkpoint is NOT GREEN evidence. The corrected fixture passed the complete repository gate at #1010.
+Exact head `0d8710172958245ecf8b8b05f10dd35237e2468e` passed CI #1019 / run `35606248055`, establishing M08.8 GREEN across the repository gate.
 
 ## Review State
 - Unresolved Critical findings: **0 known**.
@@ -39,4 +39,4 @@ Exact head `071b894c440b3c63bf8126e948593ce1750acf2d` passed CI #1010 / run `355
 - Transcript/model/reviewer text remains inert data.
 
 ## Next Action
-Execute M08.8 under strict TDD: first prove the job detail workflow lacks the required candidate review dashboard, then implement a tenant/job-scoped neutral candidate list with review/interview workflow metadata and explicit absence of AI ranking/recommendation behavior.
+Execute M08.9 closeout: inspect the complete PR diff skeptically, run/verify the full repository/provider/build/Chromium E2E gate plus accessibility/security/performance/hiring-AI-safety checks, resolve every Critical/Important finding, reconcile ledger/status/traceability/feature matrix, verify exact-final-head CI, then auto-merge PR #10 only if every authorized merge gate passes.
