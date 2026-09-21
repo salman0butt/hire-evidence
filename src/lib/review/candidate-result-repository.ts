@@ -18,6 +18,7 @@ export type CandidateReviewResultRow = {
   assessment_status: string;
   assessment: unknown;
   competency_catalog: unknown;
+  latest_score_overrides?: unknown;
 };
 
 export type CandidateReviewCompetency = CompetencyAssessment &
@@ -25,14 +26,23 @@ export type CandidateReviewCompetency = CompetencyAssessment &
     name: string;
   }>;
 
+export type CandidateScoreDisagreement = Readonly<{
+  competencyId: string;
+  aiScore: number;
+  humanScore: number;
+  delta: number;
+  disagrees: boolean;
+}>;
+
 export type CandidateReviewResult = Omit<
   CandidateReviewResultRow,
-  "assessment" | "competency_catalog"
+  "assessment" | "competency_catalog" | "latest_score_overrides"
 > &
   Readonly<{
     assessment: InterviewAssessment;
     competency_catalog: readonly CompetencyCatalogEntry[];
     review_competencies: readonly CandidateReviewCompetency[];
+    disagreements: readonly CandidateScoreDisagreement[];
   }>;
 
 type RpcResult = {
@@ -47,6 +57,11 @@ type RpcClient = {
 type CompetencyCatalogEntry = Readonly<{
   id: string;
   name: string;
+}>;
+
+type ScoreOverride = Readonly<{
+  competencyId: string;
+  humanScore: number;
 }>;
 
 function isCandidateReviewResultRow(value: unknown): value is CandidateReviewResultRow {
@@ -95,6 +110,34 @@ function parseCompetencyCatalog(value: unknown): readonly CompetencyCatalogEntry
   return entries;
 }
 
+function parseScoreOverrides(value: unknown): readonly ScoreOverride[] | null {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) return null;
+
+  const overrides: ScoreOverride[] = [];
+  const competencyIds = new Set<string>();
+
+  for (const item of value) {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+    const row = item as Record<string, unknown>;
+
+    if (
+      typeof row.competency_id !== "string" ||
+      row.competency_id.length === 0 ||
+      typeof row.human_score !== "number" ||
+      !Number.isFinite(row.human_score) ||
+      competencyIds.has(row.competency_id)
+    ) {
+      return null;
+    }
+
+    competencyIds.add(row.competency_id);
+    overrides.push({ competencyId: row.competency_id, humanScore: row.human_score });
+  }
+
+  return overrides;
+}
+
 export function createCandidateResultRepository(client: RpcClient) {
   return {
     async getCandidateResult(
@@ -118,8 +161,9 @@ export function createCandidateResultRepository(client: RpcClient) {
 
       const parsedAssessment = parseInterviewAssessment(data.assessment);
       const competencyCatalog = parseCompetencyCatalog(data.competency_catalog);
+      const scoreOverrides = parseScoreOverrides(data.latest_score_overrides);
 
-      if (!parsedAssessment.ok || !competencyCatalog) {
+      if (!parsedAssessment.ok || !competencyCatalog || !scoreOverrides) {
         throw new Error("candidate assessment unavailable");
       }
 
@@ -142,11 +186,34 @@ export function createCandidateResultRepository(client: RpcClient) {
         },
       );
 
+      const aiScores = new Map(
+        parsedAssessment.value.competencies.map((competency) => [
+          competency.competencyId,
+          competency.score,
+        ]),
+      );
+      const disagreements = scoreOverrides.map((override): CandidateScoreDisagreement => {
+        const aiScore = aiScores.get(override.competencyId);
+        if (typeof aiScore !== "number") {
+          throw new Error("candidate score override unavailable");
+        }
+
+        const delta = override.humanScore - aiScore;
+        return {
+          competencyId: override.competencyId,
+          aiScore,
+          humanScore: override.humanScore,
+          delta,
+          disagrees: delta !== 0,
+        };
+      });
+
       return {
         ...data,
         assessment: parsedAssessment.value,
         competency_catalog: competencyCatalog,
         review_competencies: reviewCompetencies,
+        disagreements,
       };
     },
   };
