@@ -49,11 +49,14 @@ describe("candidate AI/human disagreement projection", () => {
       error: null,
     });
 
-    const result = await createCandidateResultRepository({ rpc }).getCandidateResult(
+    const result = (await createCandidateResultRepository({ rpc }).getCandidateResult(
       "org-1",
       "job-1",
       "candidate-1",
-    );
+    )) as unknown as {
+      assessment: { competencies: Array<{ score: number | null }> };
+      disagreements?: unknown;
+    };
 
     expect(result.assessment.competencies[0]?.score).toBe(4);
     expect(result.disagreements).toEqual([
