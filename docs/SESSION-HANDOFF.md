@@ -1,47 +1,30 @@
 # Session Handoff
 
-This handoff never outranks actual Git/code/current exact-SHA CI. Recover `AGENTS.md`, `CODEX-START-HERE.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, and live GitHub state first.
+Actual Git/code/current exact-SHA CI outrank this handoff. Recover `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, live PR/review/CI state, then durable milestone docs.
 
 ## Repository state
-
 - Repository: `salman0butt/hire-evidence`
 - Default branch: `main`
-- Verified base/main SHA: `d85883f4177e2ec122a695092d5c6ac846afbe72` (M07 squash merge; post-merge CI #920 GREEN).
+- Verified base/main: `d85883f4177e2ec122a695092d5c6ac846afbe72` (M07 merge; post-merge CI #920 GREEN)
 - Active branch: `feat/hiring-team-review`
-- Active milestone: M08 — Hiring Team Review Experience — **IMPLEMENTING M08.4**.
-- Active milestone PR: #10 — `Build hiring team review experience` — OPEN / DRAFT.
-- Selected design: `docs/superpowers/specs/2026-09-16-hiring-team-review-design.md`.
-- Selected plan: `docs/superpowers/plans/2026-09-16-hiring-team-review.md`.
-- Latest verified head: `7cb2b5077aa5b03348c29ee86af0a56e954f0624`, CI #951 / run `35320101385` — GREEN.
+- Active PR: #10 — OPEN / DRAFT / mergeable at latest recovery
+- Active milestone: M08 — Hiring Team Review Experience — **M08.9 CLOSEOUT**
+- Latest exact verified implementation/test head before docs reconciliation: `a6320513f329a9d0c6c3e8849ef15ca57d1d3c5a`, CI #1024 / run `35626271990` GREEN
 
 ## M08 state
+M08.1–M08.8 are VERIFIED. M08.7 disagreement data is verified at `071b894c…` / CI #1010. M08.8 dashboard is verified at `0d871017…` / CI #1019 and exposes only neutral workflow metadata with direct human-review navigation.
 
-M08.1 candidate result projection/page is VERIFIED at `f36b520e…` / CI #930.
-
-M08.2 competency/evidence cards is VERIFIED at `6616fcc7…` / CI #941. The scoped result projection exposes the latest completed assessment and competency identity from the immutable published interviewer-version snapshot. The repository re-parses the M07 assessment contract, enriches configured names without mutating AI payload/history, and fails closed on decision-like payloads or unresolved competency identity. The page renders the validated assessment summary plus accessible competency cards with AI score or explicit insufficient evidence, rationale, evidence sufficiency, and inert supporting evidence references.
-
-M08.2 TDD: provider RED `b129d5d6…` CI #932 → GREEN `3ead20de…` CI #933; repository genuine RED `7d0b86e9…` → GREEN `fd50c8a1…` CI #936; card RED `82749fa7…` CI #937 → GREEN `803ca803…` CI #938; summary RED `e46a68c7…` CI #939 → GREEN `afc3b79c…` CI #940; hardening `6616fcc7…` CI #941 GREEN. `90b39865…` was a typecheck-only harness failure and is not treated as behavioral RED.
-
-M08.3 transcript viewer is VERIFIED at `7cb2b507…` / CI #951. It uses a dedicated authenticated tenant/job/candidate/attempt-scoped security-definer RPC, excludes technical events, strictly parses contiguous M06 transcript turns, renders inert speaker-separated text with accessible search, and loads from the server-derived reviewed `attempt_id`. Provider RED `67196c6b…` / #943 and page RED `280ca6ee…` / #950 are genuine. Repository/viewer checkpoints #946/#948 were typecheck-only missing-module failures and are not counted as behavioral RED.
-
-M08.4 is ACTIVE: evidence citations must resolve to the exact reviewed transcript and support keyboard-accessible focus/highlight navigation. Missing or inconsistent evidence fails closed.
+M08.9 closeout found one Important dashboard acceptance gap: accessible list/filter/sort over neutral workflow metadata. Genuine RED `f027b05c…` / CI #1021 proved the missing filter. `4ba2e1c9…` implemented accessible review-status filtering and name/status sorting without score/rank/recommendation options; CI #1023 then exposed an ambiguous existing assertion because `In review` correctly appeared in both a filter option and candidate state. `a6320513…` scoped that assertion to the candidate list and passed CI #1024.
 
 ## Review / safety state
-
-- Critical findings: **0 known**.
-- Important findings: **0 known** after M08.2 skeptical review and hardening.
-- PR #10 has no unresolved inline review threads at latest recovery.
-- Humans remain hiring decision makers; no autonomous hire/reject/ranking.
+- Critical findings: 0 known unresolved.
+- Important findings: 0 known unresolved.
+- PR #10 unresolved inline review threads: 0 at latest recovery.
+- Humans remain decision makers; no autonomous hire/reject/ranking.
 - AI assessment/provenance/history remains immutable.
-- Human overrides must preserve AI score and require attributable reason.
+- Human overrides preserve AI score and require attributable reason.
 - Tenant/job/candidate/attempt/assessment authorization is server-authoritative and fail-closed.
-- Transcript/model/reviewer text is untrusted inert data; technical events are not evaluative evidence.
+- Transcript/model/reviewer text remains inert data.
 
 ## Exact next work
-
-1. Recheck PR #10 remote head/concurrency before writing.
-2. Add a genuine behavioral RED that fails when a validated competency evidence citation does not resolve to the exact reviewed transcript turn/excerpt.
-3. Implement the minimum server-side fail-closed evidence-resolution boundary.
-4. Add a UI RED for exact citation→turn navigation with keyboard activation, programmatic focus and non-color-only visible highlight.
-5. Implement deterministic deep-link targets derived only from validated server data; keep transcript text inert.
-6. Verify focused/full exact-head gates, perform skeptical review, reconcile state, then continue M08.5 human score overrides.
+Verify the documentation-reconciliation head in exact-head CI. Recheck remote PR head, reviews/threads and mergeability. If every M08 acceptance/verification/documentation gate is satisfied, mark PR #10 ready and squash-merge using expected-head protection. Then verify resulting `main` and its CI, reconcile post-merge state, activate M09 Billing + Usage, and immediately begin its first valid unit.

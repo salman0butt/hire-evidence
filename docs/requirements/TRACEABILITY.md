@@ -1,43 +1,22 @@
 # Requirements Traceability
 
-This matrix tracks durable framework requirements and product capabilities. The canonical PRD remains the product source of truth; Git/code/current exact-SHA CI outrank stale prose.
+Canonical PRD remains product truth; Git/code/current exact-SHA CI outrank stale prose. Earlier milestone detail is preserved in Git history and milestone ledgers.
 
-| Requirement | Milestone | Spec | Implementation | Tests / Verification | Status |
-|---|---|---|---|---|---|
-| AUTO-001 — Git/GitHub durable execution memory | Product Foundation | autonomous framework | recovery/control plane + durable status/handoff/ledgers | framework verifier/CI | VERIFIED |
-| AUTO-002 — Fresh recovery before writes | Active capabilities | autonomous policy | Git/PR/CI/docs recovered before work | current autonomous recovery | VERIFIED |
-| AUTO-003 — Evidence precedence | Active capabilities | autonomous policy | stale docs reconciled to Git/code/current CI | framework verifier | VERIFIED |
-| AUTO-005 — Genuine RED→GREEN / root-cause debugging | Active capabilities | TDD/debugging policy | intended RED checkpoints followed by minimal GREEN | M08.1 + M08.2 RED→GREEN chains; typecheck-only harness failures explicitly not counted as behavioral RED | VERIFIED |
-| AUTO-006 — Critical/Important findings block completion | Active capabilities | review policy | skeptical security/architecture/AI-safety review | M08.2 summary gap fixed; validation hardened; 0 known unresolved Critical/Important | VERIFIED |
-| AUTO-007 — Fresh exact-SHA CI | Active capabilities | verification policy | GitHub Actions exact-head gate | M08.2 `6616fcc7…` CI #941 / run `35215607658` GREEN | VERIFIED |
-| AUTO-010 — Avoid duplicate concurrent work | Active capabilities | concurrency policy | active PR reused and remote head checked before writes | PR #10 reused; head rechecked before writes | VERIFIED |
-| PRD-195 — Product Foundation | Product Foundation | foundation requirements | foundation + requirements control plane | PR #2 / CI #57 | VERIFIED |
-| PRD-015/016/017/196 — SaaS shell/auth/profile | SaaS Shell + Auth | M01 spec/plan | auth/profile shell | PR #3; post-merge CI #157 | VERIFIED |
-| PRD 8–14, 18–19, 197 — Organizations/RBAC | Organizations + RBAC | M02 spec/plan | fixed roles, tenant RLS/RPCs, onboarding/team/invites/settings | PR #4; post-merge CI #232 | VERIFIED |
-| PRD 20–41, 198 — Jobs + Interviewer Builder | Jobs + Interviewer Builder | M03 spec/plan | jobs, competencies, rubrics, questions, deterministic plan, config, guardrails, publish/version, preview | PR #5; post-merge CI #432 | VERIFIED |
-| PRD 42–57, 199 — Candidates + Invitations | Candidates + Invitations | M04 design/plan | candidate records, secure invitations, lifecycle, public projection, consent, support path | PR #6; post-merge CI #517 | VERIFIED |
-| PRD 58+, 200 — Realtime AI Interview | Realtime AI Interview | M05 design/plan | authoritative attempt, provider-neutral runtime, immutable plan, bounded follow-ups, recovery | PR #7 / post-merge main | VERIFIED |
-| M05-LIVE-SMOKE — Real Gemini external-provider acceptance | Realtime AI Interview deployment | `docs/LOCAL-REALTIME-ACCEPTANCE.md` | deployment-only owner-supplied credential smoke | manual smoke; never claimed as repository CI | DEFERRED TO DEPLOYMENT |
-| PRD roadmap — Durable transcript/session continuity | Transcript + Durable Session | M06 design/plan | normalized/finalized durable transcript, attempt lifecycle/reconnect, technical events, finalization | PR #8; post-merge CI #875 | VERIFIED |
-| M07-SCHEMA — Structured runtime-validatable assessment | Evidence-Based Assessment | M07 design/plan | `assessment-schema.ts` | schema tests + branch CI | VERIFIED |
-| M07-PROMPT — Trusted immutable assessment prompt | Evidence-Based Assessment | M07 design/plan | `assessment-input.ts`, `assessment-prompt.ts` | prompt/adversarial tests + branch CI | VERIFIED |
-| M07-RUBRIC — Configured rubric-aligned 1–5/null scoring | Evidence-Based Assessment | M07 design/plan | `rubric-scoring.ts` | scoring tests + branch CI | VERIFIED |
-| M07-EVIDENCE — Evidence citations and same-attempt validation | Evidence-Based Assessment | M07 design/plan | schema citations + `evidence-validator.ts` | fabricated/sequence/speaker/excerpt tests + branch CI | VERIFIED |
-| M07-SUFFICIENCY — Evidence sufficiency and question coverage | Evidence-Based Assessment | M07 design/plan | `question-coverage.ts` | coverage/technical-interruption tests + branch CI | VERIFIED |
-| M07-SAFETY — Prompt injection and prohibited-output defense | Evidence-Based Assessment | M07 design/plan | `assessment-guardrails.ts` + fixed prompt policy | adversarial tests + M07 closeout | VERIFIED |
-| M07-PROVENANCE — Application-owned assessment provenance | Evidence-Based Assessment | M07 design/plan | `assessment-provenance.ts` | provenance tests | VERIFIED |
-| M07-PERSIST — Idempotent tenant-safe assessment generation | Evidence-Based Assessment | M07 design/plan | assessment migration + repository/RPC boundary | migration/repository tests + local Supabase CI | VERIFIED |
-| M07-HISTORY — Append-only regeneration/history | Evidence-Based Assessment | M07 design/plan | list/regeneration RPC/repository boundary | history tests + M07 CI | VERIFIED |
-| PRD 69–81, 202 — Evidence-Based Assessment Engine | Evidence-Based Assessment | M07 design/plan | integrated validated evidence-grounded assessment + provenance/history | PR #9; post-merge main CI #920 | VERIFIED |
-| M08-RESULT — Tenant-scoped candidate result projection/page | Hiring Team Review | M08 design/plan | candidate-result repository, `get_candidate_review_result`, result route | exact verified `f36b520e…` CI #930 | VERIFIED |
-| M08-CARDS — Competency/evidence review cards | Hiring Team Review | M08 design/plan | immutable completed-assessment projection, runtime validation/enrichment, summary + accessible cards | RED CI #932/#937/#939; GREEN through `6616fcc7…` CI #941 | VERIFIED |
-| M08-TRANSCRIPT — Authenticated transcript review viewer | Hiring Team Review | M08 design/plan | dedicated transcript RPC + strict repository + searchable speaker-separated viewer | provider RED #943/GREEN #944; page RED #950/GREEN #951; exact head `7cb2b507…` | VERIFIED |
-| M08-EVIDENCE-LINKS — Exact evidence deep links | Hiring Team Review | M08 design/plan | fail-closed citation resolution + validated fragment targeting + exact transcript focus/highlight navigation | RED `ca7c1247…` CI #968 → verified `d0ed1467…` CI #970 / run `35444823271` | VERIFIED |
-| M08-OVERRIDES — Human competency score overrides | Hiring Team Review | M08 design/plan | append/audit-safe tenant-scoped human overrides preserving immutable AI generation | TDD active | ACTIVE |
-| PRD roadmap — Hiring-team review remaining scope | Hiring Team Review | M08 design/plan | human overrides/notes/disagreement/dashboard/closeout | milestone plan | PLANNED |
+| Requirement / capability | Milestone | Implementation / evidence | Status |
+|---|---|---|---|
+| Product foundation through organizations/jobs/candidates/realtime/transcript | M00–M06 | PRs #2–#8 and post-merge CI | VERIFIED |
+| PRD 69–81, 202 — evidence-based assessment | M07 | structured schema, immutable input/prompt, rubric scoring, same-attempt evidence validation, sufficiency, guardrails, provenance, append-only generations/history; PR #9 / post-merge CI #920 | VERIFIED |
+| M08-RESULT — tenant-scoped candidate result | M08.1 | candidate result repository/RPC/page; `f36b520e…` / CI #930 | VERIFIED |
+| M08-CARDS — competency/evidence review | M08.2 | immutable completed-assessment projection + runtime validation + accessible cards; `6616fcc7…` / CI #941 | VERIFIED |
+| M08-TRANSCRIPT — authenticated transcript review | M08.3 | exact-scope transcript RPC/repository/searchable inert viewer; `7cb2b507…` / CI #951 | VERIFIED |
+| M08-EVIDENCE-LINKS — exact evidence navigation | M08.4 | fail-closed citation resolution and validated focus/highlight; `d0ed1467…` / CI #970 | VERIFIED |
+| M08-OVERRIDES — human competency score overrides | M08.5 | append/audit-safe tenant-scoped overrides preserving immutable AI generation and requiring reviewer reason/attribution | VERIFIED |
+| M08-REVIEW-LIFECYCLE — reviewer notes/status | M08.6 | attributable notes plus awaiting/in-review/reviewed lifecycle | VERIFIED |
+| M08-DISAGREEMENT — AI/human disagreement | M08.7 | deterministic comparison over preserved AI/human values; `071b894c…` / CI #1010 | VERIFIED |
+| M08-DASHBOARD — job candidate review workflow | M08.8 | tenant/job-scoped neutral workflow projection + direct review links; `0d871017…` / CI #1019 | VERIFIED |
+| M08-CLOSEOUT — accessible neutral list/filter/sort and final gate | M08.9 | filter by review status; sort by candidate name/review status only; no score/rank/recommendation; RED `f027b05c…` / #1021 → exact verified implementation/test head `a6320513…` / #1024 | ACTIVE — final docs/merge gate |
+| Hiring-AI human agency | M08 | immutable AI history, attributable human judgment, no autonomous hire/reject/ranking | VERIFIED through latest exact-head CI |
+| Billing and usage | M09 | activate after M08 merge/post-merge verification | PLANNED |
 
-## Active requirement interpretation
-
-M00–M07 are integrated on `main`. M08 is active on draft PR #10. M08.1 is verified at `f36b520e…` / CI #930. M08.2 is verified at `6616fcc735df5ee06616f3e6e2cb7146469cea7c`, CI #941 / run `35215607658`. M08.3 is verified at `7cb2b5077aa5b03348c29ee86af0a56e954f0624`, CI #951 / run `35320101385`. M08.4 exact evidence deep links are verified at `d0ed14671c214e5a2e38351147bc6dc54b068f29` / CI #970. M08.5 human score overrides are active.
-
-The M08 review boundary preserves human agency and historical evidence integrity. AI assessment is immutable review input, historical competency identity comes from the immutable published interviewer-version snapshot, and hiring-team transcript access must be independently authenticated and exact-scope authorized. Candidate invitation tokens are not hiring-review authority. Technical interruption events remain separate from evaluative transcript turns.
+## Active interpretation
+M00–M07 are integrated on `main`. M08 is in closeout on PR #10. M08.1–M08.8 are VERIFIED; M08.9's Important dashboard accessibility/list/filter/sort gap is fixed and `a6320513…` passed CI #1024. Remaining work is exact-head verification of this documentation reconciliation, final merge-gate recheck, authorized merge, and post-merge `main` verification before M09 activation.
