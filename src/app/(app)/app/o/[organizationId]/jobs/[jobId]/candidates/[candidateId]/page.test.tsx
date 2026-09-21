@@ -77,7 +77,7 @@ describe("candidate result page", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Ada Candidate" })).toBeInTheDocument();
     expect(screen.getByText("Senior Platform Engineer")).toBeInTheDocument();
     expect(screen.getByText("Interview status")).toBeInTheDocument();
-    expect(screen.getByText("Review status")).toBeInTheDocument();
+    expect(screen.getAllByText("Review status").some((element) => element.tagName === "DT")).toBe(true);
     expect(screen.getByText("Assessment generation")).toBeInTheDocument();
     expect(screen.getByText("AI assessment supports independent human review; it is not a hiring decision.")).toBeInTheDocument();
   });
