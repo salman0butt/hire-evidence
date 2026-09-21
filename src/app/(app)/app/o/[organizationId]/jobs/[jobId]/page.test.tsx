@@ -73,6 +73,12 @@ vi.mock("@/lib/interviewer/interview-plans", () => ({
 }));
 vi.mock("@/lib/interviewer/questions", () => ({ listQuestions: vi.fn() }));
 vi.mock("@/lib/organization/require-membership", () => ({ requireOrganizationMembership: vi.fn() }));
+vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn().mockResolvedValue({}) }));
+vi.mock("@/lib/review/job-candidate-dashboard-repository", () => ({
+  createJobCandidateDashboardRepository: vi.fn(() => ({
+    getJobCandidateDashboard: vi.fn().mockResolvedValue([]),
+  })),
+}));
 vi.mock("../job-actions", () => ({ updateJobAction: vi.fn() }));
 vi.mock("./competency-actions", () => ({
   createCompetencyAction: vi.fn(),

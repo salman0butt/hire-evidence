@@ -1,130 +1,79 @@
 # M08 — Hiring Team Review Experience
 
-Status: **NOT STARTED**
+Status: **CLOSEOUT — M08.9 ACTIVE**
 
 ## Goal
-Deliver the authoritative PRD milestone below as a reviewable, evidence-backed capability.
+Enable an authorized human hiring-team member to independently review immutable AI assessment and exact transcript evidence, record attributable human judgment, preserve disagreement/audit history, and navigate a neutral job-level review workflow.
 
 ## Authoritative PRD Milestone Definition
-
-# 203. MILESTONE 08 — HIRING TEAM REVIEW EXPERIENCE
-
-Deliver:
-
-```text
-candidate results
-assessment dashboard
-transcript viewer
-evidence deep links
-human score override
-reviewer notes
-review status
-AI/human disagreement
-job candidate dashboard
-```
-
-Exit:
-
-human can independently review AI assessment.
+Deliver the hiring-team review experience required by the canonical PRD: evidence-grounded candidate review, transcript inspection, attributable human review/overrides, preserved AI/human disagreement, and a neutral job-level review workflow. Humans remain the consequential hiring decision makers.
 
 ## Dependencies
-Evidence-Based Assessment Engine.
+M00–M07 are complete on `main`. M08 depends on tenant/RBAC boundaries, jobs/candidates, durable transcript/session data, and immutable evidence-based assessment generations established by earlier milestones.
 
 ## In Scope
-The authoritative definition plus every default iteration listed below.
+Tenant-scoped candidate result projection; competency/evidence cards; authenticated transcript review and exact evidence deep links; append/audit-safe human score overrides with reasons; reviewer notes/status; deterministic AI/human disagreement; accessible job-level candidate review list/filter/sort using neutral workflow metadata; milestone security/accessibility/integration closeout.
 
 ## Out of Scope
-Later milestones, speculative abstractions, and behavior not justified by the PRD.
-
-## Architecture Notes
-Human-review-first result experience with score/evidence cards, transcript navigation, evidence deep links, reviewer notes/states, and append-only human override records that preserve AI output and reasons.
-
-## Selected Design / Implementation Plan
-- Not created yet. On activation, recover requirements, use Superpowers brainstorming/design, write an executable plan, and record the selected paths here.
+Autonomous hire/reject/strong-hire decisions, candidate-success probability, protected-trait inference, emotion/appearance/accent/personality/deception scoring, AI best-candidate ranking, score/rank/recommendation dashboard sorting, destructive AI assessment-history rewriting, and cross-tenant review access. Billing/usage belongs to M09.
 
 ## Acceptance Criteria
-- PRD deliverables and exit criteria pass.
-- All required iterations are complete or explicitly resolved.
-- Relevant security/privacy/tenancy/accessibility/performance/AI-safety gates pass.
-- 0 unresolved Critical or Important review findings.
-- Traceability and feature state are reconciled.
-- Exact-final-head CI is green.
+- Authorized humans can independently inspect immutable AI assessment and exact supporting transcript evidence.
+- Human overrides preserve AI score/history and require attributable reason.
+- Reviewer notes/status and deterministic AI/human disagreement are preserved separately from AI output.
+- Job candidate dashboard uses neutral workflow metadata and accessible list/filter/sort only.
+- Tenant/job/candidate/attempt/assessment authorization fails closed.
+- No unresolved Critical or Important review findings remain at completion.
+- Exact-final-head required CI is fully GREEN before merge.
 
 ## Tasks / Iterations
-1. **NOT STARTED** — M08.1 — Candidate result page: identity/job/interview/status summary.
-2. **NOT STARTED** — M08.2 — Competency/evidence cards: score, rationale, sufficiency.
-3. **NOT STARTED** — M08.3 — Transcript viewer: speaker separation, search, markers.
-4. **NOT STARTED** — M08.4 — Evidence deep links: score → exact transcript turn/highlight.
-5. **NOT STARTED** — M08.5 — Human overrides: preserve AI score + human score + reason.
-6. **NOT STARTED** — M08.6 — Reviewer notes + states: awaiting review/reviewed and notes.
-7. **NOT STARTED** — M08.7 — AI/human disagreement data: durable comparison for evals.
-8. **NOT STARTED** — M08.8 — Job candidate dashboard: workflow status without AI "best candidate" ranking.
-9. **NOT STARTED** — M08.9 — Visual/accessibility/E2E QA: desktop/mobile and independent-review flow.
+1. M08.1 candidate result projection/page — **VERIFIED** (`f36b520e…`, CI #930).
+2. M08.2 competency/evidence cards — **VERIFIED** (`6616fcc7…`, CI #941).
+3. M08.3 transcript viewer — **VERIFIED** (`7cb2b507…`, CI #951).
+4. M08.4 evidence deep links — **VERIFIED** (`d0ed1467…`, CI #970).
+5. M08.5 human score overrides — **VERIFIED**. Overrides are append/audit-safe, tenant scoped, preserve immutable AI score/generation, and require reviewer attribution/reason.
+6. M08.6 reviewer notes/status lifecycle — **VERIFIED**.
+7. M08.7 AI/human disagreement data — **VERIFIED** (`071b894c…`, CI #1010 / run `35568824247`). Disagreement derives deterministically from preserved AI/human values without mutating either source.
+8. M08.8 job candidate dashboard — **VERIFIED** (`0d871017…`, CI #1019 / run `35606248055`). Tenant/job-scoped dashboard exposes neutral candidate/interview/review workflow metadata and direct human-review navigation without AI ranking/recommendation.
+9. M08.9 visual/accessibility/E2E closeout — **ACTIVE**. Skeptical review found an Important list/filter/sort acceptance gap; genuine RED `f027b05c…` / CI #1021 proved it. Implementation `4ba2e1c9…` added accessible status filtering and name/status sorting. CI #1023 exposed an ambiguous existing assertion, not a behavior defect; `a6320513…` scoped it correctly and passed CI #1024 / run `35626271990`. CI #1025/#1026 then exposed documentation-framework compatibility gaps during closeout reconciliation; product tests remained green.
 
 ## TDD Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+Key closeout evidence: genuine behavioral RED `f027b05c…` / CI #1021 failed on the missing accessible review-status filter. Implementation `4ba2e1c9…` reached intended behavior; CI #1023 exposed an ambiguous existing assertion. `a6320513…` corrected assertion scope and passed full exact-head CI #1024. Earlier M08 iterations preserve their RED/GREEN evidence in Git history and prior ledger revisions.
 
 ## Integration Test Evidence
-PENDING — milestone has not started. Never fabricate evidence.
-
-## E2E / Visual Verification
-PENDING — define milestone-specific browser/realtime/visual scenarios before closeout where applicable.
+Repository CI covers frozen dependency install, lint, typecheck, unit/component tests, autonomous/requirements verifiers, provider-backed local Supabase database boundary tests, build, Chromium E2E, and PRD coverage. Exact implementation/test head `a6320513f329a9d0c6c3e8849ef15ca57d1d3c5a` passed full CI #1024 / run `35626271990`.
 
 ## Security Review
-PENDING — cover auth/authz, tenant isolation, untrusted input, secrets, data exposure, injection and milestone-specific threats.
-
-## Accessibility Review
-PENDING where UI exists — keyboard, focus, semantics, labels, status/error states, responsive and assistive-technology paths.
-
-## Performance Review
-PENDING where relevant — bounded work, pagination, resource limits, retries and hot-path cost.
-
-## AI / Eval Review
-Humans make hiring decisions. AI/human disagreement data is retained for evaluation, not used to silently overwrite either history.
+Tenant/job/candidate/attempt/assessment authorization remains server-authoritative and fail-closed. Transcript/model/reviewer text is treated as inert data. AI assessment/provenance/history remains immutable; human overrides are attributable and preserve original AI values. No autonomous hiring decision, candidate ranking, protected-trait inference, or cross-tenant access is introduced. Unresolved Critical security findings: **0 known**. Unresolved Important security findings: **0 known**.
 
 ## Code Review Findings
-None yet; milestone has not started.
-
-## Fixes / Re-review
-PENDING when evidence-backed findings exist.
-
-## Fresh Verification Commands
-Run repository-wide verification plus milestone-specific tests. Baseline:
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm e2e
-python3 scripts/verify_autonomous_framework.py
-python3 scripts/verify_prd_coverage.py
-```
+Skeptical closeout review identified one Important dashboard accessibility/list/filter/sort acceptance gap. It was resolved under TDD and verified at `a6320513…` / CI #1024. Unresolved Critical findings: **0 known**. Unresolved Important findings: **0 known**. Unresolved PR review threads: **0** at latest recovery.
 
 ## Fresh Verification Results
-PENDING — milestone has not started.
-
-## Commits / Files Changed
-None yet.
-
-## Known Limitations
-Milestone is NOT STARTED; implementation-specific limitations are not yet known.
-
-## Documentation Updated
-This living ledger must be reconciled whenever milestone state/evidence changes.
+Latest fully GREEN implementation/test head: `a6320513f329a9d0c6c3e8849ef15ca57d1d3c5a`, CI #1024 / run `35626271990`. Documentation reconciliation `395bc534…` / CI #1025 failed only because traceability had lost verifier-required columns; `cc746131…` / CI #1026 restored those columns but failed the autonomous-framework verifier because `docs/progress/STATUS.md` lacked the literal `CI status:` marker and this ledger lacked the canonical required section headings. Install, lint, typecheck, all 668 unit/component tests, framework-verifier tests, and requirements-source-verifier tests passed before that failure. This revision restores the required documentation contract; fresh exact-head CI remains required before merge.
 
 ## Durable Recovery Sources
-`AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → relevant PRD → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
+- `AGENTS.md`
+- `docs/AUTONOMOUS-DEVELOPMENT.md`
+- `docs/progress/STATUS.md`
+- `docs/progress/KNOWN-ISSUES.md`
+- `docs/milestones/CURRENT.md`
+- `docs/requirements/TRACEABILITY.md`
+- `docs/superpowers/specs/2026-09-16-hiring-team-review-design.md`
+- `docs/superpowers/plans/2026-09-16-hiring-team-review.md`
+- PR #10 and exact-head GitHub Actions CI
 
 ## Completion Checklist
-- [ ] Requirements and iterations accounted for.
-- [ ] Acceptance criteria verified.
-- [ ] Required TDD/integration/E2E evidence recorded.
-- [ ] Security/accessibility/performance/AI-eval reviews complete where relevant.
-- [ ] 0 Critical / 0 Important findings.
-- [ ] Traceability/feature matrix reconciled.
-- [ ] Exact-final-head CI green.
-- [ ] Durable status/closeout state current.
+- [x] M08.1–M08.8 implementation accounted for.
+- [x] Safety/human-review boundaries preserved.
+- [x] 0 known unresolved Critical/Important findings.
+- [x] PR review threads clear at latest recovery.
+- [x] Dashboard accessibility/list/filter/sort acceptance gap resolved.
+- [x] Verifier-required traceability/status/ledger documentation schema restored.
+- [ ] Final documentation-reconciliation head exact-SHA CI GREEN.
+- [ ] Final remote-head/mergeability/review gate rechecked.
+- [ ] PR #10 merged under authorized AUTO_MERGE gate.
+- [ ] Post-merge `main` CI GREEN.
 
-## Next Milestone
-M09 — Billing + Usage.
+## Next milestone
+M09 — Billing + Usage. Activate only after M08 merge and post-merge verification.

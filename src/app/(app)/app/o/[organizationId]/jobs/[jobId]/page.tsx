@@ -5,6 +5,7 @@ import { InterviewerPreviewSection } from "@/components/jobs/interviewer-preview
 import { InterviewerPublicationSection } from "@/components/jobs/interviewer-publication-section";
 import { JobForm } from "@/components/jobs/job-form";
 import { QuestionSection } from "@/components/jobs/question-section";
+import { JobCandidateDashboard } from "@/components/review/job-candidate-dashboard";
 import { listCompetencies } from "@/lib/interviewer/competencies";
 import { getLatestInterviewerConfig } from "@/lib/interviewer/interviewer-configs";
 import {
@@ -15,6 +16,8 @@ import { listQuestions } from "@/lib/interviewer/questions";
 import { getJob } from "@/lib/jobs/jobs";
 import { hasOrganizationCapability } from "@/lib/organization/rbac";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
+import { createJobCandidateDashboardRepository } from "@/lib/review/job-candidate-dashboard-repository";
+import { createClient } from "@/lib/supabase/server";
 
 import { updateJobAction } from "../job-actions";
 import {
@@ -36,6 +39,8 @@ const MAX_INTERVIEW_DURATION_SECONDS = 3600;
 export default async function JobPage({ params }: JobPageProps) {
   const { organizationId, jobId } = await params;
   const context = await requireOrganizationMembership(organizationId);
+  const client = await createClient();
+  const dashboardRepository = createJobCandidateDashboardRepository(client);
   const [
     job,
     competencies,
@@ -43,6 +48,7 @@ export default async function JobPage({ params }: JobPageProps) {
     interviewPlan,
     interviewPlanId,
     interviewerConfig,
+    candidateDashboard,
   ] = await Promise.all([
     getJob(organizationId, jobId),
     listCompetencies(organizationId, jobId),
@@ -50,6 +56,7 @@ export default async function JobPage({ params }: JobPageProps) {
     getInterviewPlan(organizationId, jobId),
     getLatestInterviewPlanId(organizationId, jobId),
     getLatestInterviewerConfig(organizationId, jobId),
+    dashboardRepository.getJobCandidateDashboard(organizationId, jobId),
   ]);
   const canManage = hasOrganizationCapability(context.role, "jobs:manage");
   const canEditInterviewerConfig =
@@ -70,6 +77,12 @@ export default async function JobPage({ params }: JobPageProps) {
       ) : (
         <JobForm mode="edit" initialJob={job} readOnly />
       )}
+
+      <JobCandidateDashboard
+        organizationId={organizationId}
+        jobId={jobId}
+        candidates={candidateDashboard}
+      />
 
       {canManage ? (
         <CompetencySection
