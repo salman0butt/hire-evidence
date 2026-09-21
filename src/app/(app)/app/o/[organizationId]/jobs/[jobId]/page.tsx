@@ -5,6 +5,7 @@ import { InterviewerPreviewSection } from "@/components/jobs/interviewer-preview
 import { InterviewerPublicationSection } from "@/components/jobs/interviewer-publication-section";
 import { JobForm } from "@/components/jobs/job-form";
 import { QuestionSection } from "@/components/jobs/question-section";
+import { JobCandidateDashboard } from "@/components/review/job-candidate-dashboard";
 import { listCompetencies } from "@/lib/interviewer/competencies";
 import { getLatestInterviewerConfig } from "@/lib/interviewer/interviewer-configs";
 import {
@@ -34,12 +35,6 @@ type JobPageProps = Readonly<{
 }>;
 
 const MAX_INTERVIEW_DURATION_SECONDS = 3600;
-
-function formatReviewStatus(status: "awaiting_review" | "in_review" | "reviewed") {
-  if (status === "awaiting_review") return "Awaiting review";
-  if (status === "in_review") return "In review";
-  return "Reviewed";
-}
 
 export default async function JobPage({ params }: JobPageProps) {
   const { organizationId, jobId } = await params;
@@ -83,32 +78,11 @@ export default async function JobPage({ params }: JobPageProps) {
         <JobForm mode="edit" initialJob={job} readOnly />
       )}
 
-      <section aria-labelledby="candidate-review-title" className="space-y-4 rounded-xl border border-neutral-200 bg-white p-5">
-        <div className="space-y-1">
-          <h2 id="candidate-review-title" className="text-2xl font-semibold tracking-tight">Candidate review</h2>
-          <p className="text-sm leading-6 text-neutral-600">Review completed interviews by workflow status. Candidates are ordered alphabetically.</p>
-        </div>
-        {candidateDashboard.length === 0 ? (
-          <p className="text-sm text-neutral-600">No completed candidate interviews are ready for review.</p>
-        ) : (
-          <ul className="divide-y divide-neutral-200" aria-label="Candidates ready for review">
-            {candidateDashboard.map((candidate) => (
-              <li key={candidate.candidateId} className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-semibold">{candidate.candidateName}</p>
-                  <p className="text-sm text-neutral-600">{formatReviewStatus(candidate.reviewStatus)}</p>
-                </div>
-                <a
-                  href={`/app/o/${organizationId}/jobs/${jobId}/candidates/${candidate.candidateId}`}
-                  className="text-sm font-semibold underline underline-offset-2"
-                >
-                  Review {candidate.candidateName}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <JobCandidateDashboard
+        organizationId={organizationId}
+        jobId={jobId}
+        candidates={candidateDashboard}
+      />
 
       {canManage ? (
         <CompetencySection
