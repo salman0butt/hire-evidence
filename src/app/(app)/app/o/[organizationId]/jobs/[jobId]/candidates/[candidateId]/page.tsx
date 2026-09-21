@@ -2,6 +2,7 @@ import { CandidateTranscriptViewer } from "@/components/review/candidate-transcr
 import { validateAssessmentEvidence } from "@/lib/assessment/evidence-validator";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
 import { createCandidateResultRepository } from "@/lib/review/candidate-result-repository";
+import { createCandidateReviewRepository } from "@/lib/review/candidate-review-repository";
 import { createCandidateScoreOverrideRepository } from "@/lib/review/candidate-score-override-repository";
 import { createCandidateReviewTranscriptRepository } from "@/lib/review/candidate-transcript-repository";
 import { createClient } from "@/lib/supabase/server";
@@ -13,7 +14,7 @@ function formatEvidenceSufficiency(value: string): string { return value.charAt(
 
 function requiredFormValue(formData: FormData, name: string): string {
   const value = formData.get(name);
-  if (typeof value !== "string" || value.trim().length === 0) throw new Error("invalid human score override");
+  if (typeof value !== "string" || value.trim().length === 0) throw new Error("invalid form submission");
   return value.trim();
 }
 
@@ -36,6 +37,27 @@ export async function saveHumanScoreOverride(formData: FormData): Promise<void> 
   await repository.createScoreOverride(
     { organizationId, jobId, candidateId, attemptId, assessmentGenerationId },
     { competencyId, humanScore, reason },
+  );
+}
+
+export async function saveCandidateReview(formData: FormData): Promise<void> {
+  "use server";
+  const organizationId = requiredFormValue(formData, "organizationId");
+  const jobId = requiredFormValue(formData, "jobId");
+  const candidateId = requiredFormValue(formData, "candidateId");
+  const attemptId = requiredFormValue(formData, "attemptId");
+  const assessmentGenerationId = requiredFormValue(formData, "assessmentGenerationId");
+  const status = requiredFormValue(formData, "status");
+  const rawNotes = formData.get("reviewerNotes");
+  if (typeof rawNotes !== "string" || rawNotes.length > 4000) throw new Error("invalid candidate review");
+  if (status !== "awaiting_review" && status !== "in_review" && status !== "reviewed") throw new Error("invalid candidate review");
+
+  await requireOrganizationMembership(organizationId);
+  const client = await createClient();
+  const repository = createCandidateReviewRepository(client);
+  await repository.saveReview(
+    { organizationId, jobId, candidateId, attemptId, assessmentGenerationId },
+    { status, reviewerNotes: rawNotes.trim().length === 0 ? null : rawNotes },
   );
 }
 
@@ -63,6 +85,19 @@ export default async function CandidateResultPage({ params }: CandidateResultPag
     </dl>
     <section aria-labelledby="assessment-summary-title" className="space-y-2 rounded-xl border border-neutral-200 bg-white p-5">
       <h2 id="assessment-summary-title" className="text-2xl font-semibold tracking-tight">Assessment summary</h2><p className="max-w-3xl text-sm leading-6 text-neutral-700">{result.assessment.summary}</p><p className="text-xs leading-5 text-neutral-500">This AI-generated summary is a review input only. The hiring team makes the final decision after reviewing the underlying evidence.</p>
+    </section>
+    <section aria-labelledby="human-review-title" className="space-y-4 rounded-xl border border-neutral-200 bg-white p-5">
+      <div className="space-y-1"><h2 id="human-review-title" className="text-2xl font-semibold tracking-tight">Human review</h2><p className="text-sm leading-6 text-neutral-600">Record reviewer notes and advance the explicit human-review lifecycle. This does not alter the immutable AI assessment.</p></div>
+      <form action={saveCandidateReview} className="space-y-4">
+        <input type="hidden" name="organizationId" value={organizationId} />
+        <input type="hidden" name="jobId" value={jobId} />
+        <input type="hidden" name="candidateId" value={candidateId} />
+        <input type="hidden" name="attemptId" value={result.attempt_id} />
+        <input type="hidden" name="assessmentGenerationId" value={result.assessment_generation_id} />
+        <div><label htmlFor="review-status" className="text-sm font-medium text-neutral-700">Review status</label><select id="review-status" name="status" defaultValue={result.review_status} className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"><option value="awaiting_review">Awaiting review</option><option value="in_review">In review</option><option value="reviewed">Reviewed</option></select></div>
+        <div><label htmlFor="reviewer-notes" className="text-sm font-medium text-neutral-700">Reviewer notes</label><textarea id="reviewer-notes" name="reviewerNotes" maxLength={4000} className="mt-1 block min-h-32 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" /></div>
+        <button type="submit" className="rounded-lg border border-neutral-900 px-3 py-2 text-sm font-semibold">Save review</button>
+      </form>
     </section>
     <section aria-labelledby="competency-review-title" className="space-y-5">
       <div className="space-y-2"><h2 id="competency-review-title" className="text-2xl font-semibold tracking-tight">Competency review</h2><p className="max-w-2xl text-sm leading-6 text-neutral-600">Review the AI assessment against its cited interview evidence. Scores and rationale are review inputs, not hiring recommendations.</p></div>
