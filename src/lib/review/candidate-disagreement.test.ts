@@ -9,7 +9,12 @@ const assessment = {
       competencyId: "competency-1",
       score: 4,
       rationale: "Evidence-backed rationale",
-      evidence: [],
+      evidence: [
+        {
+          messageSequence: 7,
+          excerpt: "I would partition by tenant and keep writes idempotent.",
+        },
+      ],
       evidenceSufficiency: "sufficient",
     },
   ],
