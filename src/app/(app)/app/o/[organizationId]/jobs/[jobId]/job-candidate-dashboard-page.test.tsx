@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createJobCandidateDashboardRepository } from "@/lib/review/job-candidate-dashboard-repository";
@@ -61,7 +61,8 @@ describe("job candidate review dashboard", () => {
       "href",
       `/app/o/${organizationId}/jobs/${jobId}/candidates/33333333-3333-4333-8333-333333333333`,
     );
-    expect(screen.getByText("In review")).toBeInTheDocument();
+    const candidateList = screen.getByRole("list", { name: "Candidates ready for review" });
+    expect(within(candidateList).getByText("In review")).toBeInTheDocument();
     expect(screen.queryByText(/rank|recommended|best candidate/i)).not.toBeInTheDocument();
   });
 
