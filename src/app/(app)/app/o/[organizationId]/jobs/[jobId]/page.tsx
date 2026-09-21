@@ -86,7 +86,7 @@ export default async function JobPage({ params }: JobPageProps) {
       <section aria-labelledby="candidate-review-title" className="space-y-4 rounded-xl border border-neutral-200 bg-white p-5">
         <div className="space-y-1">
           <h2 id="candidate-review-title" className="text-2xl font-semibold tracking-tight">Candidate review</h2>
-          <p className="text-sm leading-6 text-neutral-600">Review completed interviews using neutral workflow state. Candidate ordering is not an AI ranking or recommendation.</p>
+          <p className="text-sm leading-6 text-neutral-600">Review completed interviews by workflow status. Candidates are ordered alphabetically.</p>
         </div>
         {candidateDashboard.length === 0 ? (
           <p className="text-sm text-neutral-600">No completed candidate interviews are ready for review.</p>
