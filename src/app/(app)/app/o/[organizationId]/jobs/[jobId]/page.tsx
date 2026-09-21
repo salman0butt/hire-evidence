@@ -15,6 +15,8 @@ import { listQuestions } from "@/lib/interviewer/questions";
 import { getJob } from "@/lib/jobs/jobs";
 import { hasOrganizationCapability } from "@/lib/organization/rbac";
 import { requireOrganizationMembership } from "@/lib/organization/require-membership";
+import { createJobCandidateDashboardRepository } from "@/lib/review/job-candidate-dashboard-repository";
+import { createClient } from "@/lib/supabase/server";
 
 import { updateJobAction } from "../job-actions";
 import {
@@ -33,9 +35,17 @@ type JobPageProps = Readonly<{
 
 const MAX_INTERVIEW_DURATION_SECONDS = 3600;
 
+function formatReviewStatus(status: "awaiting_review" | "in_review" | "reviewed") {
+  if (status === "awaiting_review") return "Awaiting review";
+  if (status === "in_review") return "In review";
+  return "Reviewed";
+}
+
 export default async function JobPage({ params }: JobPageProps) {
   const { organizationId, jobId } = await params;
   const context = await requireOrganizationMembership(organizationId);
+  const client = await createClient();
+  const dashboardRepository = createJobCandidateDashboardRepository(client);
   const [
     job,
     competencies,
@@ -43,6 +53,7 @@ export default async function JobPage({ params }: JobPageProps) {
     interviewPlan,
     interviewPlanId,
     interviewerConfig,
+    candidateDashboard,
   ] = await Promise.all([
     getJob(organizationId, jobId),
     listCompetencies(organizationId, jobId),
@@ -50,6 +61,7 @@ export default async function JobPage({ params }: JobPageProps) {
     getInterviewPlan(organizationId, jobId),
     getLatestInterviewPlanId(organizationId, jobId),
     getLatestInterviewerConfig(organizationId, jobId),
+    dashboardRepository.getJobCandidateDashboard(organizationId, jobId),
   ]);
   const canManage = hasOrganizationCapability(context.role, "jobs:manage");
   const canEditInterviewerConfig =
@@ -70,6 +82,33 @@ export default async function JobPage({ params }: JobPageProps) {
       ) : (
         <JobForm mode="edit" initialJob={job} readOnly />
       )}
+
+      <section aria-labelledby="candidate-review-title" className="space-y-4 rounded-xl border border-neutral-200 bg-white p-5">
+        <div className="space-y-1">
+          <h2 id="candidate-review-title" className="text-2xl font-semibold tracking-tight">Candidate review</h2>
+          <p className="text-sm leading-6 text-neutral-600">Review completed interviews using neutral workflow state. Candidate ordering is not an AI ranking or recommendation.</p>
+        </div>
+        {candidateDashboard.length === 0 ? (
+          <p className="text-sm text-neutral-600">No completed candidate interviews are ready for review.</p>
+        ) : (
+          <ul className="divide-y divide-neutral-200" aria-label="Candidates ready for review">
+            {candidateDashboard.map((candidate) => (
+              <li key={candidate.candidateId} className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-semibold">{candidate.candidateName}</p>
+                  <p className="text-sm text-neutral-600">{formatReviewStatus(candidate.reviewStatus)}</p>
+                </div>
+                <a
+                  href={`/app/o/${organizationId}/jobs/${jobId}/candidates/${candidate.candidateId}`}
+                  className="text-sm font-semibold underline underline-offset-2"
+                >
+                  Review {candidate.candidateName}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {canManage ? (
         <CompetencySection
