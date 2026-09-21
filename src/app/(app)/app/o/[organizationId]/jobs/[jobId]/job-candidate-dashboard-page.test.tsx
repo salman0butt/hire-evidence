@@ -64,4 +64,18 @@ describe("job candidate review dashboard", () => {
     expect(screen.getByText("In review")).toBeInTheDocument();
     expect(screen.queryByText(/rank|recommended|best candidate/i)).not.toBeInTheDocument();
   });
+
+  it("offers accessible filtering and sorting using neutral workflow metadata only", async () => {
+    render(await JobPage({ params: Promise.resolve({ organizationId, jobId }) }));
+
+    expect(screen.getByRole("combobox", { name: "Filter by review status" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Sort candidates" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "All review statuses" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Awaiting review" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "In review" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Reviewed" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Candidate name" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Review status" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: /score|rank|recommend/i })).not.toBeInTheDocument();
+  });
 });
