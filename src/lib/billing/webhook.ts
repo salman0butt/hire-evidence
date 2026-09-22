@@ -1,10 +1,10 @@
-import type { PlanId } from "./plans";
+import type { BillingPlanId } from "../../config/billing-plans";
 
 export type BillingSubscription = {
   id: string;
   customerId: string;
   status: string;
-  planId: PlanId;
+  planId: BillingPlanId;
   currentPeriodStart: string;
   currentPeriodEnd: string;
 };
