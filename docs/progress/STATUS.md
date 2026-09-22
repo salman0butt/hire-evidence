@@ -3,35 +3,38 @@
 Last reconciled: 2026-09-22
 
 ## Completed Milestones
-M00–M07 are COMPLETE. M07 merged to `main` as `d85883f4177e2ec122a695092d5c6ac846afbe72`; post-merge CI #920 was GREEN.
+M00–M08 are COMPLETE. M08 merged to `main` as `03be2d5857d04744af1b1e47c5351f08de0ae793` through PR #10.
 
 ## Current Milestone
-Hiring Team Review Experience (M08) — **CLOSEOUT / M08.9 ACTIVE**.
+Billing + Usage (M09) — **IMPLEMENTATION COMPLETE / MERGE PENDING**.
 
-Active branch: `feat/hiring-team-review`.
-Active PR: #10 — `Build hiring team review experience` — OPEN / DRAFT / mergeable.
-Verified base/main: `d85883f4177e2ec122a695092d5c6ac846afbe72`.
-Latest exact verified implementation/test head: `a6320513f329a9d0c6c3e8849ef15ca57d1d3c5a`, CI #1024 / run `35626271990` — GREEN across the repository CI gate.
-CI status: exact PR head `cc746131f89baeceb62a02c635badac74e880c0d` failed CI #1026 / run `35639109330` only at `scripts/verify_autonomous_framework.py`; install, lint, typecheck, all 668 unit/component tests, framework-verifier tests, and requirements-source-verifier tests passed. Root cause: this status file lacked the required `CI status:` marker and the M08 ledger closeout rewrite omitted verifier-required canonical section headings. Product behavior is unaffected.
+Active branch: `feat/billing-usage`.
+Active PR: #11 — `Build organization billing and usage` — OPEN / DRAFT / mergeable at latest recovery.
+Verified base/main: `03be2d5857d04744af1b1e47c5351f08de0ae793`.
+Exact verified closeout head: `2fd33f1a57be3b7dbd5242536a46f43f2212a51f`; CI #1051 / run `35754819174` — GREEN.
+CI status: latest durable closeout head `0787e93b58d650095d828861eb6ab429859a8745` failed CI #1053 / run `35761451232` only at autonomous-framework verification because this required status marker was missing; install, lint, typecheck, all 700 unit/component tests, framework verifier tests, and requirements-source verifier tests passed before that gate. The marker is restored by the current documentation repair and requires fresh exact-head CI.
 
-## M08 Task State
-- M08.1 Candidate result projection/page — VERIFIED.
-- M08.2 Competency/evidence cards — VERIFIED.
-- M08.3 Transcript viewer — VERIFIED.
-- M08.4 Evidence deep links — VERIFIED.
-- M08.5 Human score overrides — VERIFIED; append/audit-safe human judgment remains separate from immutable AI assessment and requires attributable reason.
-- M08.6 Reviewer notes/status lifecycle — VERIFIED.
-- M08.7 AI/human disagreement — VERIFIED at `071b894c440b3c63bf8126e948593ce1750acf2d`, CI #1010 / run `35568824247`.
-- M08.8 Job candidate dashboard — VERIFIED at `0d8710172958245ecf8b8b05f10dd35237e2468e`, CI #1019 / run `35606248055`; neutral workflow metadata only, no AI ranking/recommendation.
-- M08.9 Closeout — ACTIVE. Dashboard list/filter/sort acceptance gap was resolved under TDD; final test-scoping fix `a6320513…` passed CI #1024. Documentation verifier compatibility is being repaired after CI #1026.
+## M09 Task State
+- M09.1 Plan configuration — VERIFIED.
+- M09.2 Subscription persistence — VERIFIED.
+- M09.3 Stripe customer + checkout — VERIFIED.
+- M09.4 Webhook synchronization — VERIFIED.
+- M09.5 Billing portal + cancellation/plan changes — VERIFIED.
+- M09.6 Server-authoritative interview-second usage — VERIFIED.
+- M09.7 Usage periods/meter — VERIFIED.
+- M09.8 Server-side enforcement — VERIFIED.
+- M09.9 Billing security/idempotency E2E + closeout — VERIFIED at `2fd33f1a57be3b7dbd5242536a46f43f2212a51f`, CI #1051 / run `35754819174` GREEN.
 
 ## Review / Safety State
 Critical findings: **0 known unresolved**.
-Important findings: **0 known unresolved** after the dashboard list/filter/sort acceptance gap was fixed and exact-head implementation CI passed.
-PR #10 unresolved inline review threads: **0** at latest recovery.
-Humans remain hiring decision makers. AI assessment/provenance/history is immutable. Human overrides preserve AI scores and require attributable reasons. Tenant/job/candidate/attempt/assessment authorization remains server-authoritative. Transcript/model/reviewer text is inert data. No autonomous hire/reject/ranking or candidate-success probability.
+Important findings: **0 known unresolved**.
+PR #11 unresolved review comments/threads: **0** at latest recovery.
+Billing authority remains server-side. Client-reported duration cannot create billable usage or grant capacity. Stripe webhook state is signature-verified through the provider verification boundary and duplicate event IDs are idempotent. Tenant/RBAC boundaries remain authoritative. Billing state must not mutate hiring evidence, assessment history, or candidate scoring.
 
 ## Closeout Evidence
-M08.8 verified head `0d871017…` passed CI #1019. Closeout review found an Important gap: the dashboard needed accessible filtering/sorting over neutral workflow metadata. Genuine RED `f027b05c…` / CI #1021 failed on the missing accessible filter. Implementation `4ba2e1c9…` / CI #1023 implemented the intended behavior but exposed an ambiguous pre-existing assertion. Test-scoping fix `a6320513…` passed exact-head CI #1024 / run `35626271990`. Documentation head `395bc534…` / CI #1025 exposed traceability-schema verifier drift; `cc746131…` / CI #1026 then exposed the remaining required status/ledger markers. These are documentation-framework failures, not product regressions.
+CI #1051 on exact SHA `2fd33f1a57be3b7dbd5242536a46f43f2212a51f` passed dependency installation, lint, typecheck, unit/component tests, framework verifier tests, requirements-source verifier tests, autonomous-framework verification, requirements-source integrity verification, local Supabase startup, database boundary tests, build, Chromium installation, E2E, and PRD coverage verification. PR #11 was mergeable and had no review comments at the closeout recovery. CI #1053 on `0787e93b58d650095d828861eb6ab429859a8745` exposed only a durable-status schema regression: the required CI marker had been removed during closeout reconciliation. That documentation-only regression is repaired here.
 
-Exact next work: restore the M08 ledger's verifier-required canonical section headings, verify the resulting exact PR head in full CI, recheck PR #10 head/reviews/mergeability and all M08 closeout gates; if fully GREEN and stable, mark PR ready and squash-merge under the user's explicit AUTO_MERGE authorization, then verify post-merge `main` and activate M09.
+## Known Issues
+No known Critical or Important M09 product blocker at latest recovery. The remaining M09 action is fresh exact-head verification of this documentation repair followed by the authorized merge gate.
+
+Exact next work: Verify CI on the exact durable closeout head produced by this repair; if fully GREEN and PR #11 remains mergeable with no new blocking review or concurrent branch movement, mark it ready and squash-merge with expected-head protection, verify post-merge `main`, then activate M10 AI Quality, Guardrails & Evals and begin its first unfinished unit.

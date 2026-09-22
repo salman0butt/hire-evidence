@@ -1,6 +1,6 @@
 # M09 — Billing + Usage
 
-Status: **NOT STARTED**
+Status: **ACTIVE — M09.1 PLAN CONFIGURATION**
 
 ## Goal
 Deliver the authoritative PRD milestone below as a reviewable, evidence-backed capability.
@@ -29,30 +29,34 @@ Exit:
 organizations pay and limits are enforceable server-side.
 
 ## Dependencies
-Organizations; stable interview lifecycle and usage events.
+Organizations; stable interview lifecycle and usage events. M08 merged as `03be2d5857d04744af1b1e47c5351f08de0ae793`; post-merge CI #1029 is GREEN.
 
 ## In Scope
 The authoritative definition plus every default iteration listed below.
 
 ## Out of Scope
-Later milestones, speculative abstractions, and behavior not justified by the PRD.
+Later milestones, speculative generic metering/event frameworks, arbitrary runtime-defined plans, and behavior not justified by the PRD.
 
 ## Architecture Notes
-Stripe billing state is synchronized by verified idempotent webhooks. Server-authoritative interview seconds feed metering and entitlement checks; client-reported duration cannot grant capacity.
+Stripe billing state is synchronized by verified idempotent webhooks. Server-authoritative interview seconds feed metering and entitlement checks; client-reported duration cannot grant capacity. Internal stable plan IDs remain separate from Stripe price IDs.
 
 ## Selected Design / Implementation Plan
-- Not created yet. On activation, recover requirements, use Superpowers brainstorming/design, write an executable plan, and record the selected paths here.
+- Design: `docs/superpowers/specs/2026-09-22-billing-usage-design.md`.
+- Plan: `docs/superpowers/plans/2026-09-22-billing-usage.md`.
+- Selected approach: typed application-owned plan catalog; organization-scoped subscription projection; narrow Stripe adapter; signature-verified idempotent webhook sync; authoritative attempt-derived usage seconds; server-side entitlement service.
 
 ## Acceptance Criteria
 - PRD deliverables and exit criteria pass.
 - All required iterations are complete or explicitly resolved.
 - Relevant security/privacy/tenancy/accessibility/performance/AI-safety gates pass.
+- Client duration never becomes billing authority.
+- Duplicate finalization/webhook delivery is idempotent.
 - 0 unresolved Critical or Important review findings.
 - Traceability and feature state are reconciled.
 - Exact-final-head CI is green.
 
 ## Tasks / Iterations
-1. **NOT STARTED** — M09.1 — Plan configuration: simple organization plans/limits.
+1. **ACTIVE** — M09.1 — Plan configuration: simple organization plans/limits.
 2. **NOT STARTED** — M09.2 — Subscription persistence: organization billing state.
 3. **NOT STARTED** — M09.3 — Stripe customer + checkout: authorized organization roles only.
 4. **NOT STARTED** — M09.4 — Webhook synchronization: signature validation and idempotent state updates.
@@ -63,28 +67,28 @@ Stripe billing state is synchronized by verified idempotent webhooks. Server-aut
 9. **NOT STARTED** — M09.9 — Billing security/idempotency E2E: duplicate finalization/webhooks and authorization.
 
 ## TDD Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+M09.1 behavioral RED not yet created. Never fabricate evidence.
 
 ## Integration Test Evidence
-PENDING — milestone has not started. Never fabricate evidence.
+PENDING — milestone implementation has not reached persistence/provider integration.
 
 ## E2E / Visual Verification
-PENDING — define milestone-specific browser/realtime/visual scenarios before closeout where applicable.
+PENDING — M09.9 will cover authorized checkout/portal, forbidden roles, cross-tenant attempts, duplicate webhook/finalization, usage exhaustion and renewal behavior.
 
 ## Security Review
-PENDING — cover auth/authz, tenant isolation, untrusted input, secrets, data exposure, injection and milestone-specific threats.
+Activation design requires server-only Stripe secrets, raw-body webhook signature verification, organization/RBAC authorization, RLS for billing/usage data, controlled redirects, idempotency, and rejection of client-authoritative duration.
 
 ## Accessibility Review
-PENDING where UI exists — keyboard, focus, semantics, labels, status/error states, responsive and assistive-technology paths.
+PENDING where billing UI exists — keyboard, focus, semantics, labels, status/error states, responsive and assistive-technology paths.
 
 ## Performance Review
-PENDING where relevant — bounded work, pagination, resource limits, retries and hot-path cost.
+Plan lookup is bounded. Usage aggregation must be period-scoped/indexed. Webhook processing must remain bounded and safe under retries.
 
 ## AI / Eval Review
-Model usage/cost may inform metering but never overrides billing authority or tenant entitlements.
+Model usage/cost may inform later analytics but never overrides billing authority or tenant entitlements. Billing cannot alter assessment evidence or candidate scoring.
 
 ## Code Review Findings
-None yet; milestone has not started.
+No Critical or Important finding known at activation.
 
 ## Fixes / Re-review
 PENDING when evidence-backed findings exist.
@@ -103,16 +107,16 @@ python3 scripts/verify_prd_coverage.py
 ```
 
 ## Fresh Verification Results
-PENDING — milestone has not started.
+Post-M08-merge baseline: `main` SHA `03be2d58…`, CI #1029 / run `35651665555` GREEN. M09 branch exact-head verification pending after first implementation unit.
 
 ## Commits / Files Changed
-None yet.
+Activation branch `feat/billing-usage`; design/plan and durable activation docs added/updated.
 
 ## Known Limitations
-Milestone is NOT STARTED; implementation-specific limitations are not yet known.
+No billing behavior is implemented yet. M09.1 is the first active unit.
 
 ## Documentation Updated
-This living ledger must be reconciled whenever milestone state/evidence changes.
+Design, implementation plan, `CURRENT.md`, project status and this ledger activated on 2026-09-22.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → relevant PRD → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
