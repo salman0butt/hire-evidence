@@ -27,7 +27,14 @@ function validateMetrics(
   }
 
   for (const key of baselineKeys) {
-    if (!Number.isFinite(baseline[key]) || !Number.isFinite(candidate[key])) {
+    const baselineValue = baseline[key];
+    const candidateValue = candidate[key];
+    if (
+      baselineValue === undefined ||
+      candidateValue === undefined ||
+      !Number.isFinite(baselineValue) ||
+      !Number.isFinite(candidateValue)
+    ) {
       throw new Error("Eval metrics must contain only finite numeric values");
     }
   }
@@ -54,8 +61,13 @@ export function compareEvalVersions(
   const deltas: Record<string, number> = {};
 
   for (const key of metricKeys) {
+    const baselineValue = baseline.metrics[key];
+    const candidateValue = candidate.metrics[key];
+    if (baselineValue === undefined || candidateValue === undefined) {
+      throw new Error("Validated eval metrics unexpectedly missing");
+    }
     // Round away floating-point representation noise while preserving meaningful eval precision.
-    deltas[key] = Number((candidate.metrics[key] - baseline.metrics[key]).toFixed(12));
+    deltas[key] = Number((candidateValue - baselineValue).toFixed(12));
   }
 
   return {
