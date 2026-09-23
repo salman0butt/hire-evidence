@@ -1,33 +1,35 @@
 # Current Milestone
 
-Milestone: Billing + Usage (M09)
+Milestone: AI Quality, Guardrails & Evals (M10)
 
-Status: **IMPLEMENTATION COMPLETE — MERGE PENDING**
+Status: **IMPLEMENTATION COMPLETE — CLOSEOUT CI PENDING**
 
-Branch: `feat/billing-usage`
-PR: #11 — `Build organization billing and usage` — OPEN / DRAFT / mergeable at latest recovery.
-Base: `main` at M08 merge SHA `03be2d5857d04744af1b1e47c5351f08de0ae793`.
-Verified closeout head before this durable reconciliation: `2fd33f1a57be3b7dbd5242536a46f43f2212a51f`; CI #1051 / run `35754819174` — GREEN.
+Branch: `feat/ai-quality-evals`
+PR: #12 — `Build measurable AI quality evaluation layer` — OPEN / DRAFT / mergeable at latest recovery.
+Base: `main` at M09 merge SHA `3c63598354728d2651bf7630f9bea397a50b9a18`.
+Verified implementation head: `49e04b6ff8bd1d086d292dcaff2ad7980e96241b`; CI #1079 / run `35896402059` — GREEN.
 
-Design: `docs/superpowers/specs/2026-09-22-billing-usage-design.md`
-Plan: `docs/superpowers/plans/2026-09-22-billing-usage.md`
+Design: `docs/superpowers/specs/2026-09-23-ai-quality-guardrails-evals-design.md`
+Plan: `docs/superpowers/plans/2026-09-23-ai-quality-guardrails-evals.md`
 
 ## Iterations
-1. M09.1 Plan configuration — VERIFIED.
-2. M09.2 Subscription persistence — VERIFIED.
-3. M09.3 Stripe customer + checkout — VERIFIED.
-4. M09.4 Webhook synchronization — VERIFIED.
-5. M09.5 Billing portal + cancellation/plan changes — VERIFIED.
-6. M09.6 Server-authoritative interview-second usage — VERIFIED.
-7. M09.7 Usage periods/meter — VERIFIED.
-8. M09.8 Server-side entitlement enforcement — VERIFIED.
-9. M09.9 Billing security/idempotency E2E + closeout — VERIFIED by full CI #1051 on `2fd33f1a57be3b7dbd5242536a46f43f2212a51f`.
+1. M10.1 Eval harness — VERIFIED.
+2. M10.2 Golden interview dataset — VERIFIED.
+3. M10.3 Golden assessment dataset + human calibration — VERIFIED.
+4. M10.4 Interviewer behavior evals — VERIFIED.
+5. M10.5 Assessment grounding/schema/consistency evals — VERIFIED.
+6. M10.6 Adversarial prompt-injection evals — VERIFIED.
+7. M10.7 Fairness paired evals — VERIFIED.
+8. M10.8 Prompt/guardrail version regression comparisons — VERIFIED.
+9. M10.9 AI tracing + cost/quality metadata — VERIFIED.
+10. M10.10 Human override/disagreement analytics — VERIFIED.
+11. M10.11 CI regression gates — VERIFIED.
 
 ## Review state
-Unresolved Critical: 0 known. Unresolved Important: 0 known. Unresolved PR review comments/threads: 0 at latest recovery.
+Unresolved Critical: 0. Unresolved Important: 0. Unresolved PR review threads: 0 at latest recovery.
 
 ## Constraints
-Billing authority is server-side. Client-reported duration cannot create usage or grant capacity. Stripe webhooks require signature verification and idempotency. Organization billing data remains tenant-isolated and role-authorized. Billing must not alter hiring evidence or candidate scoring.
+Humans remain hiring decision makers. Evals measure AI behavior but do not introduce autonomous hire/reject/ranking or protected-trait, emotion, appearance, accent, personality, confidence, or deception inference. Transcript/model text is untrusted data. Deterministic gates run without provider credentials; unavailable live-model credentials cannot silently count as passing evidence.
 
 ## Next action
-Verify exact-head CI after the durable closeout reconciliation. If GREEN and the PR remains mergeable with no new blocking review or concurrent branch movement, mark PR #11 ready and squash-merge using expected-head protection. Verify post-merge `main`, activate M10 AI Quality, Guardrails & Evals, and continue.
+Verify CI on the final closeout-documentation head. If GREEN and PR #12 remains mergeable with no new blocking review or concurrent branch movement, mark ready and squash-merge with expected-head protection. Then verify post-merge `main` CI and activate M11 Enterprise Readiness.
