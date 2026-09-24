@@ -1,8 +1,9 @@
 begin;
 
-select plan(8);
+select plan(10);
 
 select has_table('public', 'audit_events', 'M11 audit events are persisted');
+select has_function('public', 'list_audit_events', array['uuid','integer','integer'], 'bounded audit read RPC exists');
 select ok(has_table_privilege('authenticated', 'public.audit_events', 'SELECT'), 'authenticated members can read tenant audit events through RLS');
 select ok(not has_table_privilege('authenticated', 'public.audit_events', 'INSERT'), 'authenticated clients cannot insert audit events directly');
 select ok(not has_table_privilege('authenticated', 'public.audit_events', 'UPDATE'), 'audit events are append-only to authenticated clients');
@@ -29,6 +30,11 @@ select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001'
 select is((select count(*) from public.audit_events), 1::bigint, 'RLS exposes only the current member organization audit events');
 select is((select organization_id from public.audit_events limit 1), '00000000-0000-0000-0000-000000000010'::uuid, 'visible audit event belongs to the current organization');
 select throws_ok($$update public.audit_events set action='tampered'$$, '42501', null, 'authenticated member cannot mutate immutable audit events');
+select is(
+  (select count(*) from public.list_audit_events('00000000-0000-0000-0000-000000000010'::uuid, 100, 0)),
+  1::bigint,
+  'bounded audit read RPC returns only the authorized organization'
+);
 
 select * from finish();
 rollback;
