@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createRetentionPolicy } from "./retention-policy";
+import { createRetentionPolicy, getEffectiveRetentionDays } from "./retention-policy";
 
 describe("organization retention policy", () => {
   it("requires explicit bounded retention windows and returns an immutable policy", () => {
@@ -20,6 +20,21 @@ describe("organization retention policy", () => {
       aiTraceDays: 30,
     });
     expect(Object.isFrozen(policy)).toBe(true);
+  });
+
+  it("calculates the effective configured retention for each supported artifact without a fallback default", () => {
+    const policy = createRetentionPolicy({
+      organizationId: "org-1",
+      transcriptDays: 90,
+      assessmentDays: 180,
+      evidenceDays: 365,
+      aiTraceDays: 30,
+    });
+
+    expect(getEffectiveRetentionDays(policy, "transcript")).toBe(90);
+    expect(getEffectiveRetentionDays(policy, "assessment")).toBe(180);
+    expect(getEffectiveRetentionDays(policy, "evidence")).toBe(365);
+    expect(getEffectiveRetentionDays(policy, "ai_trace")).toBe(30);
   });
 
   it("rejects missing, fractional, zero, negative, or unbounded retention values", () => {
