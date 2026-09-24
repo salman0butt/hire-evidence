@@ -14,6 +14,8 @@ export type RetentionPolicyInput = {
   aiTraceDays: number;
 };
 
+export type RetentionArtifact = "transcript" | "assessment" | "evidence" | "ai_trace";
+
 const MIN_RETENTION_DAYS = 1;
 const MAX_RETENTION_DAYS = 3650;
 
@@ -45,4 +47,20 @@ export function createRetentionPolicy(input: RetentionPolicyInput): RetentionPol
     evidenceDays: input.evidenceDays,
     aiTraceDays: input.aiTraceDays,
   });
+}
+
+export function getEffectiveRetentionDays(
+  policy: RetentionPolicy,
+  artifact: RetentionArtifact,
+): number {
+  switch (artifact) {
+    case "transcript":
+      return policy.transcriptDays;
+    case "assessment":
+      return policy.assessmentDays;
+    case "evidence":
+      return policy.evidenceDays;
+    case "ai_trace":
+      return policy.aiTraceDays;
+  }
 }
