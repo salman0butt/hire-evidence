@@ -24,3 +24,28 @@ on public.audit_events
 for select
 to authenticated
 using (private.is_organization_member(organization_id));
+
+create or replace function public.list_audit_events(
+  p_organization_id uuid,
+  p_limit integer,
+  p_offset integer
+)
+returns setof public.audit_events
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select audit_event.*
+  from public.audit_events as audit_event
+  where audit_event.organization_id = p_organization_id
+    and private.is_organization_member(p_organization_id)
+    and p_limit between 1 and 100
+    and p_offset >= 0
+  order by audit_event.occurred_at desc, audit_event.id desc
+  limit p_limit
+  offset p_offset;
+$$;
+
+revoke all on function public.list_audit_events(uuid, integer, integer) from public;
+grant execute on function public.list_audit_events(uuid, integer, integer) to authenticated;
