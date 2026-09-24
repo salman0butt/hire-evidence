@@ -1,6 +1,6 @@
 # M11 — Enterprise Readiness
 
-Status: **ACTIVE — M11.1 ADVANCED IMMUTABLE AUDIT TRAIL**
+Status: **ACTIVE — M11.3 COMPLETE DELETION WORKFLOWS**
 
 ## Goal
 Deliver enterprise hardening as reviewable, evidence-backed capabilities while preserving tenant isolation, privacy, evidence integrity and human hiring authority.
@@ -32,55 +32,57 @@ Later milestones, speculative abstractions, autonomous hiring decisions, candida
 - Exact-final-head CI is green.
 
 ## Tasks / Iterations
-1. **ACTIVE** — M11.1 — Advanced immutable audit trail.
-2. **PLANNED** — M11.2 — Retention configuration.
-3. **PLANNED** — M11.3 — Complete deletion workflows: transcript/assessment/evidence/audio/traces as applicable.
+1. **VERIFIED** — M11.1 — Advanced immutable audit trail.
+2. **VERIFIED** — M11.2 — Retention configuration.
+3. **ACTIVE** — M11.3 — Complete deletion workflows: transcript/assessment/evidence/audio/traces as applicable.
 4. **PLANNED** — M11.4 — Organization branding: safe logo/name/accent/welcome text; no CSS injection.
 5. **PLANNED** — M11.5 — Security hardening + rate limits + abuse controls.
 6. **PLANNED** — M11.6 — Platform observability + incident/SLA tooling.
 7. **PLANNED** — M11.7 — Access reviews/support privileged-access controls.
 8. **DECISION GATE** — M11.8 — SSO/SAML only when durable market/product evidence requires it.
 
-## M11.1 Design Boundary
-Begin with a runtime-validatable immutable audit-event domain contract. Require organization, actor, action, resource, timestamp and provenance identity; accept only bounded known metadata; reject secret-like/free-form sensitive payloads. After domain RED→GREEN, add append-only tenant-scoped persistence/RLS and authorized bounded reads.
+## Current Design Boundary
+M11.3 begins by inventorying persisted candidate artifacts and defining an explicit idempotent deletion state machine. Applicable transcript, assessment, evidence, audio and AI-trace data must be deleted or irreversibly detached tenant-safely; only minimum non-sensitive audit tombstones may remain. Retries/partial failure must fail closed and historical integrity must not be fabricated.
 
 ## TDD Evidence
-- RED: `8e5ab44d378d01dedc031f69f787565f7d13d75d`; CI #1085 failed at Typecheck because the intentionally absent `./audit-event` module was imported by the new contract test.
-- GREEN candidate: `53e5337992ad9661c68ab537b30787edaa071aae`; CI #1086 passed lint, typecheck and all 743 unit/component tests including 4 audit-event tests, but overall CI is **NOT GREEN** because the autonomous framework verifier rejected missing required milestone-ledger section headings.
-- Current repair restores those required headings without weakening tests or verification; fresh exact-head CI is required before M11.1 can be classified GREEN.
+- M11.1 RED/GREEN chain is complete through exact-head CI #1093 on `d2892d16a6511c79b3b630d8c2949cbb66e1efbe`.
+- M11.2 domain RED `3cf05460d3b65b833a1540078c04fc213931f860`; domain GREEN `7ae12445f4c2c9aa219f064c23d06319b59bafa9` passed CI #1095.
+- M11.2 persistence/mutation/audit RED `5c086b3f4ce91c251dd07f3b307164814c658514`; GREEN `33054e2c0f20850e37df22171cfd366e99aebb77` passed CI #1097.
+- M11.2 effective-policy RED `7d4b2eb5b4f1dfd889cc10d836f4ead68e7734a3`; GREEN `91a19c3274b77f77d5ac6f701984f2ecc746d314` passed exact-head CI #1099 / run `36006380119`.
+- M11.3 RED: pending artifact inventory and smallest state-machine contract.
 
 ## Integration Test Evidence
-PENDING. M11.1 persistence work requires append-only tenant-scoped database/RLS and cross-tenant adversarial tests after the domain contract is objectively GREEN.
+M11.1 append-only audit persistence/RLS and bounded organization-scoped reads are verified. M11.2 tenant-scoped retention persistence, owner/admin mutation authorization, reviewer denial, database bounds, immutable policy-change audit evidence and RLS tests are verified. M11.3 deletion persistence/adversarial evidence is pending.
 
 ## Integration / E2E Evidence
-PENDING. Persistence work requires tenant/RLS adversarial tests. UI/browser coverage follows only when a UI boundary exists.
+M11.1/M11.2 have no required new UI boundary. Database/security integration is verified through exact-head CI. M11.3 will require tenant/RLS, retry/partial-failure and historical-integrity coverage before completion.
 
 ## Security Review
-PENDING. Audit logs must not store credentials/secrets or become a shadow candidate-evidence store; cross-tenant access must fail closed. Domain contract currently rejects unbounded/secret-like payloads by construction; persistence/RLS review follows.
+M11.1/M11.2 preserve tenant isolation and explicit bounded data handling; audit metadata excludes secret-like/free-form sensitive payloads, retention has no invented legal default, and retention mutation is owner/admin-authorized. M11.3 must not allow cross-tenant deletion, silent partial success, or deletion of required minimal audit integrity records.
 
 ## Security / Privacy Review
-PENDING. Preserve tenant isolation, privacy minimization, immutable provenance, anti-fabrication and human hiring authority throughout M11.
+Preserve tenant isolation, privacy minimization, immutable provenance, anti-fabrication and human hiring authority throughout M11. Candidate deletion should minimize retained personal data while keeping only non-sensitive integrity tombstones where required.
 
 ## Accessibility / Performance Review
-PENDING where relevant. Audit reads must be bounded/paginated; any UI must meet keyboard/semantic/status requirements.
+No UI boundary exists yet for M11.1/M11.2. Audit reads are bounded/paginated. Deletion work must be bounded/idempotent and safe to retry; any later UI must meet keyboard/semantic/status requirements.
 
 ## AI / Eval Review
 AI traces and assessment artifacts follow retention/deletion/access/observability policy without leaking prompts, secrets or PII unnecessarily. Technical failures never become candidate scoring evidence.
 
 ## Code Review Findings
-None known at latest recovery. Re-review after persistence/RLS implementation and before milestone closeout.
+Unresolved Critical: 0 known. Unresolved Important: 0 known. Unresolved PR review threads: 0 at latest recovery.
 
 ## Fresh Verification
 Per unit: focused tests then repository quality gate as applicable. Milestone closeout requires lint, typecheck, tests, database/security checks, build, E2E, autonomous-framework verification, PRD coverage, exact-final-head CI.
 
 ## Fresh Verification Results
-CI #1086 on `53e5337992ad9661c68ab537b30787edaa071aae`: install PASS; lint PASS with pre-existing warnings; typecheck PASS; unit/component tests PASS (743/743); framework-verifier unit tests PASS; requirements-source verifier tests PASS; autonomous-framework verification FAIL solely because this M11 ledger lacked the exact required headings `## In Scope`, `## Out of Scope`, `## Integration Test Evidence`, `## Security Review`, and `## Fresh Verification Results`. Later stages were skipped. This commit restores those headings; fresh exact-head CI is pending.
+Exact head `91a19c3274b77f77d5ac6f701984f2ecc746d314` passed CI #1099 / run `36006380119`, completing M11.2 effective configured retention calculation. PR #13 remained open/draft/mergeable with no unresolved review threads at recovery.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → PRD/traceability → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
 
 ## Exact Next Work
-Verify fresh exact-head CI after the ledger repair. If GREEN, classify the M11.1 domain contract GREEN, then establish genuine RED for append-only tenant-scoped audit persistence/RLS and authorized bounded reads.
+Inventory persisted candidate artifacts for M11.3, establish genuine RED for an explicit idempotent deletion state-machine/domain contract, then implement the minimum safe behavior before tenant-scoped persistence deletion/RLS work.
 
 ## Completion Checklist
 - [ ] Requirements and iterations accounted for.
