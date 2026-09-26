@@ -1,19 +1,20 @@
 # Known Issues
 
-Actual Git/code/current exact-SHA CI outrank stale historical text.
+Actual Git/code/current exact-SHA CI override stale historical status. Reconciled 2026-09-26.
 
 ## Current unresolved issues
 
+### M11.3 candidate deletion persistence
+**Required scope / milestone blocker.** Current TypeScript lifecycle at `b388936674db6d8f5dbeb945d93da37a6b5ba8db` does not erase persisted candidate data. Inventory candidate-linked rows and external artifacts; implement and test tenant-safe deletion, RLS, idempotence, retries, partial failure and integrity-preserving minimal audit tombstones. Do not claim domain-level state is actual erasure.
+
+### CI #1103 recovery marker
+**CI blocker under repair.** At head `b388936674db6d8f5dbeb945d93da37a6b5ba8db`, 753 unit/component tests passed but `scripts/verify_autonomous_framework.py` failed because STATUS lacked literal `CI status:`. This reconciliation fixes the missing marker; downstream database/build/E2E gates did not run. The new exact head needs full verification.
+
 ### Runtime provider configuration / live deployment smoke
-Classification: **Deployment configuration; not an M08 repository blocker**.
-Real Gemini browser smoke requires owner-supplied `GEMINI_API_KEY` and remains tracked in `docs/LOCAL-REALTIME-ACCEPTANCE.md`. Repository CI must not claim this external smoke was executed.
+**Deployment configuration, not current M11 repository blocker.** Real Gemini browser smoke needs owner-supplied `GEMINI_API_KEY`. Never claim external smoke passed without executing it.
 
 ### External CI maintenance notices
-Classification: **Informational**.
-Third-party GitHub Actions/package runtime deprecation notices may appear and should be handled through normal maintenance without weakening quality gates.
+**Informational.** Treat package/Actions deprecation normally; do not weaken required quality gates.
 
-## M08 review blockers
-No unresolved Critical or Important finding is known at the latest recovery. The M08.9 dashboard list/filter/sort acceptance gap was resolved under TDD: genuine RED `f027b05c…` / CI #1021; implementation `4ba2e1c9…`; assertion-scoping fix `a6320513…` passed CI #1024 / run `35626271990`.
-
-## Merge gate
-PR #10 remains draft/unmerged until the documentation-reconciliation head is exact-SHA GREEN and the final remote head, review/thread state, mergeability and safety gates are rechecked. The user has explicitly authorized autonomous milestone merge only when every gate is satisfied.
+## Review and merge
+PR #13 remains OPEN/DRAFT; 0 review submissions and 0 unresolved threads at recovery. M11.3–M11.7 are incomplete. The owner permits milestone auto-merge only after all review, safety, documentation, concurrency and exact-final-head CI gates pass. Do not merge now.
