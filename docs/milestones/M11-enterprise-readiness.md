@@ -49,10 +49,14 @@ M11.3 begins by inventorying persisted candidate artifacts and defining an expli
 - M11.2 domain RED `3cf05460d3b65b833a1540078c04fc213931f860`; domain GREEN `7ae12445f4c2c9aa219f064c23d06319b59bafa9` passed CI #1095.
 - M11.2 persistence/mutation/audit RED `5c086b3f4ce91c251dd07f3b307164814c658514`; GREEN `33054e2c0f20850e37df22171cfd366e99aebb77` passed CI #1097.
 - M11.2 effective-policy RED `7d4b2eb5b4f1dfd889cc10d836f4ead68e7734a3`; GREEN `91a19c3274b77f77d5ac6f701984f2ecc746d314` passed exact-head CI #1099 / run `36006380119`.
-- M11.3 RED: pending artifact inventory and smallest state-machine contract.
+- M11.3 domain RED `c9bb5b0...` / CI #1102, domain implementation `b388936...`.
+- M11.3 candidate-row persistence RED `2afcd90...` / #1105; narrow GREEN `4050e110...` / full #1106.
+- M11.3 artifact-chain RED `f3ec33f...` / #1107; expanded assessment-trigger RED `66fe1a7...` / #1109 (14/15 expected failures).
+- M11.3 internal FK-ordered SQL erasure GREEN `be3b96a...` / full exact-head CI #1110, including database/build/E2E/coverage.
+- M11.3 unforeseen-FK atomic rollback regression `fdd2f54...` / CI #1111 pending when written.
 
 ## Integration Test Evidence
-M11.1 append-only audit persistence/RLS and bounded organization-scoped reads are verified. M11.2 tenant-scoped retention persistence, owner/admin mutation authorization, reviewer denial, database bounds, immutable policy-change audit evidence and RLS tests are verified. M11.3 deletion persistence/adversarial evidence is pending.
+M11.1 append-only audit persistence/RLS and bounded organization-scoped reads are verified. M11.2 tenant-scoped retention persistence, owner/admin mutation authorization, reviewer denial, database bounds, immutable policy-change audit evidence and RLS tests are verified. M11.3 database artifact-chain erasure is GREEN at exact-head CI #1110; rollback adversarial regression at #1111 awaited when this note was written. External artifacts remain subject to separate applicability verification.
 
 ## Integration / E2E Evidence
 M11.1/M11.2 have no required new UI boundary. Database/security integration is verified through exact-head CI. M11.3 will require tenant/RLS, retry/partial-failure and historical-integrity coverage before completion.
@@ -82,7 +86,7 @@ Exact head `91a19c3274b77f77d5ac6f701984f2ecc746d314` passed CI #1099 / run `360
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → PRD/traceability → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
 
 ## Exact Next Work
-Inventory persisted candidate artifacts for M11.3, establish genuine RED for an explicit idempotent deletion state-machine/domain contract, then implement the minimum safe behavior before tenant-scoped persistence deletion/RLS work.
+Recover CI #1111 on rollback test `fdd2f54...`; fix unexpected failures. Verify subsequent docs head. Audit applicability of external audio/provider traces and privacy closeout, then finish M11.3 before M11.4.
 
 ## Completion Checklist
 - [ ] Requirements and iterations accounted for.
@@ -96,3 +100,9 @@ Inventory persisted candidate artifacts for M11.3, establish genuine RED for an 
 
 ## Next Milestone
 M12 — Integrations.
+
+## Reconciliation — 2026-09-28
+- Full run #1110 https://github.com/salman0butt/hire-evidence/actions/runs/36463309265 passed lint/typecheck/unit/framework/requirements checks, pgTAP database boundary, build, E2E, and PRD coverage at `be3b96a3d277668ffa95c61027c8b0626a1bb077`.
+- Security review: preserved owner/admin authorization, restricted function execution and receipt table, tenant-scoped candidate selection, parent lock, database transactional rollback, one digest receipt and minimal audit event. Database deletion does not rewrite immutable assessment history; it explicitly erases source and versions only under authorized deletion. External service traces/audio have NOT been verified erased.
+- Additional pgTAP unexpected restrictive-FK test at `fdd2f54e8e286ed64cb1c38581457c9ef1c88203` requires its own final CI #1111 verification. Do not treat #1110 as verifying the newer test.
+- Independent reviewer was not available in this tool session; closeout review remains open. No merge while remaining M11 iterations are incomplete.
