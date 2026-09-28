@@ -166,7 +166,7 @@ values ('00000000-0000-0000-0000-000000000681');
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000601', true);
 select throws_ok(
-  $select public.delete_candidate_data('00000000-0000-0000-0000-000000000610'::uuid, '00000000-0000-0000-0000-000000000681'::uuid)$,
+  $$select public.delete_candidate_data('00000000-0000-0000-0000-000000000610'::uuid, '00000000-0000-0000-0000-000000000681'::uuid)$$,
   '23503',
   'update or delete on table "candidates" violates foreign key constraint "deletion_hold_candidate_fkey" on table "candidate_deletion_test_blocker"',
   'unexpected FK fails closed instead of silently allowing partial deletion'
@@ -181,7 +181,7 @@ drop table public.candidate_deletion_test_blocker;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000601', true);
 select lives_ok(
-  $select public.delete_candidate_data('00000000-0000-0000-0000-000000000610'::uuid, '00000000-0000-0000-0000-000000000681'::uuid)$,
+  $$select public.delete_candidate_data('00000000-0000-0000-0000-000000000610'::uuid, '00000000-0000-0000-0000-000000000681'::uuid)$$,
   'retry after resolving restrictive dependency succeeds'
 );
 reset role;
