@@ -1,6 +1,6 @@
 begin;
 
-select plan(15);
+select plan(25);
 
 -- A full candidate chain, including sensitive transcript, nested assessment
 -- evidence, human notes and consent. The separate organization is a sentinel.
@@ -133,6 +133,62 @@ select lives_ok(
   'retry after full erasure is idempotent'
 );
 reset role;
+
+
+-- An unknown restrictive dependent row must fail closed: all earlier
+-- invitation erasure rolls back with the candidate, receipt and audit.
+insert into public.candidates (id, organization_id, job_id, full_name, email, created_by) values (
+  '00000000-0000-0000-0000-000000000681',
+  '00000000-0000-0000-0000-000000000610',
+  '00000000-0000-0000-0000-000000000630',
+  'Rollback Candidate', 'rollback@example.test',
+  '00000000-0000-0000-0000-000000000601'
+);
+insert into public.candidate_invitations (
+  id, organization_id, job_id, candidate_id, interviewer_version_id, token_hash,
+  expires_at, state, completed_at
+) values (
+  '00000000-0000-0000-0000-000000000682',
+  '00000000-0000-0000-0000-000000000610',
+  '00000000-0000-0000-0000-000000000630',
+  '00000000-0000-0000-0000-000000000681',
+  '00000000-0000-0000-0000-000000000672',
+  repeat('f', 64), now() + interval '1 day', 'completed', now()
+);
+create table public.candidate_deletion_test_blocker (
+  candidate_id uuid not null,
+  constraint deletion_hold_candidate_fkey
+    foreign key (candidate_id) references public.candidates(id) on delete restrict
+);
+insert into public.candidate_deletion_test_blocker (candidate_id)
+values ('00000000-0000-0000-0000-000000000681');
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000601', true);
+select throws_ok(
+  $select public.delete_candidate_data('00000000-0000-0000-0000-000000000610'::uuid, '00000000-0000-0000-0000-000000000681'::uuid)$,
+  '23503',
+  'update or delete on table "candidates" violates foreign key constraint "deletion_hold_candidate_fkey" on table "candidate_deletion_test_blocker"',
+  'unexpected FK fails closed instead of silently allowing partial deletion'
+);
+reset role;
+select is((select count(*) from public.candidates where id='00000000-0000-0000-0000-000000000681'::uuid), 1::bigint, 'failed deletion preserves candidate');
+select is((select count(*) from public.candidate_invitations where id='00000000-0000-0000-0000-000000000682'::uuid), 1::bigint, 'failed deletion restores already-deleted invitation');
+select is((select count(*) from public.candidate_deletion_receipts where organization_id='00000000-0000-0000-0000-000000000610'::uuid), 1::bigint, 'failed deletion creates no receipt');
+select is((select count(*) from public.audit_events where organization_id='00000000-0000-0000-0000-000000000610'::uuid and action='candidate_data.deleted'), 1::bigint, 'failed deletion creates no completion audit');
+
+drop table public.candidate_deletion_test_blocker;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000601', true);
+select lives_ok(
+  $select public.delete_candidate_data('00000000-0000-0000-0000-000000000610'::uuid, '00000000-0000-0000-0000-000000000681'::uuid)$,
+  'retry after resolving restrictive dependency succeeds'
+);
+reset role;
+select is((select count(*) from public.candidates where id='00000000-0000-0000-0000-000000000681'::uuid), 0::bigint, 'retry erases candidate');
+select is((select count(*) from public.candidate_invitations where id='00000000-0000-0000-0000-000000000682'::uuid), 0::bigint, 'retry erases invitation');
+select is((select count(*) from public.candidate_deletion_receipts where organization_id='00000000-0000-0000-0000-000000000610'::uuid), 2::bigint, 'retry adds precisely one more receipt');
+select is((select count(*) from public.audit_events where organization_id='00000000-0000-0000-0000-000000000610'::uuid and action='candidate_data.deleted'), 2::bigint, 'retry adds precisely one more audit event');
 
 select * from finish();
 rollback;
