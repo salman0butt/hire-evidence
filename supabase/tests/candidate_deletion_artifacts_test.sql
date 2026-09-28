@@ -1,6 +1,6 @@
 begin;
 
-select plan(14);
+select plan(15);
 
 -- A full candidate chain, including sensitive transcript, nested assessment
 -- evidence, human notes and consent. The separate organization is a sentinel.
@@ -62,6 +62,10 @@ insert into public.interview_attempts (
   '00000000-0000-0000-0000-000000000630', '00000000-0000-0000-0000-000000000673',
   '00000000-0000-0000-0000-000000000650', '00000000-0000-0000-0000-000000000672', 'completed'
 );
+insert into public.interview_assessment_triggers (id, attempt_id) values (
+  '00000000-0000-0000-0000-000000000680',
+  '00000000-0000-0000-0000-000000000674'
+);
 insert into public.interview_transcript_messages (
   id, attempt_id, event_id, sequence, speaker, text
 ) values (
@@ -112,6 +116,7 @@ select is((select count(*) from public.candidates where id='00000000-0000-0000-0
 select is((select count(*) from public.candidate_invitations where id='00000000-0000-0000-0000-000000000673'::uuid), 0::bigint, 'invitation token hash is erased');
 select is((select count(*) from public.candidate_consent_events where id='00000000-0000-0000-0000-000000000679'::uuid), 0::bigint, 'consent artifact is erased');
 select is((select count(*) from public.interview_attempts where id='00000000-0000-0000-0000-000000000674'::uuid), 0::bigint, 'candidate attempt is erased');
+select is((select count(*) from public.interview_assessment_triggers where id='00000000-0000-0000-0000-000000000680'::uuid), 0::bigint, 'attempt assessment trigger is erased');
 select is((select count(*) from public.interview_transcript_messages where id='00000000-0000-0000-0000-000000000676'::uuid), 0::bigint, 'durable transcript is erased');
 select is((select count(*) from public.interview_technical_events where id='00000000-0000-0000-0000-000000000677'::uuid), 0::bigint, 'attempt technical event is erased');
 select is((select count(*) from public.assessment_generations where id='00000000-0000-0000-0000-000000000675'::uuid), 0::bigint, 'assessment and embedded evidence/provenance are erased');
