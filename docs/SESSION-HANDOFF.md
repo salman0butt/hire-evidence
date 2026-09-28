@@ -14,3 +14,10 @@ Read live Git/PR/CI and `docs/progress/STATUS.md` first; older text may be stale
 Verify documentation-marker fix on the new exact head. Then inventory Supabase candidate artifacts and create behavioral RED for tenant-scoped idempotent deletion, adversarial cross-tenant denial, retries, partial failure and historical-integrity/minimal-audit handling. The state-machine contract must not be confused with actual data erasure.
 
 Exact next work: recheck exact-head CI for marker repair, then establish persisted deletion RED.
+
+## Verified recovery on 2026-09-28
+- The earlier handoff above is historical, not live execution state. Actual main remains `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; PR #13 was still OPEN/DRAFT at artifact-chain RED head `f3ec33f32f155b75cbfc996bcbee84d1b6eecbd1` when this note was written.
+- Full exact-head CI #1104 (`f379f2afd4e6a570a86d374ef410269f2ff5e3e1`) fixed the STATUS marker; initial candidate-row deletion passed CI #1106 (`4050e110cd7845f371ebfe4027d75dacc8a2a166`).
+- Artifact-chain test at `f3ec33f32f155b75cbfc996bcbee84d1b6eecbd1` was confirmed genuinely RED by CI #1107 (https://github.com/salman0butt/hire-evidence/actions/runs/36263470981): 13/14 assertions failed because restrictive `candidate_invitations_candidate_id_fkey` prevents candidate-row-only erasure. Previous lint/typecheck/unit/framework stages passed. This is NOT GREEN or full M11.3 completion.
+- Next: add a subsequent migration performing tenant-scoped transactional, FK-ordered deletion of candidate reviews/overrides, generations/evidence, transcript/technical events, attempts, consent events, invitations and candidate; preserve owner/admin authorization, one minimal receipt/audit, retry idempotence and fail-closed semantics. Test external audio/traces separately where applicable. Keep PR draft until all M11 gates pass.
+- This handoff update is a safe GitHub connector file-write diagnostic after switching the GitHub-specific app permission to Allow all actions. Its own commit/CI must be recovered live; do not infer that artifact-chain tests passed merely because the connector accepted a documentation write.
