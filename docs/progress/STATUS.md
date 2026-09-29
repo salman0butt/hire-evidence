@@ -1,13 +1,13 @@
 # Project Status
 
-Last reconciled: 2026-09-28. Current Git/code/exact-SHA CI outrank these recovery notes.
+Last reconciled: 2026-09-29. Current Git/code/exact-SHA CI outrank these recovery notes.
 
 ## Completed Milestones
 M00–M10 COMPLETE and integrated. M10 merge/main `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; post-merge CI #1084 GREEN.
 
 ## Current Milestone
 M11 Enterprise Readiness — ACTIVE.
-Active task: M11.3 complete deletion workflows — database artifact-chain implementation verified; external audio/provider trace applicability, rollback regression verification and final privacy closeout outstanding.
+Active task: M11.3 complete deletion workflows — internal database artifact-chain and rollback regression verified by full CI #1118; unused Gemini provider session resumption removed and verified by exact-head CI #1118. External provider logging/abuse settings, any other external artifacts, and independent privacy closeout remain outstanding.
 Active branch: `feat/enterprise-readiness`.
 Active PR: #13 OPEN / DRAFT; not merge eligible.
 Main/base: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`.
@@ -16,7 +16,7 @@ M11.3 first candidate-row GREEN `4050e110cd7845f371ebfe4027d75dacc8a2a166` CI #1
 M11.3 artifact-chain RED `f3ec33f32f155b75cbfc996bcbee84d1b6eecbd1` CI #1107; expanded assessment-trigger RED `66fe1a7455915718c23846d363ddf6cf134afb14` CI #1109 (14/15 expected assertion failures).
 M11.3 FK-ordered transactional deletion implementation `be3b96a3d277668ffa95c61027c8b0626a1bb077`: full exact-head CI #1110 / `36463309265` GREEN, including database, build, E2E and coverage.
 M11.3 subsequent unexpected-FK atomic-rollback regression head `fdd2f54e8e286ed64cb1c38581457c9ef1c88203`: CI #1111 / `36464166029` was IN PROGRESS at reconciliation; recover its final outcome from GitHub, do not infer success.
-CI status: #1110 GREEN for implementation head `be3b96a3...`; newer rollback test head `fdd2f54e8...` CI #1111 CANCELLED by the documentation push before database tests; docs head `7b775de7...` CI #1112 FAILED only at autonomous-framework verification due the missing `Active PR:` marker. This commit repairs the marker and requires new exact-head full CI.
+CI status: full exact-head CI #1118 / run 36554834995 GREEN at `dabe4721675395d421f023a46ca4b73ae56a82da`, including lint, typecheck,  unit/component, framework, database boundary (including unexpected-FK rollback), build, E2E and PRD coverage. CI #1116 provided genuine RED for two Gemini session-resumption configuration tests; commits `3b419b8` and `dabe472` removed unused resumption from transport setup and ephemeral token constraints. Provider-side deletion and ZDR are not established.
 
 ## M11 Task State
 - M11.1 immutable audit — VERIFIED.
@@ -34,4 +34,4 @@ PR #13 had zero submitted reviews and zero unresolved inline threads at latest r
 ## Known Issues
 See `docs/progress/KNOWN-ISSUES.md`; real external Gemini browser smoke still depends on owner-supplied credentials and is not repository CI evidence.
 
-Exact next work: verify this repair and unexpected-FK rollback regression together on the new exact-head full CI, fix real failures, then address Gemini session-resumption privacy risk and M11.3 external artifact applicability before activating M11.4.
+Exact next work: independently review M11.3 privacy and deletion boundaries, inventory external audio/traces and owner-controlled Gemini logging/abuse settings, and document any required operator actions; do not claim provider-side deletion or activate M11.4 until closeout.
