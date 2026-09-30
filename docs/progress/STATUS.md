@@ -7,7 +7,7 @@ M00–M10 COMPLETE and integrated. M10 merge/main `54444d49761b7eb089c1c6a30a27f
 
 ## Current Milestone
 M11 Enterprise Readiness — ACTIVE.
-Active task: M11.3 complete deletion workflows — internal database artifact-chain and rollback regression verified by full CI #1118; unused Gemini provider session resumption removed and verified by exact-head CI #1118. External provider logging/abuse settings, any other external artifacts, and independent privacy closeout remain outstanding.
+Active task: M11.4 safe organization branding — extend the existing organization settings flow with validated branding metadata and safe rendering. M11.3 repository deletion workflows are VERIFIED through full CI #1118; provider-side deletion or deployment-wide zero retention is not claimed.
 Active branch: `feat/enterprise-readiness`.
 Active PR: #13 OPEN / DRAFT; not merge eligible.
 Main/base: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`.
@@ -21,8 +21,8 @@ CI status: full exact-head CI #1118 / run 36554834995 GREEN at `dabe4721675395d4
 ## M11 Task State
 - M11.1 immutable audit — VERIFIED.
 - M11.2 retention configuration — VERIFIED.
-- M11.3 deletion — ACTIVE; source database artifact chain implemented, additional adversarial rollback coverage under CI; no claim of external provider/audio erasure.
-- M11.4 organization branding — PLANNED.
+- M11.3 deletion — VERIFIED; internal artifact chain, idempotency and unexpected-FK rollback are covered by full CI #1118; application-controlled Gemini Live session resumption removed. External provider settings remain deployment/operator evidence only.
+- M11.4 organization branding — ACTIVE.
 - M11.5 security hardening/rate limits/abuse — PLANNED.
 - M11.6 observability/incident/SLA — PLANNED.
 - M11.7 privileged support/access reviews — PLANNED.
@@ -34,4 +34,4 @@ PR #13 had zero submitted reviews and zero unresolved inline threads at latest r
 ## Known Issues
 See `docs/progress/KNOWN-ISSUES.md`; real external Gemini browser smoke still depends on owner-supplied credentials and is not repository CI evidence.
 
-Exact next work: independently review M11.3 privacy and deletion boundaries, inventory external audio/traces and owner-controlled Gemini logging/abuse settings, and document any required operator actions; do not claim provider-side deletion or activate M11.4 until closeout.
+Exact next work: establish M11.4 safe-branding RED for validated accent/logo/welcome metadata in the existing organization settings boundary, then implement the smallest GREEN without arbitrary CSS/HTML/script execution.
