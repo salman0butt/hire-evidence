@@ -50,6 +50,9 @@ describe("organization settings action", () => {
       hiring_use_case: "  Structured technical hiring  ",
       candidate_support_email: "  candidates@acme.test  ",
       candidate_support_url: "  https://acme.test/interview-support  ",
+      logo_url: "  https://cdn.acme.test/logo.svg  ",
+      accent_color: "  #1A2B3C  ",
+      welcome_text: "  Welcome to your structured interview.  ",
       organization_id: "attacker-selected-organization",
       created_by: "attacker-selected-user",
     });
@@ -69,6 +72,9 @@ describe("organization settings action", () => {
       hiringUseCase: "Structured technical hiring",
       candidateSupportEmail: "candidates@acme.test",
       candidateSupportUrl: "https://acme.test/interview-support",
+      logoUrl: "https://cdn.acme.test/logo.svg",
+      accentColor: "#1A2B3C",
+      welcomeText: "Welcome to your structured interview.",
     });
     expect(mockedRevalidatePath).toHaveBeenCalledWith(`/app/o/${organizationId}`);
     expect(mockedRevalidatePath).toHaveBeenCalledWith(`/app/o/${organizationId}/settings`);
@@ -148,6 +154,30 @@ describe("organization settings action", () => {
     expect(result).toEqual({
       status: "error",
       message: "Candidate support URL must use http or https.",
+    });
+    expect(mockedUpdateSettings).not.toHaveBeenCalled();
+    expect(mockedRevalidatePath).not.toHaveBeenCalled();
+  });
+
+  it("rejects unsafe organization branding before persistence", async () => {
+    const result = await updateOrganizationSettingsAction(
+      organizationId,
+      idleOrganizationActionState,
+      form({
+        name: "Acme",
+        company_size: "",
+        hiring_use_case: "",
+        candidate_support_email: "",
+        candidate_support_url: "",
+        logo_url: "javascript:alert(1)",
+        accent_color: "#1A2B3C",
+        welcome_text: "Welcome",
+      }),
+    );
+
+    expect(result).toEqual({
+      status: "error",
+      message: "Organization logo URL must use https.",
     });
     expect(mockedUpdateSettings).not.toHaveBeenCalled();
     expect(mockedRevalidatePath).not.toHaveBeenCalled();
