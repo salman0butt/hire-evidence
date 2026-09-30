@@ -53,6 +53,9 @@ export async function updateOrganizationSettingsAction(
     name: formData.get("name"),
     companySize: formData.get("company_size"),
     hiringUseCase: formData.get("hiring_use_case"),
+    logoUrl: formData.get("logo_url"),
+    accentColor: formData.get("accent_color"),
+    welcomeText: formData.get("welcome_text"),
   });
 
   if (!validation.ok) {
@@ -85,6 +88,9 @@ export async function updateOrganizationSettingsAction(
     await updateOrganizationSettings({
       organizationId,
       ...validation.value,
+      logoUrl: validation.value.logoUrl ?? null,
+      accentColor: validation.value.accentColor ?? null,
+      welcomeText: validation.value.welcomeText ?? null,
       candidateSupportEmail,
       candidateSupportUrl,
     });
