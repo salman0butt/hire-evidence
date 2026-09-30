@@ -13,6 +13,9 @@ export type OrganizationSummary = Readonly<{
   hiringUseCase: string | null;
   candidateSupportEmail?: string | null;
   candidateSupportUrl?: string | null;
+  logoUrl?: string | null;
+  accentColor?: string | null;
+  welcomeText?: string | null;
 }>;
 
 export type UpdateOrganizationSettingsInput = Readonly<{
@@ -22,6 +25,9 @@ export type UpdateOrganizationSettingsInput = Readonly<{
   hiringUseCase: string | null;
   candidateSupportEmail: string | null;
   candidateSupportUrl: string | null;
+  logoUrl: string | null;
+  accentColor: string | null;
+  welcomeText: string | null;
 }>;
 
 export async function createOrganization(
@@ -45,7 +51,7 @@ export async function listOrganizations(): Promise<OrganizationSummary[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("organizations")
-    .select("id,name,company_size,hiring_use_case,candidate_support_email,candidate_support_url")
+    .select("id,name,company_size,hiring_use_case,candidate_support_email,candidate_support_url,logo_url,accent_color,welcome_text")
     .order("name", { ascending: true })
     .order("id", { ascending: true });
 
@@ -60,6 +66,9 @@ export async function listOrganizations(): Promise<OrganizationSummary[]> {
     hiringUseCase: organization.hiring_use_case,
     candidateSupportEmail: organization.candidate_support_email,
     candidateSupportUrl: organization.candidate_support_url,
+    logoUrl: organization.logo_url,
+    accentColor: organization.accent_color,
+    welcomeText: organization.welcome_text,
   }));
 }
 
@@ -69,7 +78,7 @@ export async function getOrganization(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("organizations")
-    .select("id,name,company_size,hiring_use_case,candidate_support_email,candidate_support_url")
+    .select("id,name,company_size,hiring_use_case,candidate_support_email,candidate_support_url,logo_url,accent_color,welcome_text")
     .eq("id", organizationId)
     .maybeSingle();
 
@@ -84,6 +93,9 @@ export async function getOrganization(
     hiringUseCase: data.hiring_use_case,
     candidateSupportEmail: data.candidate_support_email,
     candidateSupportUrl: data.candidate_support_url,
+    logoUrl: data.logo_url,
+    accentColor: data.accent_color,
+    welcomeText: data.welcome_text,
   };
 }
 
@@ -99,6 +111,9 @@ export async function updateOrganizationSettings(
       hiring_use_case: input.hiringUseCase,
       candidate_support_email: input.candidateSupportEmail,
       candidate_support_url: input.candidateSupportUrl,
+      logo_url: input.logoUrl,
+      accent_color: input.accentColor,
+      welcome_text: input.welcomeText,
       updated_at: new Date().toISOString(),
     })
     .eq("id", input.organizationId)
