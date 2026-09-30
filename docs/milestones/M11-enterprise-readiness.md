@@ -1,6 +1,6 @@
 # M11 — Enterprise Readiness
 
-Status: **ACTIVE — M11.3 COMPLETE DELETION WORKFLOWS**
+Status: **ACTIVE — M11.4 SAFE ORGANIZATION BRANDING**
 
 ## Goal
 Deliver enterprise hardening as reviewable, evidence-backed capabilities while preserving tenant isolation, privacy, evidence integrity and human hiring authority.
@@ -34,8 +34,8 @@ Later milestones, speculative abstractions, autonomous hiring decisions, candida
 ## Tasks / Iterations
 1. **VERIFIED** — M11.1 — Advanced immutable audit trail.
 2. **VERIFIED** — M11.2 — Retention configuration.
-3. **ACTIVE** — M11.3 — Complete deletion workflows: transcript/assessment/evidence/audio/traces as applicable.
-4. **PLANNED** — M11.4 — Organization branding: safe logo/name/accent/welcome text; no CSS injection.
+3. **VERIFIED** — M11.3 — Complete repository deletion workflows: tenant-scoped internal candidate artifacts, rollback/idempotency, and removal of application-controlled Gemini Live session resumption; no provider-side deletion claim.
+4. **ACTIVE** — M11.4 — Organization branding: safe logo/name/accent/welcome text; no CSS injection.
 5. **PLANNED** — M11.5 — Security hardening + rate limits + abuse controls.
 6. **PLANNED** — M11.6 — Platform observability + incident/SLA tooling.
 7. **PLANNED** — M11.7 — Access reviews/support privileged-access controls.
@@ -86,7 +86,7 @@ Exact head `91a19c3274b77f77d5ac6f701984f2ecc746d314` passed CI #1099 / run `360
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → `docs/progress/STATUS.md` → known issues → this ledger → PRD/traceability → selected spec/plan → active PR/reviews/exact-head CI → source/tests.
 
 ## Exact Next Work
-Recover CI #1111 on rollback test `fdd2f54...`; fix unexpected failures. Verify subsequent docs head. Audit applicability of external audio/provider traces and privacy closeout, then finish M11.3 before M11.4.
+Extend the existing organization settings boundary with a genuine M11.4 RED for bounded branding metadata (logo URL, accent color, welcome text), then implement the minimal safe validation/persistence path with owner/admin authorization and no arbitrary CSS/HTML/script execution.
 
 ## Completion Checklist
 - [ ] Requirements and iterations accounted for.
@@ -106,3 +106,9 @@ M12 — Integrations.
 - Security review: preserved owner/admin authorization, restricted function execution and receipt table, tenant-scoped candidate selection, parent lock, database transactional rollback, one digest receipt and minimal audit event. Database deletion does not rewrite immutable assessment history; it explicitly erases source and versions only under authorized deletion. External service traces/audio have NOT been verified erased.
 - Additional pgTAP unexpected restrictive-FK test at `fdd2f54e8e286ed64cb1c38581457c9ef1c88203` requires its own final CI #1111 verification. Do not treat #1110 as verifying the newer test.
 - Independent reviewer was not available in this tool session; closeout review remains open. No merge while remaining M11 iterations are incomplete.
+
+## M11.3 Closeout — 2026-09-30
+- CI #1111 for `fdd2f54...` finished CANCELLED and is not standalone GREEN evidence; the rollback regression is included in later full CI #1118 at `dabe4721675395d421f023a46ca4b73ae56a82da`.
+- Full CI #1118 passed lint, typecheck, unit/component, framework/source checks, database boundary including unexpected-FK rollback, build, E2E and PRD coverage.
+- Application-controlled Gemini Live session resumption was removed from transport setup and ephemeral token constraints before #1118. The app does not claim provider-side deletion or deployment-wide zero retention; project/account-level provider settings remain operational owner evidence.
+- Skeptical closeout review found 0 Critical and 0 Important repository findings. The domain lifecycle can represent audio/trace counts but is not itself evidence of provider deletion; this is a non-blocking scope note because the verified SQL path and docs make the boundary explicit.
