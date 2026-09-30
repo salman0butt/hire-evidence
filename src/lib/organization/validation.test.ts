@@ -20,6 +20,49 @@ describe("validateOrganizationInput", () => {
     });
   });
 
+
+  it("normalizes bounded inert organization branding fields", () => {
+    const input = {
+      name: "Acme",
+      companySize: null,
+      hiringUseCase: null,
+      logoUrl: "  https://cdn.acme.test/logo.svg  ",
+      accentColor: "  #1A2B3C  ",
+      welcomeText: "  Welcome to your structured interview.  ",
+    };
+
+    expect(validateOrganizationInput(input)).toEqual({
+      ok: true,
+      value: {
+        name: "Acme",
+        companySize: null,
+        hiringUseCase: null,
+        logoUrl: "https://cdn.acme.test/logo.svg",
+        accentColor: "#1A2B3C",
+        welcomeText: "Welcome to your structured interview.",
+      },
+    });
+  });
+
+  it.each([
+    ["http://cdn.acme.test/logo.svg", null, null, "Organization logo URL must use https."],
+    ["javascript:alert(1)", null, null, "Organization logo URL must use https."],
+    [null, "red", null, "Organization accent color must be a #RRGGBB hex color."],
+    [null, "#12345G", null, "Organization accent color must be a #RRGGBB hex color."],
+    [null, null, "x".repeat(501), "Organization welcome text must be 500 characters or fewer."],
+  ])("rejects unsafe or unbounded branding values", (logoUrl, accentColor, welcomeText, message) => {
+    const input = {
+      name: "Acme",
+      companySize: null,
+      hiringUseCase: null,
+      logoUrl,
+      accentColor,
+      welcomeText,
+    };
+
+    expect(validateOrganizationInput(input)).toEqual({ ok: false, message });
+  });
+
   it("normalizes optional blank fields to null", () => {
     expect(
       validateOrganizationInput({
