@@ -10,6 +10,9 @@ export type PublicInvitationProjection = Readonly<{
   candidateInstructions: string;
   candidateSupportEmail: string | null;
   candidateSupportUrl: string | null;
+  logoUrl: string | null;
+  accentColor: string | null;
+  welcomeText: string | null;
 }>;
 
 export type PublicInvitationResolution =
@@ -28,6 +31,9 @@ type PublicInvitationRow = Readonly<{
   candidate_instructions?: unknown;
   candidate_support_email?: unknown;
   candidate_support_url?: unknown;
+  logo_url?: unknown;
+  accent_color?: unknown;
+  welcome_text?: unknown;
 }>;
 
 const unavailable: PublicInvitationResolution = { status: "unavailable" };
@@ -62,6 +68,30 @@ function parseOptionalSupportUrl(value: unknown): string | null {
   }
 }
 
+function parseOptionalHttpsUrl(value: unknown): string | null {
+  if (value == null || typeof value !== "string") return null;
+  const normalized = value.trim();
+  if (!normalized || normalized.length > 2048) return null;
+  try {
+    const url = new URL(normalized);
+    return url.protocol === "https:" ? normalized : null;
+  } catch {
+    return null;
+  }
+}
+
+function parseOptionalAccentColor(value: unknown): string | null {
+  if (value == null || typeof value !== "string") return null;
+  const normalized = value.trim();
+  return /^#[0-9A-Fa-f]{6}$/.test(normalized) ? normalized : null;
+}
+
+function parseOptionalWelcomeText(value: unknown): string | null {
+  if (value == null || typeof value !== "string") return null;
+  const normalized = value.trim();
+  return normalized && normalized.length <= 500 ? normalized : null;
+}
+
 function parseProjection(row: PublicInvitationRow): PublicInvitationProjection | null {
   if (
     !isNonEmptyString(row.organization_name) ||
@@ -85,6 +115,9 @@ function parseProjection(row: PublicInvitationRow): PublicInvitationProjection |
     candidateInstructions: row.candidate_instructions,
     candidateSupportEmail: parseOptionalSupportEmail(row.candidate_support_email),
     candidateSupportUrl: parseOptionalSupportUrl(row.candidate_support_url),
+    logoUrl: parseOptionalHttpsUrl(row.logo_url),
+    accentColor: parseOptionalAccentColor(row.accent_color),
+    welcomeText: parseOptionalWelcomeText(row.welcome_text),
   };
 }
 
