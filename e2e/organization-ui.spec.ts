@@ -116,6 +116,9 @@ test.describe("organization tenant UI accessibility and responsiveness", () => {
     const hiringUseCase = page.getByLabel("Hiring use case");
     const candidateSupportEmail = page.getByLabel("Candidate support email");
     const candidateSupportUrl = page.getByLabel("Candidate support URL");
+    const logoUrl = page.getByLabel("Organization logo URL");
+    const accentColor = page.getByLabel("Accent color");
+    const welcomeText = page.getByLabel("Candidate welcome text");
     const save = page.getByRole("button", { name: "Save settings" });
     await name.focus();
     await page.keyboard.press("Tab");
@@ -126,6 +129,12 @@ test.describe("organization tenant UI accessibility and responsiveness", () => {
     await expect(candidateSupportEmail).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(candidateSupportUrl).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(logoUrl).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(accentColor).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(welcomeText).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(save).toBeFocused();
 
