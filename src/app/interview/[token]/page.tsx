@@ -72,13 +72,29 @@ export default async function CandidateInterviewPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-12 sm:py-16">
-      <section className="space-y-3" aria-labelledby="interview-heading">
+      <section
+        className="space-y-3"
+        aria-labelledby="interview-heading"
+        data-organization-accent={result.invitation.accentColor ?? undefined}
+      >
+        {result.invitation.logoUrl ? (
+          <img
+            src={result.invitation.logoUrl}
+            alt={`${result.invitation.organizationName} logo`}
+            className="max-h-16 max-w-48 object-contain"
+          />
+        ) : null}
         <p className="text-sm font-medium text-slate-600">
           {result.invitation.organizationName}
         </p>
         <h1 id="interview-heading" className="text-3xl font-semibold tracking-tight">
           {result.invitation.jobTitle} interview
         </h1>
+        {result.invitation.welcomeText ? (
+          <p className="max-w-xl whitespace-pre-wrap text-sm leading-6 text-slate-700">
+            {result.invitation.welcomeText}
+          </p>
+        ) : null}
         <p className="max-w-xl text-sm leading-6 text-slate-600">
           Review what to expect before you continue. Nothing below starts an interview
           attempt or begins recording.
