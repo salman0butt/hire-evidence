@@ -51,6 +51,31 @@ describe("public candidate invitation page", () => {
     expect(screen.getByText("Evidence Labs")).toBeInTheDocument();
   });
 
+  it("renders safe organization branding without interpreting welcome text as markup", async () => {
+    mockedResolvePublicInvitation.mockResolvedValue({
+      status: "available",
+      invitation: {
+        ...availableInvitation,
+        logoUrl: "https://cdn.evidence.test/brand/logo.png",
+        accentColor: "#2563EB",
+        welcomeText: "<strong>Welcome</strong> to your interview.",
+      },
+    });
+    const Page = await loadPage();
+
+    const { container } = render(await Page({ params: Promise.resolve({ token }) }));
+
+    expect(screen.getByRole("img", { name: "Evidence Labs logo" })).toHaveAttribute(
+      "src",
+      "https://cdn.evidence.test/brand/logo.png",
+    );
+    expect(
+      screen.getByText("<strong>Welcome</strong> to your interview."),
+    ).toBeInTheDocument();
+    expect(container.querySelector("strong")).not.toBeInTheDocument();
+    expect(container.querySelector('[data-organization-accent="#2563EB"]')).toBeInTheDocument();
+  });
+
   it("shows the required pre-interview information before the candidate can start", async () => {
     mockedResolvePublicInvitation.mockResolvedValue({
       status: "available",
