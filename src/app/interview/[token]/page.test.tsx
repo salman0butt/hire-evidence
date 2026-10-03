@@ -18,6 +18,9 @@ const availableInvitation = {
   candidateInstructions: "Use a quiet room.",
   candidateSupportEmail: "candidates@evidence.test",
   candidateSupportUrl: "https://evidence.test/interview-support",
+  logoUrl: null,
+  accentColor: null,
+  welcomeText: null,
 } as const;
 
 async function loadPage() {
