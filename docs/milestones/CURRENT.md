@@ -1,35 +1,22 @@
 # Current Milestone
 
-Milestone: AI Quality, Guardrails & Evals (M10)
-
-Status: **IMPLEMENTATION COMPLETE — CLOSEOUT CI PENDING**
-
-Branch: `feat/ai-quality-evals`
-PR: #12 — `Build measurable AI quality evaluation layer` — OPEN / DRAFT / mergeable at latest recovery.
-Base: `main` at M09 merge SHA `3c63598354728d2651bf7630f9bea397a50b9a18`.
-Verified implementation head: `49e04b6ff8bd1d086d292dcaff2ad7980e96241b`; CI #1079 / run `35896402059` — GREEN.
-
-Design: `docs/superpowers/specs/2026-09-23-ai-quality-guardrails-evals-design.md`
-Plan: `docs/superpowers/plans/2026-09-23-ai-quality-guardrails-evals.md`
+Milestone: Enterprise Readiness (M11)
+Status: **ACTIVE — M11.5 SECURITY HARDENING / RATE LIMITS / ABUSE CONTROLS**
+Branch: `feat/enterprise-readiness`; PR #13 OPEN / DRAFT.
+Base/main: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; post-merge CI #1084 GREEN.
+Design: `docs/superpowers/specs/2026-09-24-enterprise-readiness-design.md`
+Plan: `docs/superpowers/plans/2026-09-24-enterprise-readiness.md`
+Ledger: `docs/milestones/M11-enterprise-readiness.md`
 
 ## Iterations
-1. M10.1 Eval harness — VERIFIED.
-2. M10.2 Golden interview dataset — VERIFIED.
-3. M10.3 Golden assessment dataset + human calibration — VERIFIED.
-4. M10.4 Interviewer behavior evals — VERIFIED.
-5. M10.5 Assessment grounding/schema/consistency evals — VERIFIED.
-6. M10.6 Adversarial prompt-injection evals — VERIFIED.
-7. M10.7 Fairness paired evals — VERIFIED.
-8. M10.8 Prompt/guardrail version regression comparisons — VERIFIED.
-9. M10.9 AI tracing + cost/quality metadata — VERIFIED.
-10. M10.10 Human override/disagreement analytics — VERIFIED.
-11. M10.11 CI regression gates — VERIFIED.
+1. M11.1 advanced immutable audit trail — VERIFIED, CI #1093.
+2. M11.2 retention configuration — VERIFIED, CI #1099.
+3. M11.3 deletion workflows — VERIFIED. Internal artifact erasure and rollback coverage are verified through full CI #1118 at `dabe472...`; application-controlled Gemini Live session resumption was removed before that run. Provider-side deletion or deployment-wide zero retention is not claimed; project/account settings remain an operator concern.
+4. M11.4 safe organization branding — VERIFIED. Candidate-facing inert rendering completed at `0c63e11...`; full exact-head CI #1139 GREEN after genuine RED #1138.
+5. M11.5 security/rate limiting/abuse controls — ACTIVE.
+6. M11.6 observability/incident/SLA — PLANNED.
+7. M11.7 privileged support/access review — PLANNED.
+8. M11.8 SSO/SAML — CONDITIONAL DECISION GATE.
 
-## Review state
-Unresolved Critical: 0. Unresolved Important: 0. Unresolved PR review threads: 0 at latest recovery.
-
-## Constraints
-Humans remain hiring decision makers. Evals measure AI behavior but do not introduce autonomous hire/reject/ranking or protected-trait, emotion, appearance, accent, personality, confidence, or deception inference. Transcript/model text is untrusted data. Deterministic gates run without provider credentials; unavailable live-model credentials cannot silently count as passing evidence.
-
-## Next action
-Verify CI on the final closeout-documentation head. If GREEN and PR #12 remains mergeable with no new blocking review or concurrent branch movement, mark ready and squash-merge with expected-head protection. Then verify post-merge `main` CI and activate M11 Enterprise Readiness.
+## Recovery
+Recover the latest exact head and CI. Continue M11.5 by threat-modeling exposed routes, prioritizing provider-credential minting and other public candidate endpoints for bounded server-authoritative abuse controls, and establishing adversarial RED before implementation. Candidate technical failures or rate limits must never become scoring inputs. Keep #13 draft and unmerged while M11 remains incomplete.

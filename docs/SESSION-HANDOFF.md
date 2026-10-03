@@ -1,30 +1,29 @@
 # Session Handoff
 
-Actual Git/code/current exact-SHA CI outrank this handoff. Recover `AGENTS.md`, `docs/AUTONOMOUS-DEVELOPMENT.md`, live PR/review/CI state, then durable milestone docs.
+Read live Git/PR/CI and `docs/progress/STATUS.md` first; older text may be stale.
 
-## Repository state
-- Repository: `salman0butt/hire-evidence`
-- Default branch: `main`
-- Verified base/main: `d85883f4177e2ec122a695092d5c6ac846afbe72` (M07 merge; post-merge CI #920 GREEN)
-- Active branch: `feat/hiring-team-review`
-- Active PR: #10 — OPEN / DRAFT / mergeable at latest recovery
-- Active milestone: M08 — Hiring Team Review Experience — **M08.9 CLOSEOUT**
-- Latest exact verified implementation/test head before docs reconciliation: `a6320513f329a9d0c6c3e8849ef15ca57d1d3c5a`, CI #1024 / run `35626271990` GREEN
+## Recovered state on 2026-09-26
+- Main `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; CI #1084 GREEN. M00–M10 merged.
+- M11 enterprise readiness ACTIVE; branch `feat/enterprise-readiness`; PR #13 OPEN/DRAFT; pre-reconciliation head `b388936674db6d8f5dbeb945d93da37a6b5ba8db`.
+- M11.1 audit and M11.2 retention VERIFIED. M11.2 head `91a19c3274b77f77d5ac6f701984f2ecc746d314`; CI #1099 GREEN.
+- M11.3 lifecycle RED `c9bb5b0b509a057a621411945743d8e622b035ae` / CI #1102; minimal TypeScript implementation `b388936674db6d8f5dbeb945d93da37a6b5ba8db`.
+- CI #1103 / `36020938314`: 753 unit/component tests passed, framework verifier failed missing STATUS `CI status:`; later database/build/E2E not run. This documentation reconciliation fixes the marker; do not infer new exact-head CI passed.
+- 0 reviews, 0 unresolved inline threads at recovery; incomplete M11 blocks merging.
 
-## M08 state
-M08.1–M08.8 are VERIFIED. M08.7 disagreement data is verified at `071b894c…` / CI #1010. M08.8 dashboard is verified at `0d871017…` / CI #1019 and exposes only neutral workflow metadata with direct human-review navigation.
+## Next
+Verify documentation-marker fix on the new exact head. Then inventory Supabase candidate artifacts and create behavioral RED for tenant-scoped idempotent deletion, adversarial cross-tenant denial, retries, partial failure and historical-integrity/minimal-audit handling. The state-machine contract must not be confused with actual data erasure.
 
-M08.9 closeout found one Important dashboard acceptance gap: accessible list/filter/sort over neutral workflow metadata. Genuine RED `f027b05c…` / CI #1021 proved the missing filter. `4ba2e1c9…` implemented accessible review-status filtering and name/status sorting without score/rank/recommendation options; CI #1023 then exposed an ambiguous existing assertion because `In review` correctly appeared in both a filter option and candidate state. `a6320513…` scoped that assertion to the candidate list and passed CI #1024.
+Exact next work: recheck exact-head CI for marker repair, then establish persisted deletion RED.
 
-## Review / safety state
-- Critical findings: 0 known unresolved.
-- Important findings: 0 known unresolved.
-- PR #10 unresolved inline review threads: 0 at latest recovery.
-- Humans remain decision makers; no autonomous hire/reject/ranking.
-- AI assessment/provenance/history remains immutable.
-- Human overrides preserve AI score and require attributable reason.
-- Tenant/job/candidate/attempt/assessment authorization is server-authoritative and fail-closed.
-- Transcript/model/reviewer text remains inert data.
+## Verified recovery on 2026-09-28
+- The earlier handoff above is historical, not live execution state. Actual main remains `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; PR #13 was still OPEN/DRAFT at artifact-chain RED head `f3ec33f32f155b75cbfc996bcbee84d1b6eecbd1` when this note was written.
+- Full exact-head CI #1104 (`f379f2afd4e6a570a86d374ef410269f2ff5e3e1`) fixed the STATUS marker; initial candidate-row deletion passed CI #1106 (`4050e110cd7845f371ebfe4027d75dacc8a2a166`).
+- Artifact-chain test at `f3ec33f32f155b75cbfc996bcbee84d1b6eecbd1` was confirmed genuinely RED by CI #1107 (https://github.com/salman0butt/hire-evidence/actions/runs/36263470981): 13/14 assertions failed because restrictive `candidate_invitations_candidate_id_fkey` prevents candidate-row-only erasure. Previous lint/typecheck/unit/framework stages passed. This is NOT GREEN or full M11.3 completion.
+- Next: add a subsequent migration performing tenant-scoped transactional, FK-ordered deletion of candidate reviews/overrides, generations/evidence, transcript/technical events, attempts, consent events, invitations and candidate; preserve owner/admin authorization, one minimal receipt/audit, retry idempotence and fail-closed semantics. Test external audio/traces separately where applicable. Keep PR draft until all M11 gates pass.
+- This handoff update is a safe GitHub connector file-write diagnostic after switching the GitHub-specific app permission to Allow all actions. Its own commit/CI must be recovered live; do not infer that artifact-chain tests passed merely because the connector accepted a documentation write.
 
-## Exact next work
-Verify the documentation-reconciliation head in exact-head CI. Recheck remote PR head, reviews/threads and mergeability. If every M08 acceptance/verification/documentation gate is satisfied, mark PR #10 ready and squash-merge using expected-head protection. Then verify resulting `main` and its CI, reconcile post-merge state, activate M09 Billing + Usage, and immediately begin its first valid unit.
+## Recovery update — 2026-09-28, M11.3 SQL implementation
+- Assessment-trigger-inclusive pgTAP test commit `66fe1a7455915718c23846d363ddf6cf134afb14` / CI #1109 was genuine RED: 14/15 failed at restrictive candidate-invitation FK; lint/typecheck/unit/framework succeeded.
+- Follow-on transactional FK-ordered deletion migration `supabase/migrations/202609280001_erase_candidate_artifacts.sql`, head `be3b96a3d277668ffa95c61027c8b0626a1bb077`, passed exact-head full CI #1110 https://github.com/salman0butt/hire-evidence/actions/runs/36463309265.
+- A separate adversarial rollback/retry test was added to artifact-chain pgTAP at head `fdd2f54e8e286ed64cb1c38581457c9ef1c88203`; CI #1111 https://github.com/salman0butt/hire-evidence/actions/runs/36464166029 was running when written. Recover it live. This docs update is newer and requires exact-head CI too.
+- M11.3 still ACTIVE: determine applicability of external audio/model trace retention/deletion, verify rollbacks and safety, reconcile traceability. M11.4–M11.7 planned; M11.8 conditional; PR #13 OPEN/DRAFT, do not merge now.
