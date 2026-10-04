@@ -46,6 +46,10 @@ export type RealtimeSessionAuthorizationDeps = Readonly<{
     rawToken: string;
     attemptId: string;
   }) => Promise<ListFinalizedTurnsResult>) | undefined;
+  consumeCredentialMint?: ((input: {
+    rawToken: string;
+    attemptId: string;
+  }) => Promise<boolean>) | undefined;
   issueProviderCredential: (input: {
     attemptId: string;
     interviewerVersionId: string;
