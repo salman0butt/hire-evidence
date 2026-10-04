@@ -109,6 +109,16 @@ export async function authorizeRealtimeSession(
 
   if (attempt.status !== "ready") return unavailable;
 
+  if (
+    deps.consumeCredentialMint &&
+    !(await deps.consumeCredentialMint({
+      rawToken,
+      attemptId: attempt.attemptId,
+    }))
+  ) {
+    return unavailable;
+  }
+
   let transcriptTurns: readonly DurableTranscriptTurn[] | undefined;
   if (candidateSession.lifecycle === "started") {
     if (!deps.listFinalizedTurns) return unavailable;
