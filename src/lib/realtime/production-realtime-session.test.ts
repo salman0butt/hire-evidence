@@ -137,6 +137,9 @@ describe("production realtime session composition", () => {
           error: null,
         };
       }
+      if (name === "consume_realtime_credential_mint") {
+        return { data: true, error: null };
+      }
       throw new Error(`unexpected RPC: ${name}`);
     });
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
@@ -173,6 +176,7 @@ describe("production realtime session composition", () => {
     expect(rpc.mock.calls.map(([name]) => name)).toEqual([
       "resolve_realtime_candidate_session",
       "authorize_realtime_interview_session",
+      "consume_realtime_credential_mint",
     ]);
     expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
