@@ -44,8 +44,12 @@ Verified implementation boundary:
 
 Review at this checkpoint: 0 known Critical findings, 0 known Important findings, 0 submitted PR reviews, 0 unresolved inline review threads.
 
+## Current RED Attempt
+`e2d2d9fbf984b1c9179912a3d3e1ff5d1ba4806e` / CI #1162 is INVALID NOT RED. The technical-event burst pgTAP test did not run because autonomous-framework verification stopped first: required durable-document markers were removed during reconciliation. The test remains unchanged while the documentation contract is repaired.
+
 ## Known Issues
 See `docs/progress/KNOWN-ISSUES.md`; real external Gemini browser smoke still depends on owner-supplied credentials and is not repository CI evidence.
 
-## Exact Next Work
-Continue M11.5 with the next exposed-route abuse boundary: `record_realtime_interview_technical_event` currently permits an otherwise valid candidate capability to persist an unbounded number of technical-event rows. Establish a genuine adversarial database RED requiring a bounded, server-time, per-attempt ingestion limit; client-supplied `occurredAt` must not control the quota. Then implement the smallest server-authoritative GREEN without making technical failures scoring/evidence inputs.
+CI status: credential-mint unit VERIFIED by full exact-head CI #1155 at `baea4c5f22934cb5cbe20a76e02b9867611e8636`; technical-event CI #1162 is INVALID NOT RED because the autonomous-framework verifier failed before database tests.
+
+Exact next work: restore all mandatory milestone/status recovery markers, then rerun the unchanged `realtime_technical_event_rate_limit_test.sql` until pgTAP reaches the intended server-time burst assertion. Only then implement the minimal technical-event rate-limit GREEN.
