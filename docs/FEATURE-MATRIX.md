@@ -26,8 +26,12 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | AI quality/guardrails/evals | M10 | VERIFIED | Integrated M10 merge `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; post-merge CI #1084. |
 | Enterprise immutable audit | M11.1 | VERIFIED | CI #1093; append-only tenant scope. |
 | Enterprise retention configuration | M11.2 | VERIFIED | CI #1099; explicit bounded policy and audit. |
-| Candidate data deletion | M11.3 | VERIFIED | Artifact-chain RED `66fe1a7...` / #1109; internal SQL erasure GREEN `be3b96a...` / #1110; rollback plus provider-session-resumption boundary verified by full #1118 at `dabe472...`. Provider-side deletion is not claimed. |
-| Enterprise organization branding | M11.4 | ACTIVE | Extend existing organization settings with bounded logo/accent/welcome metadata and safe inert rendering; no arbitrary CSS/HTML/script. |
-| Enterprise security/observability/access reviews | M11.5–M11.7 | PLANNED | Begin after M11.4 verification. |
+| Candidate data deletion | M11.3 | VERIFIED | Internal erasure/rollback/provider-session-resumption boundary verified by full #1118; provider-side deletion not claimed. |
+| Enterprise organization branding | M11.4 | VERIFIED | Candidate-facing safe inert rendering RED #1138 → full exact-head GREEN #1139 at `0c63e11...`. |
+| Provider credential mint rate limit | M11.5 | VERIFIED | Behavioral RED #1144 → TS GREEN #1145; DB #1153 invalid fixture; genuine DB RED #1154 at `3967c823...` → full exact-head GREEN #1155 at `baea4c5...`. Server-authoritative hashed-capability/attempt window; denial is operational only. |
+| Technical-event ingestion abuse control | M11.5 | ACTIVE | Next unit: bound otherwise-valid candidate capability event bursts by server time at the database boundary; client `occurredAt` cannot drive quota. |
+| Remaining exposed-route security hardening | M11.5 | ACTIVE | Continue threat model after technical-event unit; M11.5 not complete. |
+| Observability / incident / SLA tooling | M11.6 | PLANNED | Begin after M11.5 closeout. |
+| Privileged support/access reviews | M11.7 | PLANNED | Least privilege, attributable access, reason/expiry where applicable. |
 | SSO/SAML | M11.8 | DEFERRED | Conditional product-evidence decision gate. |
 | Integrations/advanced formats/compliance | M12–M15 | PLANNED | Deferred to roadmap dependency order. |
