@@ -5,8 +5,8 @@ select plan(6);
 insert into auth.users (id, email)
 values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'mint-owner@example.com');
 
-insert into public.profiles (id, email, full_name)
-values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'mint-owner@example.com', 'Mint Owner');
+insert into public.profiles (id, display_name)
+values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Mint Owner');
 
 insert into public.organizations (id, name, created_by)
 values ('11111111-1111-4111-8111-111111111111', 'Mint Org', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
