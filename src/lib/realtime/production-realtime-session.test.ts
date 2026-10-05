@@ -49,6 +49,60 @@ describe("production realtime session composition", () => {
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
+  it("consumes a server-authoritative mint allowance before provider access", async () => {
+    const rpc = vi.fn<Rpc>(async (name) => {
+      if (name === "resolve_realtime_candidate_session") {
+        return {
+          data: [{
+            invitation_id: "11111111-1111-4111-8111-111111111111",
+            candidate_id: "22222222-2222-4222-8222-222222222222",
+            interviewer_version_id: "33333333-3333-4333-8333-333333333333",
+            duration_seconds: 1800,
+            language: "en",
+            lifecycle: "sent",
+            has_current_consent: true,
+            interview_plan: interviewPlan,
+          }],
+          error: null,
+        };
+      }
+      if (name === "authorize_realtime_interview_session") {
+        return {
+          data: [{
+            attempt_id: "44444444-4444-4444-8444-444444444444",
+            interviewer_version_id: "33333333-3333-4333-8333-333333333333",
+            resume_section_index: 0,
+            resume_question_index: 0,
+            resume_follow_ups_used: {},
+            processed_event_ids: [],
+          }],
+          error: null,
+        };
+      }
+      if (name === "consume_realtime_credential_mint") {
+        return { data: false, error: null };
+      }
+      throw new Error(`unexpected RPC: ${name}`);
+    });
+    const fetchImpl = vi.fn<typeof fetch>();
+
+    const handler = createProductionRealtimeSessionHandler({
+      apiKey: "server-only-gemini-key",
+      rpc,
+      fetchImpl,
+    });
+    const response = await handler(request, context);
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({ status: "unavailable" });
+    expect(rpc.mock.calls.map(([name]) => name)).toEqual([
+      "resolve_realtime_candidate_session",
+      "authorize_realtime_interview_session",
+      "consume_realtime_credential_mint",
+    ]);
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
   it("authorizes the capability through Supabase before minting a constrained Gemini token", async () => {
     const rpc = vi.fn<Rpc>(async (name) => {
       if (name === "resolve_realtime_candidate_session") {
