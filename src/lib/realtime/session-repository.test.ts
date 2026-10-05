@@ -212,7 +212,7 @@ describe("realtime session repository", () => {
     const repository = createRealtimeSessionRepository(rpc);
 
     await expect(
-      repository.consumeCredentialMint({
+      repository.consumeCredentialMint!({
         rawToken: "capability-secret",
         attemptId: "attempt-1",
       }),
@@ -229,10 +229,10 @@ describe("realtime session repository", () => {
     const repository = createRealtimeSessionRepository(rpc);
 
     await expect(
-      repository.consumeCredentialMint({ rawToken: "", attemptId: "attempt-1" }),
+      repository.consumeCredentialMint!({ rawToken: "", attemptId: "attempt-1" }),
     ).resolves.toBe(false);
     await expect(
-      repository.consumeCredentialMint({ rawToken: "token", attemptId: "" }),
+      repository.consumeCredentialMint!({ rawToken: "token", attemptId: "" }),
     ).resolves.toBe(false);
     expect(rpc).not.toHaveBeenCalled();
 
@@ -246,7 +246,7 @@ describe("realtime session repository", () => {
       );
 
       await expect(
-        failingRepository.consumeCredentialMint({
+        failingRepository.consumeCredentialMint!({
           rawToken: "token",
           attemptId: "attempt-1",
         }),
