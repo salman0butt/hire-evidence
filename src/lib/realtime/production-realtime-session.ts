@@ -51,6 +51,7 @@ export function createProductionRealtimeSessionHandler(
     authorizeRealtimeSession(rawToken, {
       resolveCandidateSession: repository.resolveCandidateSession,
       getOrCreateAttempt: repository.getOrCreateAttempt,
+      consumeCredentialMint: repository.consumeCredentialMint,
       listFinalizedTurns: transcriptRepository.listFinalizedTurns,
       issueProviderCredential,
     }),
