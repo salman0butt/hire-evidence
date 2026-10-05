@@ -28,10 +28,11 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Enterprise retention configuration | M11.2 | VERIFIED | CI #1099; explicit bounded policy and audit. |
 | Candidate data deletion | M11.3 | VERIFIED | Internal erasure/rollback/provider-session-resumption boundary verified by full #1118; provider-side deletion not claimed. |
 | Enterprise organization branding | M11.4 | VERIFIED | Candidate-facing safe inert rendering RED #1138 → full exact-head GREEN #1139 at `0c63e11...`. |
-| Provider credential mint rate limit | M11.5 | VERIFIED | Behavioral RED #1144 → TS GREEN #1145; DB #1153 invalid fixture; genuine DB RED #1154 at `3967c823...` → full exact-head GREEN #1155 at `baea4c5...`. Server-authoritative hashed-capability/attempt window; denial is operational only. |
-| Technical-event ingestion abuse control | M11.5 | ACTIVE | Next unit: bound otherwise-valid candidate capability event bursts by server time at the database boundary; client `occurredAt` cannot drive quota. |
-| Remaining exposed-route security hardening | M11.5 | ACTIVE | Continue threat model after technical-event unit; M11.5 not complete. |
-| Observability / incident / SLA tooling | M11.6 | PLANNED | Begin after M11.5 closeout. |
+| Provider credential mint rate limit | M11.5 | VERIFIED | Behavioral RED #1144 → TS GREEN #1145; genuine DB RED #1154 at `3967c823...` → full exact-head GREEN #1155 at `baea4c5...`. Server-authoritative hashed-capability/attempt window; denial is operational only. |
+| Technical-event ingestion abuse control | M11.5 | VERIFIED | Genuine DB RED `0c9549d...` / #1164 → contract-preserving full exact-head GREEN #1166 at `3d9448725e2441cd76123112fd004e147376aa55`; 12/server-minute cap uses server `created_at`, not client time. |
+| Realtime finalization retry hardening | M11.5 | VERIFIED | #1167 invalid target RED exposed pre-existing conflict ambiguity; #1168 genuine retry write-amplification RED; `da95e4acc65624ed5ae02bf783e819430280d557` / full #1169 GREEN makes completed retries read-only and preserves one trigger. |
+| Remaining exposed-route security hardening | M11.5 | VERIFIED | Progress route is naturally bounded by finite immutable interview plan + idempotent event IDs; no speculative throttle. M11.5 closeout review: 0 Critical, 0 Important. |
+| Observability / incident / SLA tooling | M11.6 | ACTIVE | Build privacy-minimized structured operational signals, request/correlation identity, health/error/latency diagnostics and bounded retention without secrets or shadow candidate evidence. |
 | Privileged support/access reviews | M11.7 | PLANNED | Least privilege, attributable access, reason/expiry where applicable. |
 | SSO/SAML | M11.8 | DEFERRED | Conditional product-evidence decision gate. |
 | Integrations/advanced formats/compliance | M12–M15 | PLANNED | Deferred to roadmap dependency order. |
