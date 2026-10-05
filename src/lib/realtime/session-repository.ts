@@ -75,7 +75,7 @@ export type RealtimeAttemptFinalizationResult =
 
 export type RealtimeSessionRepository = Pick<
   RealtimeSessionAuthorizationDeps,
-  "resolveCandidateSession" | "getOrCreateAttempt"
+  "resolveCandidateSession" | "getOrCreateAttempt" | "consumeCredentialMint"
 > &
   Readonly<{
     advanceAttemptProgress(input: Readonly<{
@@ -290,6 +290,17 @@ export function createRealtimeSessionRepository(rpc: Rpc): RealtimeSessionReposi
         attemptId: row.attempt_id,
         resumeCheckpoint: toResumeCheckpoint(row),
       };
+    },
+
+    async consumeCredentialMint(input): Promise<boolean> {
+      if (!input.rawToken || !input.attemptId) return false;
+
+      const { data, error } = await rpc("consume_realtime_credential_mint", {
+        p_token_hash: hashInvitationToken(input.rawToken),
+        p_attempt_id: input.attemptId,
+      });
+
+      return !error && data === true;
     },
 
     async advanceAttemptProgress(input): Promise<RealtimeAttemptProgressResult> {
