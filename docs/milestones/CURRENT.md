@@ -1,7 +1,7 @@
 # Current Milestone
 
 Milestone: Enterprise Readiness (M11)
-Status: **ACTIVE — M11.5 SECURITY HARDENING / RATE LIMITS / ABUSE CONTROLS**
+Status: **ACTIVE — M11.6 OBSERVABILITY / INCIDENT / SLA TOOLING**
 Branch: `feat/enterprise-readiness`; PR #13 OPEN / DRAFT.
 Base/main: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; post-merge CI #1084 GREEN.
 Design: `docs/superpowers/specs/2026-09-24-enterprise-readiness-design.md`
@@ -12,18 +12,16 @@ Ledger: `docs/milestones/M11-enterprise-readiness.md`
 1. M11.1 advanced immutable audit trail — VERIFIED, CI #1093.
 2. M11.2 retention configuration — VERIFIED, CI #1099.
 3. M11.3 deletion workflows — VERIFIED through full CI #1118. Provider-side deletion/deployment-wide zero retention are not claimed.
-4. M11.4 safe organization branding — VERIFIED. Candidate-facing inert rendering completed at `0c63e11...`; full exact-head CI #1139 GREEN after genuine RED #1138.
-5. M11.5 security/rate limiting/abuse controls — ACTIVE.
-   - Realtime provider-credential mint limiter — VERIFIED.
-     - CI #1143 INVALID NOT RED: missing compile seam.
-     - CI #1144 genuine behavioral RED after the seam compiled.
-     - CI #1145 TypeScript authorization-boundary GREEN.
-     - CI #1153 INVALID NOT RED: bad pgTAP fixture (`jobs.status` did not exist), zero assertions.
-     - `3967c823...` / CI #1154 genuine database RED: missing `consume_realtime_credential_mint(text, uuid)`.
-     - `baea4c5f...` / CI #1155 full exact-head GREEN: server-authoritative, hashed-capability, per-attempt two-mints-per-one-minute window with row-lock concurrency serialization; full database/build/E2E/coverage gate passed.
-6. M11.6 observability/incident/SLA — PLANNED.
+4. M11.4 safe organization branding — VERIFIED. Candidate-facing inert rendering RED #1138 → full exact-head GREEN #1139 at `0c63e11...`.
+5. M11.5 security/rate limiting/abuse controls — VERIFIED.
+   - Realtime provider-credential mint limiter: behavioral RED #1144; TypeScript GREEN #1145; genuine database RED #1154 at `3967c823...`; full exact-head GREEN #1155 at `baea4c5...`.
+   - Technical-event ingestion limiter: genuine database RED `0c9549d...` / #1164; contract-preserving server-time limiter full exact-head GREEN #1166 at `3d9448725e2441cd76123112fd004e147376aa55`.
+   - Finalization retry write-amplification: #1167 INVALID NOT RED because an existing ambiguous `ON CONFLICT` failed first; `1d7867f...` repaired only that defect; #1168 genuine RED proved completed retries rewrote `updated_at`; `da95e4acc65624ed5ae02bf783e819430280d557` / #1169 full exact-head GREEN made completed retries read-only while retaining one assessment trigger.
+   - `realtime-progress` remains naturally bounded by the finite immutable interview plan plus idempotent processed-event IDs; no speculative generic throttle added.
+   - Review: 0 known Critical and 0 known Important findings. Rate-limit/technical failures remain operational only and never candidate scoring/evidence inputs.
+6. M11.6 observability/incident/SLA — ACTIVE.
 7. M11.7 privileged support/access review — PLANNED.
 8. M11.8 SSO/SAML — CONDITIONAL DECISION GATE.
 
 ## Recovery
-Recover latest exact branch head and CI before writing. M11.5 is not complete. The next highest-risk missing abuse boundary is technical-event ingestion: `record_realtime_interview_technical_event` currently permits an otherwise valid active candidate capability to persist unbounded operational rows. Establish a genuine database RED for a bounded **server-time** per-attempt ingestion limit; do not use client-supplied `occurredAt` for quota accounting. Then implement minimal GREEN, verify exact-head CI, review, update durable state, and continue other exposed routes. Candidate technical failures or rate-limit denials must never become candidate scoring/evidence inputs. Keep PR #13 draft and unmerged while M11 remains incomplete.
+Recover latest exact branch head and CI before writing. M11.6 starts with the smallest privacy-safe operational-signal boundary: structured request/correlation identity plus bounded service health/error/latency metadata; reject secrets/raw credentials and candidate-sensitive free-form text so observability cannot become a shadow evidence store. Preserve tenant isolation, bounded retention, and sole human hiring authority. Keep PR #13 draft and unmerged while M11 remains incomplete.
