@@ -1,5 +1,13 @@
 import type { OperationalSignal } from "./operational-signal";
 
+export type OperationalServiceLevelProjection = Readonly<{
+  measuredSignals: number;
+  successfulSignals: number;
+  incidentSignals: number;
+  successRate: number | null;
+  incidentRate: number | null;
+}>;
+
 export type OperationalHealthProjection = Readonly<{
   health: "healthy" | "incident";
   totalSignals: number;
@@ -7,6 +15,7 @@ export type OperationalHealthProjection = Readonly<{
   degradedSignals: number;
   maxLatencyMs: number;
   errorCodes: readonly string[];
+  serviceLevel: OperationalServiceLevelProjection;
 }>;
 
 export function projectOperationalHealth(signals: readonly OperationalSignal[]): OperationalHealthProjection {
@@ -26,12 +35,23 @@ export function projectOperationalHealth(signals: readonly OperationalSignal[]):
     }
   }
 
+  const measuredSignals = signals.length;
+  const incidentSignals = errorSignals + degradedSignals;
+  const successfulSignals = measuredSignals - incidentSignals;
+
   return {
-    health: errorSignals > 0 || degradedSignals > 0 ? "incident" : "healthy",
-    totalSignals: signals.length,
+    health: incidentSignals > 0 ? "incident" : "healthy",
+    totalSignals: measuredSignals,
     errorSignals,
     degradedSignals,
     maxLatencyMs,
     errorCodes: [...errorCodes].sort(),
+    serviceLevel: {
+      measuredSignals,
+      successfulSignals,
+      incidentSignals,
+      successRate: measuredSignals === 0 ? null : successfulSignals / measuredSignals,
+      incidentRate: measuredSignals === 0 ? null : incidentSignals / measuredSignals,
+    },
   };
 }
