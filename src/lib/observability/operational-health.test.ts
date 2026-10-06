@@ -75,7 +75,7 @@ describe("projectOperationalHealth", () => {
         incidentRate: null,
       },
     });
-    expect(projection.serviceLevel).not.toHaveProperty("target");
-    expect(projection.serviceLevel).not.toHaveProperty("sla");
+    expect(projection).not.toHaveProperty("serviceLevel.target");
+    expect(projection).not.toHaveProperty("serviceLevel.sla");
   });
 });
