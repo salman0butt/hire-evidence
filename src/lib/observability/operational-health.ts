@@ -9,13 +9,29 @@ export type OperationalHealthProjection = Readonly<{
   errorCodes: readonly string[];
 }>;
 
-export function projectOperationalHealth(_signals: readonly OperationalSignal[]): OperationalHealthProjection {
+export function projectOperationalHealth(signals: readonly OperationalSignal[]): OperationalHealthProjection {
+  let errorSignals = 0;
+  let degradedSignals = 0;
+  let maxLatencyMs = 0;
+  const errorCodes = new Set<string>();
+
+  for (const signal of signals) {
+    maxLatencyMs = Math.max(maxLatencyMs, signal.latencyMs);
+
+    if (signal.status === "error") {
+      errorSignals += 1;
+      if (signal.errorCode) errorCodes.add(signal.errorCode);
+    } else if (signal.status === "degraded") {
+      degradedSignals += 1;
+    }
+  }
+
   return {
-    health: "healthy",
-    totalSignals: 0,
-    errorSignals: 0,
-    degradedSignals: 0,
-    maxLatencyMs: 0,
-    errorCodes: [],
+    health: errorSignals > 0 || degradedSignals > 0 ? "incident" : "healthy",
+    totalSignals: signals.length,
+    errorSignals,
+    degradedSignals,
+    maxLatencyMs,
+    errorCodes: [...errorCodes].sort(),
   };
 }
