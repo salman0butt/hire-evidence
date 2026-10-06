@@ -46,4 +46,36 @@ describe("projectOperationalHealth", () => {
       errorCodes: [],
     });
   });
+
+  it("measures non-contractual service levels from observed operational health", () => {
+    expect(projectOperationalHealth([
+      signal("ok", 40),
+      signal("degraded", 850),
+      signal("error", 1200, "PROVIDER_TIMEOUT"),
+    ])).toMatchObject({
+      serviceLevel: {
+        measuredSignals: 3,
+        successfulSignals: 1,
+        incidentSignals: 2,
+        successRate: 1 / 3,
+        incidentRate: 2 / 3,
+      },
+    });
+  });
+
+  it("does not invent service-level rates when the observation window is empty", () => {
+    const projection = projectOperationalHealth([]);
+
+    expect(projection).toMatchObject({
+      serviceLevel: {
+        measuredSignals: 0,
+        successfulSignals: 0,
+        incidentSignals: 0,
+        successRate: null,
+        incidentRate: null,
+      },
+    });
+    expect(projection.serviceLevel).not.toHaveProperty("target");
+    expect(projection.serviceLevel).not.toHaveProperty("sla");
+  });
 });
