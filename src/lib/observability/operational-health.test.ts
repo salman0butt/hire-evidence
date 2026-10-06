@@ -31,6 +31,13 @@ describe("projectOperationalHealth", () => {
       degradedSignals: 1,
       maxLatencyMs: 1200,
       errorCodes: ["PROVIDER_TIMEOUT"],
+      serviceLevel: {
+        measuredSignals: 3,
+        successfulSignals: 1,
+        incidentSignals: 2,
+        successRate: 1 / 3,
+        incidentRate: 2 / 3,
+      },
     });
     expect(projection).not.toHaveProperty("requestId");
     expect(projection).not.toHaveProperty("correlationId");
@@ -44,6 +51,13 @@ describe("projectOperationalHealth", () => {
       degradedSignals: 0,
       maxLatencyMs: 60,
       errorCodes: [],
+      serviceLevel: {
+        measuredSignals: 2,
+        successfulSignals: 2,
+        incidentSignals: 0,
+        successRate: 1,
+        incidentRate: 0,
+      },
     });
   });
 
