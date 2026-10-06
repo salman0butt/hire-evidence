@@ -1,6 +1,6 @@
 # M11 — Enterprise Readiness
 
-Status: **ACTIVE — M11.6 OBSERVABILITY / INCIDENT / SLA TOOLING**
+Status: **ACTIVE — M11.7 PRIVILEGED SUPPORT / ACCESS REVIEWS**
 
 ## Goal
 Deliver enterprise hardening as reviewable, evidence-backed capabilities while preserving tenant isolation, privacy, evidence integrity and sole human hiring authority.
@@ -32,12 +32,12 @@ Autonomous hire/reject/ranking, technical-failure scoring, secret or unnecessary
 3. **VERIFIED** — M11.3 repository deletion workflows, full CI #1118. Provider-side deletion/deployment-wide zero retention are not claimed.
 4. **VERIFIED** — M11.4 safe organization branding, full CI #1139.
 5. **VERIFIED** — M11.5 security hardening / rate limits / abuse controls, full closeout CI #1169.
-6. **ACTIVE** — M11.6 platform observability / incident / SLA tooling.
+6. **VERIFIED** — M11.6 platform observability / incident / SLA tooling.
    - Structured privacy-safe operational-signal contract — VERIFIED, #1176.
    - Bounded persistence/retention and client-role lock-down — VERIFIED, #1179.
    - Deterministic incident-health projection — VERIFIED, #1182.
-   - SLA-monitoring boundary and M11.6 closeout — NEXT.
-7. **PLANNED** — M11.7 privileged support / access reviews.
+   - Non-contractual service-level measurement and M11.6 closeout — VERIFIED, full exact-head CI #1191.
+7. **ACTIVE** — M11.7 privileged support / access reviews.
 8. **DECISION GATE** — M11.8 SSO/SAML only if durable evidence requires it.
 
 ## Current Design Boundary
@@ -84,8 +84,15 @@ PR #13 has 0 submitted reviews. Independent milestone closeout review remains re
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → live Git/PR/exact-head CI → source/tests → `docs/progress/STATUS.md` → `docs/milestones/CURRENT.md` → this ledger → traceability/feature matrix → design/plan → older handoffs/chat.
 
+### M11.6 service-level measurement
+- `2d52a66b...` / #1188 — INVALID NOT RED; TypeScript failed before the intended behavior assertion.
+- `7404a9f01dfde9329f249a55a48a55bcdfe98afd` / #1189 — genuine behavioral RED; lint/typecheck passed, 781 existing tests passed, only two new service-level assertions failed.
+- `a63350413c0d9214bea0f67810b2ba0edb8d5b0b` / #1190 — NOT GREEN; new behavior passed but old exact-object projection tests required explicit extension.
+- `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8` / #1191 — full exact-head GREEN across unit/component, framework/source verification, database, build, Chromium E2E and PRD coverage.
+- Measurement exposes observed counts/rates only; empty windows return null rates and no contractual SLA target is represented.
+
 ## Exact Next Work
-Define the smallest non-contractual SLA-monitoring projection over already privacy-safe operational health data. It should make service-level health measurable without hard-coding a customer SLA percentage that the PRD does not specify. Use strict TDD, full exact-head CI, review and durable reconciliation before M11.6 closeout.
+Begin M11.7 with a narrow privileged-support access domain contract before persistence: least privilege, explicit reason and bounded expiry where applicable, attributable actor/organization identity, auditable lifecycle and fail-closed cross-tenant behavior. Use strict TDD and preserve sole human hiring authority.
 
 ## Completion Checklist
 - [ ] All required M11 iterations complete/resolved.

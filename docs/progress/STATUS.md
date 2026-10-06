@@ -7,7 +7,7 @@ M00–M10 COMPLETE and integrated. M10 merge/main `54444d49761b7eb089c1c6a30a27f
 
 ## Current Milestone
 M11 Enterprise Readiness — ACTIVE.
-Active task: M11.6 observability / incident / SLA tooling.
+Active task: M11.7 privileged support / access reviews.
 Active branch: `feat/enterprise-readiness`.
 Active PR: #13 OPEN / DRAFT; not merge eligible while M11 remains incomplete.
 Main/base: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`.
@@ -18,8 +18,8 @@ Main/base: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`.
 - M11.3 deletion — VERIFIED through full CI #1118. Internal artifact erasure, rollback/idempotency, and removal of application-controlled Gemini Live session resumption are covered. Provider-side deletion or deployment-wide zero retention is not claimed.
 - M11.4 organization branding — VERIFIED; RED #1138 → full exact-head GREEN #1139 at `0c63e11f711114fbd7975cb66ade947077e2e61a`.
 - M11.5 security hardening/rate limits/abuse — VERIFIED through full exact-head CI #1169 at `da95e4acc65624ed5ae02bf783e819430280d557`.
-- M11.6 observability/incident/SLA — ACTIVE; privacy-safe signal contract, bounded persistence and deterministic incident-health projection are VERIFIED.
-- M11.7 privileged support/access reviews — PLANNED.
+- M11.6 observability/incident/SLA — VERIFIED through full exact-head CI #1191 at `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8`.
+- M11.7 privileged support/access reviews — ACTIVE.
 - M11.8 SSO/SAML — CONDITIONAL DECISION GATE.
 
 ## M11.6 Evidence
@@ -42,6 +42,14 @@ Review at `bb1f803f…`: 0 known Critical findings, 0 known Important findings, 
 ## Known Issues
 See `docs/progress/KNOWN-ISSUES.md`. Real external Gemini browser smoke and deployment/provider retention settings remain operator concerns, not repository CI evidence.
 
-CI status: M11.6 latest verified implementation head `bb1f803fb98cb489fe170322b52f45999d215627`; full exact-head CI #1182 GREEN. M11 remains ACTIVE.
+### Service-level measurement
+- `2d52a66bbbf4660784d22ff887f86b1fc927ae60` / CI #1188 INVALID NOT RED: direct access to the intentionally missing projection property failed TypeScript before the behavioral assertion.
+- `7404a9f01dfde9329f249a55a48a55bcdfe98afd` / CI #1189 genuine behavioral RED: lint/typecheck passed; 781 existing tests passed and only the two new service-level assertions failed.
+- `a63350413c0d9214bea0f67810b2ba0edb8d5b0b` / CI #1190 NOT GREEN: implementation behavior was correct, but two pre-existing exact-object tests required explicit contract extension.
+- `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8` / CI #1191 full exact-head GREEN: measured/successful/incident counts and success/incident rates are deterministic; empty windows use null rates; no SLA target/contract is invented. Full gate included database, build, Chromium E2E and PRD coverage.
 
-Exact next work: define the smallest non-contractual SLA-monitoring projection over privacy-safe operational health data (no hard-coded customer SLA promise), verify a genuine RED, implement minimal deterministic GREEN, run full exact-head CI, review, reconcile durable evidence, then continue M11.6 closeout or the next unmet incident/SLA acceptance boundary.
+M11.6 closeout review: 0 known Critical findings, 0 known Important findings. Aggregation remains O(n), identifier-free and operational-only; it cannot affect candidate evidence, scoring, ranking, recommendation or hiring decisions.
+
+CI status: M11.6 closeout head `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8`; full exact-head CI #1191 GREEN. M11 remains ACTIVE.
+
+Exact next work: begin M11.7 with the smallest privileged-support access contract: least privilege, explicit reason and bounded expiry where applicable, attributable audit evidence, and fail-closed cross-tenant behavior; use genuine RED→GREEN before persistence or UI.

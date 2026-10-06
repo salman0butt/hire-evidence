@@ -27,7 +27,7 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Privacy-safe operational signal contract | M11.6 | VERIFIED | Genuine behavioral RED #1175 → full exact-head GREEN #1176 at `07166058183daa1fa021b870ea640903d23f721c`. |
 | Bounded operational-signal persistence | M11.6 | VERIFIED | DB RED #1177; #1178 exposed client RPC privilege; explicit lock-down → full exact-head GREEN #1179 at `0e1c8dee...`. |
 | Incident-oriented health projection | M11.6 | VERIFIED | #1181 attempt 1 INVALID NOT RED; attempt 2 genuine RED at `bf45d9b...`; full exact-head GREEN #1182 at `bb1f803f...`. Aggregate-only, no identifiers/candidate evidence. |
-| SLA monitoring / M11.6 closeout | M11.6 | ACTIVE | Next: measurable privacy-safe operational service-level projection; no invented contractual target. |
-| Privileged support/access reviews | M11.7 | PLANNED | Least privilege, attributable access, reason/expiry where applicable. |
+| SLA monitoring / M11.6 closeout | M11.6 | VERIFIED | Genuine RED #1189; #1190 NOT GREEN due exact-object compatibility assertions; full exact-head GREEN #1191 at `84c311e1...`. Observed rates only; no invented contractual target. |
+| Privileged support/access reviews | M11.7 | ACTIVE | Least privilege, attributable access, reason/expiry where applicable; domain contract next. |
 | SSO/SAML | M11.8 | DEFERRED | Conditional product-evidence decision gate. |
 | Integrations/advanced formats/compliance | M12–M15 | PLANNED | Deferred to roadmap dependency order. |

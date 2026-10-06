@@ -7,7 +7,7 @@ Actual Git/code/current exact-SHA CI outrank this handoff. Recover `AGENTS.md`, 
 - Main/base: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; post-merge CI #1084 GREEN.
 - Active branch: `feat/enterprise-readiness`.
 - PR #13 `Build enterprise readiness controls`: OPEN / DRAFT / mergeable at latest recovery. M11 incomplete; do not merge yet.
-- Milestone: M11 Enterprise Readiness, M11.6 observability / incident / SLA tooling ACTIVE.
+- Milestone: M11 Enterprise Readiness, M11.7 privileged support / access reviews ACTIVE.
 - M11.1–M11.5 VERIFIED.
 
 ## M11.6 Verified Evidence
@@ -30,5 +30,13 @@ Actual Git/code/current exact-SHA CI outrank this handoff. Recover `AGENTS.md`, 
 - Candidate technical failures/incidents remain outside assessment/evidence/scoring/ranking/recommendation/hiring decisions.
 - 0 known Critical findings; 0 known Important findings; 0 submitted PR reviews; 0 unresolved inline review threads at latest recovery.
 
+4. Service-level measurement:
+   - `2d52a66b...` / #1188 INVALID NOT RED (TypeScript failed before behavioral assertion).
+   - `7404a9f01dfde9329f249a55a48a55bcdfe98afd` / #1189 genuine behavioral RED.
+   - `a63350413c0d9214bea0f67810b2ba0edb8d5b0b` / #1190 NOT GREEN because old exact-object tests needed explicit extension.
+   - `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8` / #1191 full exact-head GREEN. Counts/rates are observed only; empty-window rates are null and no SLA target is invented.
+
+M11.6 is VERIFIED with 0 known Critical/Important findings.
+
 ## Exact Next Work
-Recover the exact branch head after this documentation reconciliation and verify its CI. Then continue M11.6 with a smallest non-contractual SLA-monitoring projection over privacy-safe operational health data. Do not invent a contractual SLA target that the PRD does not specify. Use genuine RED→GREEN, exact-head full CI, skeptical review, durable reconciliation, and continue into M11.6 closeout/M11.7 when proven complete.
+Recover the exact branch head after this documentation reconciliation and verify its CI. Begin M11.7 with the smallest privileged-support access domain contract: least privilege, explicit reason/bounded expiry where applicable, attributable actor/organization identity, auditable lifecycle and fail-closed cross-tenant behavior. Use genuine RED→GREEN and continue autonomously.
