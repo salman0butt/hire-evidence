@@ -38,11 +38,28 @@ describe("createOperationalSignal", () => {
     expect(() => createOperationalSignal({ ...validSignal, latencyMs: 999999999 })).toThrow(/operational signal/i);
   });
 
+  it("matches the persisted five-minute latency bound", () => {
+    expect(createOperationalSignal({ ...validSignal, latencyMs: 300_000 }).latencyMs)
+      .toBe(300_000);
+    expect(() => createOperationalSignal({ ...validSignal, latencyMs: 300_001 }))
+      .toThrow(/operational signal/i);
+  });
+
   it("accepts only bounded machine-readable error codes", () => {
     expect(createOperationalSignal({ ...validSignal, status: "error", errorCode: "PROVIDER_TIMEOUT" }).errorCode)
       .toBe("PROVIDER_TIMEOUT");
     expect(() => createOperationalSignal({ ...validSignal, status: "error", errorCode: "arbitrary free form text" }))
       .toThrow(/operational signal/i);
+  });
+
+  it("rejects error codes on non-error statuses to match persistence", () => {
+    for (const status of ["ok", "degraded"] as const) {
+      expect(() => createOperationalSignal({
+        ...validSignal,
+        status,
+        errorCode: "PROVIDER_TIMEOUT",
+      })).toThrow(/operational signal/i);
+    }
   });
 });
 
