@@ -1,6 +1,6 @@
 # M11 — Enterprise Readiness
 
-Status: **ACTIVE — M11.5 SECURITY HARDENING / RATE LIMITS / ABUSE CONTROLS**
+Status: **ACTIVE — M11.6 OBSERVABILITY / INCIDENT / SLA TOOLING**
 
 ## Goal
 Deliver enterprise hardening as reviewable, evidence-backed capabilities while preserving tenant isolation, privacy, evidence integrity and sole human hiring authority.
@@ -12,15 +12,16 @@ PRD §206 covers advanced audit logs, retention configuration, data deletion wor
 M00–M10 are integrated. Base/main `54444d49761b7eb089c1c6a30a27fdfd115cdd9e` passed post-merge CI #1084. M11 work remains on `feat/enterprise-readiness`, PR #13 OPEN / DRAFT.
 
 ## In Scope
-Advanced audit, explicit retention, complete repository candidate deletion, safe organization branding, exposed-route security hardening, server-authoritative rate/abuse controls, observability/incident/SLA tooling, and privileged support/access review controls. SSO/SAML is a conditional decision gate.
+Advanced audit, explicit retention, repository candidate deletion, safe organization branding, exposed-route security hardening, server-authoritative rate/abuse controls, privacy-minimized observability, incident/SLA tooling and privileged support/access-review controls. SSO/SAML is a conditional decision gate.
 
 ## Out of Scope
-Autonomous hire/reject/ranking, technical-failure scoring, secret or unnecessary PII storage in operational controls, arbitrary CSS/HTML/script branding, fabricated deletion/provider-retention claims, and SSO/SAML without durable evidence.
+Autonomous hire/reject/ranking, technical-failure scoring, secret or unnecessary PII storage in operational controls, arbitrary CSS/HTML/script branding, fabricated deletion/provider-retention claims, invented contractual SLA promises, and SSO/SAML without durable evidence.
 
 ## Acceptance Criteria
-- PRD deliverables/exit criteria for required M11 capabilities are satisfied or explicitly resolved.
-- All behavioral units have genuine RED→GREEN evidence; invalid infrastructure/fixture failures are recorded as NOT RED/NOT GREEN.
+- Required PRD M11 capabilities are implemented or explicitly resolved.
+- Behavioral changes have genuine RED→GREEN evidence; infrastructure/fixture failures are recorded as NOT RED/NOT GREEN.
 - Relevant tenancy/RLS, security, privacy, accessibility, performance and AI-safety gates pass.
+- Observability cannot become a shadow candidate-evidence store or candidate scoring signal.
 - 0 unresolved Critical or Important review findings and 0 blocking review threads.
 - Durable status, feature matrix and traceability are current.
 - Exact-final-head full CI is GREEN before merge.
@@ -28,52 +29,63 @@ Autonomous hire/reject/ranking, technical-failure scoring, secret or unnecessary
 ## Tasks / Iterations
 1. **VERIFIED** — M11.1 advanced immutable audit trail, CI #1093.
 2. **VERIFIED** — M11.2 retention configuration, CI #1099.
-3. **VERIFIED** — M11.3 repository deletion workflows, full CI #1118. Internal erasure/rollback/idempotency and removal of application-controlled Gemini Live session resumption are covered; provider-side deletion/deployment-wide zero retention are not claimed.
-4. **VERIFIED** — M11.4 safe organization branding. Candidate-facing inert rendering RED #1138 → full exact-head GREEN #1139 at `0c63e11f711114fbd7975cb66ade947077e2e61a`.
-5. **ACTIVE** — M11.5 security hardening / rate limits / abuse controls.
-   - Provider credential mint limiter — VERIFIED through full CI #1155 at `baea4c5f22934cb5cbe20a76e02b9867611e8636`.
-   - Technical-event ingestion limiter — ACTIVE TDD unit; first CI #1162 is INVALID NOT RED because framework verification failed before pgTAP.
-6. **PLANNED** — M11.6 observability / incident / SLA tooling.
+3. **VERIFIED** — M11.3 repository deletion workflows, full CI #1118. Provider-side deletion/deployment-wide zero retention are not claimed.
+4. **VERIFIED** — M11.4 safe organization branding, full CI #1139.
+5. **VERIFIED** — M11.5 security hardening / rate limits / abuse controls, full closeout CI #1169.
+6. **ACTIVE** — M11.6 platform observability / incident / SLA tooling.
+   - Structured privacy-safe operational-signal contract — VERIFIED, #1176.
+   - Bounded persistence/retention and client-role lock-down — VERIFIED, #1179.
+   - Deterministic incident-health projection — VERIFIED, #1182.
+   - SLA-monitoring boundary and M11.6 closeout — NEXT.
 7. **PLANNED** — M11.7 privileged support / access reviews.
 8. **DECISION GATE** — M11.8 SSO/SAML only if durable evidence requires it.
 
 ## Current Design Boundary
-M11.5 prioritizes public/exposed candidate routes that can consume provider or storage resources. Controls must be server-authoritative, bounded, safe across multiple app instances, capability/attempt scoped, privacy-minimized, and operational only. Candidate technical failures and rate-limit denials must never become assessment evidence, scores, rankings, recommendations, or hiring decisions. Quota time must be server-owned rather than client-supplied.
+M11.6 observability is platform-operational only. Signals use bounded structured request/correlation/service/status/latency/error-code data, exclude secrets and candidate-sensitive free-form content, use bounded persistence, and project incident health without request/correlation/candidate identifiers. Incident and technical-failure data never become assessment evidence, scores, rankings, recommendations or hiring decisions. SLA monitoring must measure operational behavior without inventing a contractual service-level promise absent product evidence.
 
 ## TDD Evidence
-### Provider credential mint limiter
-- #1143 — INVALID NOT RED: dependency seam missing at compile time.
-- `bd409d6...` / #1144 — genuine behavioral RED: repeated request remained authorized.
-- `47e693e...` / #1145 — TypeScript authorization-boundary GREEN.
-- `5565227...` / #1153 — INVALID NOT RED: pgTAP fixture referenced nonexistent `jobs.status`; zero assertions ran.
-- `3967c8238463dd50bfe2f6b3581cfa47435492a1` / #1154 (`37284199626`) — genuine database RED: missing `consume_realtime_credential_mint(text, uuid)`.
-- `baea4c5f22934cb5cbe20a76e02b9867611e8636` / #1155 (`37284892083`) — full exact-head GREEN: frozen install, lint, typecheck, 766 unit/component tests, framework/source verifiers, database boundary, build, Chromium/E2E, PRD coverage and cleanup all passed.
+### M11.5 abuse-control closeout
+- Provider credential mint limiter — genuine database RED #1154; full exact-head GREEN #1155.
+- Technical-event ingestion limiter — genuine database RED #1164; full exact-head GREEN #1166.
+- Finalization retry write-amplification — #1167 INVALID NOT RED, #1168 genuine retry RED, full exact-head GREEN #1169 at `da95e4acc65624ed5ae02bf783e819430280d557`.
 
-### Technical-event limiter
-- `e2d2d9fbf984b1c9179912a3d3e1ff5d1ba4806e` / CI #1162 — INVALID NOT RED. The new burst pgTAP test was present and unit tests passed, but `scripts/verify_autonomous_framework.py` failed first because required milestone/status recovery markers were removed during documentation reconciliation. Database tests were skipped; no behavioral RED claim is allowed.
+### M11.6 structured operational-signal contract
+- `0f3b7721a5fa06c8a910c4be9cad7820b4535d85` / CI #1175 — genuine behavioral RED: unsafe free-form fields and invalid bounded fields were accepted.
+- `07166058183daa1fa021b870ea640903d23f721c` / CI #1176 — full exact-head GREEN for strict allow-list validation and immutable normalized output.
+
+### M11.6 bounded persistence
+- `7ee4bdf616169570e254b1d07aceac84138d1699` / CI #1177 — genuine database RED for missing persistence/server-only ingestion/cleanup boundary.
+- `46a649d3d69bd05c573f127238c9e6f9c3d73401` / CI #1178 — NOT GREEN: client API roles retained RPC execute permission.
+- `0e1c8dee4191fe62e7a0c6d12f939f2a9dc8b6fb` / CI #1179 — full exact-head GREEN after explicit client-role revocation while retaining service-role-only ingestion/purge and 30-day expiry.
+
+### M11.6 incident-health projection
+- CI #1181 attempt 1 — INVALID NOT RED; runner job cancelled before tests executed.
+- `bf45d9b21026c55b2246749501606216281c92f0` / CI #1181 attempt 2 — genuine RED: 770 existing tests passed and only the two new projection assertions failed against the deliberate zero-value seam.
+- `bb1f803fb98cb489fe170322b52f45999d215627` / CI #1182 — full exact-head GREEN: deterministic total/error/degraded counts, maximum latency, unique sorted error codes and healthy/incident state without identifier leakage.
 
 ## Integration Test Evidence
-M11.1 audit persistence/RLS, M11.2 retention persistence/authorization/audit, M11.3 tenant-scoped deletion/rollback, M11.4 branding persistence/rendering, and M11.5 provider credential mint persistence are covered by their exact-head CI evidence. The credential limiter validates hashed capability + active authoritative attempt/invitation, serializes consumption with an attempt-row lock, and enforces two mints per one-minute server-time window. Technical-event rate limiting is not implemented yet.
+M11.1–M11.5 integration evidence is preserved by their exact-head CI runs. M11.6 persistence is protected by `supabase/tests/operational_signals_test.sql`, including no anon/authenticated direct reads/inserts or ingestion RPC execution. CI #1179 and later #1182 prove the database boundary together with the application contract. CI #1182 also passed build, Chromium E2E and PRD coverage.
 
 ## Security Review
-Credential limiter review found no known Critical/Important findings: raw tokens are hashed before the DB boundary; direct operational table access is revoked with RLS enabled; attempt/invitation state is authoritative; row locking prevents multi-instance count/insert races; stale mint-window rows are minimized; denial is constant-safe and never scoring/evidence input. Technical-event limiter must preserve the same capability/attempt authorization and use server-time quota accounting.
+M11.6 review at `bb1f803f…` found 0 known Critical and 0 known Important findings. Operational payloads are strict and bounded; arbitrary transcript/resume/candidate/free-form payloads are rejected; persisted operational data is RLS-protected and client roles cannot invoke platform RPCs; retention is bounded; incident projection emits aggregates only. No signal feeds hiring evidence or scoring.
 
 ## Code Review Findings
 Unresolved Critical: 0 known.
 Unresolved Important: 0 known.
 Unresolved PR review threads: 0 at latest recovery.
-PR #13 had 0 submitted reviews at latest recovery. Independent milestone closeout review remains required before merge.
+PR #13 has 0 submitted reviews. Independent milestone closeout review remains required before merge.
 
 ## Fresh Verification Results
-- M11.4 latest verified full gate: #1139 at `0c63e11...`.
-- M11.5 provider credential limiter: full exact-head CI #1155 / `37284892083` GREEN at `baea4c5f22934cb5cbe20a76e02b9867611e8636`.
-- Technical-event test head `e2d2d9f...` / #1162 is INVALID NOT RED because framework verification failed before database tests. Documentation markers are being repaired without modifying the test.
+- M11.5 closeout: full exact-head CI #1169 at `da95e4acc65624ed5ae02bf783e819430280d557` GREEN.
+- M11.6 validation contract: CI #1176 at `07166058183daa1fa021b870ea640903d23f721c` GREEN.
+- M11.6 persistence authorization: CI #1179 at `0e1c8dee4191fe62e7a0c6d12f939f2a9dc8b6fb` GREEN.
+- M11.6 incident-health projection: CI #1182 at `bb1f803fb98cb489fe170322b52f45999d215627` GREEN.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → live Git/PR/exact-head CI → source/tests → `docs/progress/STATUS.md` → `docs/milestones/CURRENT.md` → this ledger → traceability/feature matrix → design/plan → older handoffs/chat.
 
 ## Exact Next Work
-Restore the required autonomous-framework documentation markers, then rerun the unchanged `supabase/tests/realtime_technical_event_rate_limit_test.sql`. Accept RED only if pgTAP reaches the intended assertion that a 13th same-attempt event is rejected despite manipulated client `occurredAt`. Then implement the minimal server-authoritative GREEN and continue M11.5.
+Define the smallest non-contractual SLA-monitoring projection over already privacy-safe operational health data. It should make service-level health measurable without hard-coding a customer SLA percentage that the PRD does not specify. Use strict TDD, full exact-head CI, review and durable reconciliation before M11.6 closeout.
 
 ## Completion Checklist
 - [ ] All required M11 iterations complete/resolved.
