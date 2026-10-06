@@ -7,6 +7,16 @@ export type OperationalSignal = Readonly<{
   errorCode?: string;
 }>;
 
+type RpcResult = Readonly<{
+  data: unknown;
+  error: unknown;
+}>;
+
+type Rpc = (
+  name: string,
+  args: Readonly<Record<string, unknown>>,
+) => Promise<RpcResult>;
+
 const allowedKeys = new Set([
   "requestId",
   "correlationId",
@@ -48,4 +58,28 @@ export function createOperationalSignal(input: unknown): OperationalSignal {
     latencyMs,
     ...(errorCode === undefined ? {} : { errorCode }),
   });
+}
+
+export function createOperationalSignalRecorder(rpc: Rpc) {
+  return async function recordOperationalSignal(input: unknown): Promise<void> {
+    const signal = createOperationalSignal(input);
+
+    let result: RpcResult;
+    try {
+      result = await rpc("record_operational_signal", {
+        p_request_id: signal.requestId,
+        p_correlation_id: signal.correlationId,
+        p_service: signal.service,
+        p_status: signal.status,
+        p_latency_ms: signal.latencyMs,
+        p_error_code: signal.errorCode ?? null,
+      });
+    } catch {
+      throw new Error("operational signal unavailable");
+    }
+
+    if (result.error) {
+      throw new Error("operational signal unavailable");
+    }
+  };
 }
