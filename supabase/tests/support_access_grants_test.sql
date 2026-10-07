@@ -1,11 +1,37 @@
 begin;
 
-select plan(1);
+select plan(2);
 
 select has_table(
   'public',
   'support_access_grants',
   'privileged support access grants are persisted'
+);
+
+insert into auth.users (id,email,aud,role) values
+  ('00000000-0000-0000-0000-000000000701','support-actor@example.test','authenticated','authenticated');
+insert into public.organizations (id,name,created_by) values
+  ('00000000-0000-0000-0000-000000000710','Support Access Org','00000000-0000-0000-0000-000000000701');
+
+select throws_ok(
+  $$insert into public.support_access_grants (
+    organization_id,
+    actor_user_id,
+    scope,
+    reason,
+    granted_at,
+    expires_at
+  ) values (
+    '00000000-0000-0000-0000-000000000710'::uuid,
+    '00000000-0000-0000-0000-000000000701'::uuid,
+    'write_candidate_score',
+    'customer-requested-investigation',
+    '2026-10-07T12:00:00Z'::timestamptz,
+    '2026-10-07T13:00:00Z'::timestamptz
+  )$$,
+  '23514',
+  null,
+  'database rejects support access outside the least-privilege incident-health scope'
 );
 
 select * from finish();
