@@ -28,6 +28,8 @@ Status meanings: `PLANNED`, `ACTIVE`, `IMPLEMENTED`, `VERIFIED`, `BLOCKED`, `DEF
 | Bounded operational-signal persistence | M11.6 | VERIFIED | DB RED #1177; #1178 exposed client RPC privilege; explicit lock-down → full exact-head GREEN #1179 at `0e1c8dee...`. |
 | Incident-oriented health projection | M11.6 | VERIFIED | #1181 attempt 1 INVALID NOT RED; attempt 2 genuine RED at `bf45d9b...`; full exact-head GREEN #1182 at `bb1f803f...`. Aggregate-only, no identifiers/candidate evidence. |
 | SLA monitoring / M11.6 closeout | M11.6 | VERIFIED | Genuine RED #1189; #1190 NOT GREEN due exact-object compatibility assertions; full exact-head GREEN #1191 at `84c311e1...`. Observed rates only; no invented contractual target. |
-| Privileged support/access reviews | M11.7 | ACTIVE | Least privilege, attributable access, reason/expiry where applicable; domain contract next. |
+| Privileged support least-privilege foundation | M11.7 | VERIFIED | Domain #1196 GREEN with recorded historical RED gap; persisted foundation genuine DB RED #1197 → baseline #1202 GREEN; lifetime #1203 INVALID NOT RED, genuine RED #1204 → #1205 GREEN; exact-one-hour review boundary full #1206 GREEN at `32d54c5...`. |
+| Audited support grant/revoke lifecycle | M11.7 | ACTIVE | Next: same-tenant owner/admin RPCs, fixed `read_incident_health` scope, server-authoritative times, explicit reason/expiry, immutable grant/revoke audit, reviewer/cross-tenant denial. |
+| Support access-review projection | M11.7 | PLANNED | Safe same-tenant owner/admin review of grant lifecycle/status only; no candidate evidence or scoring authority. |
 | SSO/SAML | M11.8 | DEFERRED | Conditional product-evidence decision gate. |
 | Integrations/advanced formats/compliance | M12–M15 | PLANNED | Deferred to roadmap dependency order. |
