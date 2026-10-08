@@ -1,6 +1,6 @@
 begin;
 
-select plan(3);
+select plan(5);
 
 select has_table(
   'public',
@@ -53,6 +53,48 @@ select throws_ok(
   '23514',
   null,
   'database rejects blank support access reasons'
+);
+
+select throws_ok(
+  $insert into public.support_access_grants (
+    organization_id,
+    actor_user_id,
+    scope,
+    reason,
+    granted_at,
+    expires_at
+  ) values (
+    '00000000-0000-0000-0000-000000000710'::uuid,
+    '00000000-0000-0000-0000-000000000701'::uuid,
+    'read_incident_health',
+    'zero-duration-investigation',
+    '2026-10-07T12:00:00Z'::timestamptz,
+    '2026-10-07T12:00:00Z'::timestamptz
+  )$,
+  '23514',
+  null,
+  'database rejects support access with a non-positive lifetime'
+);
+
+select throws_ok(
+  $insert into public.support_access_grants (
+    organization_id,
+    actor_user_id,
+    scope,
+    reason,
+    granted_at,
+    expires_at
+  ) values (
+    '00000000-0000-0000-0000-000000000710'::uuid,
+    '00000000-0000-0000-0000-000000000701'::uuid,
+    'read_incident_health',
+    'overlong-investigation',
+    '2026-10-07T12:00:00Z'::timestamptz,
+    '2026-10-07T13:00:00.001Z'::timestamptz
+  )$,
+  '23514',
+  null,
+  'database rejects support access lasting longer than one hour'
 );
 
 select * from finish();
