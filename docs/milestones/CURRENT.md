@@ -15,15 +15,15 @@ Ledger: `docs/milestones/M11-enterprise-readiness.md`
 4. M11.4 safe organization branding — VERIFIED, full exact-head CI #1139.
 5. M11.5 security/rate limiting/abuse controls — VERIFIED through full exact-head CI #1169.
 6. M11.6 observability/incident/SLA — VERIFIED, full exact-head CI #1191 at `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8`.
-   - Privacy-safe operational-signal validation: RED #1175 → full exact-head GREEN #1176 at `07166058183daa1fa021b870ea640903d23f721c`.
-   - Bounded persisted operational signals: database RED #1177; first implementation #1178 NOT GREEN due client RPC execute grants; authorization fix `0e1c8dee4191fe62e7a0c6d12f939f2a9dc8b6fb` → full exact-head GREEN #1179.
-   - Deterministic incident-health aggregation: #1181 attempt 1 INVALID NOT RED because runner execution was cancelled; attempt 2 genuine RED at `bf45d9b21026c55b2246749501606216281c92f0`; `bb1f803fb98cb489fe170322b52f45999d215627` → full exact-head GREEN #1182.
-   - Current privacy boundary: aggregates contain counts, maximum latency and machine-readable error codes only; no request/correlation/candidate identifiers, transcript/resume/free-form text, secrets or credentials.
 7. M11.7 privileged support/access review — ACTIVE.
+   - Least-privilege immutable domain contract is implemented; CI #1193–#1195 were INVALID NOT RED because TypeScript failed before behavior, while #1196 was GREEN. Do not fabricate a domain RED.
+   - Persisted support-access foundation: `9f6e3bdc12f7c0b9d50842840e010ff9e14ac561` / CI #1197 genuine database RED; scope/reason/RLS baseline was full GREEN by `8732fe7041515ec25170bedd9848880380ebe086` / CI #1202.
+   - Database lifetime enforcement: #1203 INVALID NOT RED due test SQL syntax; `85933a3a0075227637ffb61d54d7a1fd5d418890` / #1204 genuine RED; `48287ffe823ae7aaf5847967afe0ecac7bbfc613` / #1205 GREEN; exact-one-hour boundary review fix `32d54c5f5b4067b3fb2de5d9c717997d01f404b5` / #1206 full exact-head GREEN.
+   - Remaining M11.7 work: owner/admin same-tenant audited grant lifecycle, audited revocation, and safe access-review projection with cross-tenant denial.
 8. M11.8 SSO/SAML — CONDITIONAL DECISION GATE.
 
 ## Review State
-0 known Critical findings. 0 known Important findings. PR #13 has 0 submitted reviews and 0 unresolved inline review threads at latest recovery. M11 is not merge-ready while M11.6/M11.7 and the M11.8 decision gate remain unresolved.
+0 known Critical findings. 0 known Important findings after the exact-one-hour boundary test resolved the review gap. PR #13 had 0 submitted reviews and 0 unresolved inline review threads at the latest verified M11.7 head. M11 is not merge-ready while M11.7 and the M11.8 decision gate remain unresolved.
 
 ## Recovery
-Recover latest exact branch head and CI before writing. Begin M11.7 with the smallest least-privilege privileged-support access contract, including explicit reason/bounded expiry where applicable, attribution/auditability and fail-closed cross-tenant behavior. Keep PR #13 draft and unmerged until every M11 gate is satisfied.
+Recover the latest exact branch head and CI before writing. Continue M11.7 with the audited support-grant lifecycle: fixed least-privilege scope, server-authoritative grant time, explicit bounded expiry/reason, owner/admin same-tenant authorization, immutable audit evidence, and fail-closed cross-tenant behavior. Use genuine database RED→GREEN. Then implement audited revocation and the access-review projection. Keep PR #13 draft and unmerged until every M11 gate is satisfied.
