@@ -1,6 +1,6 @@
 # Project Status
 
-Last reconciled: 2026-10-06. Current Git/code/exact-SHA CI outrank these recovery notes.
+Last reconciled: 2026-10-08. Current Git/code/exact-SHA CI outrank these recovery notes.
 
 ## Completed Milestones
 M00–M10 COMPLETE and integrated. M10 merge/main `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; post-merge CI #1084 GREEN.
@@ -19,37 +19,29 @@ Main/base: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`.
 - M11.4 organization branding — VERIFIED; RED #1138 → full exact-head GREEN #1139 at `0c63e11f711114fbd7975cb66ade947077e2e61a`.
 - M11.5 security hardening/rate limits/abuse — VERIFIED through full exact-head CI #1169 at `da95e4acc65624ed5ae02bf783e819430280d557`.
 - M11.6 observability/incident/SLA — VERIFIED through full exact-head CI #1191 at `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8`.
-- M11.7 privileged support/access reviews — ACTIVE.
+- M11.7 privileged support/access reviews — ACTIVE. Least-privilege domain and persistence constraints are verified; audited grant/revoke lifecycle and access-review projection remain.
 - M11.8 SSO/SAML — CONDITIONAL DECISION GATE.
 
-## M11.6 Evidence
-### Structured operational-signal contract
-- `0f3b7721a5fa06c8a910c4be9cad7820b4535d85` / CI #1175 genuine behavioral RED: unsafe free-form fields and invalid identity/status/latency/error-code shapes were accepted.
-- `07166058183daa1fa021b870ea640903d23f721c` / CI #1176 full exact-head GREEN: strict allow-list schema, bounded request/correlation/service/status/latency/error-code fields, immutable normalized output, and rejection of shadow candidate/transcript/resume/free-form payloads.
+## M11.7 Evidence
+### Least-privilege domain contract
+- `e6c3ea882f9ee8c596a754ddccceb1a49d8c7ccd` / CI #1193, `09068fee01c728ac3afe3caeedba83b0425b7bbf` / CI #1194, and `45d4f71734a955d6f9714662eafd2ab66201f16c` / CI #1195 are INVALID NOT RED because TypeScript failed before the intended support-access behavior executed. Do not relabel them as behavioral RED.
+- `fafb99074f026cdbad917e8a2c9b3a9832b5714f` / CI #1196 GREEN established the immutable attributable domain grant, fixed `read_incident_health` scope, positive <=1-hour lifetime, and fail-closed tenant/scope/time use checks. This historical domain slice does not have valid pre-implementation RED evidence.
 
-### Bounded persistence and authorization
-- `7ee4bdf616169570e254b1d07aceac84138d1699` / CI #1177 genuine database RED: `operational_signals`, server-only ingestion and retention cleanup were missing.
-- `46a649d3d69bd05c573f127238c9e6f9c3d73401` / CI #1178 NOT GREEN: persistence existed but Supabase client roles still had RPC execution.
-- `0e1c8dee4191fe62e7a0c6d12f939f2a9dc8b6fb` / CI #1179 full exact-head GREEN: client-role RPC execution revoked, RLS/direct table access remain fail-closed, service-role ingestion/purge retained, and signals expire after 30 days.
+### Persisted least-privilege boundary
+- `9f6e3bdc12f7c0b9d50842840e010ff9e14ac561` / CI #1197 genuine database RED: the required `support_access_grants` persistence boundary was absent while earlier quality stages passed.
+- By `8732fe7041515ec25170bedd9848880380ebe086` / CI #1202 full exact-head GREEN, persistence was RLS-protected from anon/authenticated direct access, scope was constrained to `read_incident_health`, and blank reasons were rejected.
 
-### Incident-health projection
-- CI #1181 attempt 1 INVALID NOT RED: runner job was cancelled before tests executed.
-- `bf45d9b21026c55b2246749501606216281c92f0` / CI #1181 attempt 2 genuine behavioral RED: 770 existing tests passed and only the two new incident-health projection assertions failed against the deliberate zero-value seam.
-- `bb1f803fb98cb489fe170322b52f45999d215627` / CI #1182 full exact-head GREEN: deterministic health projection reports aggregate total/error/degraded counts, maximum latency and unique sorted machine-readable error codes without request/correlation/candidate identifiers. Full gate included database, build, Chromium E2E and PRD coverage.
+### Database lifetime enforcement
+- `42376df4e06c321739cefed2d5060155fe7c677f` / CI #1203 INVALID NOT RED: malformed pgTAP dollar quoting caused SQL syntax failure before lifetime behavior ran.
+- `85933a3a0075227637ffb61d54d7a1fd5d418890` / CI #1204 genuine RED: all earlier gates passed and only the two intended assertions failed because PostgreSQL accepted zero-duration and >1-hour grants.
+- `48287ffe823ae7aaf5847967afe0ecac7bbfc613` / CI #1205 full exact-head GREEN after adding the database lifetime check.
+- Skeptical review found one Important boundary-coverage gap: exactly one hour was not positively proven. `32d54c5f5b4067b3fb2de5d9c717997d01f404b5` / CI #1206 full exact-head GREEN added the exact-one-hour `lives_ok` regression and resolved that finding.
 
-Review at `bb1f803f…`: 0 known Critical findings, 0 known Important findings, 0 submitted PR reviews, 0 unresolved inline review threads. Projection is O(n), privacy-minimized and remains operational only; it cannot affect candidate evidence, scoring, ranking, recommendation or hiring decisions.
+Review at `32d54c5…`: 0 known Critical findings, 0 known Important findings, 0 submitted PR reviews, and 0 unresolved inline review threads. Support access remains operational-only and cannot mutate candidate evidence, scores, rankings, recommendations, or hiring decisions.
 
 ## Known Issues
-See `docs/progress/KNOWN-ISSUES.md`. Real external Gemini browser smoke and deployment/provider retention settings remain operator concerns, not repository CI evidence.
+See `docs/progress/KNOWN-ISSUES.md`. Real external Gemini browser smoke and deployment/provider retention settings remain operator concerns, not repository CI evidence. The M11.7 domain slice has a historical RED-evidence gap recorded above; subsequent persistence/lifetime work has genuine RED→GREEN evidence.
 
-### Service-level measurement
-- `2d52a66bbbf4660784d22ff887f86b1fc927ae60` / CI #1188 INVALID NOT RED: direct access to the intentionally missing projection property failed TypeScript before the behavioral assertion.
-- `7404a9f01dfde9329f249a55a48a55bcdfe98afd` / CI #1189 genuine behavioral RED: lint/typecheck passed; 781 existing tests passed and only the two new service-level assertions failed.
-- `a63350413c0d9214bea0f67810b2ba0edb8d5b0b` / CI #1190 NOT GREEN: implementation behavior was correct, but two pre-existing exact-object tests required explicit contract extension.
-- `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8` / CI #1191 full exact-head GREEN: measured/successful/incident counts and success/incident rates are deterministic; empty windows use null rates; no SLA target/contract is invented. Full gate included database, build, Chromium E2E and PRD coverage.
+CI status: M11.7 lifetime/review head `32d54c5f5b4067b3fb2de5d9c717997d01f404b5`; full exact-head CI #1206 GREEN. M11 remains ACTIVE.
 
-M11.6 closeout review: 0 known Critical findings, 0 known Important findings. Aggregation remains O(n), identifier-free and operational-only; it cannot affect candidate evidence, scoring, ranking, recommendation or hiring decisions.
-
-CI status: M11.6 closeout head `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8`; full exact-head CI #1191 GREEN. M11 remains ACTIVE.
-
-Exact next work: begin M11.7 with the smallest privileged-support access contract: least privilege, explicit reason and bounded expiry where applicable, attributable audit evidence, and fail-closed cross-tenant behavior; use genuine RED→GREEN before persistence or UI.
+Exact next work: add the smallest audited support-grant lifecycle boundary with server-authoritative grant time, fixed least-privilege scope, owner/admin same-tenant authorization, immutable audit evidence, and fail-closed cross-tenant denial; prove it with genuine database RED→GREEN before adding revocation and the access-review projection.
