@@ -19,9 +19,9 @@ Autonomous hire/reject/ranking, technical-failure scoring, secret or unnecessary
 
 ## Acceptance Criteria
 - Required PRD M11 capabilities are implemented or explicitly resolved.
-- Behavioral changes have genuine RED→GREEN evidence; infrastructure/fixture failures are recorded as NOT RED/NOT GREEN.
+- Behavioral changes have genuine RED→GREEN evidence; infrastructure/fixture/typecheck failures are recorded as NOT RED/NOT GREEN.
 - Relevant tenancy/RLS, security, privacy, accessibility, performance and AI-safety gates pass.
-- Observability cannot become a shadow candidate-evidence store or candidate scoring signal.
+- Observability/support controls cannot become a shadow candidate-evidence store or candidate scoring signal.
 - 0 unresolved Critical or Important review findings and 0 blocking review threads.
 - Durable status, feature matrix and traceability are current.
 - Exact-final-head full CI is GREEN before merge.
@@ -32,16 +32,14 @@ Autonomous hire/reject/ranking, technical-failure scoring, secret or unnecessary
 3. **VERIFIED** — M11.3 repository deletion workflows, full CI #1118. Provider-side deletion/deployment-wide zero retention are not claimed.
 4. **VERIFIED** — M11.4 safe organization branding, full CI #1139.
 5. **VERIFIED** — M11.5 security hardening / rate limits / abuse controls, full closeout CI #1169.
-6. **VERIFIED** — M11.6 platform observability / incident / SLA tooling.
-   - Structured privacy-safe operational-signal contract — VERIFIED, #1176.
-   - Bounded persistence/retention and client-role lock-down — VERIFIED, #1179.
-   - Deterministic incident-health projection — VERIFIED, #1182.
-   - Non-contractual service-level measurement and M11.6 closeout — VERIFIED, full exact-head CI #1191.
+6. **VERIFIED** — M11.6 platform observability / incident / SLA tooling, full closeout CI #1191.
 7. **ACTIVE** — M11.7 privileged support / access reviews.
+   - Domain and persisted least-privilege/lifetime safeguards are verified through #1206.
+   - Audited owner/admin grant lifecycle, revocation, and access-review projection remain.
 8. **DECISION GATE** — M11.8 SSO/SAML only if durable evidence requires it.
 
 ## Current Design Boundary
-M11.6 observability is platform-operational only. Signals use bounded structured request/correlation/service/status/latency/error-code data, exclude secrets and candidate-sensitive free-form content, use bounded persistence, and project incident health without request/correlation/candidate identifiers. Incident and technical-failure data never become assessment evidence, scores, rankings, recommendations or hiring decisions. SLA monitoring must measure operational behavior without inventing a contractual service-level promise absent product evidence.
+M11.7 support access is operational only. The only permitted scope is `read_incident_health`; grants require attributable organization/actor/reason identity and a positive lifetime no longer than one hour. Direct anon/authenticated table access remains revoked. New lifecycle RPCs must use server-authoritative timestamps, same-tenant owner/admin authorization, immutable audit evidence, and fail-closed cross-tenant behavior. Support controls must never expose or mutate candidate evidence, scores, rankings, recommendations, or hiring decisions.
 
 ## TDD Evidence
 ### M11.5 abuse-control closeout
@@ -49,50 +47,49 @@ M11.6 observability is platform-operational only. Signals use bounded structured
 - Technical-event ingestion limiter — genuine database RED #1164; full exact-head GREEN #1166.
 - Finalization retry write-amplification — #1167 INVALID NOT RED, #1168 genuine retry RED, full exact-head GREEN #1169 at `da95e4acc65624ed5ae02bf783e819430280d557`.
 
-### M11.6 structured operational-signal contract
-- `0f3b7721a5fa06c8a910c4be9cad7820b4535d85` / CI #1175 — genuine behavioral RED: unsafe free-form fields and invalid bounded fields were accepted.
-- `07166058183daa1fa021b870ea640903d23f721c` / CI #1176 — full exact-head GREEN for strict allow-list validation and immutable normalized output.
+### M11.6 closeout
+- Structured operational signals: genuine behavioral RED #1175 → full exact-head GREEN #1176.
+- Bounded persistence: genuine database RED #1177; #1178 NOT GREEN due client RPC execute grants; full exact-head GREEN #1179.
+- Incident-health projection: #1181 attempt 1 INVALID NOT RED; attempt 2 genuine behavioral RED; full exact-head GREEN #1182.
+- Service-level measurement: #1188 INVALID NOT RED; #1189 genuine behavioral RED; #1190 NOT GREEN due exact-object contract extension; full exact-head GREEN #1191.
 
-### M11.6 bounded persistence
-- `7ee4bdf616169570e254b1d07aceac84138d1699` / CI #1177 — genuine database RED for missing persistence/server-only ingestion/cleanup boundary.
-- `46a649d3d69bd05c573f127238c9e6f9c3d73401` / CI #1178 — NOT GREEN: client API roles retained RPC execute permission.
-- `0e1c8dee4191fe62e7a0c6d12f939f2a9dc8b6fb` / CI #1179 — full exact-head GREEN after explicit client-role revocation while retaining service-role-only ingestion/purge and 30-day expiry.
+### M11.7 privileged support domain
+- `e6c3ea882f9ee8c596a754ddccceb1a49d8c7ccd` / CI #1193, `09068fee01c728ac3afe3caeedba83b0425b7bbf` / CI #1194, and `45d4f71734a955d6f9714662eafd2ab66201f16c` / CI #1195 are INVALID NOT RED because TypeScript failed before the intended support-access behavior executed.
+- `fafb99074f026cdbad917e8a2c9b3a9832b5714f` / CI #1196 GREEN established the immutable attributable domain contract. No genuine pre-implementation domain RED exists; this limitation is recorded rather than fabricated.
 
-### M11.6 incident-health projection
-- CI #1181 attempt 1 — INVALID NOT RED; runner job cancelled before tests executed.
-- `bf45d9b21026c55b2246749501606216281c92f0` / CI #1181 attempt 2 — genuine RED: 770 existing tests passed and only the two new projection assertions failed against the deliberate zero-value seam.
-- `bb1f803fb98cb489fe170322b52f45999d215627` / CI #1182 — full exact-head GREEN: deterministic total/error/degraded counts, maximum latency, unique sorted error codes and healthy/incident state without identifier leakage.
+### M11.7 persisted least-privilege boundary
+- `9f6e3bdc12f7c0b9d50842840e010ff9e14ac561` / CI #1197 genuine database RED: `support_access_grants` was absent while earlier gates passed.
+- By `8732fe7041515ec25170bedd9848880380ebe086` / CI #1202 full exact-head GREEN, the table was RLS-protected from client roles, fixed to `read_incident_health`, and required a nonblank reason.
+
+### M11.7 database lifetime enforcement
+- `42376df4e06c321739cefed2d5060155fe7c677f` / CI #1203 INVALID NOT RED: malformed pgTAP dollar quoting caused syntax failure before lifetime assertions ran.
+- `85933a3a0075227637ffb61d54d7a1fd5d418890` / CI #1204 genuine database RED: earlier gates passed and only zero-duration and >1-hour grant assertions failed.
+- `48287ffe823ae7aaf5847967afe0ecac7bbfc613` / CI #1205 full exact-head GREEN after adding the positive <=1-hour database constraint.
+- Skeptical review found an Important missing positive boundary test. `32d54c5f5b4067b3fb2de5d9c717997d01f404b5` / CI #1206 full exact-head GREEN proved exactly one hour remains allowed and resolved the finding.
 
 ## Integration Test Evidence
-M11.1–M11.5 integration evidence is preserved by their exact-head CI runs. M11.6 persistence is protected by `supabase/tests/operational_signals_test.sql`, including no anon/authenticated direct reads/inserts or ingestion RPC execution. CI #1179 and later #1182 prove the database boundary together with the application contract. CI #1182 also passed build, Chromium E2E and PRD coverage.
+M11.1–M11.6 integration evidence is preserved by their exact-head CI runs. M11.7 is covered by `src/lib/support/support-access.test.ts` and `supabase/tests/support_access_grants_test.sql`. The latter verifies fixed least-privilege scope, nonblank reason, exact-one-hour allowance, non-positive lifetime rejection, and >1-hour rejection against real local Supabase. Exact-head #1206 also passed build, Chromium E2E, framework/source verification and PRD coverage.
 
 ## Security Review
-M11.6 review at `bb1f803f…` found 0 known Critical and 0 known Important findings. Operational payloads are strict and bounded; arbitrary transcript/resume/candidate/free-form payloads are rejected; persisted operational data is RLS-protected and client roles cannot invoke platform RPCs; retention is bounded; incident projection emits aggregates only. No signal feeds hiring evidence or scoring.
+At `32d54c5f5b4067b3fb2de5d9c717997d01f404b5`, 0 known Critical and 0 known Important findings remain after adding the exact-one-hour boundary regression. Current support persistence has no anon/authenticated direct table privileges, only `read_incident_health` scope, attributable nonblank reason, and database-enforced positive <=1-hour lifetime. Lifecycle RPC authorization/audit and access-review projection remain required before M11.7 completion.
 
 ## Code Review Findings
 Unresolved Critical: 0 known.
 Unresolved Important: 0 known.
-Unresolved PR review threads: 0 at latest recovery.
-PR #13 has 0 submitted reviews. Independent milestone closeout review remains required before merge.
+Unresolved PR review threads: 0 at latest verified recovery.
+PR #13 had 0 submitted reviews at the latest verified recovery. Independent milestone closeout review remains required before merge.
 
 ## Fresh Verification Results
 - M11.5 closeout: full exact-head CI #1169 at `da95e4acc65624ed5ae02bf783e819430280d557` GREEN.
-- M11.6 validation contract: CI #1176 at `07166058183daa1fa021b870ea640903d23f721c` GREEN.
-- M11.6 persistence authorization: CI #1179 at `0e1c8dee4191fe62e7a0c6d12f939f2a9dc8b6fb` GREEN.
-- M11.6 incident-health projection: CI #1182 at `bb1f803fb98cb489fe170322b52f45999d215627` GREEN.
+- M11.6 closeout: full exact-head CI #1191 at `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8` GREEN.
+- M11.7 persisted support foundation: genuine database RED #1197; baseline full exact-head GREEN #1202 at `8732fe7041515ec25170bedd9848880380ebe086`.
+- M11.7 lifetime: #1203 INVALID NOT RED; #1204 genuine RED; full GREEN #1205; review-fix full exact-head GREEN #1206 at `32d54c5f5b4067b3fb2de5d9c717997d01f404b5`.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → live Git/PR/exact-head CI → source/tests → `docs/progress/STATUS.md` → `docs/milestones/CURRENT.md` → this ledger → traceability/feature matrix → design/plan → older handoffs/chat.
 
-### M11.6 service-level measurement
-- `2d52a66b...` / #1188 — INVALID NOT RED; TypeScript failed before the intended behavior assertion.
-- `7404a9f01dfde9329f249a55a48a55bcdfe98afd` / #1189 — genuine behavioral RED; lint/typecheck passed, 781 existing tests passed, only two new service-level assertions failed.
-- `a63350413c0d9214bea0f67810b2ba0edb8d5b0b` / #1190 — NOT GREEN; new behavior passed but old exact-object projection tests required explicit extension.
-- `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8` / #1191 — full exact-head GREEN across unit/component, framework/source verification, database, build, Chromium E2E and PRD coverage.
-- Measurement exposes observed counts/rates only; empty windows return null rates and no contractual SLA target is represented.
-
 ## Exact Next Work
-Begin M11.7 with a narrow privileged-support access domain contract before persistence: least privilege, explicit reason and bounded expiry where applicable, attributable actor/organization identity, auditable lifecycle and fail-closed cross-tenant behavior. Use strict TDD and preserve sole human hiring authority.
+Add the smallest audited support-grant lifecycle boundary. Use a genuine database RED for a same-tenant owner/admin-only RPC with server-authoritative grant time, fixed `read_incident_health` scope, explicit reason/bounded expiry, immutable `support_access.granted` audit evidence, and cross-tenant/reviewer denial. Then add audited revocation and the safe access-review projection as separate RED→GREEN units.
 
 ## Completion Checklist
 - [ ] All required M11 iterations complete/resolved.
