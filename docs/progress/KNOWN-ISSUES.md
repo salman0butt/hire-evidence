@@ -1,6 +1,6 @@
 # Known Issues
 
-Reconciled 2026-10-08. Current Git/code/exact-SHA CI outrank historical notes.
+Reconciled 2026-10-09. Current Git/code/exact-SHA CI outrank historical notes.
 
 ## Current unresolved issues
 
@@ -11,13 +11,16 @@ Reconciled 2026-10-08. Current Git/code/exact-SHA CI outrank historical notes.
 **Deployment configuration, not a repository implementation blocker.** Real Gemini browser smoke requires owner-supplied credentials; never claim external smoke without execution. Project/account-level provider logging or retention settings are deployment-owner responsibilities and should be verified operationally when required.
 
 ### M11.6 contractual SLA target
-**No contractual customer SLA percentage is specified by the PRD; M11.6 repository work is VERIFIED.** Service-level measurement intentionally reports observed counts/rates without inventing a business commitment. A future explicit product/runtime target may be added only from durable requirements evidence.
+**No contractual customer SLA percentage is specified by the PRD; M11.6 repository work is VERIFIED.** Service-level measurement reports observed counts/rates without inventing a business commitment.
 
 ### M11.7 historical domain RED evidence gap
-**Evidence-history limitation, not a current functional failure.** CI #1193–#1195 failed TypeScript before the intended domain behavior ran; #1196 was GREEN. Do not claim those attempts as genuine RED. Persisted support-access and lifetime enforcement have genuine database RED→GREEN evidence (#1197, #1204 → #1202/#1205/#1206). Continue new M11.7 behavior with strict genuine RED→GREEN.
+**Evidence-history limitation, not a functional failure.** CI #1193–#1195 failed TypeScript before intended domain behavior; #1196 was GREEN. Do not claim those attempts as genuine RED. Subsequent persistence, lifetime, grant, revoke and access-review work has genuine database RED→GREEN evidence, with invalid/superseded checkpoints explicitly recorded.
 
 ### External CI maintenance notices
-**Informational.** Do not weaken required quality gates.
+**Informational.** Existing Node/action deprecation and upstream Supabase CLI notices do not justify weakening required quality gates.
+
+## M11.8 conditional SSO/SAML decision
+**Resolved DEFERRED, not blocked.** The authoritative M11 source says SSO/SAML is a potential conditional enterprise item “if required.” No durable repository/customer requirement currently requires it, so speculative implementation would violate YAGNI and the milestone plan. Reopen only when durable product/market evidence requires it.
 
 ## Review and merge
-PR #13 remains OPEN/DRAFT. M11.1–M11.6 are VERIFIED. M11.7 is ACTIVE: least-privilege domain/persistence/lifetime safeguards are verified through exact-head CI #1206 at `32d54c5f5b4067b3fb2de5d9c717997d01f404b5`; audited grant/revoke lifecycle and access-review projection remain. 0 known Critical findings and 0 known Important findings at that verified head. M11.8 remains a conditional decision gate. Milestone auto-merge is authorized only after all actual completion, safety, independent review, docs, concurrency and exact-final-head CI gates are satisfied.
+M11.1–M11.7 are VERIFIED; M11.8 is resolved DEFERRED. Verified M11.7 implementation head `7d0ec19b81a3ba897e0df03ffe3b01ebbff6c13e` passed full exact-head CI #1223 with 0 known Critical/Important findings, 0 submitted PR reviews and 0 unresolved inline review threads at recovery. PR #13 remains subject to the live final-head CI, concurrency, review/thread, mergeability and safety gates before authorized merge.
