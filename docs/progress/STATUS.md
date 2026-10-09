@@ -8,10 +8,12 @@ M00–M10 COMPLETE and integrated. M10 merge/main `54444d49761b7eb089c1c6a30a27f
 ## Current Milestone
 M11 Enterprise Readiness — **CLOSEOUT**.
 Active branch: `feat/enterprise-readiness`.
-Active PR: #13 OPEN / DRAFT at implementation head `7d0ec19b81a3ba897e0df03ffe3b01ebbff6c13e` before this documentation reconciliation.
+Active PR: #13 OPEN / DRAFT.
 Main/base: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`.
 
-All required M11 product capabilities are implemented or explicitly resolved. The remaining gates are durable-doc reconciliation, fresh exact-final-head CI, final review/concurrency checks, PR ready transition, and authorized merge.
+All required M11 product capabilities are implemented or explicitly resolved. The remaining gates are fresh exact-final-head CI, final review/concurrency checks, PR ready transition, and authorized merge.
+
+CI status: closeout documentation head `1886082e2a0266c55cb3d06c74ec71f8d48c679e` / CI #1224 is INVALID FOR COMPLETION because the autonomous framework verifier rejected missing required recovery markers/headings after lint, typecheck and all 786 unit/component tests passed. This is a documentation-contract failure, not a product/test regression. A corrected closeout head must pass the complete exact-head gate before merge.
 
 ## M11 Task State
 - M11.1 immutable audit — VERIFIED, CI #1093.
@@ -49,5 +51,5 @@ At implementation head `7d0ec19b...`: 0 known Critical findings, 0 known Importa
 ## Known Issues
 See `docs/progress/KNOWN-ISSUES.md`. Real external Gemini smoke and deployment/provider retention settings remain operator concerns, not repository CI evidence. Historical invalid RED checkpoints are preserved above rather than relabeled.
 
-## Exact Next Work
-Verify the documentation-reconciliation head with the complete CI gate, recheck PR head/reviews/threads/mergeability/concurrency, update the stale PR description, mark PR #13 ready, and squash-merge only when every authorized merge gate is green. Then verify post-merge `main` CI before activating M12.
+## Recovery
+Exact next work: verify the corrected documentation-reconciliation head with the complete CI gate, recheck PR head/reviews/threads/mergeability/concurrency, update the stale PR description, mark PR #13 ready, and squash-merge only when every authorized merge gate is green. Then verify post-merge `main` CI before activating M12.

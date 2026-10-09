@@ -84,10 +84,18 @@ M11.7 support access is operational only. The only permitted scope is `read_inci
 ## M11.8 Decision Evidence
 The authoritative source file `docs/requirements/source/AI-Interviewer-Codex-Pack/docs/milestones/M11-enterprise-readiness.md` lists the required M11 enterprise capabilities and separately describes SSO/SAML as a potential conditional item “if required.” Repository search/recovery found no durable current customer/product requirement making it required. The implementation plan directs workers to record DEFERRED when no such evidence exists. Decision: **DEFERRED / gate resolved**; do not implement speculatively.
 
-## Integration / Review Evidence
-M11.1–M11.6 integration evidence is preserved by their exact-head CI runs. M11.7 includes domain tests plus `support_access_grants_test.sql`, `support_access_lifecycle_test.sql`, `support_access_revocation_test.sql`, and `support_access_review_test.sql`. Implementation head #1223 passed the complete repository gate.
+## Integration Test Evidence
+M11.1–M11.6 integration evidence is preserved by their exact-head CI runs. M11.7 includes domain tests plus `support_access_grants_test.sql`, `support_access_lifecycle_test.sql`, `support_access_revocation_test.sql`, and `support_access_review_test.sql`. Implementation head `7d0ec19b81a3ba897e0df03ffe3b01ebbff6c13e` / CI #1223 passed lint, typecheck, 786 unit/component tests, framework/source verification, real local Supabase database boundaries, build, Chromium E2E and PRD coverage. Closeout documentation head `1886082e2a0266c55cb3d06c74ec71f8d48c679e` / CI #1224 is not completion evidence: it failed the autonomous documentation verifier because required literal markers/headings were missing after source/unit gates passed. This corrected documentation commit must receive a fresh full exact-head GREEN run.
 
-At implementation head `7d0ec19b...`: 0 known Critical findings, 0 known Important findings, 0 submitted PR reviews and 0 unresolved inline review threads. Security/privacy/YAGNI review found no remaining blocking issue. Existing external provider/deployment concerns remain documented and are not repository milestone blockers.
+## Security Review
+At verified implementation head `7d0ec19b...`, support grant/revoke/review controls preserve same-tenant owner/admin authorization, client-table lock-down, fixed least-privilege scope, bounded lifetime/page size, immutable lifecycle auditability and no candidate scoring/hiring authority. Cross-tenant/reviewer denial is covered by database tests. No known Critical or Important security/privacy finding remains. Provider-side deletion/ZDR and real external Gemini smoke remain documented operator concerns, not falsely claimed repository guarantees.
+
+## Code Review Findings
+Unresolved Critical: 0 known.
+Unresolved Important: 0 known.
+Submitted PR reviews: 0 at the latest verified recovery.
+Unresolved PR review threads: 0 at the latest verified recovery.
+Closeout documentation verifier finding from CI #1224: required literal recovery markers/headings were omitted. Root cause is documentation-contract drift in the reconciliation rewrite; this commit restores the required markers/headings without changing product behavior. Final review state must be rechecked live immediately before merge.
 
 ## Fresh Verification Results
 - M11.5 closeout: full exact-head CI #1169 GREEN.
@@ -96,12 +104,13 @@ At implementation head `7d0ec19b...`: 0 known Critical findings, 0 known Importa
 - M11.7 grant: genuine RED #1214 → full GREEN #1215.
 - M11.7 revoke: genuine RED #1217 → full GREEN #1218.
 - M11.7 access review: #1220 INVALID NOT RED; #1221 no RED evidence; genuine RED #1222 → full implementation GREEN #1223 at `7d0ec19b81a3ba897e0df03ffe3b01ebbff6c13e`.
+- M11 closeout docs: `1886082e...` / #1224 NOT GREEN due autonomous documentation verifier; corrected final-head CI pending.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → live Git/PR/exact-head CI → source/tests → `docs/progress/STATUS.md` → `docs/milestones/CURRENT.md` → this ledger → traceability/feature matrix → design/plan → older handoffs/chat.
 
 ## Exact Next Work
-No new M11 product feature is authorized. Verify the documentation-reconciliation head with full exact-head CI, recheck reviews/threads/concurrency/mergeability, update PR #13 description, mark ready if required, and execute the authorized squash merge only when every live gate passes. Verify post-merge `main` CI before activating M12.
+No new M11 product feature is authorized. Verify the corrected documentation-reconciliation head with full exact-head CI, recheck reviews/threads/concurrency/mergeability, update PR #13 description, mark ready if required, and execute the authorized squash merge only when every live gate passes. Verify post-merge `main` CI before activating M12.
 
 ## Completion Checklist
 - [x] All required M11 iterations implemented or explicitly resolved.
@@ -110,7 +119,7 @@ No new M11 product feature is authorized. Verify the documentation-reconciliatio
 - [x] Security/privacy/performance/YAGNI/AI-safety review complete where relevant; no known blocking issue.
 - [x] 0 known Critical / 0 known Important findings at verified implementation head.
 - [x] Traceability/feature matrix reconciled in the closeout commit.
-- [ ] Exact-final-head full CI GREEN — evaluate live on the current closeout head immediately before merge.
+- [ ] Exact-final-head full CI GREEN — evaluate live on the corrected closeout head immediately before merge.
 - [ ] PR #13 stable/ready/mergeable with all live merge gates satisfied.
 
 ## Next Milestone
