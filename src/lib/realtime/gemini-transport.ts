@@ -236,7 +236,6 @@ export function createGeminiRealtimeTransportAdapter(
               },
               inputAudioTranscription: {},
               outputAudioTranscription: {},
-              sessionResumption: {},
             },
           }),
         );

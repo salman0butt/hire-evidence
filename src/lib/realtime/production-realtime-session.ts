@@ -15,9 +15,12 @@ type Rpc = (
   args: Readonly<Record<string, unknown>>,
 ) => Promise<RpcResult>;
 
+type OperationalSignalRecorder = (input: unknown) => Promise<void>;
+
 type ProductionRealtimeSessionOptions = Readonly<{
   apiKey: string | undefined;
   rpc: Rpc;
+  recordOperationalSignal?: OperationalSignalRecorder;
   fetchImpl?: typeof fetch;
   now?: () => Date;
 }>;
@@ -47,12 +50,17 @@ export function createProductionRealtimeSessionHandler(
     options.now ? { now: options.now } : {},
   );
 
-  return createRealtimeSessionHandler((rawToken) =>
-    authorizeRealtimeSession(rawToken, {
-      resolveCandidateSession: repository.resolveCandidateSession,
-      getOrCreateAttempt: repository.getOrCreateAttempt,
-      listFinalizedTurns: transcriptRepository.listFinalizedTurns,
-      issueProviderCredential,
-    }),
+  return createRealtimeSessionHandler(
+    (rawToken) =>
+      authorizeRealtimeSession(rawToken, {
+        resolveCandidateSession: repository.resolveCandidateSession,
+        getOrCreateAttempt: repository.getOrCreateAttempt,
+        consumeCredentialMint: repository.consumeCredentialMint,
+        listFinalizedTurns: transcriptRepository.listFinalizedTurns,
+        issueProviderCredential,
+      }),
+    options.recordOperationalSignal
+      ? { recordOperationalSignal: options.recordOperationalSignal }
+      : {},
   );
 }

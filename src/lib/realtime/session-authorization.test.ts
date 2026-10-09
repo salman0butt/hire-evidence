@@ -139,6 +139,31 @@ describe("authorizeRealtimeSession", () => {
     expect(issueProviderCredential).not.toHaveBeenCalled();
   });
 
+  it("rate limits repeated credential minting before provider access", async () => {
+    const issueProviderCredential = vi.fn().mockResolvedValue({
+      credential: "short-lived-provider-token",
+      expiresAt: "2026-09-12T12:30:00.000Z",
+    });
+    const consumeCredentialMint = vi
+      .fn()
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false);
+    const dependencies = deps({
+      issueProviderCredential,
+      consumeCredentialMint,
+    });
+
+    await expect(
+      authorizeRealtimeSession("candidate-token", dependencies),
+    ).resolves.toMatchObject({ status: "authorized" });
+    await expect(
+      authorizeRealtimeSession("candidate-token", dependencies),
+    ).resolves.toEqual({ status: "unavailable" });
+
+    expect(consumeCredentialMint).toHaveBeenCalledTimes(2);
+    expect(issueProviderCredential).toHaveBeenCalledTimes(1);
+  });
+
   it("returns the authoritative checkpoint when resuming the same attempt", async () => {
     const resumeCheckpoint = {
       interviewerVersionId: "version-1",

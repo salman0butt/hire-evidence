@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { parseEnvironment } from "./env";
+import * as environment from "./env";
+
+const { parseEnvironment } = environment;
 
 const validSupabaseInput = {
   NEXT_PUBLIC_SUPABASE_URL: "https://project.supabase.co",
@@ -81,5 +83,40 @@ describe("parseEnvironment", () => {
         }),
       ).toThrow("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY must be non-empty");
     }
+  });
+});
+
+describe("parseSupabaseServerSecret", () => {
+  type Parser = (input: Readonly<{
+    SUPABASE_SECRET_KEY?: string | undefined;
+    SUPABASE_SERVICE_ROLE_KEY?: string | undefined;
+  }>) => string;
+
+  const getParser = () =>
+    (environment as typeof environment & { parseSupabaseServerSecret?: Parser })
+      .parseSupabaseServerSecret;
+
+  it("prefers the modern backend-only secret key and trims it", () => {
+    const parser = getParser();
+    expect(parser).toBeTypeOf("function");
+    expect(parser!({
+      SUPABASE_SECRET_KEY: "  sb_secret_platform  ",
+      SUPABASE_SERVICE_ROLE_KEY: "legacy-service-role",
+    })).toBe("sb_secret_platform");
+  });
+
+  it("accepts the legacy service-role key only as a migration fallback", () => {
+    const parser = getParser();
+    expect(parser).toBeTypeOf("function");
+    expect(parser!({ SUPABASE_SERVICE_ROLE_KEY: " legacy-service-role " }))
+      .toBe("legacy-service-role");
+  });
+
+  it("fails closed when no backend-only Supabase key is configured", () => {
+    const parser = getParser();
+    expect(parser).toBeTypeOf("function");
+    expect(() => parser!({ SUPABASE_SECRET_KEY: "  " })).toThrow(
+      /supabase.*secret.*non-empty/i,
+    );
   });
 });

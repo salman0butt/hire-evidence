@@ -23,6 +23,9 @@ async function loadResolver() {
             candidateInstructions: string;
             candidateSupportEmail: string | null;
             candidateSupportUrl: string | null;
+            logoUrl: string | null;
+            accentColor: string | null;
+            welcomeText: string | null;
           };
         }
       | { status: "unavailable" }
@@ -45,6 +48,9 @@ const validRow = {
   candidate_instructions: "Use a quiet room.",
   candidate_support_email: "candidates@evidence.test",
   candidate_support_url: "https://evidence.test/interview-support",
+  logo_url: "https://cdn.evidence.test/logo.svg",
+  accent_color: "#1A2B3C",
+  welcome_text: "Welcome to your structured interview.",
 };
 
 describe("public invitation resolver", () => {
@@ -67,6 +73,9 @@ describe("public invitation resolver", () => {
         candidateInstructions: "Use a quiet room.",
         candidateSupportEmail: "candidates@evidence.test",
         candidateSupportUrl: "https://evidence.test/interview-support",
+        logoUrl: "https://cdn.evidence.test/logo.svg",
+        accentColor: "#1A2B3C",
+        welcomeText: "Welcome to your structured interview.",
       },
     });
 
@@ -85,6 +94,29 @@ describe("public invitation resolver", () => {
     await expect(resolvePublicInvitation(rawToken)).resolves.toMatchObject({
       status: "available",
       invitation: { candidateSupportUrl: null },
+    });
+  });
+
+
+  it("drops unsafe optional branding without making the invitation unusable", async () => {
+    rpcClient({
+      data: [{
+        ...validRow,
+        logo_url: "javascript:alert(1)",
+        accent_color: "red; background:url(javascript:alert(1))",
+        welcome_text: "<script>alert(1)</script>",
+      }],
+      error: null,
+    });
+    const { resolvePublicInvitation } = await loadResolver();
+
+    await expect(resolvePublicInvitation(rawToken)).resolves.toMatchObject({
+      status: "available",
+      invitation: {
+        logoUrl: null,
+        accentColor: null,
+        welcomeText: "<script>alert(1)</script>",
+      },
     });
   });
 

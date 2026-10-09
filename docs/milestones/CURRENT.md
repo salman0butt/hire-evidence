@@ -1,35 +1,32 @@
 # Current Milestone
 
-Milestone: AI Quality, Guardrails & Evals (M10)
-
-Status: **IMPLEMENTATION COMPLETE — CLOSEOUT CI PENDING**
-
-Branch: `feat/ai-quality-evals`
-PR: #12 — `Build measurable AI quality evaluation layer` — OPEN / DRAFT / mergeable at latest recovery.
-Base: `main` at M09 merge SHA `3c63598354728d2651bf7630f9bea397a50b9a18`.
-Verified implementation head: `49e04b6ff8bd1d086d292dcaff2ad7980e96241b`; CI #1079 / run `35896402059` — GREEN.
-
-Design: `docs/superpowers/specs/2026-09-23-ai-quality-guardrails-evals-design.md`
-Plan: `docs/superpowers/plans/2026-09-23-ai-quality-guardrails-evals.md`
+Milestone: Enterprise Readiness (M11)
+Status: **CLOSEOUT — IMPLEMENTATION COMPLETE / FINAL LIVE GATES PENDING**
+Branch: `feat/enterprise-readiness`; PR #13 OPEN / DRAFT before closeout transition.
+Base/main: `54444d49761b7eb089c1c6a30a27fdfd115cdd9e`; post-M10 CI #1084 GREEN.
+Design: `docs/superpowers/specs/2026-09-24-enterprise-readiness-design.md`
+Plan: `docs/superpowers/plans/2026-09-24-enterprise-readiness.md`
+Ledger: `docs/milestones/M11-enterprise-readiness.md`
 
 ## Iterations
-1. M10.1 Eval harness — VERIFIED.
-2. M10.2 Golden interview dataset — VERIFIED.
-3. M10.3 Golden assessment dataset + human calibration — VERIFIED.
-4. M10.4 Interviewer behavior evals — VERIFIED.
-5. M10.5 Assessment grounding/schema/consistency evals — VERIFIED.
-6. M10.6 Adversarial prompt-injection evals — VERIFIED.
-7. M10.7 Fairness paired evals — VERIFIED.
-8. M10.8 Prompt/guardrail version regression comparisons — VERIFIED.
-9. M10.9 AI tracing + cost/quality metadata — VERIFIED.
-10. M10.10 Human override/disagreement analytics — VERIFIED.
-11. M10.11 CI regression gates — VERIFIED.
+1. M11.1 advanced immutable audit trail — VERIFIED, CI #1093.
+2. M11.2 retention configuration — VERIFIED, CI #1099.
+3. M11.3 deletion workflows — VERIFIED through full CI #1118; provider-side deletion/ZDR not claimed.
+4. M11.4 safe organization branding — VERIFIED, CI #1139.
+5. M11.5 security/rate limiting/abuse controls — VERIFIED, CI #1169.
+6. M11.6 observability/incident/SLA — VERIFIED, CI #1191.
+7. M11.7 privileged support/access reviews — **VERIFIED**.
+   - Domain/persistence/lifetime safeguards through #1206.
+   - Audited grant lifecycle: genuine RED `9a113f8501c5e5ed5a3e4220a406e067c42059ed` / #1214 → full GREEN `ef8b84307cd20f353f190d1b22ebb2f52d506423` / #1215.
+   - Audited revocation: genuine RED `51fa2dbaf1e810bb7231f6b85c498d8827dcf2cc` / #1217 → full GREEN `845d8e556c34061912dba3110aa30b25cef05396` / #1218.
+   - Access review: #1220 INVALID NOT RED, #1221 superseded before DB; genuine RED `2cffabf35a5543d979726f07815adc1ea03628c0` / #1222 → full GREEN `7d0ec19b81a3ba897e0df03ffe3b01ebbff6c13e` / #1223.
+8. M11.8 SSO/SAML — **DEFERRED / DECISION RESOLVED**. Source requirements make it conditional “if required”; no durable current evidence requires implementation.
 
-## Review state
-Unresolved Critical: 0. Unresolved Important: 0. Unresolved PR review threads: 0 at latest recovery.
+## Review State
+At verified implementation head `7d0ec19b...`: 0 known Critical findings, 0 known Important findings, 0 submitted PR reviews, 0 unresolved inline review threads. Security/privacy/YAGNI review found no remaining blocking issue. Support controls remain tenant-bound, operational-only and outside candidate scoring/hiring authority.
 
-## Constraints
-Humans remain hiring decision makers. Evals measure AI behavior but do not introduce autonomous hire/reject/ranking or protected-trait, emotion, appearance, accent, personality, confidence, or deception inference. Transcript/model text is untrusted data. Deterministic gates run without provider credentials; unavailable live-model credentials cannot silently count as passing evidence.
+## Live Closeout Gates
+Before merge, recover the exact current branch head and require complete exact-head CI GREEN, no newer overlapping autonomous work, 0 blocking review threads, mergeability, current durable docs/traceability, and no safety/privacy/evidence-integrity regression. Markdown must not be used as a substitute for live GitHub evidence.
 
-## Next action
-Verify CI on the final closeout-documentation head. If GREEN and PR #12 remains mergeable with no new blocking review or concurrent branch movement, mark ready and squash-merge with expected-head protection. Then verify post-merge `main` CI and activate M11 Enterprise Readiness.
+## Recovery
+The next legitimate action is milestone closeout, not new M11 feature work: verify this reconciliation commit, update PR #13 description, mark it ready when gates pass, recheck all merge gates and squash-merge. Verify post-merge `main` CI before activating M12.

@@ -14,6 +14,11 @@ export type EnvironmentInput = Readonly<{
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?: string | undefined;
 }>;
 
+export type SupabaseServerSecretInput = Readonly<{
+  SUPABASE_SECRET_KEY?: string | undefined;
+  SUPABASE_SERVICE_ROLE_KEY?: string | undefined;
+}>;
+
 const DEFAULT_APP_URL = "http://localhost:3000";
 const VALID_NODE_ENVIRONMENTS = new Set<NodeEnvironment>([
   "development",
@@ -56,6 +61,22 @@ function parsePublishableKey(value: string | undefined): string {
 
   if (!key) {
     throw new Error("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY must be non-empty");
+  }
+
+  return key;
+}
+
+export function parseSupabaseServerSecret(
+  input: SupabaseServerSecretInput,
+): string {
+  const key =
+    input.SUPABASE_SECRET_KEY?.trim() ||
+    input.SUPABASE_SERVICE_ROLE_KEY?.trim();
+
+  if (!key) {
+    throw new Error(
+      "SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY must be non-empty",
+    );
   }
 
   return key;

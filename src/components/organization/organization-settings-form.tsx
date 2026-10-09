@@ -19,6 +19,9 @@ type OrganizationSettingsFormProps = Readonly<{
     hiringUseCase: string | null;
     candidateSupportEmail?: string | null;
     candidateSupportUrl?: string | null;
+    logoUrl?: string | null;
+    accentColor?: string | null;
+    welcomeText?: string | null;
   }>;
   action?: OrganizationAction;
   canUpdate?: boolean;
@@ -165,6 +168,69 @@ export function OrganizationSettingsForm({
             Optional. Use an http or https page controlled by your organization for candidate support.
           </p>
         </div>
+
+        <fieldset className="space-y-5 border-t border-zinc-200 pt-5">
+          <legend className="text-sm font-semibold text-zinc-900">Candidate branding</legend>
+
+          <div className="space-y-2">
+            <label htmlFor="settings-logo-url" className="block text-sm font-medium text-zinc-800">
+              Organization logo URL
+            </label>
+            <input
+              id="settings-logo-url"
+              name="logo_url"
+              type="url"
+              maxLength={2048}
+              defaultValue={organization.logoUrl ?? ""}
+              disabled={!canUpdate || pending}
+              aria-describedby="settings-logo-url-help"
+              className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 disabled:bg-zinc-100 disabled:text-zinc-600"
+            />
+            <p id="settings-logo-url-help" className="text-xs leading-5 text-zinc-500">
+              Optional. Use an https URL for the organization logo shown to candidates.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="settings-accent-color" className="block text-sm font-medium text-zinc-800">
+              Accent color
+            </label>
+            <input
+              id="settings-accent-color"
+              name="accent_color"
+              type="text"
+              maxLength={7}
+              pattern="#[0-9A-Fa-f]{6}"
+              placeholder="#1A2B3C"
+              defaultValue={organization.accentColor ?? ""}
+              disabled={!canUpdate || pending}
+              aria-describedby="settings-accent-color-help"
+              className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 disabled:bg-zinc-100 disabled:text-zinc-600"
+            />
+            <p id="settings-accent-color-help" className="text-xs leading-5 text-zinc-500">
+              Optional. Enter one six-digit hex color such as #1A2B3C. Custom CSS is not supported.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="settings-welcome-text" className="block text-sm font-medium text-zinc-800">
+              Candidate welcome text
+            </label>
+            <textarea
+              id="settings-welcome-text"
+              name="welcome_text"
+              maxLength={500}
+              rows={4}
+              defaultValue={organization.welcomeText ?? ""}
+              disabled={!canUpdate || pending}
+              aria-describedby="settings-welcome-text-help"
+              className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 disabled:bg-zinc-100 disabled:text-zinc-600"
+            />
+            <p id="settings-welcome-text-help" className="text-xs leading-5 text-zinc-500">
+              Optional. Plain text only, up to 500 characters.
+            </p>
+          </div>
+        </fieldset>
 
         {state.message ? (
           <p

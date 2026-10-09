@@ -2,6 +2,9 @@ type OrganizationInput = Readonly<{
   name: unknown;
   companySize: unknown;
   hiringUseCase: unknown;
+  logoUrl?: unknown;
+  accentColor?: unknown;
+  welcomeText?: unknown;
 }>;
 
 type OrganizationValidationSuccess = Readonly<{
@@ -10,6 +13,9 @@ type OrganizationValidationSuccess = Readonly<{
     name: string;
     companySize: string | null;
     hiringUseCase: string | null;
+    logoUrl?: string | null;
+    accentColor?: string | null;
+    welcomeText?: string | null;
   }>;
 }>;
 
@@ -50,6 +56,44 @@ function normalizeOptionalText(
   return { ok: true, value: normalized };
 }
 
+function normalizeLogoUrl(
+  value: unknown,
+): { ok: true; value: string | null } | OrganizationValidationFailure {
+  const normalized = normalizeOptionalText(value, "Organization logo URL", 2048);
+  if (!normalized.ok || normalized.value === null) {
+    return normalized;
+  }
+
+  try {
+    const url = new URL(normalized.value);
+    if (url.protocol !== "https:") {
+      return { ok: false, message: "Organization logo URL must use https." };
+    }
+  } catch {
+    return { ok: false, message: "Organization logo URL must use https." };
+  }
+
+  return normalized;
+}
+
+function normalizeAccentColor(
+  value: unknown,
+): { ok: true; value: string | null } | OrganizationValidationFailure {
+  const normalized = normalizeOptionalText(value, "Organization accent color", 7);
+  if (!normalized.ok || normalized.value === null) {
+    return normalized;
+  }
+
+  if (!/^#[0-9a-fA-F]{6}$/.test(normalized.value)) {
+    return {
+      ok: false,
+      message: "Organization accent color must be a #RRGGBB hex color.",
+    };
+  }
+
+  return normalized;
+}
+
 export function validateOrganizationInput(
   input: OrganizationInput,
 ): OrganizationValidationResult {
@@ -87,12 +131,39 @@ export function validateOrganizationInput(
     return hiringUseCase;
   }
 
-  return {
-    ok: true,
-    value: {
-      name,
-      companySize: companySize.value,
-      hiringUseCase: hiringUseCase.value,
-    },
+  const value: OrganizationValidationSuccess["value"] = {
+    name,
+    companySize: companySize.value,
+    hiringUseCase: hiringUseCase.value,
   };
+
+  if ("logoUrl" in input) {
+    const logoUrl = normalizeLogoUrl(input.logoUrl);
+    if (!logoUrl.ok) {
+      return logoUrl;
+    }
+    Object.assign(value, { logoUrl: logoUrl.value });
+  }
+
+  if ("accentColor" in input) {
+    const accentColor = normalizeAccentColor(input.accentColor);
+    if (!accentColor.ok) {
+      return accentColor;
+    }
+    Object.assign(value, { accentColor: accentColor.value });
+  }
+
+  if ("welcomeText" in input) {
+    const welcomeText = normalizeOptionalText(
+      input.welcomeText,
+      "Organization welcome text",
+      500,
+    );
+    if (!welcomeText.ok) {
+      return welcomeText;
+    }
+    Object.assign(value, { welcomeText: welcomeText.value });
+  }
+
+  return { ok: true, value };
 }

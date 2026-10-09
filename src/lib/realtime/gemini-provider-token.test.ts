@@ -48,7 +48,6 @@ describe("Gemini Live ephemeral credential adapter", () => {
       liveConnectConstraints: {
         model: "models/gemini-3.1-flash-live-preview",
         config: {
-          sessionResumption: {},
           responseModalities: ["AUDIO"],
         },
       },

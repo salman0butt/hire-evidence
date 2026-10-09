@@ -53,7 +53,6 @@ export function createGeminiProviderTokenAdapter(
         liveConnectConstraints: {
           model: constrainedModel,
           config: {
-            sessionResumption: {},
             responseModalities: ["AUDIO"],
           },
         },

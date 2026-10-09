@@ -69,7 +69,6 @@ describe("Gemini Live realtime transport adapter", () => {
         },
         inputAudioTranscription: {},
         outputAudioTranscription: {},
-        sessionResumption: {},
       },
     });
     expect(events).toEqual([]);

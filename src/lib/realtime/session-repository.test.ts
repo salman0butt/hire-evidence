@@ -207,4 +207,51 @@ describe("realtime session repository", () => {
       ).resolves.toEqual({ status: "conflict" });
     }
   });
+  it("consumes the credential mint allowance through the hashed capability and authoritative attempt", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: true, error: null });
+    const repository = createRealtimeSessionRepository(rpc);
+
+    await expect(
+      repository.consumeCredentialMint!({
+        rawToken: "capability-secret",
+        attemptId: "attempt-1",
+      }),
+    ).resolves.toBe(true);
+
+    expect(rpc).toHaveBeenCalledWith("consume_realtime_credential_mint", {
+      p_token_hash: hashInvitationToken("capability-secret"),
+      p_attempt_id: "attempt-1",
+    });
+  });
+
+  it("fails credential mint consumption closed on invalid input, RPC denial, or RPC failure", async () => {
+    const rpc = vi.fn();
+    const repository = createRealtimeSessionRepository(rpc);
+
+    await expect(
+      repository.consumeCredentialMint!({ rawToken: "", attemptId: "attempt-1" }),
+    ).resolves.toBe(false);
+    await expect(
+      repository.consumeCredentialMint!({ rawToken: "token", attemptId: "" }),
+    ).resolves.toBe(false);
+    expect(rpc).not.toHaveBeenCalled();
+
+    for (const response of [
+      { data: false, error: null },
+      { data: null, error: null },
+      { data: true, error: { message: "database failure" } },
+    ]) {
+      const failingRepository = createRealtimeSessionRepository(
+        vi.fn().mockResolvedValue(response),
+      );
+
+      await expect(
+        failingRepository.consumeCredentialMint!({
+          rawToken: "token",
+          attemptId: "attempt-1",
+        }),
+      ).resolves.toBe(false);
+    }
+  });
+
 });

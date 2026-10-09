@@ -46,6 +46,10 @@ export type RealtimeSessionAuthorizationDeps = Readonly<{
     rawToken: string;
     attemptId: string;
   }) => Promise<ListFinalizedTurnsResult>) | undefined;
+  consumeCredentialMint?: ((input: {
+    rawToken: string;
+    attemptId: string;
+  }) => Promise<boolean>) | undefined;
   issueProviderCredential: (input: {
     attemptId: string;
     interviewerVersionId: string;
@@ -104,6 +108,16 @@ export async function authorizeRealtimeSession(
   });
 
   if (attempt.status !== "ready") return unavailable;
+
+  if (
+    deps.consumeCredentialMint &&
+    !(await deps.consumeCredentialMint({
+      rawToken,
+      attemptId: attempt.attemptId,
+    }))
+  ) {
+    return unavailable;
+  }
 
   let transcriptTurns: readonly DurableTranscriptTurn[] | undefined;
   if (candidateSession.lifecycle === "started") {
