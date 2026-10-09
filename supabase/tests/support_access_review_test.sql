@@ -81,6 +81,8 @@ create temporary table support_review_projection (
   status text
 ) on commit drop;
 
+grant select, insert, truncate on table support_review_projection to authenticated;
+
 set local role authenticated;
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000813',true);
