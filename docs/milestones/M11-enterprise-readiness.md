@@ -35,11 +35,13 @@ Autonomous hire/reject/ranking, technical-failure scoring, secret or unnecessary
 6. **VERIFIED** — M11.6 platform observability / incident / SLA tooling, full closeout CI #1191.
 7. **ACTIVE** — M11.7 privileged support / access reviews.
    - Domain and persisted least-privilege/lifetime safeguards are verified through #1206.
-   - Audited owner/admin grant lifecycle, revocation, and access-review projection remain.
+   - Audited owner/admin grant lifecycle was verified before the revocation unit.
+   - Audited owner/admin revocation is VERIFIED by genuine RED #1217 at `51fa2dbaf1e810bb7231f6b85c498d8827dcf2cc` → full exact-head GREEN #1218 at `845d8e556c34061912dba3110aa30b25cef05396`.
+   - Safe access-review projection with owner/admin same-tenant authorization and cross-tenant denial remains.
 8. **DECISION GATE** — M11.8 SSO/SAML only if durable evidence requires it.
 
 ## Current Design Boundary
-M11.7 support access is operational only. The only permitted scope is `read_incident_health`; grants require attributable organization/actor/reason identity and a positive lifetime no longer than one hour. Direct anon/authenticated table access remains revoked. New lifecycle RPCs must use server-authoritative timestamps, same-tenant owner/admin authorization, immutable audit evidence, and fail-closed cross-tenant behavior. Support controls must never expose or mutate candidate evidence, scores, rankings, recommendations, or hiring decisions.
+M11.7 support access is operational only. The only permitted scope is `read_incident_health`; grants require attributable organization/actor/reason identity and a positive lifetime no longer than one hour. Direct anon/authenticated table access remains revoked. Lifecycle RPCs use server-authoritative timestamps, same-tenant owner/admin authorization, immutable audit evidence, and fail-closed cross-tenant behavior. Support controls must never expose or mutate candidate evidence, scores, rankings, recommendations, or hiring decisions.
 
 ## TDD Evidence
 ### M11.5 abuse-control closeout
@@ -67,11 +69,16 @@ M11.7 support access is operational only. The only permitted scope is `read_inci
 - `48287ffe823ae7aaf5847967afe0ecac7bbfc613` / CI #1205 full exact-head GREEN after adding the positive <=1-hour database constraint.
 - Skeptical review found an Important missing positive boundary test. `32d54c5f5b4067b3fb2de5d9c717997d01f404b5` / CI #1206 full exact-head GREEN proved exactly one hour remains allowed and resolved the finding.
 
+### M11.7 audited revocation
+- `51fa2dbaf1e810bb7231f6b85c498d8827dcf2cc` / CI #1217 genuine database RED: lint, typecheck, 786 unit/component tests, framework/source verifiers and all earlier database tests passed; 10/13 revocation assertions then failed specifically because `revoke_support_access(uuid,uuid)` was absent.
+- `845d8e556c34061912dba3110aa30b25cef05396` / CI #1218 full exact-head GREEN: owner/admin same-tenant revocation, reviewer denial, cross-tenant fail-closed behavior, server-authoritative `revoked_at`, idempotent transition, direct-client mutation denial and one immutable `support_access.revoked` audit event per actual transition all passed database/build/E2E/PRD coverage.
+- Review: 0 known Critical and 0 known Important findings. Missing/cross-tenant/already-revoked grant IDs collapse to the same non-transition result, avoiding a cross-tenant existence oracle; free-form grant reason is not copied into immutable revocation audit metadata.
+
 ## Integration Test Evidence
-M11.1–M11.6 integration evidence is preserved by their exact-head CI runs. M11.7 is covered by `src/lib/support/support-access.test.ts` and `supabase/tests/support_access_grants_test.sql`. The latter verifies fixed least-privilege scope, nonblank reason, exact-one-hour allowance, non-positive lifetime rejection, and >1-hour rejection against real local Supabase. Exact-head #1206 also passed build, Chromium E2E, framework/source verification and PRD coverage.
+M11.1–M11.6 integration evidence is preserved by their exact-head CI runs. M11.7 now includes `src/lib/support/support-access.test.ts`, `supabase/tests/support_access_grants_test.sql`, `support_access_lifecycle_test.sql`, and `support_access_revocation_test.sql`. Exact-head #1218 passed lint, typecheck, unit/component tests, framework/source verification, real local Supabase database boundaries, build, Chromium E2E and PRD coverage.
 
 ## Security Review
-At `32d54c5f5b4067b3fb2de5d9c717997d01f404b5`, 0 known Critical and 0 known Important findings remain after adding the exact-one-hour boundary regression. Current support persistence has no anon/authenticated direct table privileges, only `read_incident_health` scope, attributable nonblank reason, and database-enforced positive <=1-hour lifetime. Lifecycle RPC authorization/audit and access-review projection remain required before M11.7 completion.
+At revocation GREEN `845d8e556c34061912dba3110aa30b25cef05396`, 0 known Critical and 0 known Important findings remain. Support persistence has no anon/authenticated direct table privileges; grant/revoke lifecycle is owner/admin-authorized and tenant-bound; revocation is atomic/idempotent and auditable without duplicating free-form reason. The access-review projection remains required before M11.7 completion.
 
 ## Code Review Findings
 Unresolved Critical: 0 known.
@@ -84,12 +91,13 @@ PR #13 had 0 submitted reviews at the latest verified recovery. Independent mile
 - M11.6 closeout: full exact-head CI #1191 at `84c311e1a2a85ff291251f0ccdb8cb0d05f49bb8` GREEN.
 - M11.7 persisted support foundation: genuine database RED #1197; baseline full exact-head GREEN #1202 at `8732fe7041515ec25170bedd9848880380ebe086`.
 - M11.7 lifetime: #1203 INVALID NOT RED; #1204 genuine RED; full GREEN #1205; review-fix full exact-head GREEN #1206 at `32d54c5f5b4067b3fb2de5d9c717997d01f404b5`.
+- M11.7 revocation: genuine RED #1217 at `51fa2dba...`; full exact-head GREEN #1218 at `845d8e55...`.
 
 ## Durable Recovery Sources
 `AGENTS.md` → `docs/AUTONOMOUS-DEVELOPMENT.md` → live Git/PR/exact-head CI → source/tests → `docs/progress/STATUS.md` → `docs/milestones/CURRENT.md` → this ledger → traceability/feature matrix → design/plan → older handoffs/chat.
 
 ## Exact Next Work
-Add the smallest audited support-grant lifecycle boundary. Use a genuine database RED for a same-tenant owner/admin-only RPC with server-authoritative grant time, fixed `read_incident_health` scope, explicit reason/bounded expiry, immutable `support_access.granted` audit evidence, and cross-tenant/reviewer denial. Then add audited revocation and the safe access-review projection as separate RED→GREEN units.
+Add the safe support access-review projection as a separate genuine database RED→GREEN unit. It must permit only same-tenant owners/admins to review bounded grant lifecycle/status data, deny reviewers and cross-tenant callers, preserve direct-table lock-down, and expose no candidate evidence, scores, rankings, recommendations or hiring-decision authority. Then resolve the M11.8 SSO/SAML evidence gate and perform milestone closeout.
 
 ## Completion Checklist
 - [ ] All required M11 iterations complete/resolved.
